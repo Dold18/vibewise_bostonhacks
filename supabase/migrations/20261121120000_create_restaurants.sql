@@ -68,3 +68,6 @@ create index restaurants_price_idx    on restaurants (price_band);
 alter table restaurants enable row level security;
 create policy "restaurants are readable by everyone" on restaurants
   for select to anon, authenticated using (true);
+
+-- Explicit table privilege so reads work even if default privileges are changed (idempotent).
+grant select on restaurants to anon, authenticated;
