@@ -14,7 +14,9 @@
   },
   "dependencies": {
     "@duckdb/node-api": "^2.0.1-r.1",
-    "@supabase/supabase-js": "^2.119.2"
+    "@supabase/supabase-js": "^2.119.2",
+    "node-html-parser": "9.0.7",
+    "proj4": "2.22.0"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
