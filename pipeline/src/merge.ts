@@ -3,7 +3,7 @@ import {
   MATCH_SIMILAR_NAME_METERS, MATCH_SIMILARITY_THRESHOLD,
 } from './config.ts';
 import { metersBetween } from './geo.ts';
-import { nameKey, nameSimilarity } from './normalize.ts';
+import { nameKey } from './normalize.ts';
 import { fsqRow, osmRow } from './sources.ts';
 import type { DroppedDuplicate, FsqPlace, MatchPair, OsmPlace, RestaurantRow, Source } from './types.ts';
 
@@ -34,13 +34,19 @@ export function dedupeWithin<T extends Located>(
   // Single pass in id order: each item is compared only against already-kept items.
   const sorted = [...items].sort((a, b) => (idOf(a) < idOf(b) ? -1 : idOf(a) > idOf(b) ? 1 : 0));
   const kept: T[] = [];
+  const keptByKey = new Map<string, number[]>(); // nameKey -> indices into kept, ascending
   const replacedBy = new Map<string, string>(); // droppedId -> id of the item that beat it
   for (const item of sorted) {
     const key = nameKey(item.name);
-    const j = key === '' ? -1 : kept.findIndex(
-      (k) => nameKey(k.name) === key && metersBetween(k, item) <= DEDUPE_WITHIN_METERS,
-    );
-    if (j === -1) { kept.push(item); continue; }
+    const bucket = key === '' ? undefined : keptByKey.get(key);
+    const j = bucket?.find((idx) => metersBetween(kept[idx]!, item) <= DEDUPE_WITHIN_METERS) ?? -1;
+    if (j === -1) {
+      if (key !== '') {
+        if (bucket) bucket.push(kept.length); else keptByKey.set(key, [kept.length]);
+      }
+      kept.push(item);
+      continue;
+    }
     const incumbent = kept[j]!;
     const diff = fieldsOf(item) - fieldsOf(incumbent);
     const itemWins = diff !== 0 ? diff > 0 : tieBreak(source, idOf(item), idOf(incumbent)) < 0;
@@ -57,17 +63,49 @@ export function dedupeWithin<T extends Located>(
   return { kept, dropped };
 }
 
+const CELL_DEG = 0.001; // ~111 m of latitude, >= 50 m of longitude below 63 degrees
+
+function tokensOf(key: string): Set<string> {
+  return new Set(key.split(' '));
+}
+
+function jaccard(a: Set<string>, b: Set<string>): number {
+  let inter = 0;
+  for (const t of a) if (b.has(t)) inter++;
+  return inter / (a.size + b.size - inter);
+}
+
 export function matchSources(osm: OsmPlace[], fsq: FsqPlace[]): MatchPair[] {
+  // Index Foursquare places by grid cell so each OSM place only looks at nearby ones; name work is precomputed once.
+  const grid = new Map<string, Array<{ f: FsqPlace; key: string; tokens: Set<string> }>>();
+  const cell = (v: number) => Math.floor(v / CELL_DEG);
+  for (const f of fsq) {
+    const key = nameKey(f.name);
+    if (key === '') continue; // an empty key never matches (same-name needs a non-empty key; similarity is 0)
+    const id = `${cell(f.lat)},${cell(f.lng)}`;
+    const entry = { f, key, tokens: tokensOf(key) };
+    const list = grid.get(id);
+    if (list) list.push(entry); else grid.set(id, [entry]);
+  }
   const candidates: Array<{ osmId: string; fsqId: string; meters: number; similarity: number }> = [];
   for (const o of osm) {
     const ko = nameKey(o.name);
     if (ko === '') continue;
-    for (const f of fsq) {
-      const meters = metersBetween(o, f);
-      const sameName = nameKey(f.name) === ko && meters <= MATCH_SAME_NAME_METERS;
-      const similarity = nameSimilarity(o.name, f.name);
-      if (sameName || (similarity >= MATCH_SIMILARITY_THRESHOLD && meters <= MATCH_SIMILAR_NAME_METERS)) {
-        candidates.push({ osmId: o.osmId, fsqId: f.fsqId, meters, similarity });
+    const to = tokensOf(ko);
+    const cy = cell(o.lat);
+    const cx = cell(o.lng);
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        for (const { f, key, tokens } of grid.get(`${cy + dy},${cx + dx}`) ?? []) {
+          const meters = metersBetween(o, f);
+          if (meters > MATCH_SAME_NAME_METERS) continue;
+          const sameName = key === ko;
+          if (!sameName && meters > MATCH_SIMILAR_NAME_METERS) continue;
+          const similarity = jaccard(to, tokens);
+          if (sameName || similarity >= MATCH_SIMILARITY_THRESHOLD) {
+            candidates.push({ osmId: o.osmId, fsqId: f.fsqId, meters, similarity });
+          }
+        }
       }
     }
   }

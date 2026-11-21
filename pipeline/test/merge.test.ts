@@ -132,3 +132,20 @@ test('mergePlaces: a stale FSQ record still fills gaps on its OSM match', () => 
   assert.equal(rows[0]!.fsq_place_id, 'f1');
   assert.equal(staleFsqDropped, 0);
 });
+
+test('matchSources handles 3,000 x 3,000 points in under 2 s', () => {
+  const n = 3000;
+  const osmPts: OsmPlace[] = [];
+  const fsqPts: FsqPlace[] = [];
+  for (let i = 0; i < n; i++) {
+    const lat = 42.25 + ((i * 7919) % n) / n * 0.15;
+    const lng = -71.15 + ((i * 104729) % n) / n * 0.15;
+    osmPts.push(osm(`node/${i}`, `Place ${i} Grill`, lat, lng));
+    fsqPts.push(fsq(`f${i}`, `Place ${i} Grill`, lat + D30 / 3, lng));
+  }
+  const start = performance.now();
+  const pairs = matchSources(osmPts, fsqPts);
+  const elapsed = performance.now() - start;
+  assert.equal(pairs.length, n);
+  assert.ok(elapsed < 2000, `took ${elapsed} ms`);
+});
