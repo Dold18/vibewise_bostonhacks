@@ -13,7 +13,11 @@ import type {
 
 type Filter = ExpressionSpecification;
 
-export const palette = {
+/**
+ * Every color the map style uses. The vibe theme (src/features/vibeTheme)
+ * blends these toward a user's top vibes; `basePalette` is the plain map.
+ */
+export const basePalette = {
   land: '#f3f3f0',
   urban: '#eceae6',
   water: '#9fcaf5',
@@ -37,7 +41,27 @@ export const palette = {
   textPrimary: '#3c4043',
   textSecondary: '#5f6368',
   halo: '#ffffff',
-} as const;
+  aeroway: '#e4e6ea',
+  runway: '#d4d7dc',
+  building3dMid: '#e2e0e6',
+  building3dHigh: '#d9dbe6',
+  neighbourhoodLabel: '#80868b',
+  sky: '#bcd9f7',
+  horizon: '#e9f2fb',
+  light: '#ffffff',
+};
+export type PaletteKey = keyof typeof basePalette;
+/** Colors as `#rrggbb`. */
+export type Palette = Record<PaletteKey, string>;
+
+/** How long paint changes (e.g. a theme change) animate, in ms. */
+export const THEME_TRANSITION_MS = 800;
+
+/** `#rrggbb` → `rgba(r,g,b,alpha)`. */
+function withAlpha(hex: string, alpha: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
+}
 
 const SOURCE = 'openmaptiles';
 export const BUILDING_3D_LAYER = 'building-3d';
@@ -95,7 +119,7 @@ function road(
   ];
 }
 
-const layers: LayerSpecification[] = [
+const buildLayers = (palette: Palette): LayerSpecification[] => [
   { id: 'background', type: 'background', paint: { 'background-color': palette.land } },
 
   // --- Land use & land cover ---
@@ -191,7 +215,7 @@ const layers: LayerSpecification[] = [
     source: SOURCE,
     'source-layer': 'aeroway',
     filter: ['match', ['geometry-type'], ['Polygon', 'MultiPolygon'], true, false],
-    paint: { 'fill-color': '#e4e6ea' },
+    paint: { 'fill-color': palette.aeroway },
   },
   {
     id: 'aeroway-runway',
@@ -200,7 +224,7 @@ const layers: LayerSpecification[] = [
     'source-layer': 'aeroway',
     filter: ['all', isLine, classIn('runway', 'taxiway')],
     paint: {
-      'line-color': '#d4d7dc',
+      'line-color': palette.runway,
       'line-width': ['interpolate', ['exponential', 1.5], ['zoom'], 11, 2, 17, 50],
     },
   },
@@ -267,14 +291,17 @@ const layers: LayerSpecification[] = [
         0,
         palette.building3d,
         60,
-        '#e2e0e6',
+        palette.building3dMid,
         200,
-        '#d9dbe6',
+        palette.building3dHigh,
       ],
       'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 14, 0, 15, ['coalesce', ['get', 'render_height'], 0]],
       'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
       // Starts at full strength; main.ts fades it with camera pitch (0 when top-down).
       'fill-extrusion-opacity': BUILDING_3D_OPACITY,
+      // Follows the camera pitch frame by frame, so it keeps MapLibre's default
+      // 300ms instead of the slower style-wide theme transition.
+      'fill-extrusion-opacity-transition': { duration: 300, delay: 0 },
       'fill-extrusion-vertical-gradient': true,
     },
   },
@@ -291,7 +318,7 @@ const layers: LayerSpecification[] = [
       'text-size': 13,
       'text-max-width': 8,
     },
-    paint: { 'text-color': palette.waterLabel, 'text-halo-color': 'rgba(255,255,255,0.6)', 'text-halo-width': 1 },
+    paint: { 'text-color': palette.waterLabel, 'text-halo-color': withAlpha(palette.halo, 0.6), 'text-halo-width': 1 },
   },
   {
     id: 'road-label',
@@ -325,7 +352,7 @@ const layers: LayerSpecification[] = [
       'text-letter-spacing': 0.12,
       'text-max-width': 7,
     },
-    paint: { 'text-color': '#80868b', 'text-halo-color': palette.halo, 'text-halo-width': 1.5 },
+    paint: { 'text-color': palette.neighbourhoodLabel, 'text-halo-color': palette.halo, 'text-halo-width': 1.5 },
   },
   {
     id: 'place-city',
@@ -343,23 +370,29 @@ const layers: LayerSpecification[] = [
   },
 ];
 
-export const mapStyle: StyleSpecification = {
-  version: 8,
-  name: 'Vibenta Maps Draft',
-  glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
-  sources: {
-    [SOURCE]: { type: 'vector', url: 'https://tiles.openfreemap.org/planet' },
-  },
-  // Light from the screen's left (azimuth 295°); pin shadows in style.css fall
-  // the opposite way (115°) so the two stay consistent.
-  light: { anchor: 'viewport', color: '#ffffff', intensity: 0.35, position: [1.4, 295, 40] },
-  sky: {
-    'sky-color': '#bcd9f7',
-    'horizon-color': '#e9f2fb',
-    'fog-color': palette.land,
-    'sky-horizon-blend': 0.6,
-    'horizon-fog-blend': 0.7,
-    'fog-ground-blend': 0.85,
-  },
-  layers,
-};
+/** The full map style in the given colors. Only colors depend on the palette. */
+export function buildMapStyle(palette: Palette): StyleSpecification {
+  return {
+    version: 8,
+    name: 'Vibenta Maps Draft',
+    glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
+    sources: {
+      [SOURCE]: { type: 'vector', url: 'https://tiles.openfreemap.org/planet' },
+    },
+    transition: { duration: THEME_TRANSITION_MS, delay: 0 },
+    // Light from the screen's left (azimuth 295°); pin shadows in style.css fall
+    // the opposite way (115°) so the two stay consistent.
+    light: { anchor: 'viewport', color: palette.light, intensity: 0.35, position: [1.4, 295, 40] },
+    sky: {
+      'sky-color': palette.sky,
+      'horizon-color': palette.horizon,
+      'fog-color': palette.land,
+      'sky-horizon-blend': 0.6,
+      'horizon-fog-blend': 0.7,
+      'fog-ground-blend': 0.85,
+    },
+    layers: buildLayers(palette),
+  };
+}
+
+export const mapStyle: StyleSpecification = buildMapStyle(basePalette);
