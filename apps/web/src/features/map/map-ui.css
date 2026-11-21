@@ -1,0 +1,245 @@
+/*
+ * Map overlays: destination popup and starting-point marker.
+ * Tokens (--vb-*) come from .vb-ui in discovery/discovery.css.
+ */
+
+/* ---------- Destination popup (MapLibre Popup with Vibenta content) ---------- */
+
+.vb-place-popup {
+  z-index: 2;
+}
+
+.vb-place-popup .maplibregl-popup-content {
+  padding: 0;
+  border-radius: 16px;
+  border: 1px solid rgba(60, 64, 67, 0.12);
+  box-shadow:
+    0 4px 12px rgba(60, 64, 67, 0.18),
+    0 1px 3px rgba(60, 64, 67, 0.2);
+  background: #fff;
+}
+
+/* The tip points at the pin; colour it to match the surface. */
+.vb-place-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+.vb-place-popup.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+.vb-place-popup.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+  border-top-color: #fff;
+}
+.vb-place-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip,
+.vb-place-popup.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+.vb-place-popup.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+  border-bottom-color: #fff;
+}
+.vb-place-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: #fff;
+}
+.vb-place-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: #fff;
+}
+
+.vb-popup {
+  width: min(304px, calc(100vw - 32px));
+  padding: 14px 14px 12px;
+  font-size: 14px;
+  animation: vb-popup-in 0.16s ease-out;
+}
+
+@keyframes vb-popup-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+.vb-popup-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.vb-popup-badge {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--badge-color, #1a73e8) 16%, #fff);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--badge-color, #1a73e8) 35%, #fff);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.vb-popup-badge:empty::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--badge-color, #1a73e8);
+}
+
+.vb-popup-titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.vb-popup-titles h3 {
+  margin: 1px 0 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.vb-popup-titles p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--vb-muted);
+}
+
+.vb-popup-close {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin: -4px -6px 0 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.vb-popup-close svg {
+  fill: var(--vb-muted);
+}
+
+.vb-popup-close:hover {
+  background: var(--vb-hover);
+}
+
+.vb-popup-details {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 10px 0 0;
+  border-top: 1px solid var(--vb-border);
+  font-size: 13px;
+}
+
+.vb-popup-details li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+
+.vb-popup-details svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  fill: var(--vb-muted);
+}
+
+.vb-popup-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.vb-popup-navigate,
+.vb-popup-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  border-radius: 18px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.vb-popup-navigate {
+  flex: 1;
+  border: 0;
+  background: var(--vb-accent);
+  color: #fff !important;
+}
+
+.vb-popup-navigate svg {
+  fill: #fff;
+}
+
+.vb-popup-navigate:hover {
+  background: #1765cc;
+}
+
+.vb-popup-save {
+  padding: 0 14px;
+  border: 1px solid var(--vb-border);
+  background: var(--vb-surface);
+  color: var(--vb-accent) !important;
+}
+
+.vb-popup-save svg {
+  fill: var(--vb-accent);
+}
+
+.vb-popup-save:hover {
+  background: #f6fafe;
+}
+
+.vb-popup-save[aria-pressed='true'] {
+  background: var(--vb-accent-soft);
+  border-color: #aecbfa;
+}
+
+.vb-popup-links {
+  display: flex;
+  gap: 14px;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.vb-popup-links a {
+  color: var(--vb-accent);
+  text-decoration: none;
+}
+
+.vb-popup-links a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Starting-point marker ---------- */
+
+/* MapLibre positions these marker elements; only size/visuals here. */
+.vb-origin {
+  width: 18px;
+  height: 18px;
+  z-index: 2;
+}
+
+.vb-origin-dot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #1a73e8;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+/* Accuracy halo: only created for a real browser geolocation fix. */
+.vb-origin-halo {
+  width: var(--halo-size, 0px);
+  height: var(--halo-size, 0px);
+  border-radius: 50%;
+  background: rgba(26, 115, 232, 0.14);
+  border: 1px solid rgba(26, 115, 232, 0.35);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vb-popup {
+    animation: none;
+  }
+}
