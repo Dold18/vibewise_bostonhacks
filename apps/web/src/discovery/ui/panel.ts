@@ -132,7 +132,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     icon(ICONS.chevronDown, 20, 'vb-icon vb-summary-chevron'),
   );
 
-  const heading = h('h2', { class: 'vb-title', id: titleId }, 'Plan your outing');
+  const heading = h('h2', { class: 'vb-title', id: titleId, tabindex: '-1' }, 'Plan your outing');
   const subtitle = h('p', { class: 'vb-subtitle' }, 'First, the basics. Then we’ll find the feeling.');
 
   const planSection = h(
@@ -192,7 +192,9 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
       : 'Your inspiration is saved here. Visual matching and the adaptive quiz are coming next.';
     if (next === 'vibe') {
       closePopups();
-      vibeStep.focus();
+      // Keep the instructional placeholder visible until the user clicks the box.
+      // Focus the step heading for accessible navigation instead of the textarea.
+      heading.focus();
     } else {
       activity.focus();
     }
