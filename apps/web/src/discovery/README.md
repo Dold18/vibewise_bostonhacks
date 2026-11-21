@@ -10,25 +10,50 @@ to the map pins.
 
 ## Mounting
 
+`main.ts` (map-owned) mounts the panel as the primary left-hand interface. Callum's
+slide-out sidebar, its ☰ button and its Location type dropdown were removed.
+
 ```ts
-// src/main.ts: the only change to map-owned code
-import { mountDiscoveryPanel } from './discovery';
-mountDiscoveryPanel(document.body, { placeCard: card });
+mountDiscoveryPanel(document.body, {
+  placeCard: card,
+  mapLayers: {
+    available: CATEGORIES,                    // the map's own place categories
+    onChange: ({ layerIds, detail }) => showCategories(/* those categories */, detail),
+  },
+});
 ```
 
-The panel only reads the map's DOM:
+The panel never touches map state directly. The map keeps doing all the
+loading (tile POIs, Overpass) and drawing. The panel reads the map's DOM in
+two ways:
 
 - It watches `#place-card`'s `hidden` attribute. While a destination card is
-  open, the panel collapses to a one-line summary. The user can still expand
-  it on top of the card. When the card closes, the panel returns to its
-  previous state.
-- It measures `#search-form` and `#chips`, if present, so it sits below them.
+  open, the panel collapses to a one-line summary, and it returns to its
+  previous state when the card closes.
+- It measures `#search-form` to sit just below it.
 
-It does not change map state or styles, and no map CSS is overridden.
+Both hooks are optional. The search bar and cards are temporary and will be
+replaced later, so nothing here depends on them being present.
 
-On phones (≤640px) the panel is a bottom sheet. It starts collapsed to a
-summary bar that sits clear of the map attribution and controls. While a card
-is open, the summary docks under the search bar.
+On phones (≤640px) the panel is a bottom sheet that starts collapsed.
+
+## What the map loads (`mapLayers.ts`)
+
+| Panel selection | Map categories (the map's existing `CATEGORIES`) |
+|---|---|
+| No activity yet | All five, from the loaded map tiles only (no network request) |
+| Food & drinks | Restaurants, Coffee, Bars |
+| Activities, no type chosen | Bars, Parks, Museums |
+| Museums & galleries / Outdoors & parks / Nightlife | Museums / Parks / Bars; several types load the union |
+| Live music, Sightseeing, Sports & recreation, Games & entertainment, Shopping, Student events | No layer yet. The choice is kept, the panel says so, and nothing is substituted. |
+| Open to anything | All five |
+
+- Each change is reported once, about 500 ms after the last one, and only
+  when the set of categories changes. Ticking cuisines, or changing budget,
+  timing, starting point or vibe, never triggers a map request.
+- The map then sends **one** combined Overpass request for all chosen
+  categories (`placesNearAny` in `osm.ts`) and aborts any older request, so a
+  late response can't replace newer pins.
 
 ## Public API
 
@@ -113,14 +138,15 @@ travel time.
 | Timing | No | `opening_hours` isn't parsed yet; that needs a parser such as opening_hours.js. |
 | Vibe text | No | Reserved for the Vibe Engine. |
 
-`rankPlaces` is **not yet wired to the map pins**. Connecting it to
-`showPlaces()` changes how pins render, so the map owner should do that or
-approve it. The panel tells users that preferences don't filter pins yet.
+`rankPlaces` is **not yet wired to the map pins**. Pins are chosen by
+category only, via `mapLayers.ts`. Connecting `rankPlaces` to pin visibility
+and size (`PinLook` in `main.ts`) is the next step and needs the map owner.
+The panel tells users that their other choices don't filter pins yet.
 
 ## Tests
 
 ```sh
-npm test         # vitest run: reducer, Boston time, locations, filtering, layout
+npm test         # vitest run: reducer, Boston time, locations, filtering, layout, map layers, osm.ts
 npm run build    # tsc && vite build
 ```
 

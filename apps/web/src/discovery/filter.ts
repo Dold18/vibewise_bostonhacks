@@ -239,17 +239,16 @@ export function straightLineDistance(a: GeoPoint, b: GeoPoint): number {
 // Panel qualifications
 // ---------------------------------------------------------------------------
 
-/** What the panel should say about preferences that can't (fully) be applied yet. */
+/**
+ * What the panel should say about saved preferences that don't affect the map
+ * yet. Activity is the only preference that changes what the map shows (via
+ * mapLayers.ts); unsupported activity types are explained next to that field.
+ * `rankPlaces` above is the next step and is not wired to the pins yet.
+ */
 export function qualificationsFor(prefs: InitialPreferences): string[] {
   const notes: string[] = [];
-  if (prefs.activity === 'food_drinks' && prefs.cuisines.length > 0) {
-    notes.push("Cuisine comes from OpenStreetMap tags; places with no cuisine listed are kept and marked unknown.");
-  }
-  if (prefs.activity === 'activities' && prefs.activityTypes.includes('student_events')) {
-    notes.push('Student events: no event source is connected yet, so this choice is saved but not applied.');
-  }
   if (prefs.origin) {
-    notes.push('Starting point is used for straight-line distance only, not MBTA travel time.');
+    notes.push("Starting point saved. It doesn't rank places yet; travel times need the transit service.");
   }
   if (prefs.budget && prefs.budget.maxCentsPerPerson !== null) {
     notes.push("Budget saved. Venue prices and transit fares aren't available yet, so nothing is filtered by cost.");

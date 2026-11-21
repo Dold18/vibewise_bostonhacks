@@ -9,6 +9,7 @@
 import { bostonWallTime, toDateInputValue } from '../bostonTime';
 import { qualificationsFor } from '../filter';
 import type { GeolocationEnvironment, LocationSuggestionProvider } from '../locations';
+import { mapLayersFor, type MapLayer } from '../mapLayers';
 import {
   ACTIVITY_OPTIONS,
   ACTIVITY_TYPE_OPTIONS,
@@ -34,6 +35,8 @@ export interface PanelDeps {
   provider: LocationSuggestionProvider;
   geolocation?: GeolocationEnvironment;
   now: () => Date;
+  /** The map's place categories, when the panel drives what the map loads. */
+  mapLayers?: readonly MapLayer[];
 }
 
 export interface Panel {
@@ -43,7 +46,7 @@ export interface Panel {
   destroy(): void;
 }
 
-export function createPanel({ prefs, layout, provider, geolocation, now }: PanelDeps): Panel {
+export function createPanel({ prefs, layout, provider, geolocation, now, mapLayers }: PanelDeps): Panel {
   const dispatch = prefs.dispatch;
   const bodyId = uid('panel-body');
   const titleId = uid('panel-title');
@@ -174,7 +177,13 @@ export function createPanel({ prefs, layout, provider, geolocation, now }: Panel
     h(
       'footer',
       { class: 'vb-footer' },
-      h('p', { class: 'vb-footer-note' }, "Preview: preferences are saved but don't filter map pins yet."),
+      h(
+        'p',
+        { class: 'vb-footer-note' },
+        mapLayers
+          ? "Activity sets which places the map loads. Other choices are saved but don't filter pins yet."
+          : "Preview: preferences are saved but don't filter map pins yet.",
+      ),
       resetBtn,
     ),
   );
@@ -214,6 +223,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now }: Panel
     activityTypes.setVisible(secondary === 'activityTypes');
     cuisines.setSelected(state.cuisines);
     activityTypes.setSelected(state.activityTypes);
+    renderMapHints(state);
     origin.setValue(state.origin);
     budget.setValue(state.budget?.choice ?? null);
     budget.setHint(
@@ -232,6 +242,34 @@ export function createPanel({ prefs, layout, provider, geolocation, now }: Panel
     resetBtn.disabled = JSON.stringify(state) === EMPTY_STATE;
   }
   const EMPTY_STATE = JSON.stringify(initialPreferences());
+
+  /** Say plainly what the map is showing for these preferences, and what it can't show yet. */
+  function renderMapHints(state: InitialPreferences) {
+    if (!mapLayers) return;
+    const sel = mapLayersFor(state, mapLayers);
+    const labels = (ids: readonly string[]) =>
+      mapLayers.filter((l) => ids.includes(l.id)).map((l) => l.label).join(', ');
+    activity.setHint(
+      sel.detail === 'tiles'
+        ? 'Until you choose, the map shows nearby places of every type it supports.'
+        : sel.layerIds.length
+          ? `On the map: ${labels(sel.layerIds)}`
+          : 'Nothing on the map matches these choices yet.',
+    );
+
+    const unsupported = ACTIVITY_TYPE_OPTIONS.filter((o) => sel.unsupportedActivityTypes.includes(o.id)).map((o) => o.label);
+    activityTypes.setHint(
+      unsupported.length === 0
+        ? ''
+        : sel.layerIds.length === 0
+          ? `${unsupported.join(', ')} ${unsupported.length === 1 ? "isn't" : "aren't"} on the map yet, so no places are shown. Your choice is saved.`
+          : `Not on the map yet: ${unsupported.join(', ')}. Your choice is saved.`,
+      'warning',
+    );
+    cuisines.setHint(
+      state.cuisines.length ? "Saved for recommendations. Cuisine doesn't filter map pins yet." : '',
+    );
+  }
 
   const unsubPrefs = prefs.subscribe(render);
   const unsubLayout = layout.subscribe(renderLayout);

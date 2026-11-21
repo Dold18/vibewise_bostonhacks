@@ -21,6 +21,7 @@ export interface MultiSelectField<Id extends string> {
   root: HTMLElement;
   setSelected(ids: readonly Id[]): void;
   setVisible(visible: boolean): void;
+  setHint(text: string, tone?: 'muted' | 'warning'): void;
   close(): void;
   destroy(): void;
 }
@@ -75,6 +76,8 @@ export function createMultiSelectField<Id extends string>(config: MultiSelectFie
     h('span', { class: 'vb-label', id: labelId }, config.label),
     h('div', { class: 'vb-control' }, trigger, popover),
   );
+  const hint = h('p', { class: 'vb-hint', hidden: true, 'aria-live': 'polite' });
+  root.append(hint);
 
   let open = false;
   let selected: readonly Id[] = [];
@@ -142,6 +145,11 @@ export function createMultiSelectField<Id extends string>(config: MultiSelectFie
     setVisible(visible) {
       if (!visible) setOpen(false);
       root.hidden = !visible;
+    },
+    setHint(text, tone = 'muted') {
+      hint.textContent = text;
+      hint.hidden = !text;
+      hint.classList.toggle('is-warning', tone === 'warning');
     },
     close: () => setOpen(false),
     destroy: stopOutside,

@@ -179,6 +179,11 @@ describe('qualifications', () => {
     expect(qualificationsFor(initialPreferences())).toEqual([]);
   });
 
+  it('says the starting point does not rank places yet', () => {
+    const origin = { label: 'Park Street station', location: { lat: 42.35639, lng: -71.0624 }, source: 'local_suggestion' as const };
+    expect(qualificationsFor(prefs({ type: 'setOrigin', origin })).join(' ')).toMatch(/doesn't rank places yet/);
+  });
+
   it('explains every saved-but-unapplied preference', () => {
     const s = prefs(
       { type: 'setActivity', activity: 'activities' },
@@ -188,7 +193,6 @@ describe('qualifications', () => {
       { type: 'setVibeText', text: 'cozy' },
     );
     const text = qualificationsFor(s).join(' ');
-    expect(text).toMatch(/Student events/);
     expect(text).toMatch(/prices and transit fares aren't available/);
     expect(text).toMatch(/Opening hours aren't checked/);
     expect(text).toMatch(/Vibe matching is not active/);

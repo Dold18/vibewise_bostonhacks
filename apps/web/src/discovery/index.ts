@@ -12,6 +12,7 @@
 import './discovery.css';
 import { BOSTON_LOCATIONS } from './data/bostonLocations.generated';
 import { createLocalSuggestionProvider, type GeolocationEnvironment, type LocationSuggestionProvider } from './locations';
+import { createMapLayerNotifier, type MapLayer, type MapLayerSelection } from './mapLayers';
 import { initialPreferences, preferencesReducer, type InitialPreferences } from './preferences';
 import { createStore, initialLayout, layoutReducer } from './store';
 import { createPanel } from './ui/panel';
@@ -19,6 +20,7 @@ import { createPanel } from './ui/panel';
 export type { InitialPreferences } from './preferences';
 export { rankPlaces, evaluatePlace, type RankResult, type RankedPlace } from './filter';
 export type { LocationSuggestionProvider, LocationSuggestion } from './locations';
+export type { MapLayer, MapLayerSelection } from './mapLayers';
 
 export interface DiscoveryPanelOptions {
   /** The map's destination card. While it's visible the panel collapses to a summary. */
@@ -29,6 +31,15 @@ export interface DiscoveryPanelOptions {
   locationProvider?: LocationSuggestionProvider;
   geolocation?: GeolocationEnvironment;
   now?: () => Date;
+  /**
+   * The map's place categories and a callback to load them. Called once on
+   * mount, then (debounced) whenever the set of layers to show changes.
+   */
+  mapLayers?: {
+    available: readonly MapLayer[];
+    onChange(selection: MapLayerSelection): void;
+    debounceMs?: number;
+  };
 }
 
 export interface DiscoveryPanelHandle {
@@ -41,7 +52,7 @@ const MOBILE_QUERY = '(max-width: 640px)';
 const GAP_PX = 12;
 
 const defaultAnchors = () =>
-  ['search-form', 'chips'].map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
+  ['search-form'].map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
 
 export function mountDiscoveryPanel(container: HTMLElement, options: DiscoveryPanelOptions = {}): DiscoveryPanelHandle {
   const now = options.now ?? (() => new Date());
@@ -56,6 +67,7 @@ export function mountDiscoveryPanel(container: HTMLElement, options: DiscoveryPa
     provider: options.locationProvider ?? createLocalSuggestionProvider(BOSTON_LOCATIONS),
     geolocation: options.geolocation,
     now,
+    mapLayers: options.mapLayers?.available,
   });
   container.append(panel.root);
 
@@ -87,6 +99,14 @@ export function mountDiscoveryPanel(container: HTMLElement, options: DiscoveryPa
     mo.observe(card, { attributes: true, attributeFilter: ['hidden'] });
     syncCard();
     cleanups.push(() => mo.disconnect());
+  }
+
+  // Tell the map which categories to load: now, then after changes settle.
+  if (options.mapLayers) {
+    const { available, onChange, debounceMs } = options.mapLayers;
+    const notifier = createMapLayerNotifier(prefs.getState, available, onChange, debounceMs);
+    notifier.start();
+    cleanups.push(prefs.subscribe(notifier.schedule), notifier.dispose);
   }
 
   const handle: DiscoveryPanelHandle = {
