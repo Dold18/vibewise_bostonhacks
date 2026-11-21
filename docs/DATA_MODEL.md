@@ -220,7 +220,7 @@ search_restaurants(
 - **Foursquare OS Places (Apache 2.0):** keep its attribution notice.
 - **Honesty:** unknown hours or price are stored as `null` / `'unknown'` and shown as such. Seeded reviews are flagged `is_seed` and labeled.
 
-## 7a. User accounts (proposed, P-012)
+## 7a. User accounts (proposed, P-014)
 Migration `supabase/migrations/20261121180000_create_accounts.sql`. Users sign in with Supabase Auth (email + password).
 
 | Table | Columns | Access |

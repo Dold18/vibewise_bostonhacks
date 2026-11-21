@@ -1,5 +1,5 @@
 /**
- * User accounts (docs/DECISIONS.md P-012): sign-in in the top right, a private
+ * User accounts (docs/DECISIONS.md P-014): sign-in in the top right, a private
  * vibe history, and a map theme that follows the user's top vibes.
  *
  * The Vibe Engine records readings with `store.recordVibe(signal)`.

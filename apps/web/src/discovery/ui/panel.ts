@@ -3,8 +3,9 @@
  * change through the preferences store, and collapses to a one-line summary
  * (never disappears) while the map's destination card is open.
  *
- * The body is a `data-step="preferences"` section so the Vibe Quiz can later
- * replace it inside the same panel without touching the map.
+ * The user first sets practical constraints, then moves into a dedicated
+ * inspiration screen. Both screens share the existing preferences store;
+ * future Akinator questions can replace/extend the second screen.
  */
 import { bostonWallTime, toDateInputValue } from '../bostonTime';
 import { qualificationsFor } from '../filter';
@@ -18,7 +19,6 @@ import {
   initialPreferences,
   secondaryFieldFor,
   summarizePreferences,
-  VIBE_TEXT_MAX_LENGTH,
   type InitialPreferences,
   type PreferencesAction,
 } from '../preferences';
@@ -28,6 +28,7 @@ import { createLocationField } from './locationField';
 import { createMultiSelectField } from './multiSelectField';
 import { createSelectField } from './selectField';
 import { createTimingField } from './timingField';
+import { createVibeStep } from './vibeStep';
 
 export interface PanelDeps {
   prefs: Store<InitialPreferences, PreferencesAction>;
@@ -97,25 +98,8 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     onCustomChange: (date, time) => dispatch({ type: 'setCustomTiming', date, time, now: now() }),
   });
 
-  const vibeId = uid('vibe');
-  const vibeCountId = uid('vibe-count');
-  const vibe = h('textarea', {
-    id: vibeId,
-    class: 'vb-textarea',
-    rows: 3,
-    maxlength: VIBE_TEXT_MAX_LENGTH,
-    placeholder: 'An intimate cafe on a rainy night, somewhere lively with friends...',
-    'aria-describedby': vibeCountId,
-  });
-  const vibeCount = h('span', { class: 'vb-counter', id: vibeCountId }, `0/${VIBE_TEXT_MAX_LENGTH}`);
-  vibe.addEventListener('input', () => dispatch({ type: 'setVibeText', text: vibe.value }));
-  const vibeField = h(
-    'div',
-    { class: 'vb-field vb-vibe' },
-    h('label', { class: 'vb-label', for: vibeId }, 'Describe your vibe ', h('span', { class: 'vb-optional' }, '(optional)')),
-    vibe,
-    h('div', { class: 'vb-field-foot' }, h('span', { class: 'vb-hint-inline' }, 'Saved for the upcoming vibe matching.'), vibeCount),
-  );
+  const vibeStep = createVibeStep(prefs);
+  let currentStep: 'plan' | 'vibe' = 'plan';
 
   // --- Notes, header, footer ------------------------------------------------
   const notesList = h('ul', { class: 'vb-notes-list' });
@@ -134,6 +118,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   const resetBtn = h('button', { type: 'button', class: 'vb-text-btn' }, 'Clear all');
   resetBtn.addEventListener('click', () => {
     dispatch({ type: 'reset' });
+    showStep('plan');
     activity.focus();
   });
 
@@ -147,6 +132,35 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     icon(ICONS.chevronDown, 20, 'vb-icon vb-summary-chevron'),
   );
 
+  const heading = h('h2', { class: 'vb-title', id: titleId, tabindex: '-1' }, 'Plan your outing');
+  const subtitle = h('p', { class: 'vb-subtitle' }, 'First, the basics. Then we’ll find the feeling.');
+
+  const planSection = h(
+    'section',
+    { class: 'vb-step', 'data-step': 'preferences', 'aria-labelledby': titleId },
+    activity.root,
+    cuisines.root,
+    activityTypes.root,
+    origin.root,
+    budget.root,
+    timing.root,
+    notes,
+  );
+  const vibeSection = h(
+    'section',
+    { class: 'vb-step', 'data-step': 'vibe', 'aria-labelledby': titleId, hidden: true },
+    vibeStep.root,
+  );
+
+  const continueBtn = h('button', { type: 'button', class: 'vb-primary-btn vb-continue-btn' }, 'Continue to your vibe');
+  const backBtn = h('button', { type: 'button', class: 'vb-text-btn vb-back-btn' }, 'Back to details');
+  const doneBtn = h('button', { type: 'button', class: 'vb-primary-btn vb-continue-btn' }, 'Save my vibe');
+
+  const planActions = h('div', { class: 'vb-footer-actions' }, resetBtn, continueBtn);
+  const vibeActions = h('div', { class: 'vb-footer-actions', hidden: true }, backBtn, doneBtn);
+  const footerNote = h('p', { class: 'vb-step-footnote' },
+    'Next: describe the atmosphere you have in mind. All these details stay saved.');
+  const footer = h('footer', { class: 'vb-footer vb-step-footer' }, footerNote, planActions, vibeActions);
   const body = h(
     'div',
     { class: 'vb-body', id: bodyId },
@@ -154,41 +168,47 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
       'header',
       { class: 'vb-header' },
       h('span', { class: 'vb-handle', 'aria-hidden': 'true' }),
-      h(
-        'div',
-        { class: 'vb-header-text' },
-        h('h2', { class: 'vb-title', id: titleId }, 'Plan your outing'),
-        h('p', { class: 'vb-subtitle' }, 'Set the basics. The map stays live while you choose.'),
-      ),
+      h('div', { class: 'vb-header-text' }, heading, subtitle),
       minimizeBtn,
     ),
-    h(
-      'section',
-      { class: 'vb-step', 'data-step': 'preferences', 'aria-labelledby': titleId },
-      activity.root,
-      cuisines.root,
-      activityTypes.root,
-      origin.root,
-      budget.root,
-      timing.root,
-      vibeField,
-      notes,
-    ),
-    h(
-      'footer',
-      { class: 'vb-footer' },
-      h(
-        'p',
-        { class: 'vb-footer-note' },
-        mapLayers
-          ? "Activity sets which places the map loads. Other choices are saved but don't filter pins yet."
-          : "Preview: preferences are saved but don't filter map pins yet.",
-      ),
-      resetBtn,
-    ),
+    planSection,
+    vibeSection,
+    footer,
   );
 
+  function showStep(next: 'plan' | 'vibe') {
+    currentStep = next;
+    planSection.hidden = next !== 'plan';
+    vibeSection.hidden = next !== 'vibe';
+    planActions.hidden = next !== 'plan';
+    vibeActions.hidden = next !== 'vibe';
+    root.dataset.step = next;
+    heading.textContent = next === 'plan' ? 'Plan your outing' : 'Find your vibe';
+    subtitle.textContent = next === 'plan'
+      ? 'First, the basics. Then we’ll find the feeling.'
+      : 'Use words, images, memories or music to show us what you mean.';
+    footerNote.textContent = next === 'plan'
+      ? 'Next: describe the atmosphere you have in mind. All these details stay saved.'
+      : 'Your inspiration is saved here. Visual matching and the adaptive quiz are coming next.';
+    if (next === 'vibe') {
+      closePopups();
+      // Keep the instructional placeholder visible until the user clicks the box.
+      // Focus the step heading for accessible navigation instead of the textarea.
+      heading.focus();
+    } else {
+      activity.focus();
+    }
+  }
+
+  continueBtn.addEventListener('click', () => showStep('vibe'));
+  backBtn.addEventListener('click', () => showStep('plan'));
+  doneBtn.addEventListener('click', () => {
+    layout.dispatch({ type: 'collapse' });
+    summaryBtn.focus();
+  });
+
   const root = h('aside', { class: 'vb-discovery', 'aria-label': 'Plan your outing' }, summaryBtn, body);
+  root.dataset.step = currentStep;
 
   // --- Layout ---------------------------------------------------------------
   const fields = [activity, cuisines, activityTypes, origin, budget, timing];
@@ -230,15 +250,15 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
       state.budget && state.budget.maxCentsPerPerson !== null ? 'Estimated total per person, before transit fare.' : '',
     );
     timing.update(state);
-    if (vibe.value !== state.vibeText) vibe.value = state.vibeText;
-    vibeCount.textContent = `${state.vibeText.length}/${VIBE_TEXT_MAX_LENGTH}`;
+    vibeStep.render(state);
 
     const q = qualificationsFor(state);
     notesList.replaceChildren(...q.map((text) => h('li', {}, text)));
     notes.hidden = q.length === 0;
 
     const parts = summarizePreferences(state);
-    summaryText.textContent = parts.length ? parts.join(' · ') : 'Set activity, start, budget and time';
+    if (state.vibeText.trim() || state.vibeImages.length > 0) parts.push('Vibe saved' + (state.vibeImages.length ? ` · ${state.vibeImages.length} photo${state.vibeImages.length === 1 ? '' : 's'}` : ''));
+    summaryText.textContent = parts.length ? parts.join(' · ') : 'Plan your outing and define the vibe';
     resetBtn.disabled = JSON.stringify(state) === EMPTY_STATE;
   }
   const EMPTY_STATE = JSON.stringify(initialPreferences());
@@ -283,6 +303,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
       unsubPrefs();
       unsubLayout();
       fields.forEach((f) => f.destroy());
+      vibeStep.destroy();
     },
   };
 }

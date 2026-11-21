@@ -23,7 +23,7 @@ const CATALOG_CATEGORY: Record<string, string> = {
 };
 
 const INDEX_COLUMNS = 'place_id, source, source_id, name, category, location';
-const DETAIL_COLUMNS = 'place_id, address, website, phone, cuisines, hours_raw, osm_tags, attribution';
+const DETAIL_COLUMNS = 'place_id, address, website, phone, cuisines, hours_raw, osm_tags, attribution, price_band, price_source';
 const PAGE_SIZE = 1000; // PostgREST max_rows
 const DETAIL_CHUNK = 100; // place ids per request, keeps the URL short
 
@@ -46,6 +46,10 @@ export interface CatalogDetails {
   hours_raw: string | null;
   osm_tags: Record<string, string> | null;
   attribution: string;
+  /** '$'..'$$$$' or 'unknown'; never null. */
+  price_band: string;
+  /** 'menu' (read from a menu) or 'estimate' (LLM guess, labeled "(est.)"); null when unknown. */
+  price_source: string | null;
 }
 
 interface IndexRow {
@@ -103,6 +107,8 @@ export function pinToPlace(pin: CatalogPin, details?: CatalogDetails): Place {
   if (details?.phone) tags.phone = details.phone;
   if (details?.hours_raw) tags.opening_hours = details.hours_raw;
   if (details?.attribution) tags['catalog:attribution'] = details.attribution;
+  if (details?.price_band) tags['catalog:price_band'] = details.price_band;
+  if (details?.price_source) tags['catalog:price_source'] = details.price_source;
   const kind = details?.osm_tags?.amenity ?? pin.category;
   const cuisine = details?.cuisines?.[0];
   return {
@@ -114,6 +120,19 @@ export function pinToPlace(pin: CatalogPin, details?: CatalogDetails): Place {
     category: humanize(cuisine ? `${cuisine} ${kind}` : kind),
     tags,
   };
+}
+
+const PRICE_BANDS = new Set(['$', '$$', '$$$', '$$$$']);
+
+/**
+ * Card text for a price: "$$" from a menu, "$$ (est.)" for an estimate, otherwise
+ * "Price unknown". A band without a known source is not shown as known.
+ */
+export function priceLabel(band: string | undefined, source: string | undefined): string {
+  if (!band || !PRICE_BANDS.has(band)) return 'Price unknown';
+  if (source === 'menu') return band;
+  if (source === 'estimate') return `${band} (est.)`;
+  return 'Price unknown';
 }
 
 /** Per map category: pins within `radiusMeters` of `center`, nearest first, at most `limit` each. */

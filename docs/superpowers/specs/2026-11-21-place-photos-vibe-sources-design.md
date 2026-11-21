@@ -70,7 +70,7 @@ Ranking is my call: explicitly linked photos are near-certain to be correct; web
 
 ## 5. Student uploads
 
-- Signed-in users (existing Supabase Auth, P-012) can add a review to a place: rating 1–5, text, optional vibe tags from the DATA_MODEL §3 vocabulary, and up to 3 photos.
+- Signed-in users (existing Supabase Auth, P-014) can add a review to a place: rating 1–5, text, optional vibe tags from the DATA_MODEL §3 vocabulary, and up to 3 photos.
 - Photos go to a public-read Supabase Storage bucket `place-photos`, under `<user_id>/<uuid>.<ext>`. JPEG, PNG or WebP only, at most 5 MB each. Strip EXIF location in the browser before upload (privacy, AGENTS.md §5).
 - The upload form states that the user grants Vibenta permission to show the photo and that it must be their own photo.
 - Users can delete their own reviews and photos. The team can hide anything through the dashboard (`hidden`).

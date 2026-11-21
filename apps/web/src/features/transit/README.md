@@ -23,6 +23,7 @@ Needs Node >= 22 (runs TypeScript directly). Test: `node apps/web/scripts/transi
 
 ## Tier 2 (one transfer, greedy)
 - `hubs.ts` — the line-pair → hub table (data only; audit/correct here).
-- `tier2.ts` — `planTier2`: for each relevant line pair, first hub where BOTH legs validate by route pattern (`validateHub` → `selectRideablePattern`, the same function Tier 1 uses). First valid wins; no comparison of hubs. No candidate/valid hub → `no_tier1_route` with reason `no_candidate_hub` / `no_valid_hub` (Tier 0 fallback).
-- `planTripLive` tries Tier 1, then Tier 2 only when the stops share no pattern. Each leg is service-gated independently; leg B is gated at leg A's scheduled arrival (`TRANSFER_BUFFER_SEC`, default 0). Results carry `lastTrainBack` for the final leg.
+- `tier2.ts` — `tier2Candidates` (all pattern-valid transfers, greedy order) and `planTier2` (the first): for each relevant line pair, first hub where BOTH legs validate by route pattern (`validateHub` → `selectRideablePattern`, the same function Tier 1 uses). First valid wins; no comparison of hubs. No candidate/valid hub → `no_tier1_route` with reason `no_candidate_hub` / `no_valid_hub` (Tier 0 fallback).
+- P-012 (Proposed): one walk transfer, Orange@Haymarket ↔ Green@Government Center (≤ 400 m straight-line, labeled estimate), tried after in-station hubs. The live layer moves to the next pattern-valid hub when one fails the service gate.
+- `planTripLive` tries Tier 1, then Tier 2 only when the stops share no pattern. Each leg is service-gated independently; leg B is gated at leg A's scheduled arrival + transfer walk + `TRANSFER_BUFFER_SEC` (120 s). Results carry `lastTrainBack` for the final leg.
 - Tests: `node apps/web/scripts/transit/test-tier2.ts` (hub audit, validation proofs, live cases).

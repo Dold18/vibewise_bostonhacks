@@ -68,7 +68,7 @@
 
 **Files:**
 - Create: `supabase/migrations/20261121180000_create_accounts.sql`
-- Modify: `docs/DATA_MODEL.md` (new section "User accounts" listing both tables), `docs/CONTRACTS.md` (add a proposed `VibeSignal`), `docs/DECISIONS.md` (add `P-012 · Proposed · User accounts and vibe-reactive theme`)
+- Modify: `docs/DATA_MODEL.md` (new section "User accounts" listing both tables), `docs/CONTRACTS.md` (add a proposed `VibeSignal`), `docs/DECISIONS.md` (add `P-014 · Proposed · User accounts and vibe-reactive theme`)
 
 **Interfaces:**
 - Produces:
@@ -90,8 +90,8 @@
   - DATA_MODEL.md: the two tables and the RLS summary.
   - CONTRACTS.md: under §2, add
     `export interface VibeSignal { scores: Partial<Record<VibeKey, number>>; source: 'quiz' | 'text' | 'image' | 'song' | 'place' | 'dev'; placeId?: string }`
-    marked **Proposed (P-012)**.
-  - DECISIONS.md: P-012, with context, decision (from the spec §6), implications (VibeProfile.tags produced by the account module until Vibe workstream replaces it), and revisit trigger.
+    marked **Proposed (P-014)**.
+  - DECISIONS.md: P-014, with context, decision (from the spec §6), implications (VibeProfile.tags produced by the account module until Vibe workstream replaces it), and revisit trigger.
 - [ ] **Step 4: Commit**
 
 ```bash
