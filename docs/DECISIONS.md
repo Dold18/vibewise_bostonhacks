@@ -136,6 +136,22 @@
 - **Decision:** When more than one rideable pattern covers the same stops between origin and destination (same `route_id` and `direction_id`), the engine returns the trip as `branchAgnostic: true` with every match in `equivalentPatterns`. The chosen `pattern` is only a representative, and the option id and leg `source` name the route and direction, not a branch. A stretch served by a single pattern stays pinned to that pattern.
 - **Implications:** `/schedules` and service-running lookups for branch-agnostic trips must key on `route_id` + `direction_id` (then filter trips to `equivalentPatterns`), never on the representative `pattern`. Pattern-specific trips are queried by their pattern.
 
+### P-012 · Proposed · Tier 2 walk transfer: Government Center ↔ Haymarket only (extends D-007)
+- **Date / owner:** 2026-11-21 / transit workstream. **Flagged for ratification**; approved for implementation on the feature branch by the transit and UI-wiring owner, not yet ratified by the team.
+- **Context:** A Tier 2 hub was one station served by both lines. Green-B/C reach Haymarket and North Station only through time-limited patterns (`Green-B-816`, `Green-C-836`), so Orange ↔ Green-B/C was effectively Tier 0 outside early mornings. Example: BU Central → Haymarket on Green-B has one trip a day, at 05:42; a Saturday 3:35 PM request correctly returned `no_service`. The canonical Green-B/C patterns end at Government Center, 376 m (straight-line) from Haymarket.
+- **Decision:** Tier 2 now also includes **one short, capped, labeled-as-estimate surface walk between two schedule-verified rides**, not just in-station transfers. Exactly one pair: Orange at **Haymarket** ↔ Green at **Government Center**, in either direction.
+  - A transfer is `exit` stop + `entry` stop + `walkMeters`. In-station hubs are the `exit === entry`, 0 m case and behave as before.
+  - Walk distance is computed from `stops.json` (haversine), at the same ~80 m/min as other walks, and is labeled a straight-line estimate. Walk transfers over **400 m** are skipped.
+  - Both rides are still validated per route pattern and gated against `/schedules`. Leg B is gated at leg A's arrival **+ walk + 2 min buffer**. The walk appears as a middle leg (`walk, ride, walk, ride, walk`) with `fromStopName`/`toStopName`, and `transfers` is still 1.
+  - Order: in-station hubs first, then walk transfers. Still greedy, with no ranking. One behavior change to D-007's "first valid hub wins": `planTripLive` now moves to the next **pattern-valid** hub when the earlier one fails the service gate (`no_service`), so Haymarket-on-a-mornings-only-pattern no longer blocks the Government Center walk. If every hub fails, the first hub's failure is reported. API errors still stop immediately.
+- **Why / alternatives:** The walk restores real midday Orange ↔ Green-B/C trips using two verified rides and no new data source. Rejected: leaving it as Tier 0; adding Park St ↔ Downtown Crossing and State ↔ Government Center now (out of scope until this is proven); street-routed walk times (no walking API, so estimates stay labeled).
+- **Implications:**
+  - Tier 2 no longer means "same station only". In-station walking is still not modeled; the surface walk is straight-line and the real street walk may be longer.
+  - No change to the `TransitLeg` / `TransitOption` types in [CONTRACTS.md](CONTRACTS.md); `legs` is just 5 long for this case. `Tier2Plan` gains `entry`, `transferWalkMeters`, `transferWalkSec`.
+  - `hubs.ts` adds `walks` and `candidateTransfers`; `tier2.ts` adds `tier2Candidates`; `ride.ts` loops them. The rendering in `transitRoute.ts` needed no change (verified).
+  - Test expectations changed: Oak Grove → BU and BU → Chinatown at midday were `no_service` and are now `ok` via the walk. Tests in `test-tier2.ts` cover both, plus the original Saturday 3:35 PM case.
+- **Revisit trigger:** The team rejects surface walks in Tier 2, or a second pair is wanted (needs its own review), or a real walking-time source is available.
+
 ## How to add a decision
 ~~~md
 ### D-007 · Accepted/Proposed/Superseded · Short title

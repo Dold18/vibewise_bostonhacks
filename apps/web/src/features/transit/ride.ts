@@ -2,7 +2,7 @@
 // whether a route may be drawn at all (PROJECT_BRIEF §9 rule 3, D-007, D-008).
 
 import { planTier1, selectRideablePattern, type LegSelection, type Tier1Plan } from "./engine.ts";
-import { planTier2, type Tier2Plan } from "./tier2.ts";
+import { tier2Candidates, type Tier2Plan } from "./tier2.ts";
 import { bostonParts, fmtBoston, mbtaGet, prevDate, scheduleWindows, type JsonApiResource, type LiveOptions } from "./mbta.ts";
 import type {
   LastTrainBack, LiveErrorResult, NoServiceResult, NoTier1Route, RideTiming, TransitLeg, TransitLegDraft, TransitOption,
@@ -167,7 +167,7 @@ export type LivePlanResult =
   | ({ status: "ok"; tier: 1; option: TransitOption; plan: Tier1Plan; timing: RideTiming; service: ServiceCheck } & LiveOkBase)
   | ({
       status: "ok"; tier: 2; option: TransitOption; plan: Tier2Plan; timings: [RideTiming, RideTiming]; services: [ServiceCheck, ServiceCheck];
-      /** Scheduled wait at the hub: leg B departure minus leg A arrival. */
+      /** Scheduled wait at the boarding platform: leg B departure minus (leg A arrival + transfer walk). */
       transferWaitSeconds: number;
     } & LiveOkBase)
   | NoTier1Route
@@ -190,9 +190,18 @@ export async function planTripLive(
   const t1 = planTier1(origin, destination);
   if (!("status" in t1)) return liveTier1(t1, opts);
   if (t1.reason !== "no_shared_pattern") return t1; // same stop / wrong direction: a transfer would not help
-  const t2 = planTier2(origin, destination);
-  if ("status" in t2) return t2;
-  return liveTier2(t2, opts);
+  const t2 = tier2Candidates(origin, destination);
+  if (!Array.isArray(t2)) return t2;
+  // Greedy order, no ranking. A hub that validates by pattern but whose trains are not running
+  // (no_service) is skipped for the next pattern-valid hub (P-012); an error stops (cannot verify).
+  // If none runs, report the FIRST hub's failure, as before.
+  let first: LivePlanResult | undefined;
+  for (const plan of t2) {
+    const r = await liveTier2(plan, opts);
+    if (r.status !== "no_service") return r;
+    first ??= r;
+  }
+  return first as LivePlanResult;
 }
 
 const fill = (l: TransitLegDraft, rideSeconds: number, t: RideTiming): TransitLeg =>
@@ -247,28 +256,32 @@ async function liveTier2(plan: Tier2Plan, opts: LiveOptions): Promise<LivePlanRe
   }
   const tA = sA.next;
 
-  // Leg B: gate independently, at the time the rider actually reaches the hub (request-time check:
-  // B must depart after A arrives; never precomputed).
-  const boardB = new Date(Date.parse(tA.arrivesAt) + TRANSFER_BUFFER_SEC * 1000);
+  // Leg B: gate independently, at the time the rider actually reaches the boarding platform
+  // (request-time check: B must depart after A arrives + transfer walk + buffer; never precomputed).
+  // The walk (P-012, 0 for in-station) is a straight-line estimate.
+  const boardB = new Date(Date.parse(tA.arrivesAt) + (plan.transferWalkSec + TRANSFER_BUFFER_SEC) * 1000);
   let sB: ServiceCheck;
   try { sB = await checkService(plan.legB, boardB, opts); } catch (e) { return err(e, "leg B"); }
   if (!sB.running || !sB.next) {
     return {
       status: "no_service", failedLeg: "B",
-      message: `Leg A (${plan.legA.pattern.route_id}) is running, but leg B (${plan.legB.pattern.route_id} from ${plan.hub.name} to ${plan.legB.to.name}) has no train serving those stops ` +
+      message: `Leg A (${plan.legA.pattern.route_id}) is running, but leg B (${plan.legB.pattern.route_id} from ${plan.entry.name} to ${plan.legB.to.name}) has no train serving those stops ` +
         `around ${fmtBoston(boardB)} (checked MBTA /schedules), so the transfer route is not drawn; night bus or walk. ` +
         `Nearest stop: ${plan.originStop.stop.name}, ~${Math.round(plan.originStop.walkSeconds / 60)} min walk (estimate).`,
       nextScheduledDepartureAt: sB.next?.departsAt, ...base,
     };
   }
   const tB = sB.next;
-  const transferWaitSeconds = Math.round((Date.parse(tB.departsAt) - Date.parse(tA.arrivesAt)) / 1000);
+  // Scheduled wait on the platform: B departs minus when you get there (A arrives + transfer walk).
+  const transferWaitSeconds = Math.round((Date.parse(tB.departsAt) - Date.parse(tA.arrivesAt)) / 1000) - plan.transferWalkSec;
 
-  const [walkInLeg, rideA, rideB, walkOutLeg] = plan.option.legs;
-  const legs: TransitLeg[] = [walkKnown(walkInLeg), fill(rideA, tA.rideSeconds, tA), fill(rideB, tB.rideSeconds, tB), walkKnown(walkOutLeg)];
+  // legs: walk, rideA, [transfer walk], rideB, walk
+  const draft = plan.option.legs;
+  const legs: TransitLeg[] = draft.map((l, i) =>
+    l.mode !== "subway" ? walkKnown(l) : fill(l, i === 1 ? tA.rideSeconds : tB.rideSeconds, i === 1 ? tA : tB));
   const option: TransitOption = {
     id: plan.option.id, transfers: 1, legs,
-    // Walk + ride A + scheduled wait at hub + ride B + walk. Excludes the initial wait for train A.
+    // Walk + ride A + [transfer walk] + scheduled wait + ride B + walk. Excludes the initial wait for train A.
     durationSec: legs.reduce((s, l) => s + l.durationSec, 0) + transferWaitSeconds,
   };
   return {
