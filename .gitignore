@@ -1,0 +1,5 @@
+# Environment files hold API keys and secrets. Ignored everywhere in the repo.
+# Commit a .env.example (names only, no values) to document required variables.
+.env
+.env.*
+!.env.example

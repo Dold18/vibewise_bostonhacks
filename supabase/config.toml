@@ -1,0 +1,60 @@
+# Supabase CLI configuration for local development.
+# The hosted project is linked through Supabase's GitHub integration
+# (working directory ".", production branch "main"): every migration in
+# ./migrations is applied to the PRODUCTION database when it merges into main.
+# Test migrations locally (`supabase start` / `supabase db reset`) before merging.
+#
+# Full reference: https://supabase.com/docs/guides/local-development/cli/config
+
+# Identifies this project's local Docker containers. Not the hosted project ref.
+project_id = "vibenta_bostonhacks"
+
+[api]
+enabled = true
+port = 54321
+# Schemas exposed through the REST API. `public` holds the app tables and RPC functions.
+schemas = ["public", "graphql_public"]
+# `extensions` is on the search path so pgvector / PostGIS types resolve unqualified.
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+# Must match the hosted project's Postgres version
+# (Dashboard -> Project Settings -> Infrastructure). Update if it differs.
+major_version = 17
+
+[db.migrations]
+enabled = true
+
+[db.seed]
+# Seeds run on local `supabase db reset` only; never on production.
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]
+# Local email catcher for auth emails.
+enabled = true
+port = 54324
+
+[auth]
+enabled = true
+# Vite dev server (apps/web).
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["http://127.0.0.1:5173"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+
+[edge_runtime]
+# Edge Functions (e.g. the planned Yelp review fetcher) live in ./functions.
+enabled = true
+policy = "per_worker"
