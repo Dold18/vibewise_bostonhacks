@@ -179,6 +179,29 @@ create table restaurant_stations (
   walk_meters numeric not null,
   primary key (restaurant_id, station_id)
 );
+
+-- Static routing data for Tier 1/2 (section 9), baked from the MBTA V3 API / GTFS static feed.
+-- Sequence and matching are per route pattern (branch), not per line.
+create table pattern_stops (
+  route_pattern_id text not null,     -- V3 route pattern (branch + direction), e.g. a Red Ashmont pattern
+  route_id text not null,             -- e.g. 'Red', 'Green-E'
+  station_id text references stations(id),
+  seq int not null,                   -- ordered stop sequence within this pattern
+  primary key (route_pattern_id, station_id)
+);
+
+create table line_shapes (
+  route_pattern_id text primary key,
+  route_color text,                   -- GTFS route_color
+  geometry jsonb not null             -- GeoJSON, [lng, lat]
+);
+
+create table transfer_hubs (          -- candidate hubs only; validated per pattern at request time
+  line_a text not null,
+  line_b text not null,
+  station_id text references stations(id),
+  primary key (line_a, line_b, station_id)
+);
 ```
 
 Search logic should live in SQL functions called from TypeScript with `supabase.rpc(...)`, passing the query embedding as a number array.
@@ -197,6 +220,16 @@ Do not build anything that stores Google content or shows it on a non-Google map
 
 - **Data:** MBTA V3 API (stops, routes, schedules, predictions, alerts) and the GTFS static feed for station locations and route colors (`route_color`). Get a free API key from the MBTA developers site.
 - **MVP routing (simple):** Nearest station to the user plus nearest station to the restaurant, the lines involved, and walking time from the station to the restaurant (assume about 80 m per minute of walking). Show whether the trip is direct on one line or needs a transfer.
+  - **Tier 0: feasibility (the floor; always ships, built first).** For each place, precomputed nearest stop(s) within ~800 m and walk time (~80 m/min; label it an estimate). At request time show the nearest stop, next departures from MBTA V3 `/predictions`, and the walk estimate. This feeds ranking: hard-to-reach or soon-to-be-stranded places are down-ranked. No routing engine is required. If `/predictions` fails, show no departures; never substitute guessed arrivals.
+  - **Tier 1: same-pattern journeys.** Matching is per **route pattern (branch)**, never per line or color. In V3, `Green-B`, `Green-C`, `Green-D` and `Green-E` are distinct routes, and `Red` splits into Ashmont and Braintree patterns at JFK/UMass. The origin stop and destination stop qualify only if both lie on the **same route pattern** and the origin's stop-sequence index comes before the destination's in that pattern's direction of travel. Then draw the real `/shapes` polyline sliced between the two stops and compute time from `/schedules`. Checking only "both stops are on Red" would draw Alewife→Braintree for an Ashmont-bound trip; do not do this.
+  - **Tier 2: greedy single transfer (bonus; built only after the vibe finder works end to end).** When the stops are on different patterns, transfer once at a hub. The hardcoded line-pair→hub table is a **candidate list, not a guarantee**: Red↔Orange: Downtown Crossing; Red↔Green: Park Street; Orange↔Green: Haymarket/North Station; Orange↔Blue: State; Green↔Blue: Government Center; Red↔Blue: none. Greedy = take the first candidate hub that passes **pattern-level validation of both legs**: (a) the hub and the origin stop lie on one origin route pattern, with the hub after the origin in that direction; and (b) the hub and the destination stop lie on one **destination** route pattern, with the destination after the hub in that direction. The hub being served by some route of the destination's color is **not** sufficient (for example, transferring onto Green at a hub whose pattern does not continue to the destination's Green branch). No optimality search. Verify the table against the current GTFS at bake time. The timing seam is a **request-time check, never precomputed**: leg A's arrival at the hub (from `/schedules` or `/predictions` at the requested departure time) must precede a real leg B departure from that hub, so this is where the offline-baked data meets live data.
+  - **Correctness rules (non-negotiable).**
+    1. *Direction check:* derive ride direction from the ordered stop sequence of the specific route pattern; never guess. Riding the wrong way is the one error a Boston judge spots instantly.
+    2. *Honest fallback:* if no single transfer connects the stops (e.g. Red↔Blue, or any case greedy misses), degrade to Tier 0: nearest stop + next departures + "multi-leg trip, ~X min", labeled as an estimate with its source (schedule-derived), not drawn as a single line. Never draw an unverified route.
+    3. *Service-running check on drawn routes:* the Tier 1/2 drawing path runs the same service check as the Tier 0 late-night path (section 2, item 5 and the Late night bullet below). Before drawing, confirm from `/schedules` that every leg's pattern is running at the departure time, and for Tier 2 that the second leg departs after arrival at the hub. Every drawn route carries the last-train-back label. If the T is not running, do not draw it; show the late-night message instead ("no train service; night bus or walk").
+  - **Non-goal for the MVP:** general multi-transfer routing. Subway only; bus, commuter rail, ferry and Silver Line cases degrade to Tier 0. Full door-to-door routing stays the labeled stretch below.
+  - **Build order (a judgment, stated plainly):** Tier 0 ships before any vibe-ranking polish. Tier 1 is built with Tier 0 for the M2 gate. Tier 2 is a bonus built only after the vibe finder works end to end. Transit (Tier 0/1) and the vibe/embedding pipeline are built **in parallel from the start**; M2 drawing work must not block the start of M3. Routing is supporting cast, not the foundation; do not spend the weekend on transfer edge cases while the differentiator is unbuilt.
+  - **Precomputed offline** (baked into the catalog / `stations` / `restaurant_stations`, plus the tables sketched in section 7): per place, nearest stop(s) and walk time; per stop, the lines serving it and its ordered sequence index **per route pattern**; per line, the `/shapes` geometry and `route_color`; the fixed hub candidate table. The origin's nearest stop is computed at request time from the static stop table, since the origin is chosen by the user.
 - **Stretch routing:** Full trip planning with OpenTripPlanner (GTFS plus OSM). Do not use Google Directions on a non-Google map.
 - **Late night:** Use MBTA schedules to determine whether service is running and when the last train back departs. Restaurants open after service ends must be labeled clearly.
 - **Alerts:** Optionally surface service alerts (shuttles, closures) for lines a result depends on.
