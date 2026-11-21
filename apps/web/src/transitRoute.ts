@@ -1,187 +1,386 @@
 // Client side of the transit route feature. Talks to the server ONLY via fetch('/api/transit/route');
 // it must never import from ./features/transit (that module is server-side, see server/index.ts).
-import type { Map as MapLibreMap, GeoJSONSource } from 'maplibre-gl';
+//
+// Two parts:
+// - fetchRoute(): the request, with cancellation and a checked response shape.
+// - The map overlay: route lines in their real MBTA colours over a dark casing, boarding /
+//   transfer / exit stations, and walking legs only when their geometry is a verified
+//   pedestrian path (straight-line estimates are never drawn as streets).
+import type { GeoJSONSource, Map as MapLibreMap } from 'maplibre-gl';
 
 export type LatLng = { lat: number; lng: number };
 
 // Minimal local mirror of the response shapes we use (CONTRACTS.md TransitLeg/TransitOption + the
 // status wrappers from the server). Unknown extra fields are ignored.
-interface Leg {
+export interface RouteLeg {
   mode: string;
   durationSec: number;
+  distanceMeters?: number;
   geometry: [number, number][]; // [lng, lat]
   routeShortName?: string;
   routeColor?: string;
   fromStopName?: string;
   toStopName?: string;
+  instructions?: string;
+  /** Provenance, e.g. "approx: straight-line walk, ~80 m/min" or "MBTA GTFS static shape …". */
+  source?: string;
 }
-interface LastTrainBack {
+/** Schedule-derived timing of one ride (never a live prediction). */
+export interface RideTiming {
+  kind: 'scheduled';
+  departsAt: string;
+  arrivesAt: string;
+  rideSeconds: number;
+}
+export interface LastTrainBack {
   fromStopName: string;
   toStopName: string;
   departsAt: string;
   catchable: boolean;
 }
+export interface RouteOk {
+  status: 'ok';
+  tier?: 1 | 2;
+  option: { durationSec: number; transfers: number; legs: RouteLeg[] };
+  /** Tier 1: the single ride. */
+  timing?: RideTiming;
+  /** Tier 2: both rides. */
+  timings?: [RideTiming, RideTiming];
+  /** Tier 2: scheduled wait at the transfer station (included in durationSec). */
+  transferWaitSeconds?: number;
+  lastTrainBack: LastTrainBack | null;
+  lastTrainBackNote?: string;
+}
 export type RouteResponse =
-  | { status: 'ok'; option: { durationSec: number; transfers: number; legs: Leg[] }; lastTrainBack: LastTrainBack | null; lastTrainBackNote?: string }
+  | RouteOk
   | { status: 'no_tier1_route'; reason?: string }
   | { status: 'no_service'; message: string; nextScheduledDepartureAt?: string }
   | { status: 'error'; message: string };
 
-export type RouteState =
-  | { kind: 'origin_required' }
-  | { kind: 'loading' }
+export type FetchRouteResult =
   | { kind: 'result'; result: RouteResponse }
-  | { kind: 'error'; message: string };
+  | { kind: 'error'; reason: 'unreachable' | 'invalid_response'; message: string };
 
-export async function fetchRoute(origin: LatLng, destination: LatLng, signal: AbortSignal): Promise<RouteState> {
+const finiteNonnegative = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n) && n >= 0;
+const validCoordinate = (p: unknown) => Array.isArray(p) && p.length === 2 && typeof p[0] === 'number' && typeof p[1] === 'number' && Number.isFinite(p[0]) && Number.isFinite(p[1]) && Math.abs(p[0]) <= 180 && Math.abs(p[1]) <= 90;
+const validDate = (s: unknown) => typeof s === 'string' && Number.isFinite(Date.parse(s));
+const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null;
+
+function validTiming(t: unknown) { return isObj(t) && t.kind === 'scheduled' && validDate(t.departsAt) && validDate(t.arrivesAt) && finiteNonnegative(t.rideSeconds); }
+
+/** True only for a response we can safely render (an `ok` must carry legs with geometry arrays). */
+export function isRouteResponse(body: unknown): body is RouteResponse {
+  if (!isObj(body) || typeof body.status !== 'string') return false;
+  switch (body.status) {
+    case 'ok': {
+      const o = body.option;
+      return (
+        isObj(o) &&
+        finiteNonnegative(o.durationSec) &&
+        finiteNonnegative(o.transfers) && Number.isInteger(o.transfers) &&
+        Array.isArray(o.legs) &&
+        o.legs.length > 0 &&
+        o.legs.every((l) => isObj(l) && typeof l.mode === 'string' && finiteNonnegative(l.durationSec) && Array.isArray(l.geometry) && l.geometry.length >= 2 && l.geometry.every(validCoordinate) && ['routeShortName', 'routeColor', 'fromStopName', 'toStopName', 'source'].every(k => l[k] === undefined || typeof l[k] === 'string')) &&
+        (body.timing === undefined || validTiming(body.timing)) &&
+        (body.timings === undefined || (Array.isArray(body.timings) && body.timings.length === 2 && body.timings.every(validTiming))) &&
+        (body.lastTrainBack == null || (isObj(body.lastTrainBack) && typeof body.lastTrainBack.fromStopName === 'string' && typeof body.lastTrainBack.toStopName === 'string' && validDate(body.lastTrainBack.departsAt) && typeof body.lastTrainBack.catchable === 'boolean'))
+      );
+    }
+    case 'no_tier1_route':
+      return true;
+    case 'no_service':
+      return typeof body.message === 'string' && (body.nextScheduledDepartureAt === undefined || validDate(body.nextScheduledDepartureAt));
+    case 'error':
+      return typeof body.message === 'string';
+    default:
+      return false;
+  }
+}
+
+/** POST the two points to the server. Throws only AbortError (the caller cancelled). */
+export async function fetchRoute(
+  origin: LatLng,
+  destination: LatLng,
+  signal: AbortSignal,
+  fetchImpl: typeof fetch = fetch,
+): Promise<FetchRouteResult> {
+  let res: Response;
   try {
-    const res = await fetch('/api/transit/route', {
+    res = await fetchImpl('/api/transit/route', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ origin, destination }),
       signal,
     });
-    const body = (await res.json().catch(() => null)) as RouteResponse | null;
-    if (!body || typeof body.status !== 'string') {
-      return { kind: 'error', message: `Route service returned an unexpected response (HTTP ${res.status}).` };
-    }
-    return { kind: 'result', result: body };
   } catch (e) {
     if ((e as Error).name === 'AbortError') throw e;
-    return { kind: 'error', message: "Couldn't reach the route service." };
+    return { kind: 'error', reason: 'unreachable', message: "Couldn't reach the route service. Is the transit API running?" };
   }
+  const body: unknown = await res.json().catch(() => null);
+  if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+  if (!isRouteResponse(body)) {
+    return { kind: 'error', reason: 'invalid_response', message: `The route service returned an unexpected response (HTTP ${res.status}).` };
+  }
+  return { kind: 'result', result: body };
 }
 
-const boston = (iso: string) =>
-  new Date(iso).toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
-
-const NO_ROUTE_TEXT: Record<string, string> = {
-  same_stop: 'The nearest stations to you and this place are the same one, so there is no train ride to take.',
-  no_shared_pattern: 'No MBTA subway route connects the stations nearest you and this place.',
-  no_pattern_in_travel_direction: 'No subway line runs from the station nearest you to the one nearest this place.',
+export const NO_ROUTE_TEXT: Record<string, string> = {
+  same_stop: 'The nearest stations to the start and the destination are the same one, so there is no train ride to take.',
+  no_shared_pattern: 'No MBTA subway route connects the stations nearest these two points.',
+  no_pattern_in_travel_direction: 'No subway line runs from the station nearest the start to the one nearest the destination.',
   no_candidate_hub: 'No single-transfer subway route connects these stations.',
   no_valid_hub: 'No single-transfer subway route connects these stations.',
 };
 
-/** Fill `box` with the state's message. Drawing is separate (drawRoute) and only happens for `ok`. */
-export function renderRouteState(box: HTMLElement, state: RouteState, retry: () => void) {
-  box.replaceChildren();
-  box.dataset.state = state.kind === 'result' ? state.result.status : state.kind;
-  const line = (text: string, cls = 'route-line') => {
-    const p = document.createElement('p');
-    p.className = cls;
-    p.textContent = text;
-    box.append(p);
-  };
-  const title = (text: string) => line(text, 'route-title');
+// ---- Line colours -----------------------------------------------------------
 
-  if (state.kind === 'origin_required') {
-    title('Getting there');
-    line('Pick a starting point in the left panel to see the transit route.');
-  } else if (state.kind === 'loading') {
-    title('Getting there');
-    line('Finding a route…');
-  } else if (state.kind === 'error') {
-    title("Couldn't get a route");
-    line(state.message);
-    addRetry(box, retry);
-  } else {
-    const r = state.result;
-    if (r.status === 'ok') {
-      const mins = Math.max(1, Math.round(r.option.durationSec / 60));
-      const t = r.option.transfers;
-      title(`About ${mins} min · ${t === 0 ? 'no transfers' : `${t} transfer${t === 1 ? '' : 's'}`}`);
-      line('Walk and ride time; excludes waiting for the train. Walks are straight-line estimates.', 'route-note');
-      const ul = document.createElement('ul');
-      ul.className = 'route-legs';
-      for (const leg of r.option.legs) {
-        const li = document.createElement('li');
-        const m = Math.max(1, Math.round(leg.durationSec / 60));
-        const what =
-          leg.mode === 'walk'
-            ? `Walk to ${leg.toStopName ?? 'destination'}`
-            : `${leg.routeShortName ?? leg.mode}: ${leg.fromStopName ?? ''} → ${leg.toStopName ?? ''}`;
-        li.textContent = `${what} · ${m} min`;
-        li.style.setProperty('--leg-color', leg.mode === 'walk' ? '#6b7280' : (leg.routeColor ?? '#1a73e8'));
-        li.className = leg.mode === 'walk' ? 'leg-walk' : 'leg-transit';
-        ul.append(li);
-      }
-      box.append(ul);
-      if (r.lastTrainBack) {
-        const l = r.lastTrainBack;
-        line(
-          `Last scheduled train back from ${l.fromStopName} toward ${l.toStopName}: ${boston(l.departsAt)}` +
-            (l.catchable ? '' : ' (leaves before you would arrive)'),
-        );
-      } else {
-        line(`Last train back: ${r.lastTrainBackNote ?? 'unavailable'}.`, 'route-note');
-      }
-    } else if (r.status === 'no_tier1_route') {
-      title('No subway route found');
-      line((r.reason && NO_ROUTE_TEXT[r.reason]) || 'No MBTA subway route connects these places.');
-    } else if (r.status === 'no_service') {
-      title('No trains running right now');
-      line(r.message);
-      if (r.nextScheduledDepartureAt) line(`Next scheduled departure: ${boston(r.nextScheduledDepartureAt)}.`);
-    } else {
-      title("Couldn't get a route");
-      line(r.message);
-      addRetry(box, retry);
-    }
+/**
+ * Official MBTA subway colours (GTFS route_color), used only when a leg carries
+ * no colour of its own. The leg's own `routeColor` always wins.
+ */
+export const MBTA_LINE_COLORS: Record<string, string> = {
+  Red: '#DA291C',
+  Mattapan: '#DA291C',
+  Orange: '#ED8B00',
+  Blue: '#003DA5',
+  Green: '#00843D',
+  B: '#00843D',
+  C: '#00843D',
+  D: '#00843D',
+  E: '#00843D',
+};
+/** Unknown line: neutral gray, never a guessed MBTA colour. */
+export const UNKNOWN_LINE_COLOR = '#9AA0A6';
+
+const HEX = /^#?[0-9a-f]{6}$/i;
+
+export function lineColor(leg: Pick<RouteLeg, 'routeColor' | 'routeShortName'>): { color: string; known: boolean } {
+  if (leg.routeColor && HEX.test(leg.routeColor)) {
+    const hex = leg.routeColor.toUpperCase();
+    return { color: hex.startsWith('#') ? hex : `#${hex}`, known: true };
   }
+  const ref = leg.routeShortName ? MBTA_LINE_COLORS[leg.routeShortName] : undefined;
+  return ref ? { color: ref, known: true } : { color: UNKNOWN_LINE_COLOR, known: false };
 }
 
-function addRetry(box: HTMLElement, retry: () => void) {
-  const b = document.createElement('button');
-  b.type = 'button';
-  b.className = 'action-btn route-retry';
-  b.textContent = 'Try again';
-  b.addEventListener('click', retry);
-  box.append(b);
+/** "Red Line", "Green Line B", or the short name for anything else. */
+export function lineName(leg: Pick<RouteLeg, 'routeShortName' | 'mode'>): string {
+  const n = leg.routeShortName;
+  if (!n) return leg.mode === 'subway' ? 'Subway' : leg.mode;
+  if (['Red', 'Orange', 'Blue', 'Green', 'Mattapan'].includes(n)) return `${n} Line`;
+  if (/^[BCDE]$/.test(n)) return `Green Line ${n}`;
+  return n;
 }
 
-// ---- Map overlay ----------------------------------------------------------
+// ---- Walking provenance -----------------------------------------------------
 
-const SRC = 'transit-route';
-const WALK = 'transit-route-walk';
-const RIDE = 'transit-route-ride';
+/**
+ * Walking geometry is drawn only when its source says it's a real pedestrian
+ * path. Proposed convention for the transit workstream: a walk leg whose
+ * `source` starts with "pedestrian-route:" carries routed street/sidewalk
+ * geometry. Everything else (today: "approx: straight-line walk …") is an
+ * estimate and is shown only as text in the itinerary.
+ */
+export const VERIFIED_WALK_SOURCE = /^pedestrian-route:/i;
+
+export function isVerifiedWalkGeometry(leg: RouteLeg): boolean {
+  return leg.mode === 'walk' && !!leg.source && VERIFIED_WALK_SOURCE.test(leg.source) && leg.geometry.length >= 2;
+}
+
+const isRide = (leg: RouteLeg) => leg.mode !== 'walk';
+
+// ---- Stations ----------------------------------------------------------------
+
+export type StationRole = 'board' | 'transfer' | 'exit';
+export interface RouteStation {
+  role: StationRole;
+  name: string;
+  lng: number;
+  lat: number;
+  /** Colour of the line boarded (or, for the exit, the line left). */
+  color: string;
+}
+
+/** Boarding, transfer and exit stations, from the ride legs' own geometry and stop names. */
+export function routeStations(legs: RouteLeg[]): RouteStation[] {
+  const rides = legs.filter((l) => isRide(l) && Array.isArray(l.geometry) && l.geometry.length >= 2);
+  const out: RouteStation[] = [];
+  rides.forEach((leg, i) => {
+    const [sLng, sLat] = leg.geometry[0];
+    const color = lineColor(leg).color;
+    if (i === 0) out.push({ role: 'board', name: leg.fromStopName ?? '', lng: sLng, lat: sLat, color });
+    else out.push({ role: 'transfer', name: leg.fromStopName ?? rides[i - 1].toStopName ?? '', lng: sLng, lat: sLat, color });
+    if (i === rides.length - 1) {
+      const [eLng, eLat] = leg.geometry[leg.geometry.length - 1];
+      out.push({ role: 'exit', name: leg.toStopName ?? '', lng: eLng, lat: eLat, color });
+    }
+  });
+  return out;
+}
+
+// ---- GeoJSON for the overlay ------------------------------------------------
+
+export interface RouteLineFeature {
+  type: 'Feature';
+  properties: { kind: 'ride' | 'walk'; color: string; order: number };
+  geometry: { type: 'LineString'; coordinates: [number, number][] };
+}
+export interface RouteStationFeature {
+  type: 'Feature';
+  properties: { role: StationRole; name: string; color: string };
+  geometry: { type: 'Point'; coordinates: [number, number] };
+}
+
+/** Each ride leg in its own colour; walking legs only with verified geometry. */
+export function routeLineFeatures(legs: RouteLeg[]): { type: 'FeatureCollection'; features: RouteLineFeature[] } {
+  const features: RouteLineFeature[] = [];
+  legs.forEach((leg, order) => {
+    if (!Array.isArray(leg.geometry) || leg.geometry.length < 2) return;
+    if (leg.mode === 'walk') {
+      if (!isVerifiedWalkGeometry(leg)) return; // estimate: itinerary text only
+      features.push({ type: 'Feature', properties: { kind: 'walk', color: '#FFFFFF', order }, geometry: { type: 'LineString', coordinates: leg.geometry } });
+      return;
+    }
+    features.push({ type: 'Feature', properties: { kind: 'ride', color: lineColor(leg).color, order }, geometry: { type: 'LineString', coordinates: leg.geometry } });
+  });
+  return { type: 'FeatureCollection', features };
+}
+
+export function routeStationFeatures(legs: RouteLeg[]): { type: 'FeatureCollection'; features: RouteStationFeature[] } {
+  return {
+    type: 'FeatureCollection',
+    features: routeStations(legs).map((s) => ({
+      type: 'Feature',
+      properties: { role: s.role, name: s.name, color: s.color },
+      geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
+    })),
+  };
+}
+
+/** [[west, south], [east, north]] around everything drawn, plus extra points (start, destination). */
+export function routeBounds(legs: RouteLeg[], extra: LatLng[] = []): [[number, number], [number, number]] | null {
+  const pts: [number, number][] = [];
+  for (const f of routeLineFeatures(legs).features) pts.push(...f.geometry.coordinates);
+  for (const s of routeStations(legs)) pts.push([s.lng, s.lat]);
+  for (const p of extra) pts.push([p.lng, p.lat]);
+  if (pts.length === 0) return null;
+  let [w, s, e, n] = [Infinity, Infinity, -Infinity, -Infinity];
+  for (const [lng, lat] of pts) {
+    w = Math.min(w, lng);
+    e = Math.max(e, lng);
+    s = Math.min(s, lat);
+    n = Math.max(n, lat);
+  }
+  return [[w, s], [e, n]];
+}
+
+// ---- Map overlay ------------------------------------------------------------
+
+const LINE_SRC = 'transit-route';
+const STATION_SRC = 'transit-route-stations';
+export const ROUTE_LAYERS = {
+  rideCasing: 'transit-route-ride-casing',
+  ride: 'transit-route-ride',
+  walkCasing: 'transit-route-walk-casing',
+  walk: 'transit-route-walk',
+  stations: 'transit-route-station-dots',
+  stationLabels: 'transit-route-station-labels',
+} as const;
+const CASING = '#0B1220';
 const EMPTY = { type: 'FeatureCollection', features: [] } as const;
 
-function ensureLayers(map: MapLibreMap): GeoJSONSource {
-  if (!map.getSource(SRC)) {
-    map.addSource(SRC, { type: 'geojson', data: EMPTY });
+/** The basemap's first label layer: route lines go just beneath it so street names stay readable. */
+function firstSymbolLayer(map: MapLibreMap): string | undefined {
+  return map.getStyle().layers?.find((l) => l.type === 'symbol' && !l.id.startsWith('transit-route') && !l.id.startsWith('vb-'))?.id;
+}
+
+function ensureLayers(map: MapLibreMap): { lines: GeoJSONSource; stations: GeoJSONSource } {
+  if (!map.getSource(LINE_SRC)) {
+    map.addSource(LINE_SRC, { type: 'geojson', data: EMPTY });
+    map.addSource(STATION_SRC, { type: 'geojson', data: EMPTY });
+    const before = firstSymbolLayer(map);
+    const round = { 'line-cap': 'round', 'line-join': 'round' } as const;
+    map.addLayer(
+      {
+        id: ROUTE_LAYERS.rideCasing,
+        type: 'line',
+        source: LINE_SRC,
+        filter: ['==', ['get', 'kind'], 'ride'],
+        layout: round,
+        paint: { 'line-color': CASING, 'line-opacity': 0.85, 'line-width': ['interpolate', ['linear'], ['zoom'], 11, 8, 16, 12] },
+      },
+      before,
+    );
+    map.addLayer(
+      {
+        id: ROUTE_LAYERS.ride,
+        type: 'line',
+        source: LINE_SRC,
+        filter: ['==', ['get', 'kind'], 'ride'],
+        layout: round,
+        paint: { 'line-color': ['get', 'color'], 'line-width': ['interpolate', ['linear'], ['zoom'], 11, 5, 16, 7.5] },
+      },
+      before,
+    );
+    map.addLayer(
+      {
+        id: ROUTE_LAYERS.walkCasing,
+        type: 'line',
+        source: LINE_SRC,
+        filter: ['==', ['get', 'kind'], 'walk'],
+        layout: round,
+        paint: { 'line-color': CASING, 'line-opacity': 0.8, 'line-width': 7.5 },
+      },
+      before,
+    );
+    map.addLayer(
+      {
+        id: ROUTE_LAYERS.walk,
+        type: 'line',
+        source: LINE_SRC,
+        filter: ['==', ['get', 'kind'], 'walk'],
+        layout: { 'line-cap': 'butt', 'line-join': 'round' },
+        paint: { 'line-color': '#FFFFFF', 'line-width': 4.5, 'line-dasharray': [1.4, 1.2] },
+      },
+      before,
+    );
+    // Stations sit above everything (including labels) so they stay readable.
     map.addLayer({
-      id: RIDE,
-      type: 'line',
-      source: SRC,
-      filter: ['==', ['get', 'mode'], 'transit'],
-      layout: { 'line-cap': 'round', 'line-join': 'round' },
-      paint: { 'line-color': ['get', 'color'], 'line-width': 6, 'line-opacity': 0.9 },
+      id: ROUTE_LAYERS.stations,
+      type: 'circle',
+      source: STATION_SRC,
+      paint: {
+        'circle-color': '#FFFFFF',
+        'circle-radius': ['match', ['get', 'role'], 'transfer', 7.5, 6.5],
+        'circle-stroke-color': ['get', 'color'],
+        'circle-stroke-width': ['match', ['get', 'role'], 'transfer', 4, 3.5],
+      },
     });
     map.addLayer({
-      id: WALK,
-      type: 'line',
-      source: SRC,
-      filter: ['==', ['get', 'mode'], 'walk'],
-      layout: { 'line-cap': 'butt', 'line-join': 'round' },
-      paint: { 'line-color': '#374151', 'line-width': 4, 'line-dasharray': [1, 1.5] },
+      id: ROUTE_LAYERS.stationLabels,
+      type: 'symbol',
+      source: STATION_SRC,
+      layout: {
+        'text-field': ['get', 'name'],
+        'text-font': ['Noto Sans Bold'],
+        'text-size': 13,
+        'text-offset': [0, 1.1],
+        'text-anchor': 'top',
+      },
+      paint: { 'text-color': '#FFFFFF', 'text-halo-color': CASING, 'text-halo-width': 1.6 },
     });
   }
-  return map.getSource(SRC) as GeoJSONSource;
+  return { lines: map.getSource(LINE_SRC) as GeoJSONSource, stations: map.getSource(STATION_SRC) as GeoJSONSource };
 }
 
 export function clearRoute(map: MapLibreMap) {
-  (map.getSource(SRC) as GeoJSONSource | undefined)?.setData(EMPTY);
+  (map.getSource(LINE_SRC) as GeoJSONSource | undefined)?.setData(EMPTY);
+  (map.getSource(STATION_SRC) as GeoJSONSource | undefined)?.setData(EMPTY);
 }
 
-/** Draw only what the server returned (each leg's own geometry). Walk = dashed gray, transit = line color. */
-export function drawRoute(map: MapLibreMap, legs: Leg[]) {
-  const features = legs
-    .filter((l) => Array.isArray(l.geometry) && l.geometry.length >= 2)
-    .map((l) => ({
-      type: 'Feature' as const,
-      properties: { mode: l.mode === 'walk' ? 'walk' : 'transit', color: l.routeColor ?? '#1a73e8' },
-      geometry: { type: 'LineString' as const, coordinates: l.geometry },
-    }));
-  ensureLayers(map).setData({ type: 'FeatureCollection', features });
+/** Draw only what the server returned (each leg's own geometry). Replaces any earlier route. */
+export function drawRoute(map: MapLibreMap, legs: RouteLeg[]) {
+  const { lines, stations } = ensureLayers(map);
+  lines.setData(routeLineFeatures(legs));
+  stations.setData(routeStationFeatures(legs));
 }
