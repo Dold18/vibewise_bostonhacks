@@ -49,7 +49,7 @@ export function createVibeStep(prefs: Store<InitialPreferences, PreferencesActio
     class: 'vb-textarea vb-vibe-story',
     rows: 6,
     maxlength: VIBE_TEXT_MAX_LENGTH,
-    placeholder: 'Describe a feeling, song, artist, movie or scene — even objects or colors.\n\nFor example: Warm lighting, rainy streets and soft jazz, like a cozy movie scene.',
+    placeholder: 'Picture yourself there. What would you see, hear, and feel? What would you want to avoid?\n\nExample: Warm amber lights, old books, soft jazz. A little social, but quiet enough to talk for hours.',
     'aria-describedby': `${helpId} ${counterId}`,
   });
   story.addEventListener('input', () => prefs.dispatch({ type: 'setVibeText', text: story.value }));
@@ -199,7 +199,7 @@ export function createVibeStep(prefs: Store<InitialPreferences, PreferencesActio
       story,
       h('div', { class: 'vb-field-foot' },
         h('span', { class: 'vb-hint-inline', id: helpId },
-          'A few words or a full description — both work.'),
+          'Specific details help, but even one reference is enough to start.'),
         counter,
       ),
     ),
