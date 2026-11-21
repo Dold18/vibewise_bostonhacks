@@ -134,6 +134,8 @@ create table student_reviews (
 create index student_reviews_restaurant_idx on student_reviews (restaurant_id);
 ~~~
 
+The MBTA routing tables (`pattern_stops`, `line_shapes`, `transfer_hubs`) are defined in [PROJECT_BRIEF.md §7](../PROJECT_BRIEF.md) under decision D-007 and owned by the transit workstream. They aren't repeated here.
+
 ### Mapping to CONTRACTS.md `Place`
 
 | `Place` field | Column |
