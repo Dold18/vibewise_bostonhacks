@@ -3,6 +3,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
 import { BUILDING_3D_LAYER, BUILDING_3D_OPACITY, mapStyle } from './mapStyle';
 import { PIN_COLORS } from './pinColors';
+import { mountAccount } from './features/account';
 import {
   CATEGORIES,
   formatAddress,
@@ -604,6 +605,9 @@ discovery = mountDiscoveryPanel(document.body, {
     },
   },
 });
+
+// Accounts: sign-in in the top right; the map theme follows the user's vibes.
+mountAccount(document.body, { map });
 
 // A different starting point makes the shown route wrong: re-plan for the open card's place.
 let lastOrigin = currentOrigin();
