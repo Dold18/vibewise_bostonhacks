@@ -3,7 +3,7 @@
 //
 // Two parts:
 // - fetchRoute(): the request, with cancellation and a checked response shape.
-// - The map overlay: route lines in their real MBTA colours over a dark casing, boarding /
+// - The map overlay: route lines in their real MBTA colours with a soft neon glow, boarding /
 //   transfer / exit stations, and walking legs only when their geometry is a verified
 //   pedestrian path (straight-line estimates are never drawn as streets).
 import type { GeoJSONSource, Map as MapLibreMap } from 'maplibre-gl';
@@ -17,6 +17,9 @@ export interface RouteLeg {
   durationSec: number;
   distanceMeters?: number;
   geometry: [number, number][]; // [lng, lat]
+  /** Actual station/end point fields already supplied by the API. */
+  start?: LatLng & { stop_id?: string };
+  end?: LatLng & { stop_id?: string };
   routeShortName?: string;
   routeColor?: string;
   fromStopName?: string;
@@ -194,6 +197,7 @@ const isRide = (leg: RouteLeg) => leg.mode !== 'walk';
 export type StationRole = 'board' | 'transfer' | 'exit';
 export interface RouteStation {
   role: StationRole;
+  id?: string;
   name: string;
   lng: number;
   lat: number;
@@ -203,17 +207,27 @@ export interface RouteStation {
 
 /** Boarding, transfer and exit stations, from the ride legs' own geometry and stop names. */
 export function routeStations(legs: RouteLeg[]): RouteStation[] {
-  const rides = legs.filter((l) => isRide(l) && Array.isArray(l.geometry) && l.geometry.length >= 2);
+  const rides = legs.filter(l => isRide(l) && Array.isArray(l.geometry) && l.geometry.length >= 2);
   const out: RouteStation[] = [];
-  rides.forEach((leg, i) => {
-    const [sLng, sLat] = leg.geometry[0];
-    const color = lineColor(leg).color;
-    if (i === 0) out.push({ role: 'board', name: leg.fromStopName ?? '', lng: sLng, lat: sLat, color });
-    else out.push({ role: 'transfer', name: leg.fromStopName ?? rides[i - 1].toStopName ?? '', lng: sLng, lat: sLat, color });
-    if (i === rides.length - 1) {
-      const [eLng, eLat] = leg.geometry[leg.geometry.length - 1];
-      out.push({ role: 'exit', name: leg.toStopName ?? '', lng: eLng, lat: eLat, color });
+  const point = (leg: RouteLeg, at: 'start' | 'end') => {
+    const p = leg[at];
+    if (p && Number.isFinite(p.lng) && Number.isFinite(p.lat)) return { lng: p.lng, lat: p.lat, id: p.stop_id };
+    const [lng, lat] = leg.geometry[at === 'start' ? 0 : leg.geometry.length - 1];
+    return { lng, lat };
+  };
+  function add(station: RouteStation) {
+    const previous = out.find(s => (s.id && s.id === station.id) ||
+      (Math.abs(s.lng - station.lng) < .00002 && Math.abs(s.lat - station.lat) < .00002));
+    if (previous) {
+      if (station.role === 'transfer') { previous.role = station.role; previous.color = station.color; }
+      return;
     }
+    out.push(station);
+  }
+  rides.forEach((leg, i) => {
+    const color = lineColor(leg).color;
+    add({ role: i === 0 ? 'board' : 'transfer', name: leg.fromStopName ?? '', ...point(leg, 'start'), color });
+    add({ role: i === rides.length - 1 ? 'exit' : 'transfer', name: leg.toStopName ?? '', ...point(leg, 'end'), color });
   });
   return out;
 }
@@ -238,7 +252,7 @@ export function routeLineFeatures(legs: RouteLeg[]): { type: 'FeatureCollection'
     if (!Array.isArray(leg.geometry) || leg.geometry.length < 2) return;
     if (leg.mode === 'walk') {
       if (!isVerifiedWalkGeometry(leg)) return; // estimate: itinerary text only
-      features.push({ type: 'Feature', properties: { kind: 'walk', color: '#FFFFFF', order }, geometry: { type: 'LineString', coordinates: leg.geometry } });
+      features.push({ type: 'Feature', properties: { kind: 'walk', color: '#17212E', order }, geometry: { type: 'LineString', coordinates: leg.geometry } });
       return;
     }
     features.push({ type: 'Feature', properties: { kind: 'ride', color: lineColor(leg).color, order }, geometry: { type: 'LineString', coordinates: leg.geometry } });
@@ -279,14 +293,13 @@ export function routeBounds(legs: RouteLeg[], extra: LatLng[] = []): [[number, n
 const LINE_SRC = 'transit-route';
 const STATION_SRC = 'transit-route-stations';
 export const ROUTE_LAYERS = {
-  rideCasing: 'transit-route-ride-casing',
+  rideGlow: 'transit-route-ride-glow',
   ride: 'transit-route-ride',
+  rideHighlight: 'transit-route-ride-highlight',
   walkCasing: 'transit-route-walk-casing',
   walk: 'transit-route-walk',
   stations: 'transit-route-station-dots',
-  stationLabels: 'transit-route-station-labels',
 } as const;
-const CASING = '#0B1220';
 const EMPTY = { type: 'FeatureCollection', features: [] } as const;
 
 /** The basemap's first label layer: route lines go just beneath it so street names stay readable. */
@@ -300,17 +313,13 @@ function ensureLayers(map: MapLibreMap): { lines: GeoJSONSource; stations: GeoJS
     map.addSource(STATION_SRC, { type: 'geojson', data: EMPTY });
     const before = firstSymbolLayer(map);
     const round = { 'line-cap': 'round', 'line-join': 'round' } as const;
-    map.addLayer(
-      {
-        id: ROUTE_LAYERS.rideCasing,
-        type: 'line',
-        source: LINE_SRC,
-        filter: ['==', ['get', 'kind'], 'ride'],
-        layout: round,
-        paint: { 'line-color': CASING, 'line-opacity': 0.85, 'line-width': ['interpolate', ['linear'], ['zoom'], 11, 8, 16, 12] },
-      },
-      before,
-    );
+    // The halo and thin luminous center add neon contrast without changing MBTA line identity.
+    map.addLayer({
+      id: ROUTE_LAYERS.rideGlow, type: 'line', source: LINE_SRC,
+      filter: ['==', ['get', 'kind'], 'ride'], layout: round,
+      paint: { 'line-color': ['get', 'color'], 'line-opacity': 0.8, 'line-blur': 6,
+        'line-width': ['interpolate', ['linear'], ['zoom'], 11, 18, 16, 26] },
+    }, before);
     map.addLayer(
       {
         id: ROUTE_LAYERS.ride,
@@ -322,6 +331,12 @@ function ensureLayers(map: MapLibreMap): { lines: GeoJSONSource; stations: GeoJS
       },
       before,
     );
+    map.addLayer({
+      id: ROUTE_LAYERS.rideHighlight, type: 'line', source: LINE_SRC,
+      filter: ['==', ['get', 'kind'], 'ride'], layout: round,
+      paint: { 'line-color': '#FFFFFF', 'line-opacity': 0.75,
+        'line-width': ['interpolate', ['linear'], ['zoom'], 11, 1, 16, 1.8] },
+    }, before);
     map.addLayer(
       {
         id: ROUTE_LAYERS.walkCasing,
@@ -329,7 +344,7 @@ function ensureLayers(map: MapLibreMap): { lines: GeoJSONSource; stations: GeoJS
         source: LINE_SRC,
         filter: ['==', ['get', 'kind'], 'walk'],
         layout: round,
-        paint: { 'line-color': CASING, 'line-opacity': 0.8, 'line-width': 7.5 },
+        paint: { 'line-color': '#F7FAFC', 'line-opacity': 0.95, 'line-width': 8 },
       },
       before,
     );
@@ -340,7 +355,7 @@ function ensureLayers(map: MapLibreMap): { lines: GeoJSONSource; stations: GeoJS
         source: LINE_SRC,
         filter: ['==', ['get', 'kind'], 'walk'],
         layout: { 'line-cap': 'butt', 'line-join': 'round' },
-        paint: { 'line-color': '#FFFFFF', 'line-width': 4.5, 'line-dasharray': [1.4, 1.2] },
+        paint: { 'line-color': '#17212E', 'line-width': 4.5, 'line-dasharray': [1.6, 1.4] },
       },
       before,
     );
@@ -356,19 +371,7 @@ function ensureLayers(map: MapLibreMap): { lines: GeoJSONSource; stations: GeoJS
         'circle-stroke-width': ['match', ['get', 'role'], 'transfer', 4, 3.5],
       },
     });
-    map.addLayer({
-      id: ROUTE_LAYERS.stationLabels,
-      type: 'symbol',
-      source: STATION_SRC,
-      layout: {
-        'text-field': ['get', 'name'],
-        'text-font': ['Noto Sans Bold'],
-        'text-size': 13,
-        'text-offset': [0, 1.1],
-        'text-anchor': 'top',
-      },
-      paint: { 'text-color': '#FFFFFF', 'text-halo-color': CASING, 'text-halo-width': 1.6 },
-    });
+
   }
   return { lines: map.getSource(LINE_SRC) as GeoJSONSource, stations: map.getSource(STATION_SRC) as GeoJSONSource };
 }

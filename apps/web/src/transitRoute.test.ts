@@ -1,5 +1,9 @@
+import type { Map as MapLibreMap } from 'maplibre-gl';
 import { describe, expect, it, vi } from 'vitest';
 import {
+  drawRoute,
+  clearRoute,
+  ROUTE_LAYERS,
   fetchRoute,
   isRouteResponse,
   isVerifiedWalkGeometry,
@@ -79,13 +83,13 @@ describe('route geometry', () => {
     expect(isVerifiedWalkGeometry(TRANSFER_TRIP[0])).toBe(false);
   });
 
-  it('draws walking legs as white dashes once their geometry is a verified pedestrian route', () => {
+  it('draws walking legs as dark dashes with light casing once their geometry is a verified pedestrian route', () => {
     // TEST FIXTURE: the proposed provenance marker for routed walking paths.
     const routed = walk([-71.12, 42.374], [-71.119, 42.373], 'pedestrian-route: TEST FIXTURE');
     routed.geometry = [[-71.12, 42.374], [-71.1195, 42.3738], [-71.119, 42.373]];
     expect(isVerifiedWalkGeometry(routed)).toBe(true);
     const f = routeLineFeatures([routed, RED]).features;
-    expect(f[0].properties).toEqual({ kind: 'walk', color: '#FFFFFF', order: 0 });
+    expect(f[0].properties).toEqual({ kind: 'walk', color: '#17212E', order: 0 });
     expect(f[0].geometry.coordinates).toHaveLength(3);
   });
 
@@ -151,4 +155,38 @@ describe('route API responses', () => {
     abort.abort();
     await expect(p).rejects.toMatchObject({ name: 'AbortError' });
   });
+});
+
+describe('station endpoint coordinates and walking transfers', () => {
+  it('prefers station coordinates to the shape endpoints and merges one physical hub', () => {
+    const red={...RED,start:{lat:42.3731,lng:-71.1191,stop_id:'harvard'},end:{lat:42.3561,lng:-71.0621,stop_id:'park'}};
+    const green={...GREEN,start:{lat:42.3561,lng:-71.0621,stop_id:'park'}};
+    const stations=routeStations([red,green]);
+    expect(stations).toHaveLength(3);expect(stations[0]).toMatchObject({lat:42.3731,lng:-71.1191});expect(stations[1].role).toBe('transfer');
+  });
+  it('keeps both stations for a surface transfer and renders only verified initial/transfer/final walking paths', () => {
+    const other={...GREEN,geometry:[[-71.059,42.359],[-71.095,42.349]] as [number,number][],fromStopName:'Government Center TEST FIXTURE'};
+    const transfer=walk([-71.062,42.356],[-71.059,42.359]);
+    const legs=[TRANSFER_TRIP[0],RED,transfer,other,TRANSFER_TRIP[3]];
+    expect(routeStations(legs).map(s=>s.role)).toEqual(['board','transfer','transfer','exit']);
+    expect(routeLineFeatures(legs).features.filter(f=>f.properties.kind==='walk')).toHaveLength(0);
+    const verified=legs.map(l=>l.mode==='walk'?{...l,source:'pedestrian-route: TEST FIXTURE'}:l);
+    expect(routeLineFeatures(verified).features.filter(f=>f.properties.kind==='walk')).toHaveLength(3);
+  });
+});
+
+it('keeps neon rail identity and high-contrast walking above the focus layer without duplicating layers', () => {
+  const sources=new Map<string,{setData:ReturnType<typeof vi.fn>}>();
+  const layers: {id:string;paint:Record<string,unknown>}[]=[];
+  const map={getStyle:()=>({layers:[{id:'water-label',type:'symbol'}]}),getSource:(id:string)=>sources.get(id),
+    addSource:(id:string)=>sources.set(id,{setData:vi.fn()}),addLayer:(l:{id:string;paint:Record<string,unknown>})=>layers.push(l)};
+  drawRoute(map as unknown as MapLibreMap,TRANSFER_TRIP);drawRoute(map as unknown as MapLibreMap,TRANSFER_TRIP);
+  expect(new Set(layers.map(l=>l.id)).size).toBe(Object.keys(ROUTE_LAYERS).length);
+  expect(layers.find(l=>l.id===ROUTE_LAYERS.ride)?.paint['line-color']).toEqual(['get','color']);
+  expect(layers.find(l=>l.id===ROUTE_LAYERS.rideGlow)?.paint['line-blur']).toBeGreaterThan(0);
+  expect(layers.find(l=>l.id===ROUTE_LAYERS.rideHighlight)?.paint['line-color']).toBe('#FFFFFF');
+  expect(layers.find(l=>l.id===ROUTE_LAYERS.walk)?.paint['line-color']).toBe('#17212E');
+  expect(layers.find(l=>l.id===ROUTE_LAYERS.walkCasing)?.paint['line-color']).toBe('#F7FAFC');
+  clearRoute(map as unknown as MapLibreMap);
+  expect(sources.get('transit-route')!.setData).toHaveBeenLastCalledWith({type:'FeatureCollection',features:[]});
 });
