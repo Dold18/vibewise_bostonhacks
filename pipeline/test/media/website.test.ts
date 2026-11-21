@@ -15,6 +15,7 @@ const PLACE: EnrichPlace = { id: 1, placeId: 'osm:node/1', name: 'Example Cafe',
 
 function fakeHttp(pages: Record<string, FetchResult>): PoliteFetcher {
   return {
+    async getBytes() { throw new Error('not used'); },
     async getText(url) { return pages[url] ?? { ok: false, reason: 'http', detail: `HTTP 404 from ${url}` }; },
     async getJson() { throw new Error('not used'); },
   };
@@ -132,7 +133,7 @@ test('images whose URL declares a size under 400 px, blurred placeholders, avata
 test('a website on a review, social or delivery platform is not scraped', async () => {
   for (const site of ['https://www.tripadvisor.com/Restaurant_Review-x', 'https://facebook.com/x', 'https://www.doordash.com/store/x', 'https://linktr.ee/x', 'https://www.yelp.com/biz/x']) {
     let fetched = false;
-    const http: PoliteFetcher = { async getText() { fetched = true; return ok(site, HOME); }, async getJson() { throw new Error('x'); } };
+    const http: PoliteFetcher = { async getBytes() { throw new Error('not used'); }, async getText() { fetched = true; return ok(site, HOME); }, async getJson() { throw new Error('x'); } };
     const r = await scrapeWebsite({ ...PLACE, website: site }, http);
     assert.equal(fetched, false, site);
     assert.equal(r.failure?.ok === false && r.failure.reason, 'third_party', site);

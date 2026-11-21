@@ -84,6 +84,7 @@ test('loadCityLicenses pages each dataset and caches the result', async () => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'city-'));
   const urls: string[] = [];
   const http: PoliteFetcher = {
+    async getBytes() { throw new Error('not used'); },
     async getText() { throw new Error('not used'); },
     async getJson<T>(url: string): Promise<T> {
       urls.push(url);

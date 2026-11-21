@@ -13,6 +13,7 @@ function img(id: string, metersSouth: number, compass: number) {
 function fakeHttp(data: unknown[]) {
   const urls: string[] = [];
   const http: PoliteFetcher = {
+    async getBytes() { throw new Error('not used'); },
     async getText() { throw new Error('not used'); },
     async getJson<T>(url: string): Promise<T> { urls.push(url); return { data } as T; },
   };

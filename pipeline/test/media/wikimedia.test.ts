@@ -14,6 +14,7 @@ interface FileSpec { license: string; artist?: string; categories?: string[] }
 function fakeWiki(opts: { files?: Record<string, FileSpec>; geosearch?: string[]; wikidata?: Record<string, unknown>; extract?: string }) {
   const urls: string[] = [];
   const http: PoliteFetcher = {
+    async getBytes() { throw new Error('not used'); },
     async getText() { throw new Error('not used'); },
     async getJson<T>(url: string): Promise<T> {
       urls.push(url);

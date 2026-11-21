@@ -50,6 +50,7 @@ test('loadListings reads Boston subpages plus the fixed pages, and caches them',
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'wv-'));
   const urls: string[] = [];
   const http: PoliteFetcher = {
+    async getBytes() { throw new Error('not used'); },
     async getText() { throw new Error('not used'); },
     async getJson<T>(url: string): Promise<T> {
       urls.push(url);

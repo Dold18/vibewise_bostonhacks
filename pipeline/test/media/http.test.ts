@@ -109,3 +109,44 @@ test('getJson parses JSON and throws on a non-2xx status', async () => {
   assert.deepEqual(await h.fetcher.getJson('https://api.test/good'), { a: 1 });
   await assert.rejects(h.fetcher.getJson('https://api.test/bad'), /500/);
 });
+
+test('getBytes returns the body and content type', async () => {
+  const h = harness(() => new Response(new Uint8Array([1, 2, 3]), { headers: { 'content-type': 'image/jpeg' } }));
+  const r = await h.fetcher.getBytes('https://img.test/a.jpg');
+  assert.equal(r.ok, true);
+  assert.deepEqual(r.ok && [...r.bytes], [1, 2, 3]);
+  assert.equal(r.ok && r.contentType, 'image/jpeg');
+  assert.equal(new Headers(h.calls[0]!.init.headers).get('user-agent'), USER_AGENT);
+});
+
+test('getBytes reports a 404 as http', async () => {
+  const h = harness(() => new Response('nope', { status: 404 }));
+  const r = await h.fetcher.getBytes('https://img.test/a.jpg');
+  assert.equal(r.ok === false && r.reason, 'http');
+});
+
+test('getBytes stops reading past maxBytes and cancels the stream', async () => {
+  let pulled = 0;
+  const stream = new ReadableStream<Uint8Array>({
+    pull(controller) { pulled++; controller.enqueue(new Uint8Array(1000)); },
+  });
+  const h = harness(() => new Response(stream, { headers: { 'content-type': 'image/jpeg' } }));
+  const r = await h.fetcher.getBytes('https://img.test/endless.jpg', { maxBytes: 5000 });
+  assert.equal(r.ok === false && r.reason, 'too_large');
+  assert.ok(pulled <= 8, `pulled ${pulled} chunks`);
+});
+
+test('getBytes rejects an oversized Content-Length without reading', async () => {
+  let pulled = 0;
+  const stream = new ReadableStream<Uint8Array>({ pull(c) { pulled++; c.enqueue(new Uint8Array(10)); c.close(); } });
+  const h = harness(() => new Response(stream, { headers: { 'content-type': 'image/jpeg', 'content-length': '999999999' } }));
+  const r = await h.fetcher.getBytes('https://img.test/big.jpg', { maxBytes: 5000 });
+  assert.equal(r.ok === false && r.reason, 'too_large');
+  assert.equal(pulled <= 1, true);
+});
+
+test('getBytes reports a timeout', async () => {
+  const h = harness(() => { throw new DOMException('timed out', 'TimeoutError'); });
+  const r = await h.fetcher.getBytes('https://img.test/a.jpg');
+  assert.equal(r.ok === false && r.reason, 'timeout');
+});
