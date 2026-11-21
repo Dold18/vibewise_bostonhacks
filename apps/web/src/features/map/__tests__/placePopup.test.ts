@@ -73,3 +73,8 @@ describe('popup anchoring offsets', () => {
     expect(Object.keys(POPUP_OFFSETS as object).sort()).toEqual(anchors.sort());
   });
 });
+
+it('includes catalog source attribution in popup details', () => {
+  const p = {id:'catalog-test-fixture', name:'TEST FIXTURE', lat:42.35,lon:-71.06,category:'Cafe', tags:{'catalog:attribution':'Foursquare TEST FIXTURE'}};
+  expect(popupDetails(p).attribution).toBe('Foursquare TEST FIXTURE');
+});

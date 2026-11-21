@@ -27,8 +27,15 @@ import {
 import { createOriginMarker, mapLibreOriginDeps, recenterTarget, shouldRevealOrigin } from './features/map/originMarker';
 import { createPlacePopup, POPUP_PIN_GAP } from './features/map/placePopup';
 import { pinTarget, popupRevealShift } from './features/map/popupPlacement';
-import { realPlaceId, type RouteEndpoint } from './features/navigation/routing';
+import { createApiRouteProvider, placeIdFor, sameLocation, type RouteEndpoint } from './features/navigation/routing';
 import { createRoutePlanner } from './features/navigation/ui/routePlannerView';
+import { createStore } from './discovery/store';
+import { initialTripState, tripReducer, createTripRouter } from './features/navigation/trip';
+import { createTripSearch } from './features/navigation/ui/searchView';
+import { createPitchLock } from './features/map/pitchLock';
+import { createFocusController } from './features/map/focusMode';
+import { paddingAround } from './features/map/routeFrame';
+import { drawRoute, clearRoute, routeBounds } from './transitRoute';
 import { catalogPlacesNear, isCatalogCategory } from './catalog';
 
 const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
@@ -70,6 +77,7 @@ const PIN_PATH = 'M14 0C6.3 0 0 6.2 0 13.9 0 24.3 14 40 14 40s14-15.7 14-26.1C28
 let markers: Marker[] = [];
 let shadows: Marker[] = [];
 let selectedPin: HTMLElement | null = null;
+let temporaryPlaceMarker: Marker | null = null;
 
 /*
  * MapLibre positions every marker by rewriting its element's inline
@@ -158,7 +166,7 @@ function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: 
   // Pins refreshed under an open popup (the map moved): keep its place highlighted.
   const open = placePopup?.current();
   const openPin = open ? pinById.get(open.id) : undefined;
-  if (openPin) selectPin(openPin);
+  if (openPin) { selectPin(openPin); temporaryPlaceMarker?.remove(); temporaryPlaceMarker = null; }
 }
 
 /** Every pin the same: what search results and location types use until match scores exist. */
@@ -201,12 +209,19 @@ const placePopup = createPlacePopup(map, {
   onClose: () => {
     setPinSelected(selectedPin, false);
     selectedPin = null;
+    temporaryPlaceMarker?.remove(); temporaryPlaceMarker = null;
   },
 });
 
 // The popup never changes the discovery panel (no collapse/expand/move);
 // instead the camera keeps the popup clear of the panel where it can.
 function openPlace(place: Place, look: { color: string; icon?: string }) {
+  temporaryPlaceMarker?.remove(); temporaryPlaceMarker = null;
+  if (!pinById.has(place.id)) {
+    const el = pinElement(); el.classList.add('selected', 'vb-temporary-place'); el.setAttribute('aria-label', place.name);
+    el.style.setProperty('--pin-color', look.color);
+    temporaryPlaceMarker = new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
+  }
   placePopup.open(place, look);
 }
 
@@ -245,7 +260,7 @@ function focusPlace(place: Place) {
   const { container, panel } = placementFrame();
   const target = pinTarget(size, POPUP_PIN_GAP, container, panel);
   const offset: [number, number] = [target.x - container.right / 2, target.y - container.bottom / 2];
-  map.flyTo({ center: [place.lon, place.lat], zoom: Math.max(map.getZoom(), 16.5), ...TILTED, offset, essential: true });
+  map.flyTo({ center: [place.lon, place.lat], zoom: Math.max(map.getZoom(), 16.5), pitch: pitchLock.isLocked() ? 0 : map.getPitch(), bearing: pitchLock.isLocked() ? 0 : map.getBearing(), offset, essential: true });
 }
 
 // ---------------------------------------------------------------------------
@@ -287,19 +302,14 @@ function openSearchResult(place: Place) {
   focusPlace(place);
 }
 
-/** Show a saved place: reuse its pin if it's on the map, otherwise add it to the current pins. */
+/** Saved destinations reuse pins or one temporary marker, without changing activity filters. */
 function openSavedPlace(place: Place, categoryId?: string) {
-  if (!pinById.has(place.id)) {
-    const looks = new Map(pinLooks);
-    const category = CATEGORIES.find((c) => c.id === categoryId);
-    looks.set(place.id, { color: CATEGORY_COLORS[categoryId ?? ''] ?? CATEGORY_COLORS.search, icon: category?.icon });
-    showPlaces(
-      [...shownPlaces.filter((p) => p.id !== place.id), place],
-      (p) => ({ color: looks.get(p.id)?.color ?? CATEGORY_COLORS.search, scale: 1 }),
-      (p) => looks.get(p.id)?.icon,
-    );
-  }
-  openSearchResult(place);
+  const category = CATEGORIES.find(c => c.id === categoryId);
+  const pin = pinById.get(place.id);
+  if (pin) selectPin(pin);
+  openPlace(place, pinLooks.get(place.id) ?? { color: CATEGORY_COLORS[categoryId ?? ''] ?? CATEGORY_COLORS.search, icon: category?.icon });
+  discovery.showView('preferences');
+  focusPlace(place);
 }
 
 // ---------------------------------------------------------------------------
@@ -499,6 +509,7 @@ $('zoom-out').addEventListener('click', () => map.zoomOut());
 $('compass').addEventListener('click', () => map.easeTo({ bearing: 0 }));
 
 tiltBtn.addEventListener('click', () => {
+  if (pitchLock.isLocked()) return;
   const flat = map.getPitch() < 5;
   map.easeTo(flat ? { ...TILTED, duration: 1000 } : { pitch: 0, bearing: 0, duration: 1000 });
 });
@@ -507,7 +518,10 @@ function syncControls() {
   needle.style.transform = `rotate(${-map.getBearing()}deg)`;
   const flat = map.getPitch() < 5;
   tiltBtn.textContent = flat ? '3D' : '2D';
-  tiltBtn.title = flat ? 'Switch to 3D view' : 'Switch to top-down view';
+  const locked = pitchLock.isLocked();
+  tiltBtn.disabled = locked;
+  tiltBtn.title = locked ? 'Navigation keeps the map in 2D. Close Directions to restore 3D.' : flat ? 'Switch to 3D view' : 'Switch to top-down view';
+  tiltBtn.setAttribute('aria-label', tiltBtn.title);
 }
 
 /**
@@ -528,11 +542,10 @@ map.on('pitch', () => {
   syncControls();
   syncDepth();
 });
-syncControls();
 syncDepth();
 
 // ---------------------------------------------------------------------------
-// Trip planner (opened by Navigate; live MBTA routing not connected yet)
+// Shared Search / Navigation state and MBTA route provider
 // ---------------------------------------------------------------------------
 
 const mapPlaceSuggestions = createPlaceListProvider(() => shownPlaces, {
@@ -549,37 +562,45 @@ const savedSuggestions = createPlaceListProvider(() => saved.list().map(savedToP
 });
 const bostonSuggestions = createBostonSuggestionProvider();
 
-const planner = createRoutePlanner({
-  fromSuggestions: combineProviders([bostonSuggestions, savedSuggestions, mapPlaceSuggestions], 'Offline Boston list, saved places and places on the map'),
-  toSuggestions: combineProviders([mapPlaceSuggestions, savedSuggestions, bostonSuggestions], 'Places on the map, saved places and the offline Boston list'),
-  // Live routing (transit's planTripLive via createTransitRouteProvider) is switched on in a later step.
-  provider: null,
-});
+const trip = createStore(tripReducer, initialTripState());
+const fromSuggestions = combineProviders([bostonSuggestions, savedSuggestions, mapPlaceSuggestions], 'Offline Boston list, saved places and places on the map');
+const toSuggestions = combineProviders([mapPlaceSuggestions, savedSuggestions, bostonSuggestions], 'Places on the map, saved places and the offline Boston list');
+const pitchLock = createPitchLock(map, { reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches, onChange: () => queueMicrotask(syncControls) });
+const focus = createFocusController(map, pitchLock);
+const resolvePlaceId = (id: string) => {
+  const p = shownPlaces.find(p => p.id === id) ?? saved.list().map(savedToPlace).find(p => p.id === id);
+  return p ? placeIdFor(p) : undefined;
+};
+const planner = createRoutePlanner({ store: trip, fromSuggestions, toSuggestions, resolvePlaceId, provider: createApiRouteProvider() });
 document.body.append(planner.root);
-
+syncControls();
+const endpointFor = (place: Place): RouteEndpoint => ({ label: place.name, location: { lat: place.lat, lng: place.lon }, source: 'map_place', placeId: placeIdFor(place) });
+const discoveryEndpoint = (): RouteEndpoint | null => {
+  const o = discovery.getPreferences().origin;
+  return o ? { ...o, location: { ...o.location } } : null;
+};
 function openPlanner(place: Place) {
-  const to: RouteEndpoint = {
-    label: place.name,
-    location: { lat: place.lat, lng: place.lon },
-    source: 'map_place',
-    ...(realPlaceId(place.id) ? { placeId: place.id } : {}),
-  };
-  const origin = discovery.getPreferences().origin;
-  const from: RouteEndpoint | null = origin
-    ? { label: origin.label, location: { ...origin.location }, source: 'discovery_origin' }
-    : null;
+  trip.dispatch({ type: 'navigateTo', destination: endpointFor(place), discoveryOrigin: discoveryEndpoint() });
   closePopup();
-  planner.open({ from, to });
 }
+function previewEndpoint(e: RouteEndpoint) {
+  const place = shownPlaces.find(p => p.id === e.placeId) ?? saved.list().map(savedToPlace).find(p => p.id === e.placeId)
+    ?? { id: e.placeId ?? 'trip-preview', name: e.label, lat: e.location.lat, lon: e.location.lng, category: 'Chosen location', tags: {} };
+  openSearchResult(place);
+}
+const tripSearch = createTripSearch({ store: trip, fromSuggestions, toSuggestions, resolvePlaceId, provider: searchProvider,
+  onDestination: previewEndpoint,
+  onOpen: () => trip.dispatch({ type: 'openSearch', discoveryOrigin: discoveryEndpoint(), selectedPlace: placePopup.current() ? endpointFor(placePopup.current()!) : null }),
+  onClose: () => discovery.showView('preferences'), onResults: showSearchResults,
+  onSelect: place => { trip.dispatch({ type: 'setTo', endpoint: endpointFor(place) }); openSearchResult(place); discovery.showView('preferences'); },
+});
 
 // ---------------------------------------------------------------------------
 // Discovery panel: the left-hand interface. Its Activity choice decides which
 // categories the map loads; Quick Tools give search, saved places and recenter.
 // ---------------------------------------------------------------------------
 
-let lastLayers: MapLayerSelection | null = null;
 const loadLayers = (selection: MapLayerSelection) => {
-  lastLayers = selection;
   void showCategories(
     CATEGORIES.filter((c) => selection.layerIds.includes(c.id)),
     selection.detail,
@@ -588,15 +609,7 @@ const loadLayers = (selection: MapLayerSelection) => {
 
 const discovery = mountDiscoveryPanel(document.body, {
   mapLayers: { available: CATEGORIES, onChange: loadLayers },
-  search: {
-    provider: searchProvider,
-    onResults: showSearchResults,
-    onSelect: (place) => openSearchResult(place),
-    // Leaving search: back to the Activity's places.
-    onDismiss: () => {
-      if (lastLayers) loadLayers(lastLayers);
-    },
-  },
+  search: tripSearch,
   saved: {
     store: saved,
     onSelect: (s) => openSavedPlace(savedToPlace(s), s.categoryId),
@@ -605,7 +618,7 @@ const discovery = mountDiscoveryPanel(document.body, {
     // No starting point: Boston Common, from the bundled OpenStreetMap list.
     const common = bostonCommon()?.location;
     const target = recenterTarget(discovery.getPreferences().origin, common ?? BOSTON);
-    const flat = map.getPitch() < 5;
+    const flat = pitchLock.isLocked() || map.getPitch() < 5;
     map.flyTo({
       center: target.center,
       zoom: 16,
@@ -628,3 +641,45 @@ const syncOrigin = () => {
 };
 discovery.subscribe(syncOrigin);
 syncOrigin();
+
+// Trip markers and route layers follow only the current generation.
+const tripOrigin = createOriginMarker(mapLibreOriginDeps(map));
+let destinationMarker: Marker | null = null;
+let renderedGeneration = -1;
+let userMovedWhileLoading = false;
+let routeStyleReady = map.isStyleLoaded();
+map.on('movestart', e => { if (e.originalEvent && trip.getState().route.kind === 'loading') userMovedWhileLoading = true; });
+const syncTrip = () => {
+  const s = trip.getState();
+  focus.apply(s);
+  if (!s.searchOpen && discovery.element().dataset.panelView === 'search') discovery.showView('preferences');
+  tripOrigin.update(s.navigationOpen && s.from && !sameLocation(s.from.location, discovery.getPreferences().origin?.location) ? s.from : null);
+  if (s.navigationOpen && s.to) {
+    if (!destinationMarker) {
+      const el = document.createElement('div'); el.className = 'vb-trip-destination'; el.setAttribute('role', 'img');
+      destinationMarker = new Marker({ element: el }).setLngLat([s.to.location.lng, s.to.location.lat]).addTo(map);
+    }
+    destinationMarker.getElement().setAttribute('aria-label', `Destination: ${s.to.label}`);
+    destinationMarker.setLngLat([s.to.location.lng, s.to.location.lat]);
+  } else { destinationMarker?.remove(); destinationMarker = null; }
+  if (s.route.kind === 'loading' && renderedGeneration !== s.generation) { userMovedWhileLoading = false; renderedGeneration = s.generation; }
+  if (!routeStyleReady) return;
+  if (s.navigationOpen && s.route.kind === 'done' && s.route.result.status === 'ok') {
+    const legs = s.route.result.route.option.legs;
+    drawRoute(map, legs); focus.refresh();
+    if (renderedGeneration !== -s.generation - 2) {
+      renderedGeneration = -s.generation - 2;
+      const bounds = routeBounds(legs, [s.from!.location, s.to!.location]);
+      if (bounds && !userMovedWhileLoading) {
+        const container = map.getContainer().getBoundingClientRect();
+        const obstacles = [discovery.element(), planner.root].map(el => el.getBoundingClientRect());
+        map.fitBounds(bounds, { padding: paddingAround(container, obstacles), pitch: 0, bearing: 0, duration: 650, maxZoom: 16 });
+      }
+    }
+  } else clearRoute(map);
+};
+trip.subscribe(syncTrip);
+discovery.subscribe(syncTrip);
+map.on('style.load', () => { routeStyleReady = true; renderedGeneration = -1; syncTrip(); });
+createTripRouter(trip, createApiRouteProvider());
+if (import.meta.env.DEV) Object.assign(window, { vibentaTrip: trip });

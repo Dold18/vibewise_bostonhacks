@@ -23,6 +23,7 @@ export interface PopupDetails {
   details: PopupDetail[];
   website?: string;
   osmUrl: string;
+  attribution?: string;
 }
 
 export function safeHttpUrl(raw: string | undefined): string | undefined {
@@ -45,7 +46,7 @@ export function popupDetails(place: Place): PopupDetails {
   const phone = place.tags.phone ?? place.tags['contact:phone'];
   if (phone) details.push({ kind: 'phone', text: phone });
   const website = safeHttpUrl(place.tags.website ?? place.tags['contact:website']);
-  return { title: place.name, category: place.category, details, ...(website ? { website } : {}), osmUrl: osmUrl(place) };
+  return { title: place.name, category: place.category, details, ...(website ? { website } : {}), osmUrl: osmUrl(place), attribution: place.tags['catalog:attribution'] };
 }
 
 /*
@@ -206,6 +207,7 @@ export function createPlacePopup(map: MapLibreMap, deps: PlacePopupDeps): PlaceP
     if (d.website) links.append(link('Website', d.website));
     links.append(link('OpenStreetMap', d.osmUrl));
     root.append(links);
+    if (d.attribution) { const attribution = document.createElement('p'); attribution.className = 'vb-popup-attribution'; attribution.textContent = d.attribution; root.append(attribution); }
 
     root.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
