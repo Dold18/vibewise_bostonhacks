@@ -34,6 +34,7 @@ import { initialTripState, tripReducer, createTripRouter } from './features/navi
 import { createTripSearch } from './features/navigation/ui/searchView';
 import { createPitchLock } from './features/map/pitchLock';
 import { createFocusController } from './features/map/focusMode';
+import { createPinLabels } from './features/map/pinLabels';
 import { markerVisible, setMarkerVisible } from './features/map/markerVisibility';
 import { createRouteHubs } from './features/map/routeHubs';
 import { paddingAround } from './features/map/routeFrame';
@@ -718,3 +719,7 @@ discovery.subscribe(syncTrip);
 map.on('style.load', () => { routeStyleReady = true; renderedGeneration = -1; syncTrip(); });
 createTripRouter(trip, createApiRouteProvider());
 if (import.meta.env.DEV) Object.assign(window, { vibentaTrip: trip });
+
+// Place names stay attached to DOM pins, with collisions resolved after camera/marker updates.
+const pinLabels = createPinLabels(map.getContainer(), () => [...document.querySelectorAll('.vb-discovery, .vb-place-popup, .map-controls, .vb-route-hub, .vb-hub-label')]);
+map.on('render', pinLabels.schedule);

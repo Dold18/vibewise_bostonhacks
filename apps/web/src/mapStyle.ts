@@ -294,23 +294,6 @@ const layers: LayerSpecification[] = [
     paint: { 'text-color': palette.waterLabel, 'text-halo-color': 'rgba(255,255,255,0.6)', 'text-halo-width': 1 },
   },
   {
-    id: 'road-label',
-    type: 'symbol',
-    source: SOURCE,
-    'source-layer': 'transportation_name',
-    minzoom: 13,
-    filter: classIn('motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'minor'),
-    layout: {
-      'symbol-placement': 'line',
-      'text-field': name,
-      'text-font': ['Noto Sans Regular'],
-      'text-size': ['interpolate', ['linear'], ['zoom'], 13, 10, 17, 13],
-      'text-rotation-alignment': 'map',
-      'text-pitch-alignment': 'viewport',
-    },
-    paint: { 'text-color': palette.textSecondary, 'text-halo-color': palette.halo, 'text-halo-width': 1.5 },
-  },
-  {
     id: 'place-neighbourhood',
     type: 'symbol',
     source: SOURCE,

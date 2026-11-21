@@ -267,3 +267,11 @@ body[data-focus="search"] .vb-origin-dot,
 body[data-focus="navigation"] .vb-origin-dot { box-shadow: 0 0 9px rgba(26, 115, 232, .55); }
 
 .vb-route-hub.label-above .vb-hub-label { top: auto; bottom: calc(100% + 6px); }
+
+.pin-name { position: absolute; width: max-content; max-width: 180px; padding: 2px 0; background: transparent; color: #233e58; font-size: 11.5px; font-weight: 500; letter-spacing: .005em; line-height: 1.35; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; visibility: hidden; pointer-events: none; }
+.pin-name.is-visible { visibility: visible; }
+.pin-name.is-priority { max-width: 250px; white-space: normal; color: #163d67; font-size: 12.5px; font-weight: 650; }
+.vb-marker-hidden .pin-name, body[data-focus="navigation"] .pin .pin-name { visibility: hidden !important; }
+
+body[data-focus="search"] .pin-name,
+body[data-focus="navigation"] .vb-trip-destination .pin-name { color: #eef6ff; }
