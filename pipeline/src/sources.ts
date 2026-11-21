@@ -1,4 +1,4 @@
-import { ATTRIBUTION_FSQ, ATTRIBUTION_OSM, OSM_AMENITIES } from './config.ts';
+import { ATTRIBUTION_FSQ, ATTRIBUTION_OSM, OSM_AMENITIES, STUDY_BBOX } from './config.ts';
 import { toEwkt } from './geo.ts';
 import { fsqAddress, fsqCategory, fsqCuisines, osmAddress, osmCategory, osmCuisines, pickOsmTags } from './normalize.ts';
 import type { FsqPlace, OsmPlace, RestaurantRow } from './types.ts';
@@ -16,9 +16,22 @@ function clean(v: unknown): string | null {
 }
 
 function toNumber(v: unknown): number | null {
-  if (v === null || v === undefined || v === '') return null;
+  if (typeof v === 'string') {
+    const t = v.trim();
+    if (t === '') return null;
+    v = t;
+  }
+  if (v === null || v === undefined) return null;
   const n = typeof v === 'number' ? v : typeof v === 'string' ? Number(v) : NaN;
   return Number.isFinite(n) ? n : null;
+}
+
+const BBOX_MARGIN_DEG = 0.01;
+
+/** Rejects (0,0) and other stray coordinates: must lie within the study bbox plus a small margin. */
+function inStudyArea(lat: number, lng: number): boolean {
+  return lat >= STUDY_BBOX.south - BBOX_MARGIN_DEG && lat <= STUDY_BBOX.north + BBOX_MARGIN_DEG
+    && lng >= STUDY_BBOX.west - BBOX_MARGIN_DEG && lng <= STUDY_BBOX.east + BBOX_MARGIN_DEG;
 }
 
 export function parseOverpass(elements: OverpassElement[]): OsmPlace[] {
@@ -33,7 +46,7 @@ export function parseOverpass(elements: OverpassElement[]): OsmPlace[] {
     if ('disused:amenity' in tags || 'was:amenity' in tags) continue;
     const lat = el.lat ?? el.center?.lat;
     const lng = el.lon ?? el.center?.lon;
-    if (typeof lat !== 'number' || typeof lng !== 'number') continue;
+    if (typeof lat !== 'number' || typeof lng !== 'number' || !inStudyArea(lat, lng)) continue;
     out.push({ osmId: `${el.type}/${el.id}`, name, lat, lng, tags });
   }
   return out;
@@ -49,7 +62,7 @@ export function parseFsqRows(rows: Record<string, unknown>[]): FsqPlace[] {
     const labels = Array.isArray(r.fsq_category_labels)
       ? r.fsq_category_labels.filter((l): l is string => typeof l === 'string')
       : [];
-    if (!fsqId || !name || lat === null || lng === null || labels.length === 0) continue;
+    if (!fsqId || !name || lat === null || lng === null || !inStudyArea(lat, lng) || labels.length === 0) continue;
     if (fsqCategory(labels[0]) === null) continue;
     out.push({
       fsqId, name, lat, lng,

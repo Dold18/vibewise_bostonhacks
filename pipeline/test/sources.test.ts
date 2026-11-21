@@ -59,3 +59,21 @@ test('fsqRow throws when the primary label is not dining', () => {
   assert.throws(() => fsqRow({ fsqId: 'z', name: 'Shoes', lat: 1, lng: 2, address: null, locality: null, postcode: null,
     tel: null, website: null, dateRefreshed: null, categoryLabels: ['Retail > Shoe Store'] }, runStart));
 });
+
+test('parsers skip coordinates outside the study area, including (0,0) and blank strings', () => {
+  const els = parseOverpass([
+    { type: 'node', id: 1, lat: 0, lon: 0, tags: { name: 'Null Island', amenity: 'cafe' } },
+    { type: 'node', id: 2, lat: 42.35, lon: -71.06, tags: { name: 'Boston', amenity: 'cafe' } },
+    { type: 'node', id: 3, lat: 42.42, lon: -71.06, tags: { name: 'Edge margin', amenity: 'cafe' } },
+    { type: 'node', id: 4, lat: 42.5, lon: -71.06, tags: { name: 'Too far', amenity: 'cafe' } },
+  ]);
+  assert.deepEqual(els.map((p) => p.osmId), ['node/2', 'node/3']);
+  const base = { fsq_place_id: 'f1', name: 'X', latitude: ' 42.35 ', longitude: '-71.06', fsq_category_labels: ['Dining and Drinking > Bakery'], date_refreshed: null };
+  const out = parseFsqRows([
+    base,
+    { ...base, fsq_place_id: 'f2', latitude: 0, longitude: 0 },
+    { ...base, fsq_place_id: 'f3', latitude: '  ' },
+  ]);
+  assert.deepEqual(out.map((p) => p.fsqId), ['f1']);
+  assert.equal(out[0]!.lat, 42.35);
+});

@@ -143,16 +143,21 @@ function utcDay(date: string): number {
   return Date.parse(`${date}T00:00:00Z`) / 86_400_000;
 }
 
-function isFresh(dateRefreshed: string | null, today: string): boolean {
-  if (dateRefreshed === null) return false;
-  return Math.round(utcDay(today) - utcDay(dateRefreshed)) <= FSQ_MAX_AGE_DAYS;
+/** 'fresh' / 'stale' for a parseable date (or a missing one, which is stale); 'unparseable' otherwise (also stale). */
+export function freshness(dateRefreshed: string | null, today: string): 'fresh' | 'stale' | 'unparseable' {
+  if (dateRefreshed === null) return 'stale';
+  const head = dateRefreshed.slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(head)) return 'unparseable';
+  const day = utcDay(head);
+  if (Number.isNaN(day)) return 'unparseable';
+  return Math.round(utcDay(today) - day) <= FSQ_MAX_AGE_DAYS ? 'fresh' : 'stale';
 }
 
 export function mergePlaces(
   osm: OsmPlace[],
   fsq: FsqPlace[],
   opts: { runStart: string; today: string },
-): { rows: RestaurantRow[]; matches: MatchPair[]; dropped: DroppedDuplicate[]; staleFsqDropped: number } {
+): { rows: RestaurantRow[]; matches: MatchPair[]; dropped: DroppedDuplicate[]; staleFsqDropped: number; unparseableDates: number } {
   const o = dedupeWithin(osm, (p) => p.osmId, 'osm', osmFieldCount);
   const f = dedupeWithin(fsq, (p) => p.fsqId, 'foursquare', fsqFieldCount);
   const matches = matchSources(o.kept, f.kept);
@@ -176,12 +181,18 @@ export function mergePlaces(
     rows.push(row);
   }
   let staleFsqDropped = 0;
+  let unparseableDates = 0;
   for (const p of f.kept) {
     if (matchedFsq.has(p.fsqId)) continue;
-    if (!isFresh(p.dateRefreshed, opts.today)) { staleFsqDropped++; continue; }
+    const fresh = freshness(p.dateRefreshed, opts.today);
+    if (fresh !== 'fresh') {
+      staleFsqDropped++;
+      if (fresh === 'unparseable') unparseableDates++;
+      continue;
+    }
     rows.push(fsqRow(p, opts.runStart));
   }
-  return { rows, matches, dropped: [...o.dropped, ...f.dropped], staleFsqDropped };
+  return { rows, matches, dropped: [...o.dropped, ...f.dropped], staleFsqDropped, unparseableDates };
 }
 
 /** Throws if two rows share a `source:source_id` or a non-null fsq_place_id (the upsert/rekey would corrupt data). */

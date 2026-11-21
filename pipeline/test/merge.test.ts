@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assertUniqueKeys, dedupeWithin, matchSources, mergePlaces } from '../src/merge.ts';
+import { assertUniqueKeys, dedupeWithin, freshness, matchSources, mergePlaces } from '../src/merge.ts';
 import { ATTRIBUTION_FSQ, ATTRIBUTION_MERGED, ATTRIBUTION_OSM } from '../src/config.ts';
 import { fsqRow, osmRow } from '../src/sources.ts';
 import type { FsqPlace, OsmPlace } from '../src/types.ts';
@@ -160,4 +160,25 @@ test('assertUniqueKeys passes unique rows and names duplicates otherwise', () =>
   const linkedA = { ...a, fsq_place_id: 'f1' };
   assert.throws(() => assertUniqueKeys([linkedA, f]), /duplicate fsq_place_id .*f1/);
   assertUniqueKeys([a, b]); // multiple null fsq ids are fine
+});
+
+test('freshness: 730 days is fresh, 731 is stale, date-time prefixes parse, junk is unparseable', () => {
+  assert.equal(freshness('2024-11-21', '2026-11-21'), 'fresh'); // 730 days
+  assert.equal(freshness('2024-11-20', '2026-11-21'), 'stale'); // 731 days
+  assert.equal(freshness('2026-06-01T08:30:00Z', today), 'fresh');
+  assert.equal(freshness('2023-01-01 00:00:00', today), 'stale');
+  assert.equal(freshness(null, today), 'stale');
+  assert.equal(freshness('last spring', today), 'unparseable');
+  assert.equal(freshness('2026-13-45', today), 'unparseable');
+});
+
+test('mergePlaces counts unparseable refresh dates separately from stale ones', () => {
+  const r = mergePlaces([], [
+    fsq('a', 'A', 42.31, -71.11, { dateRefreshed: 'garbage' }),
+    fsq('b', 'B', 42.32, -71.12, { dateRefreshed: '2020-01-01' }),
+    fsq('c', 'C', 42.33, -71.13, { dateRefreshed: '2026-06-01T10:00:00' }),
+  ], { runStart, today });
+  assert.equal(r.unparseableDates, 1);
+  assert.equal(r.staleFsqDropped, 2);
+  assert.deepEqual(r.rows.map((x) => x.source_id), ['c']);
 });

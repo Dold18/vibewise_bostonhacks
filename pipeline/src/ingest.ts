@@ -53,7 +53,7 @@ export function assertWritable(input: { osmLoaded: boolean; fsqLoaded: boolean; 
 }
 
 export interface SummaryInput {
-  osm: number; fsq: number; matches: number; dropped: number; staleFsqDropped: number;
+  osm: number; fsq: number; matches: number; dropped: number; staleFsqDropped: number; unparseableDates?: number;
   existingKeys: Set<string>; rows: RestaurantRow[]; actions: RekeyAction[]; notSeen: number | null;
 }
 
@@ -72,6 +72,7 @@ export function summarize(input: SummaryInput): string {
     `Matched pairs: ${input.matches}`,
     `Duplicates dropped: ${input.dropped}`,
     `Stale Foursquare dropped: ${input.staleFsqDropped}`,
+    `Foursquare unparseable refresh dates: ${input.unparseableDates ?? 0}`,
     `Inserted: ${inserted}`,
     `Updated: ${input.rows.length - inserted}`,
     `Promoted: ${promoted}`,
@@ -119,6 +120,7 @@ async function main(): Promise<void> {
   const base = {
     osm: osm.length, fsq: fsq.length, matches: merged.matches.length,
     dropped: merged.dropped.length, staleFsqDropped: merged.staleFsqDropped,
+    unparseableDates: merged.unparseableDates,
   };
 
   if (args.dryRun) {

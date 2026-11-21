@@ -3,3 +3,7 @@
 .env
 .env.*
 !.env.example
+
+# Raw MBTA GTFS feed (re-download with apps/web/scripts/transit/fetch-gtfs.sh)
+data/gtfs/
+*.zip
