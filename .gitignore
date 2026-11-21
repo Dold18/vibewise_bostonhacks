@@ -1,0 +1,9 @@
+# Environment files hold API keys and secrets. Ignored everywhere in the repo.
+# Commit a .env.example (names only, no values) to document required variables.
+.env
+.env.*
+!.env.example
+
+# Raw MBTA GTFS feed (re-download with apps/web/scripts/transit/fetch-gtfs.sh)
+data/gtfs/
+*.zip

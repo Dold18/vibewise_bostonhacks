@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vibenta Maps</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="map" aria-label="Map of Boston"></div>
+
+    <div class="top-bar">
+      <div class="search-wrap">
+        <form class="search" id="search-form" role="search">
+          <input id="search-input" type="search" placeholder="Search Boston" autocomplete="off" aria-label="Search places" />
+          <button type="submit" class="icon-btn accent" aria-label="Search">
+            <svg viewBox="0 0 24 24" width="22" height="22">
+              <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16a6.47 6.47 0 0 0 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14" />
+            </svg>
+          </button>
+          <button type="button" class="icon-btn" id="search-clear" aria-label="Clear search" hidden>
+            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" /></svg>
+          </button>
+        </form>
+        <ul class="results" id="results" hidden></ul>
+      </div>
+    </div>
+
+    <aside class="place-card" id="place-card" hidden></aside>
+
+    <div class="map-controls">
+      <button type="button" class="control tilt" id="tilt-toggle" title="Switch to 2D view">2D</button>
+      <button type="button" class="control" id="compass" title="Reset to north">
+        <svg viewBox="0 0 24 24" width="24" height="24" id="compass-needle">
+          <path d="M12 2 8 12h8z" fill="#ea4335" />
+          <path d="M12 22l4-10H8z" fill="#9aa0a6" />
+        </svg>
+      </button>
+      <div class="control-stack">
+        <button type="button" class="control" id="zoom-in" aria-label="Zoom in">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z" /></svg>
+        </button>
+        <button type="button" class="control" id="zoom-out" aria-label="Zoom out">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M19 13H5v-2h14z" /></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" hidden></div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

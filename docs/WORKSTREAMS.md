@@ -49,7 +49,9 @@ Never edit another workstream's owned files to make a local agent's code compile
 - Function/service `getTransitRoutes(request: TransitRequest): Promise<TransitResponse>`.
 - Validated provider data normalized to walking/transit legs and geometry.
 - Test cases covering at least one feasible journey, no route, provider failure and malformed data.
-- Evidence that line labels, stops and durations are real provider fields (not guessed).
+- Evidence that line labels, stops and durations are real provider fields (not guessed). Stop sequence and shapes come from provider data, not hand-drawn.
+- Tier 0 per-place feasibility output (nearest stop, walk estimate, next departures) and Tier 1 same-pattern journeys per D-007.
+- Tests for: wrong-direction rejection; same color but different branch (e.g. Red Ashmont vs Braintree) rejected; a case with no single-pattern connection (e.g. Red↔Blue) degrading to Tier 0; no drawn route when service is not running.
 
 **Integration owner must produce:**
 - One canonical place fixture/catalog, selectedPlaceId, origin and request lifecycle.
