@@ -11,10 +11,12 @@ export const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 const BACKOFF_MS = [10_000, 20_000, 40_000]; // between the 4 attempts
 const REQUEST_TIMEOUT_MS = 180_000;
+/** Rate limits and transient server errors are retried with backoff; other errors stop the run. */
+const RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504]);
 
 /** Still rate-limited or overloaded after every attempt; usually the key's quota is used up. */
 export class GeminiQuotaError extends Error {}
-/** Any other failure: a bad key or model name, or a response without text. */
+/** Any other failure, e.g. a bad key or model name (4xx). */
 export class GeminiRequestError extends Error {}
 
 export interface GeminiOptions {
@@ -87,7 +89,7 @@ export function createPriceEstimator(o: GeminiOptions): (places: PromptPlace[]) 
         if ((err as Error).name !== 'TimeoutError' && !(err instanceof TypeError)) throw err;
         res = null;
       }
-      if (res === null || res.status === 429 || res.status === 503) {
+      if (res === null || RETRYABLE_STATUS.has(res.status)) {
         const backoff = BACKOFF_MS[attempt];
         if (backoff === undefined) {
           throw new GeminiQuotaError(`Gemini still returned ${res?.status ?? 'no response'} after ${attempt + 1} attempts (quota used up or service overloaded)`);
@@ -102,7 +104,8 @@ export function createPriceEstimator(o: GeminiOptions): (places: PromptPlace[]) 
       const json = (await res.json()) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }> };
       const candidate = json.candidates?.[0];
       const text = candidate?.content?.parts?.map((p) => p.text ?? '').join('') ?? '';
-      if (!text) throw new GeminiRequestError(`Gemini returned no text (finishReason ${candidate?.finishReason ?? 'none'})`);
+      // No text (e.g. finishReason SAFETY or MAX_TOKENS) comes back as '', which the caller
+      // treats like an unreadable response: retried once, then the batch is skipped.
       return text;
     }
   };

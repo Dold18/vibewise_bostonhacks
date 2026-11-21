@@ -5,7 +5,7 @@
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { connect, fetchPriceCandidates, writePriceBands } from './db.ts';
-import { DEFAULT_GEMINI_MODEL, GeminiQuotaError, createPriceEstimator } from './gemini.ts';
+import { DEFAULT_GEMINI_MODEL, createPriceEstimator } from './gemini.ts';
 import {
   needsRetry, parseEstimates, planWrites, toPromptPlace,
   type PriceAnswer, type PriceCandidate, type PromptPlace, type WritePlan,
@@ -81,11 +81,9 @@ export async function runPriceEnrichment(deps: {
         result = parseEstimates(await deps.estimate(places), ids);
       }
     } catch (err) {
-      if (err instanceof GeminiQuotaError) {
-        s.stoppedEarly = err.message;
-        break;
-      }
-      throw err;
+      // Quota or any other failure: stop, keep what was written, report it. A re-run continues.
+      s.stoppedEarly = (err as Error).message;
+      break;
     }
     if (!result.ok) {
       s.skippedBatches++;

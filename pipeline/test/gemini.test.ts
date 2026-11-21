@@ -66,10 +66,18 @@ test('throws GeminiRequestError on 400 without retry', async () => {
   assert.equal(h.calls.length, 1);
 });
 
-test('throws GeminiRequestError when the response has no text', async () => {
+test('returns empty text when the response has none, so the batch is retried then skipped', async () => {
   const h = harness([{ status: 200, body: { candidates: [{ finishReason: 'SAFETY' }] } }]);
-  await assert.rejects(h.estimate(PLACES), GeminiRequestError);
+  assert.equal(await h.estimate(PLACES), '');
 });
+
+for (const status of [500, 502, 504]) {
+  test(`retries ${status} like 503`, async () => {
+    const h = harness([{ status }, { status: 200, body: okBody('[]') }]);
+    assert.equal(await h.estimate(PLACES), '[]');
+    assert.equal(h.calls.length, 2);
+  });
+}
 
 test('retries a timed-out or dropped request like a 503', async () => {
   let calls = 0;

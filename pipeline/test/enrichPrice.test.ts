@@ -104,8 +104,15 @@ test('missing rows are counted and not written', async () => {
   assert.deepEqual(r.plans[0]!.bands.$$, [1, 3]);
 });
 
-test('other errors propagate', async () => {
-  await assert.rejects(runPriceEnrichment({
-    candidates: [cand(1)], estimate: async () => { throw new Error('400 bad key'); }, write: null, batchSize: 10,
-  }), /bad key/);
+test('other errors stop the run and keep the partial summary', async () => {
+  const r = recorder();
+  let calls = 0;
+  const s = await runPriceEnrichment({
+    candidates: [1, 2, 3].map(cand),
+    estimate: async (p) => { if (++calls === 2) throw new Error('400 bad key'); return answerAll(p); },
+    write: r.write, batchSize: 1,
+  });
+  assert.equal(s.stoppedEarly, '400 bad key');
+  assert.equal(s.written, 1);
+  assert.equal(r.plans.length, 1);
 });
