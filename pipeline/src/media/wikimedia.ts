@@ -28,9 +28,20 @@ export function isAllowedLicense(shortName: string): boolean {
   return /^(cc0|cc-zero|public domain|pd\b|pd-|cc[ -]by(-sa)?([ -]\d|$))/i.test(s);
 }
 
+// Area words common in Boston photo titles; they say where, not which place.
+const LOCALITY = new Set([
+  'boston', 'cambridge', 'somerville', 'brookline', 'allston', 'brighton', 'fenway', 'harvard', 'kendall', 'central',
+  'porter', 'davis', 'square', 'street', 'st', 'avenue', 'ave', 'station', 'center', 'centre', 'downtown', 'north', 'south',
+]);
+
+/** A token that can identify a place: 3+ letters, not a number, not a generic food word or an area word. */
+function isSpecificToken(t: string): boolean {
+  return !GENERIC.has(t) && !LOCALITY.has(t) && (t.match(/\p{L}/gu)?.length ?? 0) >= 3;
+}
+
 export function isDistinctiveName(name: string): boolean {
   const tokens = nameKey(name).split(' ').filter(Boolean);
-  const specific = tokens.filter((t) => !GENERIC.has(t));
+  const specific = tokens.filter(isSpecificToken);
   if (specific.length === 0) return false;
   return tokens.length >= 2 || specific.some((t) => t.length >= 5);
 }

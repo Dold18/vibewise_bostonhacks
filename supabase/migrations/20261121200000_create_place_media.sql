@@ -28,7 +28,7 @@ create table public.place_photos (
   page_url        text,                -- link-back: Commons file page, website page, Mapillary image page
   license         text,                -- e.g. 'CC BY-SA 4.0'; null for website photos and uploads
   credit          text,                -- author or domain, as displayed
-  author_id       uuid references auth.users (id) on delete cascade,  -- uploads only
+  author_id       uuid default auth.uid() references auth.users (id) on delete cascade,  -- uploads only
   review_id       bigint references public.student_reviews (id) on delete cascade,
   rank            smallint not null check (rank between 1 and 5),     -- display rank by source (spec §4.1)
   is_seed         boolean not null default false,
@@ -41,6 +41,7 @@ create table public.place_photos (
 );
 create index place_photos_restaurant_idx on public.place_photos (restaurant_id, rank);
 create unique index place_photos_restaurant_url_idx on public.place_photos (restaurant_id, url) where url is not null;
+create unique index place_photos_restaurant_mapillary_idx on public.place_photos (restaurant_id, mapillary_id) where mapillary_id is not null;
 
 -- Text the later vibe step reads. Holds crawled website text, so it is never public (brief §11).
 create table public.place_vibe_inputs (
@@ -81,13 +82,21 @@ create policy "photos: read visible" on public.place_photos
 create policy "photos: add own upload" on public.place_photos
   for insert to authenticated
   with check (author_id = (select auth.uid()) and kind = 'student' and source = 'upload'
-              and match_method = 'upload' and rank = 1 and not is_seed and not hidden);
+              and match_method = 'upload' and rank = 1 and not is_seed and not hidden
+              -- An upload is a file in the user's own folder: no external URL, license or link-back.
+              and url is null and mapillary_id is null and license is null and page_url is null
+              and storage_path like (select auth.uid())::text || '/%'
+              and (review_id is null or exists (
+                select 1 from public.student_reviews r where r.id = review_id and r.author_id = (select auth.uid()))));
 create policy "photos: delete own upload" on public.place_photos
   for delete to authenticated using (author_id = (select auth.uid()) and kind = 'student');
 
 revoke all on public.student_reviews, public.place_photos, public.place_vibe_inputs from anon, authenticated;
 grant select on public.student_reviews, public.place_photos to anon, authenticated;
-grant insert, delete on public.student_reviews, public.place_photos to authenticated;
+grant delete on public.student_reviews, public.place_photos to authenticated;
+-- Column-level insert: author_id comes from its auth.uid() default; ids, flags and credits can't be supplied.
+grant insert (restaurant_id, rating, body, vibe_tags) on public.student_reviews to authenticated;
+grant insert (restaurant_id, kind, source, match_method, storage_path, review_id, rank) on public.place_photos to authenticated;
 
 revoke all on public.restaurant_points from anon, authenticated;
 grant select on public.restaurant_points to service_role;

@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { EnrichPlace, PhotoCandidate, VibeInput } from './types.ts';
+import { photoKey } from './rank.ts';
+import type { EnrichPlace, PhotoCandidate, VibeInput, VibeSource } from './types.ts';
 
 const PAGE_SIZE = 1000; // PostgREST max_rows
 
@@ -23,10 +24,15 @@ export async function fetchEnrichPlaces(client: SupabaseClient, opts: { refresh:
   }
 }
 
-export async function fetchHiddenUrls(client: SupabaseClient, restaurantId: number): Promise<Set<string>> {
-  const { data, error } = await client.from('place_photos').select('url').eq('restaurant_id', restaurantId).eq('hidden', true);
-  if (error) throw new Error(`fetchHiddenUrls failed for ${restaurantId}: ${error.message}`);
-  return new Set(((data ?? []) as Array<{ url: string | null }>).flatMap((r) => (r.url ? [r.url] : [])));
+/** Keys (see rank.ts photoKey) of the place's hidden photos, so the pipeline never re-adds them. */
+export async function fetchHiddenKeys(client: SupabaseClient, restaurantId: number): Promise<Set<string>> {
+  const { data, error } = await client.from('place_photos').select('url, mapillary_id').eq('restaurant_id', restaurantId).eq('hidden', true);
+  if (error) throw new Error(`fetchHiddenKeys failed for ${restaurantId}: ${error.message}`);
+  const rows = (data ?? []) as Array<{ url: string | null; mapillary_id?: string | null }>;
+  return new Set(rows.flatMap((r) => {
+    const key = photoKey({ url: r.url, mapillaryId: r.mapillary_id ?? null });
+    return key ? [key] : [];
+  }));
 }
 
 export async function fetchStudentReviewText(client: SupabaseClient, restaurantId: number): Promise<string[]> {
@@ -36,13 +42,18 @@ export async function fetchStudentReviewText(client: SupabaseClient, restaurantI
   return ((data ?? []) as Array<{ body: string }>).map((r) => r.body).filter((b) => b.trim() !== '');
 }
 
-/** Replace the pipeline's photos for one place (student and hidden rows survive), upsert its inputs, mark it checked. */
+/**
+ * Replace the pipeline's photos for one place (student and hidden rows survive), replace its inputs, mark it checked.
+ * Inputs whose source didn't produce anything this run are removed, except `keepSources` (their producer failed
+ * transiently, so the old text is kept rather than erased).
+ */
 export async function writePlaceMedia(
   client: SupabaseClient,
   restaurantId: number,
   photos: Array<PhotoCandidate & { rank: number }>,
   inputs: VibeInput[],
   checkedAt: string,
+  keepSources: VibeSource[] = [],
 ): Promise<void> {
   const del = await client.from('place_photos').delete()
     .eq('restaurant_id', restaurantId).neq('kind', 'student').eq('hidden', false);
@@ -62,6 +73,11 @@ export async function writePlaceMedia(
     const ups = await client.from('place_vibe_inputs').upsert(rows, { onConflict: 'restaurant_id,source' });
     if (ups.error) throw new Error(`upsert place_vibe_inputs failed for ${restaurantId}: ${ups.error.message}`);
   }
+
+  const survive = [...new Set([...inputs.map((i) => i.source), ...keepSources])].sort();
+  const stale = client.from('place_vibe_inputs').delete().eq('restaurant_id', restaurantId);
+  const cleared = survive.length > 0 ? await stale.not('source', 'in', `(${survive.map((s) => `"${s}"`).join(',')})`) : await stale;
+  if (cleared.error) throw new Error(`delete stale place_vibe_inputs failed for ${restaurantId}: ${cleared.error.message}`);
 
   const upd = await client.from('restaurants').update({ media_checked_at: checkedAt }).eq('id', restaurantId);
   if (upd.error) throw new Error(`update restaurants.media_checked_at failed for ${restaurantId}: ${upd.error.message}`);

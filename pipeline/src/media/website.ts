@@ -111,6 +111,21 @@ export function extractPage(html: string, pageUrl: string): PageExtract {
   return { text, description, images, aboutUrl };
 }
 
+// Review, social, booking, delivery and link-in-bio platforms: not the place's own site, and their content
+// can't be stored or used for AI (DECISIONS.md P-013).
+const THIRD_PARTY_HOSTS = [
+  'tripadvisor.com', 'yelp.com', 'facebook.com', 'fb.com', 'instagram.com', 'twitter.com', 'x.com', 'tiktok.com',
+  'google.com', 'goo.gl', 'g.page', 'foursquare.com', 'opentable.com', 'resy.com', 'exploretock.com', 'sevenrooms.com',
+  'doordash.com', 'grubhub.com', 'ubereats.com', 'seamless.com', 'postmates.com', 'caviar.com', 'toasttab.com',
+  'order.online', 'chownow.com', 'slicelife.com', 'menupages.com', 'allmenus.com', 'zomato.com', 'linktr.ee',
+  'beacons.ai', 'linkin.bio', 'zmenu.com', 'restaurantji.com', 'menufy.com',
+];
+
+function isThirdParty(url: string): boolean {
+  const host = new URL(url).hostname.toLowerCase().replace(/\.$/, '');
+  return THIRD_PARTY_HOSTS.some((h) => host === h || host.endsWith(`.${h}`));
+}
+
 function websiteUrl(raw: string): string | null {
   const v = raw.trim();
   try {
@@ -136,8 +151,12 @@ export async function scrapeWebsite(
   const start = websiteUrl(place.website);
   if (!start) return { photos: [], input: null, failure: { ok: false, reason: 'http', detail: `invalid website URL: ${place.website}` } };
 
+  const thirdParty = (url: string) => ({ photos: [], input: null, failure: { ok: false as const, reason: 'third_party' as const, detail: `not the place's own site: ${url}` } });
+  if (isThirdParty(start)) return thirdParty(start);
+
   const home = await http.getText(start, { checkRobots: true });
   if (!home.ok) return { photos: [], input: null, failure: home };
+  if (isThirdParty(home.url)) return thirdParty(home.url);
   const homePage = extractPage(home.body, home.url);
 
   const pages: Array<{ url: string; page: PageExtract }> = [{ url: home.url, page: homePage }];

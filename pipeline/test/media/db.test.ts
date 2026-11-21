@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { fetchEnrichPlaces, fetchHiddenUrls, writePlaceMedia } from '../../src/media/db.ts';
+import { fetchEnrichPlaces, fetchHiddenKeys, writePlaceMedia } from '../../src/media/db.ts';
 import type { PhotoCandidate } from '../../src/media/types.ts';
 
 type Call = { table: string; op: string; args: unknown[] };
@@ -75,8 +75,31 @@ test('fetchEnrichPlaces maps view rows to EnrichPlace and filters unchecked rows
   assert.equal(again.calls.some((c) => c.op === 'is'), false);
 });
 
-test('fetchHiddenUrls returns hidden photo URLs for the place', async () => {
+test('fetchHiddenKeys filters on hidden rows of the place', async () => {
   const { client, calls } = fakeClient(() => ({ data: [{ url: 'https://a/h.jpg' }, { url: null }], error: null }));
-  assert.deepEqual([...await fetchHiddenUrls(client, 7)], ['https://a/h.jpg']);
+  assert.deepEqual([...await fetchHiddenKeys(client, 7)], ['https://a/h.jpg']);
   assert.ok(calls.some((c) => c.op === 'eq' && c.args[0] === 'hidden' && c.args[1] === true));
+});
+
+test('fetchHiddenKeys returns URL keys and mapillary: keys', async () => {
+  const { client } = fakeClient(() => ({ data: [{ url: 'https://a/h.jpg', mapillary_id: null }, { url: null, mapillary_id: 'm1' }], error: null }));
+  assert.deepEqual([...await fetchHiddenKeys(client, 7)].sort(), ['https://a/h.jpg', 'mapillary:m1']);
+});
+
+test('writePlaceMedia removes inputs whose source is absent this run, except kept ones', async () => {
+  const { client, calls } = fakeClient(() => ({ error: null }));
+  await writePlaceMedia(client, 7, [], [{ source: 'osm_tags', content: 'x', sourceUrl: null }], 'now', ['website']);
+  const del = calls.findIndex((c) => c.table === 'place_vibe_inputs' && c.op === 'delete');
+  assert.ok(del >= 0);
+  const after = calls.slice(del + 1).filter((c) => c.table === 'place_vibe_inputs');
+  assert.ok(after.some((c) => c.op === 'eq' && c.args[0] === 'restaurant_id' && c.args[1] === 7));
+  assert.ok(after.some((c) => c.op === 'not' && c.args[0] === 'source' && c.args[1] === 'in' && c.args[2] === '("osm_tags","website")'));
+});
+
+test('writePlaceMedia with no inputs and nothing kept removes all of the place inputs', async () => {
+  const { client, calls } = fakeClient(() => ({ error: null }));
+  await writePlaceMedia(client, 7, [], [], 'now');
+  const del = calls.findIndex((c) => c.table === 'place_vibe_inputs' && c.op === 'delete');
+  assert.ok(del >= 0);
+  assert.equal(calls.slice(del + 1).some((c) => c.table === 'place_vibe_inputs' && c.op === 'not'), false);
 });

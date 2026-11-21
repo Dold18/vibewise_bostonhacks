@@ -3,7 +3,8 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { connect } from './db.ts';
 import { cityLicenseInput, loadCityLicenses, matchCityLicenses, type CityLicense } from './media/cityLicenses.ts';
-import { fetchEnrichPlaces, fetchHiddenUrls, fetchStudentReviewText, writePlaceMedia } from './media/db.ts';
+import { fetchEnrichPlaces, fetchHiddenKeys, fetchStudentReviewText, writePlaceMedia } from './media/db.ts';
+import { nameKey } from './normalize.ts';
 import { createPoliteFetcher, type FetchResult } from './media/http.ts';
 import { facingPhoto } from './media/mapillary.ts';
 import { loadCampuses, loadDemoIds, loadStops, tierOf, type Tier } from './media/priority.ts';
@@ -29,8 +30,11 @@ export interface EnrichContext {
   listings: Listing[];
   licenses: CityLicense[];
   mapillary: ((p: EnrichPlace) => Promise<PhotoCandidate | null>) | null;
-  hiddenUrls: (restaurantId: number) => Promise<Set<string>>;
+  /** Keys of hidden photos (rank.ts photoKey). A failure here fails the place: unfiltered photos are never written. */
+  hiddenKeys: (restaurantId: number) => Promise<Set<string>>;
   studentReviews: (restaurantId: number) => Promise<string[]>;
+  /** How many catalog places share each nameKey; chains get no name-only Wikivoyage match. */
+  nameCounts: Map<string, number>;
 }
 
 export interface PlaceResult {
@@ -38,7 +42,11 @@ export interface PlaceResult {
   inputs: VibeInput[];
   websiteFailure: string | null;
   errors: string[];
+  /** Sources whose producer failed transiently: their stored inputs are kept, not cleared. */
+  keepSources: VibeSource[];
 }
+
+const TRANSIENT_WEBSITE_FAILURES = new Set(['timeout', 'network']);
 
 function positiveInt(name: string, v: string | undefined, fallback: number | null): number | null {
   if (v === undefined) return fallback;
@@ -78,10 +86,14 @@ function osmUrl(placeId: string): string | null {
 }
 
 export async function enrichPlace(place: EnrichPlace, ctx: EnrichContext): Promise<PlaceResult> {
+  // Fetched first and not caught: without it, hidden photos could be re-added.
+  const hidden = await ctx.hiddenKeys(place.id);
   const errors: string[] = [];
-  async function attempt<T>(name: string, fn: () => Promise<T>, fallback: T): Promise<T> {
+  const keep = new Set<VibeSource>();
+  async function attempt<T>(name: string, fn: () => Promise<T>, fallback: T, feeds?: VibeSource): Promise<T> {
     try { return await fn(); } catch (err) {
       errors.push(`${name}: ${err instanceof Error ? err.message : String(err)}`);
+      if (feeds) keep.add(feeds);
       return fallback;
     }
   }
@@ -89,12 +101,13 @@ export async function enrichPlace(place: EnrichPlace, ctx: EnrichContext): Promi
   const candidates: PhotoCandidate[] = [];
   const inputs: VibeInput[] = [];
 
-  const site = await attempt('website', () => ctx.website(place), { photos: [], input: null, failure: null });
+  const site = await attempt('website', () => ctx.website(place), { photos: [], input: null, failure: null }, 'website');
   candidates.push(...site.photos);
   if (site.input) inputs.push(site.input);
   const websiteFailure = site.failure && !site.failure.ok ? site.failure.reason : null;
+  if (websiteFailure && TRANSIENT_WEBSITE_FAILURES.has(websiteFailure)) keep.add('website');
 
-  const linked = await attempt('linked', () => ctx.linked(place), { photos: [], wikidata: null });
+  const linked = await attempt('linked', () => ctx.linked(place), { photos: [], wikidata: null }, 'wiki');
   candidates.push(...linked.photos);
   candidates.push(...await attempt('geosearch', () => ctx.geosearch(place), [] as PhotoCandidate[]));
   if (ctx.mapillary) {
@@ -103,8 +116,9 @@ export async function enrichPlace(place: EnrichPlace, ctx: EnrichContext): Promi
   }
 
   const title = linked.wikidata?.enwikiTitle;
-  const wp = title ? await attempt('wikipedia', () => ctx.wikipedia(title), null) : null;
-  const wv = await attempt('wikivoyage', async () => matchListing(place, ctx.listings), null);
+  const wp = title ? await attempt('wikipedia', () => ctx.wikipedia(title), null, 'wiki') : null;
+  const sameNamePlaces = ctx.nameCounts.get(nameKey(place.name)) ?? 1;
+  const wv = await attempt('wikivoyage', async () => matchListing(place, ctx.listings, { sameNamePlaces }), null, 'wiki');
   const wikiParts = [wp ? `Wikipedia: ${wp.text}` : null, wv?.content ? `Wikivoyage: ${wv.content}` : null].filter((s): s is string => s !== null);
   if (wikiParts.length > 0) {
     const wvUrl = wv ? `https://en.wikivoyage.org/wiki/${encodeURIComponent(wv.pageTitle.replace(/ /g, '_'))}` : null;
@@ -114,14 +128,15 @@ export async function enrichPlace(place: EnrichPlace, ctx: EnrichContext): Promi
   const tags = Object.entries(place.osmTags ?? {}).filter(([k]) => !OSM_TAGS_LEFT_OUT.has(k));
   if (tags.length > 0) inputs.push({ source: 'osm_tags', content: tags.map(([k, v]) => `${k}=${v}`).join('; '), sourceUrl: osmUrl(place.placeId) });
 
-  const city = await attempt('city_licenses', async () => cityLicenseInput(matchCityLicenses(place, ctx.licenses)), null);
+  const city = await attempt('city_licenses', async () => cityLicenseInput(matchCityLicenses(place, ctx.licenses)), null, 'city_licenses');
   if (city) inputs.push(city);
 
-  const reviews = await attempt('student_reviews', () => ctx.studentReviews(place.id), [] as string[]);
+  const reviews = await attempt('student_reviews', () => ctx.studentReviews(place.id), [] as string[], 'student_reviews');
   if (reviews.length > 0) inputs.push({ source: 'student_reviews', content: reviews.join('\n---\n'), sourceUrl: null });
 
-  const hidden = await attempt('hidden_urls', () => ctx.hiddenUrls(place.id), new Set<string>());
-  return { photos: rankPhotos(candidates, hidden), inputs, websiteFailure, errors };
+  const produced = new Set(inputs.map((i) => i.source));
+  const keepSources = [...keep].filter((s) => !produced.has(s));
+  return { photos: rankPhotos(candidates, hidden), inputs, websiteFailure, errors, keepSources };
 }
 
 export function summarizeMedia(results: PlaceResult[], skippedTiers: number): string {
@@ -166,7 +181,11 @@ async function main(): Promise<void> {
   ]);
   console.log(`Loaded ${listings.length} Wikivoyage listings, ${licenses.length} city licenses, ${demo.size} demo places`);
 
-  const all = await fetchEnrichPlaces(client, { refresh: args.refresh });
+  // Name counts come from the whole catalog, not just unchecked rows, so chains are recognized on resumed runs too.
+  const catalog = await fetchEnrichPlaces(client, { refresh: true });
+  const all = args.refresh ? catalog : await fetchEnrichPlaces(client, { refresh: false });
+  const nameCounts = new Map<string, number>();
+  for (const p of catalog) nameCounts.set(nameKey(p.name), (nameCounts.get(nameKey(p.name)) ?? 0) + 1);
   const tiered = all.map((p) => ({ p, tier: tierOf(p, { demo, stops, campuses }) }));
   const wanted = tiered.filter((t) => args.tiers.includes(t.tier)).sort((a, b) => a.tier - b.tier || a.p.id - b.p.id);
   const queue = args.limit === null ? wanted : wanted.slice(0, args.limit);
@@ -180,8 +199,9 @@ async function main(): Promise<void> {
     wikipedia: (t) => wikipediaExtract(t, api),
     listings, licenses,
     mapillary: mapillaryToken ? (p) => facingPhoto(p, mapillaryToken, api) : null,
-    hiddenUrls: (id) => fetchHiddenUrls(client, id),
+    hiddenKeys: (id) => fetchHiddenKeys(client, id),
     studentReviews: (id) => fetchStudentReviewText(client, id),
+    nameCounts,
   };
 
   const results: PlaceResult[] = [];
@@ -195,12 +215,19 @@ async function main(): Promise<void> {
   async function worker(): Promise<void> {
     while (next < queue.length) {
       const { p, tier } = queue[next++]!;
-      const r = await enrichPlace(p, ctx);
+      let r: PlaceResult;
+      try {
+        r = await enrichPlace(p, ctx);
+      } catch (err) {
+        // Nothing is written; media_checked_at stays null, so the next run retries this place.
+        results.push({ photos: [], inputs: [], websiteFailure: null, keepSources: [], errors: [`place: ${err instanceof Error ? err.message : String(err)}`] });
+        continue;
+      }
       if (args.dryRun) {
         dryRows.push({ placeId: p.placeId, name: p.name, tier, ...r });
       } else {
         try {
-          await writePlaceMedia(client, p.id, r.photos, r.inputs, new Date().toISOString());
+          await writePlaceMedia(client, p.id, r.photos, r.inputs, new Date().toISOString(), r.keepSources);
         } catch (err) {
           r.errors.push(`write: ${err instanceof Error ? err.message : String(err)}`);
         }

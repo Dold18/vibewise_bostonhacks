@@ -21,7 +21,8 @@ function ctx(over: Partial<EnrichContext> = {}): EnrichContext {
     listings: [{ name: 'Bukowski Tavern', lat: 42.3478, lng: -71.0845, content: 'Huge beer list.', pageTitle: 'Boston/Back Bay' }],
     licenses: [],
     mapillary: null,
-    hiddenUrls: async () => new Set(),
+    hiddenKeys: async () => new Set(),
+    nameCounts: new Map(),
     studentReviews: async () => [],
     ...over,
   };
@@ -64,7 +65,7 @@ test('student reviews appear only when they exist, joined by a separator', async
 });
 
 test('a hidden URL never comes back', async () => {
-  const r = await enrichPlace(PLACE, ctx({ hiddenUrls: async () => new Set(['https://bukowski.test/a.jpg']) }));
+  const r = await enrichPlace(PLACE, ctx({ hiddenKeys: async () => new Set(['https://bukowski.test/a.jpg']) }));
   assert.deepEqual(r.photos.map((p) => p.url), ['https://upload.wikimedia.org/a.jpg']);
 });
 
@@ -82,8 +83,8 @@ test('mapillary runs only when configured', async () => {
 
 test('summarizeMedia reports coverage per source', () => {
   const results: PlaceResult[] = [
-    { photos: [{ ...photo('website', 'a'), rank: 3 }, { ...photo('osm', 'b'), rank: 2 }], inputs: [{ source: 'website', content: 'x', sourceUrl: null }], websiteFailure: null, errors: [] },
-    { photos: [], inputs: [], websiteFailure: 'robots', errors: ['wikivoyage: boom'] },
+    { photos: [{ ...photo('website', 'a'), rank: 3 }, { ...photo('osm', 'b'), rank: 2 }], inputs: [{ source: 'website', content: 'x', sourceUrl: null }], websiteFailure: null, errors: [], keepSources: [] },
+    { photos: [], inputs: [], websiteFailure: 'robots', errors: ['wikivoyage: boom'], keepSources: [] },
   ];
   assert.equal(summarizeMedia(results, 3), [
     'Places processed: 2',
@@ -94,4 +95,27 @@ test('summarizeMedia reports coverage per source', () => {
     'Website failures: robots 1',
     'Places with errors: 1',
   ].join('\n'));
+});
+
+test('a failed hidden-photo lookup fails the place instead of writing unfiltered photos', async () => {
+  await assert.rejects(enrichPlace(PLACE, ctx({ hiddenKeys: async () => { throw new Error('db down'); } })), /db down/);
+});
+
+test('inputs whose source errored, or a website that timed out, are kept rather than cleared', async () => {
+  const r = await enrichPlace(PLACE, ctx({
+    website: async () => ({ photos: [], input: null, failure: { ok: false, reason: 'timeout', detail: 'x' } }),
+    studentReviews: async () => { throw new Error('db hiccup'); },
+  }));
+  assert.deepEqual([...r.keepSources].sort(), ['student_reviews', 'website']);
+  const gone = await enrichPlace(PLACE, ctx({ website: async () => ({ photos: [], input: null, failure: { ok: false, reason: 'robots', detail: 'x' } }) }));
+  assert.deepEqual(gone.keepSources, []);
+});
+
+test('chain branches sharing a name get no name-only Wikivoyage match', async () => {
+  const listings = [{ name: 'Bukowski Tavern', lat: null, lng: null, content: 'One listing.', pageTitle: 'Boston' }];
+  const noWiki = async () => ({ photos: [], wikidata: null });
+  const single = await enrichPlace(PLACE, ctx({ listings, nameCounts: new Map([['bukowski tavern', 1]]), linked: noWiki }));
+  assert.ok(single.inputs.some((i) => i.source === 'wiki'));
+  const chain = await enrichPlace(PLACE, ctx({ listings, nameCounts: new Map([['bukowski tavern', 4]]), linked: noWiki }));
+  assert.equal(chain.inputs.some((i) => i.source === 'wiki'), false);
 });

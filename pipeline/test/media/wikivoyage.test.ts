@@ -68,3 +68,9 @@ test('loadListings reads Boston subpages plus the fixed pages, and caches them',
   assert.equal(urls.length, n);
   assert.deepEqual(second, first);
 });
+
+test('a name-only match is refused when several places share the name (chains)', () => {
+  const only = L({});
+  assert.equal(matchListing(PLACE, [only], { sameNamePlaces: 3 }), null);
+  assert.equal(matchListing(PLACE, [only], { sameNamePlaces: 1 }), only);
+});

@@ -148,3 +148,9 @@ test('wikipediaExtract returns null for an empty extract', async () => {
   const { http } = fakeWiki({ extract: '' });
   assert.equal(await wikipediaExtract('Nothing', http), null);
 });
+
+test('numbers, short tokens and locality words do not make a name distinctive', () => {
+  for (const n of ['Cafe 1', 'Bar 10', 'Pho 88', 'Harvard Square Cafe', 'Boston Pizza', 'Cafe JP']) assert.equal(isDistinctiveName(n), false, n);
+  for (const n of ['Tatte Bakery', 'Clover Food Lab', "Joe's Pizza"]) assert.equal(isDistinctiveName(n), true, n);
+  assert.equal(nameMatches('File:Harvard Square cafe 1.jpg', 'Cafe 1'), false);
+});

@@ -128,3 +128,21 @@ test('images whose URL declares a size under 400 px, blurred placeholders, avata
     'https://storyblok.test/f/1440x602/hero.png',
   ]);
 });
+
+test('a website on a review, social or delivery platform is not scraped', async () => {
+  for (const site of ['https://www.tripadvisor.com/Restaurant_Review-x', 'https://facebook.com/x', 'https://www.doordash.com/store/x', 'https://linktr.ee/x', 'https://www.yelp.com/biz/x']) {
+    let fetched = false;
+    const http: PoliteFetcher = { async getText() { fetched = true; return ok(site, HOME); }, async getJson() { throw new Error('x'); } };
+    const r = await scrapeWebsite({ ...PLACE, website: site }, http);
+    assert.equal(fetched, false, site);
+    assert.equal(r.failure?.ok === false && r.failure.reason, 'third_party', site);
+  }
+});
+
+test('a website that redirects to a third-party platform is dropped', async () => {
+  const http = fakeHttp({ 'https://www.example.com/': ok('https://www.facebook.com/examplecafe', HOME) });
+  const r = await scrapeWebsite(PLACE, http);
+  assert.deepEqual(r.photos, []);
+  assert.equal(r.input, null);
+  assert.equal(r.failure?.ok === false && r.failure.reason, 'third_party');
+});

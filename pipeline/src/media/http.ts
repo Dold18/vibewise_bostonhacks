@@ -4,7 +4,7 @@ import type { FetchDeps } from './types.ts';
 
 export type FetchResult =
   | { ok: true; url: string; contentType: string; body: string }
-  | { ok: false; reason: 'robots' | 'http' | 'timeout' | 'not_html' | 'network'; detail: string };
+  | { ok: false; reason: 'robots' | 'http' | 'timeout' | 'not_html' | 'network' | 'third_party'; detail: string };
 
 export interface PoliteFetcher {
   getText(url: string, opts?: { checkRobots?: boolean }): Promise<FetchResult>;

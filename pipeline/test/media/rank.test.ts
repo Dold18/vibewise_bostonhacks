@@ -42,3 +42,8 @@ test('Mapillary sorts last and dedupes by image id', () => {
   ], new Set());
   assert.deepEqual(out.map((p) => [p.source, p.rank]), [['commons', 4], ['mapillary', 5]]);
 });
+
+test('a hidden Mapillary photo is dropped by its image id', () => {
+  const out = rankPhotos([c('mapillary', null, { mapillaryId: 'm1' }), c('commons', 'https://a/c.jpg')], new Set(['mapillary:m1']));
+  assert.deepEqual(out.map((p) => p.source), ['commons']);
+});
