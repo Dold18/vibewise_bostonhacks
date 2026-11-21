@@ -67,3 +67,13 @@ test('actions are ordered clear, promote, collapse, each by id ascending; inputs
   ]);
   assert.equal(JSON.stringify([existing, rows]), snapshot);
 });
+
+test('clear: OSM row vanished and its fsq record survives as an fsq-only row', () => {
+  assert.deepEqual(planRekey([ex(3, 'osm', 'node/1', 'f1')], [fsqRow('f1')]), [{ kind: 'clear_fsq', id: 3 }]);
+});
+
+test('clear: two OSM rows swap fsq ids', () => {
+  assert.deepEqual(
+    planRekey([ex(3, 'osm', 'node/1', 'f1'), ex(4, 'osm', 'node/2', 'f2')], [osmRow(1, 'f2'), osmRow(2, 'f1')]),
+    [{ kind: 'clear_fsq', id: 3 }, { kind: 'clear_fsq', id: 4 }]);
+});
