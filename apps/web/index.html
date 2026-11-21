@@ -17,7 +17,7 @@
     <div class="top-bar">
       <div class="search-wrap">
         <form class="search" id="search-form" role="search">
-          <button type="button" class="icon-btn" aria-label="Menu">
+          <button type="button" class="icon-btn menu-btn" id="menu-toggle" aria-label="Menu" aria-controls="side-panel" aria-expanded="false">
             <svg viewBox="0 0 24 24" width="22" height="22"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z" /></svg>
           </button>
           <input id="search-input" type="search" placeholder="Search Boston" autocomplete="off" aria-label="Search places" />
@@ -32,8 +32,25 @@
         </form>
         <ul class="results" id="results" hidden></ul>
       </div>
-      <div class="chips" id="chips" role="toolbar" aria-label="Browse nearby"></div>
     </div>
+
+    <aside class="side-panel" id="side-panel" aria-label="Map options">
+      <header class="panel-header">
+        <span class="panel-title">Vibenta</span>
+        <button type="button" class="icon-btn" id="panel-close" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" /></svg>
+        </button>
+      </header>
+      <section class="panel-section">
+        <label class="field-label" for="location-type">Location type</label>
+        <div class="select-wrap">
+          <select id="location-type">
+            <option value="">Select a type</option>
+          </select>
+        </div>
+        <p class="field-hint">Shows matching places around the center of the map.</p>
+      </section>
+    </aside>
 
     <aside class="place-card" id="place-card" hidden></aside>
 

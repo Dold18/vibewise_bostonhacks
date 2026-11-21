@@ -54,35 +54,57 @@ let markers: Marker[] = [];
 let shadows: Marker[] = [];
 let selectedPin: HTMLElement | null = null;
 
+/*
+ * MapLibre positions every marker by rewriting its element's inline
+ * `transform` each frame. So the marker elements below carry no transform,
+ * transition or position styling of their own; all visuals and animation
+ * live on inner elements. (A transition on the marker itself makes it lag
+ * behind the map, which detached pins from their shadows.)
+ */
+
 /**
- * A pin's shadow: the pin silhouette lying on the ground plane, its tip at the
- * pin's base, cast away from the scene light. It fades in with camera pitch.
+ * A pin's ground shadow, laid flat on the map by MapLibre: a soft contact spot
+ * under the tip plus the pin's silhouette cast away from the scene light.
+ * Fades in with camera pitch (see syncDepth).
  */
 function shadowElement(): HTMLElement {
   const el = document.createElement('div');
   el.className = 'pin-shadow';
-  el.innerHTML = `<svg class="pin-shadow-shape" viewBox="0 0 28 40" preserveAspectRatio="none" aria-hidden="true">
-    <path d="${PIN_PATH}" />
-  </svg>`;
+  el.innerHTML = `<svg class="pin-shadow-cast" viewBox="0 0 28 40" aria-hidden="true"><path d="${PIN_PATH}" /></svg>
+    <span class="pin-shadow-contact"></span>`;
   return el;
 }
 
-function pinElement(color: string, icon?: string): HTMLElement {
+/**
+ * How one pin looks. Today every pin in a result set shares a look; the plan
+ * is for each place's match score to drive both (better match = stronger
+ * color, bigger pin). `scale` 1 is the default 28×40px pin; its shadow
+ * scales with it.
+ */
+interface PinLook {
+  color: string;
+  scale: number;
+}
+
+function applyPinLook(pin: HTMLElement, shadow: HTMLElement, look: PinLook) {
+  pin.style.setProperty('--pin-color', look.color);
+  pin.style.setProperty('--pin-scale', String(look.scale));
+  shadow.style.setProperty('--pin-scale', String(look.scale));
+}
+
+/** A solid teardrop pin, colored and sized entirely by --pin-color / --pin-scale. */
+function pinElement(): HTMLElement {
   const el = document.createElement('button');
   el.type = 'button';
   el.className = 'pin';
-  el.style.setProperty('--pin-color', color);
-  el.innerHTML = `<svg viewBox="0 0 28 40" width="28" height="40" aria-hidden="true">
-    <path d="${PIN_PATH}" fill="var(--pin-color)" stroke="rgba(0,0,0,.18)" />
-  </svg>`;
-  const glyph = document.createElement('span');
-  glyph.className = 'pin-glyph';
-  glyph.textContent = icon ?? '';
-  el.append(glyph);
+  const body = document.createElement('span');
+  body.className = 'pin-body';
+  body.innerHTML = `<svg viewBox="0 0 28 40" width="28" height="40" aria-hidden="true"><path d="${PIN_PATH}" /></svg>`;
+  el.append(body);
   return el;
 }
 
-function showPlaces(places: Place[], color: string, icon?: string) {
+function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: string) {
   clearPins();
   // Shadows first so every pin draws above every shadow.
   shadows = places.map((place) =>
@@ -91,17 +113,22 @@ function showPlaces(places: Place[], color: string, icon?: string) {
       .addTo(map),
   );
   markers = places.map((place, i) => {
-    const el = pinElement(color, icon);
+    const look = lookFor(place);
+    const el = pinElement();
+    applyPinLook(el, shadows[i].getElement(), look);
     el.dataset.index = String(i);
     el.setAttribute('aria-label', place.name);
     el.addEventListener('click', (e) => {
       e.stopPropagation();
       selectPin(el);
-      openCard(place, color, icon);
+      openCard(place, look.color, icon);
     });
     return new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
   });
 }
+
+/** Every pin the same: what search results and location types use until match scores exist. */
+const uniformLook = (color: string) => (): PinLook => ({ color, scale: 1 });
 
 function clearPins() {
   [...markers, ...shadows].forEach((m) => m.remove());
@@ -235,7 +262,7 @@ clearBtn.addEventListener('click', () => {
   resultsList.hidden = true;
   clearPins();
   closeCard();
-  setActiveChip(undefined);
+  cancelCategory();
   input.focus();
 });
 
@@ -245,7 +272,7 @@ form.addEventListener('submit', async (e) => {
   if (!query) return;
   searchAbort?.abort();
   searchAbort = new AbortController();
-  setActiveChip(undefined);
+  cancelCategory();
   showToast('Searching…', true);
   try {
     const places = await searchPlaces(query, searchAbort.signal);
@@ -264,7 +291,7 @@ function renderResults(places: Place[]) {
     return;
   }
   const color = CATEGORY_COLORS.search;
-  showPlaces(places, color);
+  showPlaces(places, uniformLook(color));
   for (const [i, place] of places.entries()) {
     const li = el('li');
     const btn = el('button', 'result');
@@ -286,41 +313,70 @@ function renderResults(places: Place[]) {
 }
 
 // ---------------------------------------------------------------------------
-// Category chips (Overpass)
+// Side panel (opened by the ☰ button in the search bar)
 // ---------------------------------------------------------------------------
 
-const chipsBar = $<HTMLElement>('chips');
-let chipAbort: AbortController | undefined;
-let activeChip: string | undefined;
+const panel = $<HTMLElement>('side-panel');
+const menuBtn = $<HTMLButtonElement>('menu-toggle');
+const typeSelect = $<HTMLSelectElement>('location-type');
+
+function setPanelOpen(open: boolean) {
+  panel.classList.toggle('open', open);
+  menuBtn.setAttribute('aria-expanded', String(open));
+  if (open) typeSelect.focus();
+}
+
+menuBtn.addEventListener('click', () => setPanelOpen(!panel.classList.contains('open')));
+$('panel-close').addEventListener('click', () => {
+  setPanelOpen(false);
+  menuBtn.focus();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && panel.classList.contains('open')) {
+    setPanelOpen(false);
+    menuBtn.focus();
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Location type (tile POIs + Overpass)
+// ---------------------------------------------------------------------------
+
+let categoryAbort: AbortController | undefined;
 
 for (const category of CATEGORIES) {
-  const chip = el('button', 'chip');
-  chip.type = 'button';
-  chip.dataset.id = category.id;
-  chip.append(el('span', 'chip-icon', category.icon), el('span', undefined, category.label));
-  chip.addEventListener('click', () => toggleCategory(category));
-  chipsBar.append(chip);
+  typeSelect.append(new Option(`${category.icon}  ${category.label}`, category.id));
 }
 
-function setActiveChip(id: string | undefined) {
-  activeChip = id;
-  for (const chip of chipsBar.querySelectorAll<HTMLElement>('.chip')) {
-    chip.classList.toggle('active', chip.dataset.id === id);
-  }
+typeSelect.addEventListener('change', () => {
+  showCategory(CATEGORIES.find((c) => c.id === typeSelect.value));
+  // On phones the panel covers the map; get it out of the way so the pins are visible.
+  if (window.innerWidth <= 640) setPanelOpen(false);
+});
+
+/** Reflect the active type in the dropdown and badge the ☰ button while a filter is on. */
+function setActiveCategory(id: string | undefined) {
+  typeSelect.value = id ?? '';
+  menuBtn.classList.toggle('has-filter', id !== undefined);
 }
 
-async function toggleCategory(category: Category) {
-  chipAbort?.abort();
+/** Drop the active type and any lookup still in flight (so it can't overwrite newer pins). */
+function cancelCategory() {
+  categoryAbort?.abort();
+  setActiveCategory(undefined);
+}
+
+async function showCategory(category: Category | undefined) {
+  categoryAbort?.abort();
   closeCard();
   resultsList.hidden = true;
-  if (activeChip === category.id) {
-    setActiveChip(undefined);
+  setActiveCategory(category?.id);
+  if (!category) {
     clearPins();
     hideToast();
     return;
   }
-  setActiveChip(category.id);
-  const abort = (chipAbort = new AbortController());
+  const abort = (categoryAbort = new AbortController());
   const label = category.label.toLowerCase();
   const color = CATEGORY_COLORS[category.id] ?? CATEGORY_COLORS.search;
   const c = map.getCenter();
@@ -335,7 +391,7 @@ async function toggleCategory(category: Category) {
     if (abort.signal.aborted || haveDetailed) return;
     const quick = placesFromTiles(tilePois(category), center, radius);
     quickCount = quick.length;
-    showPlaces(quick, color, category.icon);
+    showPlaces(quick, uniformLook(color), category.icon);
     if (quickCount > 0) hideToast();
   };
   showQuick();
@@ -351,7 +407,7 @@ async function toggleCategory(category: Category) {
     if (abort.signal.aborted) return;
     if (detailed.length > 0) {
       haveDetailed = true;
-      showPlaces(detailed, color, category.icon);
+      showPlaces(detailed, uniformLook(color), category.icon);
       hideToast();
     } else if (quickCount === 0) {
       showToast(`No ${label} found here. Try moving the map.`);
@@ -359,7 +415,7 @@ async function toggleCategory(category: Category) {
   } catch {
     if (abort.signal.aborted) return;
     if (quickCount === 0) {
-      setActiveChip(undefined);
+      setActiveCategory(undefined);
       showToast(`Couldn't find ${label} here, and the OSM details service is busy. Try again shortly.`);
     } else {
       showToast('Showing basic info. The OSM details service is busy right now.');
