@@ -85,7 +85,7 @@ describe('Navigate defaults', () => {
     const half = run({ type: 'openSearch', discoveryOrigin: null, selectedPlace: CAFE }, { type: 'getDirections' });
     expect(half.navigationOpen).toBe(false);
     const s = run({ type: 'openSearch', discoveryOrigin: PARK, selectedPlace: CAFE }, { type: 'getDirections' });
-    expect(s).toMatchObject({ navigationOpen: true, searchOpen: false, from: PARK, to: CAFE });
+    expect(s).toMatchObject({ navigationOpen: true, directionsExpanded: true, searchOpen: false, from: PARK, to: CAFE });
     expect(needsRoute(s)).toBe(true);
   });
 
@@ -179,5 +179,31 @@ describe('route lifecycle', () => {
     createTripRouter(store, { name: 'boom', plan: async () => Promise.reject(new Error('socket hang up')) });
     store.dispatch({ type: 'navigateTo', destination: CAFE, discoveryOrigin: PARK });
     await vi.waitFor(() => expect(store.getState().route).toMatchObject({ kind: 'done', result: { status: 'error', message: 'socket hang up' } }));
+  });
+});
+
+describe('Directions presentation is independent of navigation', () => {
+  it('opens Directions immediately for resolved endpoints and for a missing origin', () => {
+    expect(run({type:'navigateTo',destination:CAFE,discoveryOrigin:PARK}).directionsExpanded).toBe(true);
+    expect(run({type:'navigateTo',destination:CAFE,discoveryOrigin:null}).directionsExpanded).toBe(true);
+  });
+  it('collapsing and expanding leaves the in-flight request and generation intact', () => {
+    let s = run({type:'navigateTo',destination:CAFE,discoveryOrigin:PARK});
+    s=tripReducer(s,{type:'requestStarted',generation:s.generation});
+    const expanded=tripReducer(s,{type:'setDirectionsExpanded',expanded:true});
+    const collapsed=tripReducer(expanded,{type:'setDirectionsExpanded',expanded:false});
+    expect(collapsed.navigationOpen).toBe(true); expect(collapsed.route).toBe(s.route); expect(collapsed.generation).toBe(s.generation);
+  });
+  it('collapse does not abort or duplicate requests; Exit does', () => {
+    const store=createStore(tripReducer,initialTripState());
+    let signal: AbortSignal | undefined;
+    const plan=vi.fn((_r, s: AbortSignal)=> { signal=s; return new Promise<RouteResult>(()=>{}); });
+    const router=createTripRouter(store,{name:'TEST FIXTURE',plan});
+    store.dispatch({type:'navigateTo',destination:CAFE,discoveryOrigin:PARK});
+    store.dispatch({type:'setDirectionsExpanded',expanded:true});
+    store.dispatch({type:'setDirectionsExpanded',expanded:false});
+    expect(signal!.aborted).toBe(false);expect(plan).toHaveBeenCalledOnce();
+    store.dispatch({type:'endNavigation'});expect(signal!.aborted).toBe(true);expect(store.getState().directionsExpanded).toBe(false);
+    router.dispose();
   });
 });

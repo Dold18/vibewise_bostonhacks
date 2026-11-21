@@ -41,7 +41,7 @@ function walkStep(leg: RouteLeg, toLabel: string): ItineraryStep {
   return {
     kind: 'walk',
     text: `Walk to ${toLabel}`,
-    detail: verified ? `${minutes(leg.durationSec)}${dist} · walking route` : `About ${minutes(leg.durationSec)}${dist} · straight-line estimate`,
+    detail: verified ? `${minutes(leg.durationSec)}${dist} · walking route` : `About ${minutes(leg.durationSec)}${dist} · straight-line estimate. Estimated walking connection — route not verified.`,
     estimate: !verified,
   };
 }

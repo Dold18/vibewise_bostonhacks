@@ -16,15 +16,25 @@ export function createRoutePlanner(c: RoutePlannerConfig) {
   const store = c.store ?? createStore(tripReducer, initialTripState());
   const router = !c.store && c.provider ? createTripRouter(store, c.provider) : null;
   const fields = createTripFields({ ...c, store });
-  const close = h('button', { type: 'button', class: 'vb-icon-btn', 'aria-label': 'Close directions' }, icon(ICONS.close, 20));
+  const close = h('button', { type: 'button', class: 'vb-icon-btn', 'aria-label': 'Collapse directions' }, icon(ICONS.close, 20));
+  const exit = h('button', { type: 'button', class: 'vb-text-btn vb-exit-navigation', 'aria-label': 'Exit Navigation' }, 'Exit');
+  const pill = h('button', { type: 'button', class: 'vb-directions-pill', 'aria-expanded': 'false' }, icon(ICONS.directions, 20), 'Directions');
+  const compactExit = h('button', { type: 'button', class: 'vb-text-btn vb-exit-navigation', 'aria-label': 'Exit Navigation' }, 'Exit');
+  const control = h('div', { class: 'vb-directions-control', hidden: true }, pill, compactExit);
   const results = h('div', { class: 'vb-planner-results', 'aria-live': 'polite' });
-  const root = h('section', { class: 'vb-ui vb-planner', role: 'dialog', 'aria-label': 'Directions', hidden: true },
-    h('header', { class: 'vb-planner-header' }, h('h2', { class: 'vb-planner-title' }, 'Directions'), close), fields.root, results);
+  const root = h('section', { class: 'vb-ui vb-planner', role: 'dialog', 'aria-label': 'Directions', id: 'vb-directions-panel', hidden: true },
+    h('header', { class: 'vb-planner-header' }, h('h2', { class: 'vb-planner-title' }, 'Directions'), exit, close), fields.root, results);
   const end = () => { fields.close(); store.dispatch({ type: 'endNavigation' }); };
-  close.addEventListener('click', end);
-  root.addEventListener('keydown', e => { if(e.key === 'Escape' && !e.defaultPrevented) { e.stopPropagation(); end(); } });
+  const collapse = () => { fields.close(); store.dispatch({ type: 'setDirectionsExpanded', expanded: false }); pill.focus(); };
+  pill.setAttribute('aria-controls', 'vb-directions-panel');
+  pill.addEventListener('click', () => store.dispatch({ type: 'setDirectionsExpanded', expanded: true }));
+  close.addEventListener('click', collapse);
+  exit.addEventListener('click', end); compactExit.addEventListener('click', end);
+  root.addEventListener('keydown', e => { if(e.key === 'Escape' && !e.defaultPrevented) { e.stopPropagation(); collapse(); } });
   function render(s: TripState, prev?: TripState) {
-    root.hidden = !s.navigationOpen;
+    root.hidden = !s.navigationOpen || !s.directionsExpanded;
+    control.hidden = !s.navigationOpen || s.directionsExpanded;
+    pill.setAttribute("aria-expanded", String(s.directionsExpanded));
     results.replaceChildren();
     const missing = missingEndpoint(s);
     const p = (text: string) => h('p', { class: 'vb-planner-notice' }, text);
@@ -56,12 +66,14 @@ export function createRoutePlanner(c: RoutePlannerConfig) {
     }
     if (s.navigationOpen !== prev?.navigationOpen) {
       c.onOpenChange?.(s.navigationOpen);
-      if (s.navigationOpen) queueMicrotask(() => { if (!s.from) fields.focusFrom(); else close.focus(); });
     }
   }
+  const focusOff = store.subscribe((s, prev) => {
+    if (s.navigationOpen && s.directionsExpanded && (!prev.navigationOpen || !prev.directionsExpanded)) queueMicrotask(() => { if (!store.getState().directionsExpanded) return; if (!s.from) fields.focusFrom(); else close.focus(); });
+  });
   const off = store.subscribe(render); render(store.getState());
-  return { root, open: ({ from, to }: { from: RouteEndpoint | null; to: RouteEndpoint | null }) => {
+  return { root, control, open: ({ from, to }: { from: RouteEndpoint | null; to: RouteEndpoint | null }) => {
     if (to) store.dispatch({ type: 'navigateTo', destination: to, discoveryOrigin: from });
   }, close: end, isOpen: () => store.getState().navigationOpen, getState: store.getState,
-    destroy: () => { off(); router?.dispose(); fields.destroy(); root.remove(); } };
+    destroy: () => { off(); focusOff(); router?.dispose(); fields.destroy(); root.remove(); control.remove(); } };
 }

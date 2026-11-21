@@ -25,6 +25,7 @@ export type RouteStatus =
 export interface TripState {
   searchOpen: boolean;
   navigationOpen: boolean;
+  directionsExpanded: boolean;
   from: RouteEndpoint | null;
   to: RouteEndpoint | null;
   fromIsUserPick: boolean;
@@ -41,6 +42,7 @@ export type TripAction =
   /** "Get directions" in Search: navigate between the endpoints already chosen. */
   | { type: 'getDirections' }
   | { type: 'endNavigation' }
+  | { type: 'setDirectionsExpanded'; expanded: boolean }
   | { type: 'setFrom'; endpoint: RouteEndpoint | null }
   | { type: 'setTo'; endpoint: RouteEndpoint | null }
   | { type: 'swap' }
@@ -51,6 +53,7 @@ export type TripAction =
 export const initialTripState = (): TripState => ({
   searchOpen: false,
   navigationOpen: false,
+  directionsExpanded: false,
   from: null,
   to: null,
   fromIsUserPick: false,
@@ -88,13 +91,15 @@ export function tripReducer(s: TripState, a: TripAction): TripState {
       return s.searchOpen ? { ...s, searchOpen: false } : s;
     case 'navigateTo': {
       const start = startFor(s, a.discoveryOrigin);
-      return { ...withEndpoints(s, start.from, copy(a.destination), start.userPick), navigationOpen: true, searchOpen: false };
+      return { ...withEndpoints(s, start.from, copy(a.destination), start.userPick), navigationOpen: true, directionsExpanded: true, searchOpen: false };
     }
     case 'getDirections':
       if (!canRoute(s)) return s;
-      return { ...withEndpoints(s, s.from, s.to, s.fromIsUserPick), navigationOpen: true, searchOpen: false };
+      return { ...withEndpoints(s, s.from, s.to, s.fromIsUserPick), navigationOpen: true, directionsExpanded: true, searchOpen: false };
+    case 'setDirectionsExpanded':
+      return s.navigationOpen && s.directionsExpanded !== a.expanded ? { ...s, directionsExpanded: a.expanded } : s;
     case 'endNavigation':
-      return s.navigationOpen ? { ...s, navigationOpen: false, generation: s.generation + 1, route: { kind: 'idle' } } : s;
+      return s.navigationOpen ? { ...s, navigationOpen: false, directionsExpanded: false, generation: s.generation + 1, route: { kind: 'idle' } } : s;
     case 'setFrom':
       return withEndpoints(s, copy(a.endpoint), s.to, true);
     case 'setTo':
