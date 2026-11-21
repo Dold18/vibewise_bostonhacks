@@ -1,12 +1,14 @@
-// Tier 2: greedy single transfer (D-007, PROJECT_BRIEF §9). One hub maximum, first valid hub wins,
-// no comparison of alternatives. Pattern-level validation on BOTH legs via the same functions
+// Tier 2: greedy single transfer (D-007, PROJECT_BRIEF §9). One transfer maximum, first valid hub wins,
+// no ranking of alternatives. P-012 (Proposed): a transfer may be a short capped surface walk between
+// two stations, and the live layer falls through to the next pattern-valid hub only when the
+// previous one fails the service gate. Pattern-level validation on BOTH legs via the same functions
 // Tier 1 uses (selectRideablePattern → sharedPatterns + direction + D-008 equivalence).
 
 import {
   buildRideLeg, getStop, legId, lineOf, nearestStop, patternsServing, selectRideablePattern, walkLegBetween,
   type LegSelection,
 } from "./engine.ts";
-import { candidateHubs } from "./hubs.ts";
+import { candidateTransfers } from "./hubs.ts";
 import type { GeoPoint, NearestStop, NoTier1Route, Stop, TransitLegDraft, TransitOptionDraft } from "./types.ts";
 
 const LINE_ORDER = ["Red", "Orange", "Green", "Blue"];
@@ -38,8 +40,15 @@ export function validateHub(origin: Stop, hub: Stop, destination: Stop, lineA: s
 }
 
 export interface Tier2Plan {
-  option: TransitOptionDraft; // transfers: 1; legs walk → subway → subway → walk
+  option: TransitOptionDraft; // transfers: 1; legs walk → subway → [walk] → subway → walk (middle walk only for P-012 walk transfers)
+  /** Station where leg A ends (the hub, for in-station transfers). */
   hub: Stop;
+  /** Station where leg B starts. Same as `hub` for in-station transfers. */
+  entry: Stop;
+  /** Straight-line transfer walk in meters; 0 for in-station transfers. */
+  transferWalkMeters: number;
+  /** Transfer walk duration (estimate), seconds; 0 for in-station transfers. */
+  transferWalkSec: number;
   legA: LegSelection;
   legB: LegSelection;
   originStop: NearestStop;
@@ -48,7 +57,12 @@ export interface Tier2Plan {
   rejected: { hub: string; lines: [string, string]; failedLeg: "A" | "B"; reason: string }[];
 }
 
-export function planTier2(origin: GeoPoint, destination: GeoPoint): Tier2Plan | NoTier1Route {
+/**
+ * Every pattern-valid transfer, in trial order (greedy order, not ranked). The first is what
+ * `planTier2` returns; the live layer walks the list only to skip a hub whose trains are not
+ * running (e.g. Haymarket on Green-B, which exists only on an early-morning pattern).
+ */
+export function tier2Candidates(origin: GeoPoint, destination: GeoPoint): Tier2Plan[] | NoTier1Route {
   const o = nearestStop(origin);
   const d = nearestStop(destination);
   const none = (reason: NoTier1Route["reason"]): NoTier1Route =>
@@ -56,29 +70,43 @@ export function planTier2(origin: GeoPoint, destination: GeoPoint): Tier2Plan | 
   if (o.stop.stop_id === d.stop.stop_id) return none("same_stop");
 
   const rejected: Tier2Plan["rejected"] = [];
+  const plans: Tier2Plan[] = [];
   let sawCandidate = false;
   for (const lineA of linesServing(o.stop)) {
     for (const lineB of linesServing(d.stop)) {
       if (lineA === lineB) continue; // same-line/different-branch transfers are not in the hub table
-      for (const hubId of candidateHubs(lineA, lineB)) {
-        const hub = getStop(hubId);
-        if (!hub || hub.stop_id === o.stop.stop_id || hub.stop_id === d.stop.stop_id) continue;
+      for (const t of candidateTransfers(lineA, lineB)) {
+        const exit = getStop(t.exit.stop_id), entry = getStop(t.entry.stop_id);
+        if (!exit || !entry || exit.stop_id === o.stop.stop_id || entry.stop_id === d.stop.stop_id) continue;
         sawCandidate = true;
-        const v = validateHub(o.stop, hub, d.stop, lineA, lineB);
-        if (!v.ok) { rejected.push({ hub: hub.name, lines: [lineA, lineB], failedLeg: v.failedLeg, reason: v.reason }); continue; }
-        // Greedy: first hub that validates both legs wins. No comparison with other hubs.
+        // Leg A: origin → exit on lineA. Leg B: entry → destination on lineB. (exit === entry in-station.)
+        const legA = selectRideablePattern(o.stop, exit, lineA);
+        if ("reason" in legA) { rejected.push({ hub: exit.name, lines: [lineA, lineB], failedLeg: "A", reason: legA.reason }); continue; }
+        const legB = selectRideablePattern(entry, d.stop, lineB);
+        if ("reason" in legB) { rejected.push({ hub: entry.name, lines: [lineA, lineB], failedLeg: "B", reason: legB.reason }); continue; }
+        const transferWalk = exit.stop_id === entry.stop_id ? null
+          : { ...walkLegBetween(exit, entry, `Walk from ${exit.name} to ${entry.name}`), fromStopName: exit.name, toStopName: entry.name };
         const legs: TransitLegDraft[] = [
           walkLegBetween(origin, o.stop, `Walk to ${o.stop.name}`),
-          buildRideLeg(v.legA),
-          buildRideLeg(v.legB),
+          buildRideLeg(legA),
+          ...(transferWalk ? [transferWalk] : []),
+          buildRideLeg(legB),
           walkLegBetween(d.stop, destination, `Walk from ${d.stop.name}`),
         ];
-        return {
-          option: { id: `tier2:${hub.stop_id}:${legId(v.legA)}+${legId(v.legB)}:${o.stop.stop_id}>${d.stop.stop_id}`, durationSec: null, transfers: 1, legs },
-          hub, legA: v.legA, legB: v.legB, originStop: o, destinationStop: d, rejected,
-        };
+        const walkTag = transferWalk ? `~${entry.stop_id}` : "";
+        plans.push({
+          option: { id: `tier2:${exit.stop_id}${walkTag}:${legId(legA)}+${legId(legB)}:${o.stop.stop_id}>${d.stop.stop_id}`, durationSec: null, transfers: 1, legs },
+          hub: exit, entry, transferWalkMeters: transferWalk?.distanceMeters ?? 0, transferWalkSec: transferWalk?.durationSec ?? 0,
+          legA, legB, originStop: o, destinationStop: d, rejected: [...rejected],
+        });
       }
     }
   }
-  return none(sawCandidate ? "no_valid_hub" : "no_candidate_hub");
+  return plans.length ? plans : none(sawCandidate ? "no_valid_hub" : "no_candidate_hub");
+}
+
+/** First pattern-valid transfer (greedy, no ranking). */
+export function planTier2(origin: GeoPoint, destination: GeoPoint): Tier2Plan | NoTier1Route {
+  const r = tier2Candidates(origin, destination);
+  return Array.isArray(r) ? r[0] : r;
 }

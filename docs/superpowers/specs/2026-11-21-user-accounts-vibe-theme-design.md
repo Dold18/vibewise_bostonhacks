@@ -176,7 +176,7 @@ create index vibe_events_user_time_idx on vibe_events (user_id, created_at desc)
 
 ### 6.6 Contracts and docs
 
-- `recordVibe` takes vibe scores in the vocabulary that CONTRACTS.md's `VibeProfile.tags` already references. Add a **proposed** `VibeSignal` type to CONTRACTS.md as `{ scores, source, placeId? }` and log decision **P-012 · Proposed** in DECISIONS.md. Both need team ratification; the code ships against the proposal.
+- `recordVibe` takes vibe scores in the vocabulary that CONTRACTS.md's `VibeProfile.tags` already references. Add a **proposed** `VibeSignal` type to CONTRACTS.md as `{ scores, source, placeId? }` and log decision **P-014 · Proposed** in DECISIONS.md. Both need team ratification; the code ships against the proposal.
 - Add the `profiles` and `vibe_events` tables to DATA_MODEL.md.
 
 ## 7. Verification

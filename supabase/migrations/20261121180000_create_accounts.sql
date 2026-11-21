@@ -1,4 +1,4 @@
--- User accounts: per-user settings and a private vibe history (DECISIONS.md P-012).
+-- User accounts: per-user settings and a private vibe history (DECISIONS.md P-014).
 -- Spec: docs/superpowers/specs/2026-11-21-user-accounts-vibe-theme-design.md
 -- No location of any kind is stored here.
 

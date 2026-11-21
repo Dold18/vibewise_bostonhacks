@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CATEGORIES, type Category } from './osm';
-import { nearestByCategory, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin } from './catalog';
+import { nearestByCategory, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
 
 const cat = (id: string) => CATEGORIES.find((c) => c.id === id) as Category;
 const CENTER = { lat: 42.3555, lon: -71.0636 };
@@ -37,6 +37,8 @@ const DETAILS: CatalogDetails = {
   hours_raw: 'Mo-Su 07:00-19:00',
   osm_tags: { amenity: 'cafe' },
   attribution: '© OpenStreetMap contributors (ODbL)',
+  price_band: 'unknown',
+  price_source: null,
 };
 
 describe('parsePoint', () => {
@@ -81,6 +83,7 @@ describe('pinToPlace', () => {
         phone: '617-555-0100',
         opening_hours: 'Mo-Su 07:00-19:00',
         'catalog:attribution': '© OpenStreetMap contributors (ODbL)',
+        'catalog:price_band': 'unknown',
       },
     });
   });
@@ -91,7 +94,7 @@ describe('pinToPlace', () => {
   });
   it('leaves unknown detail fields out', () => {
     const place = pinToPlace(pin(), { ...DETAILS, address: null, website: null, phone: null, hours_raw: null, cuisines: [], osm_tags: null });
-    expect(Object.keys(place.tags).sort()).toEqual(['catalog:attribution', 'catalog:place_id', 'catalog:source']);
+    expect(Object.keys(place.tags).sort()).toEqual(['catalog:attribution', 'catalog:place_id', 'catalog:price_band', 'catalog:source']);
   });
   it('keeps the Foursquare id for Foursquare-only places', () => {
     const place = pinToPlace(pin({ placeId: 'fsq:abc', source: 'foursquare', sourceId: 'abc' }), { ...DETAILS, attribution: 'Foursquare OS Places (Apache 2.0)' });
@@ -119,5 +122,32 @@ describe('nearestByCategory', () => {
   });
   it('ignores map categories the catalog does not hold', () => {
     expect(nearestByCategory([near], [cat('parks')], CENTER, 1000, 10)).toEqual([]);
+  });
+});
+
+describe('price on the card', () => {
+  it('labels estimates, menu prices and unknown', () => {
+    expect(priceLabel('$$', 'estimate')).toBe('$$ (est.)');
+    expect(priceLabel('$$$$', 'menu')).toBe('$$$$');
+    expect(priceLabel('unknown', undefined)).toBe('Price unknown');
+    expect(priceLabel(undefined, undefined)).toBe('Price unknown');
+    expect(priceLabel('$$$$$', 'estimate')).toBe('Price unknown');
+    expect(priceLabel('$', undefined)).toBe('Price unknown'); // a band with no source is not trusted
+  });
+
+  it('puts price into tags from details', () => {
+    const p = pinToPlace(pin(), { ...DETAILS, price_band: '$', price_source: 'estimate' });
+    expect(p.tags['catalog:price_band']).toBe('$');
+    expect(p.tags['catalog:price_source']).toBe('estimate');
+  });
+
+  it('keeps unknown price as a tag without a source', () => {
+    const p = pinToPlace(pin(), DETAILS);
+    expect(p.tags['catalog:price_band']).toBe('unknown');
+    expect(p.tags['catalog:price_source']).toBeUndefined();
+  });
+
+  it('omits price tags without details', () => {
+    expect(pinToPlace(pin()).tags['catalog:price_band']).toBeUndefined();
   });
 });

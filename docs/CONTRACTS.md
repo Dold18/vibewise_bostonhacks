@@ -120,7 +120,7 @@ export interface Recommendation {
   reasons: string[];
 }
 
-// Proposed (DECISIONS.md P-012), not yet ratified.
+// Proposed (DECISIONS.md P-014), not yet ratified.
 // One vibe reading for the signed-in user, sent by the Vibe Engine to the
 // account module's recordVibe(). Keys are the DATA_MODEL.md §3 vocabulary
 // (VibeKey), values in [0,1]; unknown keys are dropped, out-of-range values clamped.
