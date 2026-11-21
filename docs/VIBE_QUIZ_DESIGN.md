@@ -47,6 +47,58 @@ The question form is the *presentation*; answer options are grounded in semantic
 - Contrast answers that are *different on the unresolved factor* while holding understood preferences roughly constant.
 - Prefer nuanced comparisons once broad ambience is known, e.g. “rainy neon street vs intimate synth-lit hideaway” rather than “old vs modern.”
 
+## Song snippets: effortless, optional listening
+
+**Product requirement:** When a question presents song choices, each song must have a small, independent **Listen / Pause preview** affordance, so a user who doesn't know the track can still choose based on sound. **Selection and playback are separate actions**: tapping Listen must never submit the quiz answer.
+
+### Compact interface
+A song-choice card/row shows:
+- Track title and artist in one concise line group.
+- A short *curated atmosphere descriptor*, e.g. “dreamy · hazy · nostalgic,” as a useful fallback rather than pretending a song is universally interpreted the same way.
+- A compact round Play/Pause button at right, with an accessible label “Listen to a preview of [track] by [artist].”
+- An optional slim playback-progress indicator or provider-native indicator that appears **only after** the user starts listening. Do not fabricate progress or a promised 30-second duration.
+- Clearly selectable main card area for “This matches my vibe,” visually distinct from the playback button.
+
+On small screens, cards stay stacked and readable; the player may open a compact inline embedded controller below the active song. Never render three full-height music embeds concurrently or open a separate tab just to hear a preview when in-page playback is supported.
+
+### Playback interaction rules
+1. **Never autoplay** music when the question appears.
+2. Only one preview can play at a time. Starting another should pause/destroy the previous controller where supported.
+3. Pause playback on question selection, Skip, Next, Back, closing the quiz, or replacing the current set of songs.
+4. The user can answer immediately without playing anything.
+5. Show loading/unavailable status gracefully; if this browser/account/territory cannot play a sample, provide an official “Listen on Spotify / Apple Music” link and keep a concise description.
+6. “I don't know these” and Skip are valid choices and must never imply a dislike for the songs.
+7. Never equate hitting Play with selecting a track or an affinity signal unless consent and a distinct action are given. Don't track listening time for recommendation inference by default.
+8. Respect reduced-motion settings and keyboard accessibility. Album art only where permissioned/authorized (provider embeds can supply art within their terms).
+
+### Preview sourcing and limitations
+- **Initial preferred implementation:** Use an authorized provider-native track embed with controls, lazily mounted for the song the user requests. Spotify's official iFrame API can create, play and pause embeds: https://developer.spotify.com/documentation/embeds/references/iframe-api . Its compact official track player is approximately 152px tall at a minimum 280px wide when revealed: https://developer.spotify.com/documentation/embeds/tutorials/creating-an-embed . Playback may be a partial preview, a full song for eligible signed-in users, or unavailable; do **not** promise a clip length or universal availability.
+- **Provider alternative:** Apple Music's officially generated embeddable track player documents 30-second playback for listeners who aren't signed in: https://artists.apple.com/support/1117-apple-music-marketing-tools . Validate rights, availability, embedding and integration UX before committing to it.
+- **Avoid for this use case:** Spotify Web API `preview_url` fields for newly created apps (restricted since Nov 2024); Apple iTunes Search API `previewUrl` files as free entertainment clips (Apple explicitly limits promotional samples to store promotion, with store-badge requirements). See https://developer.spotify.com/blog/2024-11-27-changes-to-the-web-api and https://performance-partners.apple.com/search-api .
+- Never download, rehost, cut, concatenate or redistribute copyrighted music samples. Don't claim to create/use an independent audio snippet without a licensed source.
+
+### Provider-independent data contract (proposed)
+```ts
+type SongQuestionOption = QuestionOption & {
+  track: {
+    title: string;
+    artist: string;
+    spotifyTrackId?: string;        // official embed identity
+    appleMusicEmbedUrl?: string;    // verified generated embed
+    openInProviderUrl?: string;     // authorized link for fallback
+  };
+  playback: 'embed_available' | 'external_only' | 'unknown';
+};
+```
+The UI should not depend on leaked provider MP3 URLs. Playback availability must be decided from actual provider capability, not an LLM assertion.
+
+### Build sequence
+1. **A:** Song-choice rows with title, artist, text descriptors, and distinct **select** vs. **listen** controls. Use a *labeled mock/unavailable state*, not fake audio.
+2. **B:** Integrate one provider's official embed for a curated handful of verified tracks; test desktop/mobile browsers and unavailable states. Keep the embed lazily mounted.
+3. **C:** Optional richer dynamic metadata, art and provider choices; ensure no music service credentials are exposed in client code and no song choices require accounts merely to participate.
+
+**Acceptance:** unfamiliar listeners can hear an authorized sample when available and still answer without listening; no autoplay, no simultaneous tracks, playback pauses on navigation, provider-unavailable fallback works, and the card never confuses play with select.
+
 ## Data model: beyond seven bipolar traits
 Represent the user's temporary **desired scene**, not personality.
 
@@ -127,6 +179,7 @@ A creative quiz cannot generate honest recommendations from generic OSM POI type
 - Retain PR #23's testable session/reducer approach, but explicitly mark it as a scaffold.
 - Curate 20–30 independent scene feature IDs and annotate at least 20 varied real places.
 - Create **12–16 high-quality, manually authored questions across at least five distinct families** (film, music, image, metaphor, dealbreaker).
+- Song options display track/artist and a separate, accessible **Listen preview** control; audio is optional and initially may use provider availability fallback. Never simulate actual playback.
 - Implement selection against actual candidate venues using diversity and discrimination heuristics.
 - Test that opposing answers re-rank candidate places and visibly update map pins; preserve normal transit selection.
 
@@ -146,6 +199,7 @@ A creative quiz cannot generate honest recommendations from generic OSM POI type
 - After a film or song reference, users can answer without already knowing the work.
 - `Skip` and `I don't know these` do not imply negative preference.
 - No fabricated venue traits, fake track playback, or unlicensed visual assets.
+- Song previews are user-initiated, one at a time, stop on navigation, and use authorized provider playback or a clearly stated unavailable/external fallback.
 - Changing an answer can revise the resulting profile and map ranking.
 - The user can see matches early; the system doesn't force all possible questions.
 
