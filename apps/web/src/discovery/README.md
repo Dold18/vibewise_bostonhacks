@@ -1,12 +1,20 @@
 # Discovery panel: initial preferences v1
 
-A floating "Plan your outing" panel on the left of the Living Map. It collects
-the practical preferences (activity with a cuisine or activity-type
-multi-select, starting point, budget, and time) plus an optional vibe text. It
-also provides a tested filtering/ranking foundation for the map's places.
+A floating two-step discovery panel on the left of the Living Map.
+**Step 1: Plan your outing** collects practical preferences (activity with
+cuisine or activity-type multiselect, starting point, budget, and time).
+**Continue to your vibe** switches to Step 2 without losing these values.
+**Step 2: Find your vibe** provides a guided free-text field with selectable
+examples and an accessible multi-photo drop zone with previews.
 
-**Not included yet:** the Vibe Quiz, AI or vibe interpretation, and any change
-to the map pins.
+Photos are held as browser-local `File` objects only (maximum five JPG/PNG/WebP
+files, each up to 8 MB). They are **not uploaded or analyzed yet**. Moving back
+to Step 1 and forward again preserves both text and photos during the session.
+Clear all removes them; refresh does not retain photos. `Save my vibe` collapses
+the panel with a clear summary.
+
+**Not included yet:** the adaptive Vibe Quiz, AI/image interpretation, or vibe
+matching against map pins. This screen is the input foundation for those features.
 
 ## Mounting
 
@@ -60,7 +68,7 @@ On phones (≤640px) the panel is a bottom sheet that starts collapsed.
 ```ts
 const panel = mountDiscoveryPanel(container, options);
 panel.getPreferences();        // InitialPreferences
-panel.subscribe((prefs) => …); // returns an unsubscribe function
+panel.subscribe((prefs) => …); // returns an unsubscribe function, including local vibeImages changes
 panel.destroy();
 
 import { rankPlaces } from './discovery';
@@ -79,6 +87,7 @@ In dev builds the handle is also available as `window.vibentaDiscovery`.
 | `budget` | `{ choice, maxCentsPerPerson }` in USD cents. `null` cents means no limit; a `null` budget means not chosen. |
 | `timing` | `{ kind, start, end?, timeZone: 'America/New_York', resolvedAt }`, ISO 8601 with Boston offset |
 | `vibeText` | Free text, ≤500 characters. Stored only, never used for filtering. |
+| `vibeImages` | Browser-local `File[]`, up to 5 JPG/PNG/WebP images of ≤8 MB each; never uploaded by this panel. |
 
 All changes go through `preferencesReducer`. `normalizePreferences(unknown)`
 cleans untrusted input, e.g. state restored from storage.
@@ -150,5 +159,5 @@ npm test         # vitest run: reducer, Boston time, locations, filtering, layou
 npm run build    # tsc && vite build
 ```
 
-The tests run in Node with no DOM. DOM behaviour (keyboard, focus,
+The unit tests run in Node with no DOM (including image validation and state retention). DOM behaviour (keyboard, focus,
 collapse/restore, mobile layout) was checked manually in Chrome.

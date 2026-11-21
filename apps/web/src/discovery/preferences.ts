@@ -8,6 +8,7 @@
  * These are *practical* constraints only. The optional vibe text is stored
  * verbatim for the future Vibe Engine and is deliberately ignored by filtering.
  */
+import { supportedVibeImage, MAX_VIBE_IMAGES } from './vibeImages';
 import {
   addDays,
   bostonWallTime,
@@ -151,6 +152,8 @@ export interface InitialPreferences {
   timingError: TimingError | null;
   /** Free text for the future Vibe Engine. Never used by practical filtering. */
   vibeText: string;
+  /** Browser-memory-only references; files are never sent to a server by this panel. */
+  vibeImages: File[];
 }
 
 export type TimingError = 'incomplete' | 'invalid' | 'past';
@@ -166,6 +169,7 @@ export const initialPreferences = (): InitialPreferences => ({
   customTiming: { date: '', time: '' },
   timingError: null,
   vibeText: '',
+  vibeImages: [],
 });
 
 // ---------------------------------------------------------------------------
@@ -182,6 +186,7 @@ export type PreferencesAction =
   | { type: 'setTiming'; kind: TimingKind; now: Date }
   | { type: 'setCustomTiming'; date: string; time: string; now: Date }
   | { type: 'setVibeText'; text: string }
+  | { type: 'setVibeImages'; files: File[] }
   | { type: 'reset' };
 
 const CUISINE_IDS = new Set<string>(CUISINE_OPTIONS.map((o) => o.id));
@@ -238,6 +243,10 @@ export function preferencesReducer(state: InitialPreferences, action: Preference
 
     case 'setVibeText':
       return { ...state, vibeText: action.text.slice(0, VIBE_TEXT_MAX_LENGTH) };
+
+    case 'setVibeImages':
+      // Files stay in memory; reject unsupported or oversized inputs at the state boundary too.
+      return { ...state, vibeImages: action.files.filter(supportedVibeImage).slice(0, MAX_VIBE_IMAGES) };
 
     case 'reset':
       return initialPreferences();
@@ -399,6 +408,8 @@ export function normalizePreferences(input: unknown, now: Date = new Date()): In
     cuisines: activity === 'food_drinks' ? pick(raw.cuisines, CUISINE_OPTIONS) : [],
     activityTypes: activity === 'activities' ? pick(raw.activityTypes, ACTIVITY_TYPE_OPTIONS) : [],
     vibeText: typeof raw.vibeText === 'string' ? raw.vibeText.slice(0, VIBE_TEXT_MAX_LENGTH) : '',
+    // Restored JSON cannot contain usable File objects. Require a new local selection.
+    vibeImages: [],
   };
 
   const budget = raw.budget as Partial<Budget> | null | undefined;
