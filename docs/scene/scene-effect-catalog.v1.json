@@ -22,7 +22,10 @@
       "maintain labels and attribution",
       "honor prefers-reduced-motion",
       "avoid new third-party media without usage rights"
-    ]
+    ],
+    "aiOverrideLimit": 12,
+    "maxWeightedPresets": 3,
+    "fullStateResolvedLocally": true
   },
   "groups": [
     {
@@ -47,7 +50,8 @@
             "watercolor",
             "paper_atlas"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "hue_bias",
@@ -66,7 +70,8 @@
             "gold",
             "slate"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "saturation",
@@ -80,7 +85,8 @@
             "vibrant",
             "hypercolor"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "contrast_curve",
@@ -93,7 +99,8 @@
             "dramatic",
             "flat_print"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "temperature",
@@ -107,7 +114,8 @@
             "moon_blue",
             "ice_cold"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "shadow_tint",
@@ -121,7 +129,8 @@
             "brown",
             "warm_gray"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "highlight_tint",
@@ -136,7 +145,8 @@
             "ice_blue",
             "magenta"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "selective_color",
@@ -149,7 +159,8 @@
             "cool_only",
             "venue_only"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "grade_finish",
@@ -163,9 +174,12 @@
             "cinematic",
             "high_gloss"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         }
-      ]
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
     },
     {
       "id": "sky_and_horizon",
@@ -186,7 +200,8 @@
             "storm_gray",
             "dream_pastel"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "horizon_glow",
@@ -200,7 +215,8 @@
             "neon_band",
             "pale_mist"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "horizon_blend",
@@ -211,7 +227,8 @@
             "soft_diffuse",
             "sharp_silhouette"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "fog_horizon_color",
@@ -225,7 +242,8 @@
             "golden",
             "rose"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "celestial_symbol",
@@ -238,7 +256,8 @@
             "full_moon",
             "abstract_orb"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "cloud_form",
@@ -252,7 +271,8 @@
             "storm_mass",
             "abstract_layers"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "cloud_motion",
@@ -264,7 +284,8 @@
             "gentle_parallax",
             "dramatic_shift"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "starfield",
@@ -277,7 +298,8 @@
             "dense",
             "illustrated_constellations"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "sky_illustration",
@@ -290,9 +312,12 @@
             "retro_gradient",
             "space_dust"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         }
-      ]
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
     },
     {
       "id": "lighting_and_shadows",
@@ -312,7 +337,8 @@
             "noir",
             "neon_reflection"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "light_color",
@@ -328,7 +354,8 @@
             "cyan",
             "icy_blue"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "light_angle",
@@ -342,7 +369,8 @@
             "side_lit",
             "back_lit"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "light_intensity",
@@ -355,7 +383,8 @@
             "bright",
             "high_key"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "ambient_fill",
@@ -368,7 +397,8 @@
             "muted",
             "deep_shadow"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "shadow_character",
@@ -381,7 +411,8 @@
             "dramatic",
             "graphic"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "rim_light",
@@ -394,7 +425,8 @@
             "neon_pink",
             "neon_cyan"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "bounce_light",
@@ -407,7 +439,8 @@
             "cyan",
             "mixed_neon"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "local_spotlights",
@@ -420,7 +453,8 @@
             "neon_pools",
             "venue_targeted"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "bloom",
@@ -433,7 +467,8 @@
             "neon",
             "cinematic"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "shadow_projection",
@@ -444,9 +479,12 @@
             "stylized_short",
             "stylized_long"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         }
-      ]
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
     },
     {
       "id": "building_surfaces",
@@ -470,7 +508,8 @@
             "pastel",
             "ink_black"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "roof_palette",
@@ -486,7 +525,8 @@
             "midnight",
             "pastel"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "wall_vertical_gradient",
@@ -500,7 +540,8 @@
             "warm_top",
             "cool_top"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "height_color_treatment",
@@ -514,7 +555,8 @@
             "dark_towers",
             "muted_lowrise"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "building_outline",
@@ -529,7 +571,8 @@
             "cyan_glow",
             "magenta_glow"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "corner_appearance",
@@ -540,7 +583,8 @@
             "softened",
             "rounded_illustration"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "building_opacity",
@@ -551,7 +595,8 @@
             "soft_translucent",
             "ghosted"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "building_highlight",
@@ -563,7 +608,8 @@
             "selective_facade",
             "top_match_only"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "facade_look",
@@ -578,7 +624,8 @@
             "smooth_cement",
             "paper_cutout"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "window_pattern",
@@ -592,7 +639,8 @@
             "full_grid",
             "neon_accent"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "window_glow",
@@ -606,7 +654,8 @@
             "blue",
             "mixed"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "emissive_trim",
@@ -619,7 +668,8 @@
             "fine_magenta",
             "white_architectural"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "roof_details",
@@ -631,7 +681,8 @@
             "illustrated_equipment",
             "soft_halo"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "building_material_finish",
@@ -644,7 +695,8 @@
             "glassy_illusion",
             "wet_sheen"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "silhouette_style",
@@ -656,9 +708,12 @@
             "light_outline",
             "luminous_edge"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         }
-      ]
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
     },
     {
       "id": "roads_and_ground",
@@ -677,7 +732,8 @@
             "neon_dark",
             "sandstone"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "major_road_emphasis",
@@ -689,7 +745,8 @@
             "strong",
             "diagrammatic"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "minor_road_emphasis",
@@ -701,7 +758,8 @@
             "minimal",
             "equal"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "road_casing",
@@ -715,7 +773,8 @@
             "neon_cyan",
             "neon_pink"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "pedestrian_paths",
@@ -728,7 +787,8 @@
             "soft_glow",
             "sketch"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "rail_treatment",
@@ -741,7 +801,8 @@
             "cool",
             "luminous"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "street_material",
@@ -755,7 +816,8 @@
             "cobblestone_illustration",
             "paper_texture"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "wet_sheen",
@@ -767,7 +829,8 @@
             "moderate",
             "rainy_night"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "lane_detail",
@@ -779,7 +842,8 @@
             "strong_graphic",
             "retro_diagram"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "crosswalk_treatment",
@@ -791,7 +855,8 @@
             "subtle",
             "illustrated"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "street_lights",
@@ -804,7 +869,8 @@
             "cold_white",
             "neon"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "road_reflections",
@@ -816,7 +882,8 @@
             "neon_streaks",
             "warm_streaks"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "ground_shadows",
@@ -828,9 +895,12 @@
             "illustrated",
             "dark_edge"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         }
-      ]
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
     },
     {
       "id": "natural_land",
@@ -850,7 +920,8 @@
             "storybook",
             "moonlit"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "wood_palette",
@@ -864,7 +935,8 @@
             "teal_illustrative",
             "muted"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "sand_palette",
@@ -877,7 +949,8 @@
             "cold_gray",
             "sunset_pink"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "foliage_density_illusion",
@@ -890,7 +963,8 @@
             "lush",
             "dense_illustration"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "leaf_particles",
@@ -902,7 +976,8 @@
             "petals",
             "blossoms"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "seasonal_visual",
@@ -915,7 +990,8 @@
             "autumn_gold",
             "winter_frost"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "tree_symbol_style",
@@ -928,7 +1004,8 @@
             "fine_line",
             "low_poly"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "grass_texture",
@@ -940,7 +1017,8 @@
             "watercolor",
             "soft_dapple"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "floral_accents",
@@ -952,7 +1030,8 @@
             "wildflowers",
             "bright_spring"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "park_glow",
@@ -964,7 +1043,8 @@
             "golden_sun",
             "storybook"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "hillshade_style",
@@ -976,9 +1056,12 @@
             "topographic",
             "dramatic"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         }
-      ]
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
     },
     {
       "id": "water_and_coast",
@@ -998,7 +1081,8 @@
             "purple_twilight",
             "black_ink"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "coastline_line",
@@ -1011,7 +1095,8 @@
             "gold",
             "luminous_cyan"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "water_texture",
@@ -1024,7 +1109,8 @@
             "watercolor",
             "fine_lines"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "surface_motion",
@@ -1036,7 +1122,8 @@
             "gentle_wave",
             "dramatic_wave"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "water_reflectivity",
@@ -1049,7 +1136,8 @@
             "sun_glint",
             "neon_reflect"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "harbor_mist",
@@ -1061,7 +1149,8 @@
             "medium",
             "dense"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "shimmer_speed",
@@ -1073,7 +1162,8 @@
             "moderate",
             "lively"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "reflected_colors",
@@ -1086,7 +1176,8 @@
             "rose",
             "mixed_neon"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "water_depth_look",
@@ -1098,9 +1189,12 @@
             "deep_edge",
             "contour"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         }
-      ]
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
     },
     {
       "id": "air_and_atmosphere",
@@ -1117,7 +1211,8 @@
             "medium",
             "heavy"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "fog_hue",
@@ -1132,7 +1227,8 @@
             "warm_gold",
             "rose"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "haze_profile",
@@ -1145,7 +1241,8 @@
             "ground",
             "waterfront"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "vignette",
@@ -1159,7 +1256,8 @@
             "warm",
             "cool"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "grain",
@@ -1172,7 +1270,8 @@
             "analog_noise",
             "paper_grain"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "dust_motes",
@@ -1184,7 +1283,8 @@
             "visible",
             "sunlit"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "rain",
@@ -1197,7 +1297,8 @@
             "cinematic",
             "storm_visual"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "snow",
@@ -1209,7 +1310,8 @@
             "gentle",
             "dense"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "sparkle",
@@ -1222,7 +1324,8 @@
             "magical",
             "neon"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "fireflies",
@@ -1234,7 +1337,8 @@
             "gentle",
             "many"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "petals",
@@ -1246,7 +1350,8 @@
             "slow_fall",
             "whimsical"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "light_shafts",
@@ -1258,7 +1363,8 @@
             "sunbeams",
             "night_beams"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "lens_glare",
@@ -1270,7 +1376,8 @@
             "film_lens",
             "starburst"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "chromatic_aberration",
@@ -1281,7 +1388,8 @@
             "very_subtle",
             "retro_glitch"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "scanlines",
@@ -1293,7 +1401,8 @@
             "retro_monitor",
             "holographic"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "distortion",
@@ -1305,7 +1414,8 @@
             "heat_haze",
             "holographic_warp"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "volumetric_weather",
@@ -1317,9 +1427,12 @@
             "dramatic_fog",
             "heavy_rain"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         }
-      ]
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
     },
     {
       "id": "cinematic_and_artistic",
@@ -1342,7 +1455,8 @@
             "paper_diorama",
             "comic_ink"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "paper_texture",
@@ -1355,7 +1469,8 @@
             "blueprint_paper",
             "grainy_print"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "ink_edges",
@@ -1367,7 +1482,8 @@
             "heavy_outline",
             "hand_drawn"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "halftone",
@@ -1379,7 +1495,8 @@
             "comic_print",
             "retro_newsprint"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "color_banding",
@@ -1391,7 +1508,8 @@
             "duotone",
             "tritone"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "analog_aging",
@@ -1403,7 +1521,8 @@
             "light_leak",
             "film_burn"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "decorative_frame",
@@ -1416,7 +1535,8 @@
             "vintage_border",
             "technical_hud"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "grid_overlay",
@@ -1428,7 +1548,8 @@
             "sci_fi",
             "subtle_graph"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "parallax_decoration",
@@ -1440,7 +1561,8 @@
             "paper_layers",
             "abstract_shapes"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "illustration_props",
@@ -1453,9 +1575,12 @@
             "seasonal_icons",
             "hologram_glyphs"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         }
-      ]
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
     },
     {
       "id": "camera_and_perspective",
@@ -1472,7 +1597,8 @@
             "cinematic_3d",
             "deep_3d"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         },
         {
           "id": "bearing_preference",
@@ -1484,7 +1610,8 @@
             "slight_angle",
             "diagonal_cinematic"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         },
         {
           "id": "zoom_behavior",
@@ -1496,7 +1623,8 @@
             "strongest_match",
             "top_group_fit"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         },
         {
           "id": "framing",
@@ -1509,7 +1637,8 @@
             "waterfront_focus",
             "skyline_framing"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         },
         {
           "id": "transition_easing",
@@ -1521,7 +1650,8 @@
             "cinematic_slow",
             "swift_clean"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         },
         {
           "id": "reveal_motion",
@@ -1534,7 +1664,8 @@
             "wide_establish",
             "vertical_tilt"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         },
         {
           "id": "camera_idle_motion",
@@ -1545,7 +1676,8 @@
             "gentle_drift",
             "very_slow_orbit"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": false
         },
         {
           "id": "parallax_strength",
@@ -1556,7 +1688,8 @@
             "subtle",
             "medium"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": false
         },
         {
           "id": "focus_depth",
@@ -1567,7 +1700,8 @@
             "subtle_blur",
             "foreground_emphasis"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": false
         },
         {
           "id": "camera_shake",
@@ -1577,9 +1711,12 @@
             "off",
             "tiny_artistic"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": false
         }
-      ]
+      ],
+      "aiSelectable": false,
+      "selectPolicy": "user_controlled_unless_explicit_reveal"
     },
     {
       "id": "marker_recommendations",
@@ -1597,7 +1734,8 @@
             "minimal_dot",
             "constellation"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "pin_material",
@@ -1610,7 +1748,8 @@
             "outlined",
             "metallic_illusion"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "pin_color_language",
@@ -1622,7 +1761,8 @@
             "match_gradient",
             "neutral_monochrome"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "match_scale",
@@ -1634,7 +1774,8 @@
             "moderate",
             "dramatic"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "low_match_treatment",
@@ -1647,7 +1788,8 @@
             "desaturate",
             "soft_hide"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "pin_glow",
@@ -1660,7 +1802,8 @@
             "neon_halo",
             "warm_halo"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "pin_pulse",
@@ -1672,7 +1815,8 @@
             "gentle",
             "attention_on_top1"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "selected_ring",
@@ -1685,7 +1829,8 @@
             "spotlight",
             "soft_pulse"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "pin_shadow",
@@ -1697,7 +1842,8 @@
             "dramatic",
             "tinted"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "cluster_mode",
@@ -1709,7 +1855,8 @@
             "soft_groups",
             "count_badges"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "rank_annotation",
@@ -1721,7 +1868,8 @@
             "top_5",
             "match_labels"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "arrival_emphasis",
@@ -1732,7 +1880,8 @@
             "selected_destination",
             "destination_and_stops"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "visual_match_heat",
@@ -1744,9 +1893,12 @@
             "soft_heatmap",
             "localized_tint"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         }
-      ]
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
     },
     {
       "id": "neighborhood_and_places",
@@ -1763,7 +1915,8 @@
             "top5",
             "soft_regions"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "matched_building_outline",
@@ -1775,7 +1928,8 @@
             "accent",
             "bright_glow"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "relevant_neighborhood_tint",
@@ -1786,7 +1940,8 @@
             "subtle",
             "moderate"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "local_light_pools",
@@ -1798,7 +1953,8 @@
             "cold",
             "color_mixed"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "place_scene_particles",
@@ -1810,7 +1966,8 @@
             "rare",
             "gathered"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "venue_material_highlight",
@@ -1822,7 +1979,8 @@
             "soft_neon",
             "illustrated_rim"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "local_fog_clearing",
@@ -1833,7 +1991,8 @@
             "reveal_near_matches",
             "clear_route_area"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "district_story_labels",
@@ -1844,7 +2003,8 @@
             "subtle",
             "editorial"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "match_connections",
@@ -1856,9 +2016,12 @@
             "soft_light_paths",
             "constellation_lines"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         }
-      ]
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
     },
     {
       "id": "text_and_labels",
@@ -1876,7 +2039,8 @@
             "gold_accent",
             "cyan_accent"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "label_font_personality",
@@ -1890,7 +2054,8 @@
             "technical",
             "hand_drawn"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "label_weight",
@@ -1902,7 +2067,8 @@
             "medium",
             "bold"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "label_letterspacing",
@@ -1913,7 +2079,8 @@
             "airy",
             "tight"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "label_caps",
@@ -1924,7 +2091,8 @@
             "neighborhood_caps",
             "all_upper"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "label_halo",
@@ -1937,7 +2105,8 @@
             "strong",
             "minimal"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "label_density",
@@ -1949,7 +2118,8 @@
             "minimal",
             "detailed"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "road_label_priority",
@@ -1961,7 +2131,8 @@
             "neighborhoods",
             "detailed"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "cartographic_icon_style",
@@ -1973,7 +2144,8 @@
             "illustrated",
             "outlined"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "place_name_flair",
@@ -1984,9 +2156,12 @@
             "subtle_emphasis",
             "editorial_headers"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         }
-      ]
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
     },
     {
       "id": "interface_and_cards",
@@ -2004,7 +2179,8 @@
             "polished_cream",
             "ink_dark"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "panel_translucency",
@@ -2016,7 +2192,8 @@
             "medium_glass",
             "strong_glass"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "panel_border",
@@ -2029,7 +2206,8 @@
             "neon_edge",
             "soft_shadow"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "card_surface",
@@ -2042,7 +2220,8 @@
             "paper",
             "dark_glass"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "card_shadow",
@@ -2054,7 +2233,8 @@
             "floating",
             "dramatic"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "accent_token",
@@ -2070,7 +2250,8 @@
             "gold",
             "forest"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "button_treatment",
@@ -2083,7 +2264,8 @@
             "glassy",
             "minimal_line"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "progress_meter",
@@ -2096,7 +2278,8 @@
             "fine_line",
             "constellation"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "icon_treatment",
@@ -2108,7 +2291,8 @@
             "geometric",
             "illustrated"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "focus_frame",
@@ -2120,7 +2304,8 @@
             "letterbox",
             "thin_glow"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "panel_background_blur",
@@ -2132,9 +2317,12 @@
             "medium",
             "high"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         }
-      ]
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
     },
     {
       "id": "animation_and_morph",
@@ -2151,7 +2339,8 @@
             "deliberate",
             "instant"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "effect_stagger",
@@ -2163,7 +2352,8 @@
             "building_then_sky",
             "sky_then_building"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "color_wave",
@@ -2175,7 +2365,8 @@
             "lateral",
             "around_matches"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "ambient_pace",
@@ -2187,7 +2378,8 @@
             "balanced",
             "lively"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "particle_motion",
@@ -2200,7 +2392,8 @@
             "twinkle",
             "swirl"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "pin_update_motion",
@@ -2212,7 +2405,8 @@
             "gentle_spring",
             "instant"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         },
         {
           "id": "light_shift_motion",
@@ -2223,7 +2417,8 @@
             "sweep",
             "pulse"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "sky_shift_motion",
@@ -2234,7 +2429,8 @@
             "dusk_roll",
             "cloud_pan"
           ],
-          "tier": "extension"
+          "tier": "extension",
+          "allowIntensity": true
         },
         {
           "id": "building_reveal_motion",
@@ -2246,7 +2442,8 @@
             "vertical_wave",
             "block_cascade"
           ],
-          "tier": "custom"
+          "tier": "custom",
+          "allowIntensity": true
         },
         {
           "id": "motion_texture",
@@ -2259,9 +2456,12 @@
             "flicker",
             "ambient_drift"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": true
         }
-      ]
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
     },
     {
       "id": "navigation_safe",
@@ -2275,7 +2475,8 @@
             "provider_leg_colors",
             "high_contrast_leg_colors"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         },
         {
           "id": "walk_line",
@@ -2285,7 +2486,8 @@
             "contrasting_dashed",
             "contrasting_dotted"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         },
         {
           "id": "station_icon",
@@ -2295,7 +2497,8 @@
             "focus_only",
             "navigation_only"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         },
         {
           "id": "focus_marker_visibility",
@@ -2305,7 +2508,8 @@
             "selected_only",
             "route_relevant"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         },
         {
           "id": "map_label_safety",
@@ -2314,7 +2518,8 @@
           "values": [
             "contrast_guard_required"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         },
         {
           "id": "reduced_motion",
@@ -2324,7 +2529,8 @@
             "respect_system",
             "disabled"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         },
         {
           "id": "attribution",
@@ -2333,7 +2539,8 @@
           "values": [
             "always_visible"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         },
         {
           "id": "geographic_accuracy",
@@ -2342,7 +2549,8 @@
           "values": [
             "preserve_geometry"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         },
         {
           "id": "route_layer_integrity",
@@ -2351,7 +2559,8 @@
           "values": [
             "never_replace_style"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         },
         {
           "id": "route_highlight_priority",
@@ -2360,7 +2569,8 @@
           "values": [
             "above_scene_effects"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         },
         {
           "id": "selection_preservation",
@@ -2369,9 +2579,12 @@
           "values": [
             "never_clear_on_theme_change"
           ],
-          "tier": "foundation"
+          "tier": "foundation",
+          "allowIntensity": false
         }
-      ]
+      ],
+      "aiSelectable": false,
+      "selectPolicy": "locked_system_safety"
     }
   ]
 }
