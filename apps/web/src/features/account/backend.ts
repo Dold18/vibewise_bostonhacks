@@ -110,7 +110,10 @@ export function createSupabaseBackend(client: SupabaseClient): AccountBackend {
       return { needsConfirmation: !data.session };
     },
     async signOut() {
-      await client.auth.signOut();
+      // `local` removes this device's session before the network call. The
+      // default (`global`) keeps it on a network error, and the next token
+      // refresh would quietly sign the user back in.
+      await client.auth.signOut({ scope: 'local' });
     },
     async loadProfile(userId) {
       const row = check(

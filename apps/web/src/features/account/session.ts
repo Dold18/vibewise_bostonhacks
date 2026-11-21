@@ -131,7 +131,8 @@ export function createAccountStore(
       try {
         await backend.signOut();
       } catch {
-        // The local session is cleared either way.
+        // The backend signs out with scope 'local', which clears this device's
+        // session before any network call; only the server-side revoke can fail.
       }
     },
 
