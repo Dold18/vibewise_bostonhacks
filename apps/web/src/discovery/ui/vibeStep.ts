@@ -13,23 +13,19 @@ import type { Store } from '../store';
 import { h, icon, uid } from './dom';
 
 const PHOTO_ICON = 'M21 19V5H3v14h18zm0-16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h18zM8.5 7a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zm-4 10 5-4 3 2.5 3-4.5 4.5 6H4.5z';
-const PLUS_ICON = 'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z';
 const REMOVE_ICON = 'M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z';
 
 const EXAMPLES = [
   {
     title: 'Movie scene',
-    detail: 'Warm & nostalgic',
     text: 'Like a rainy bookshop scene in a romantic movie: warm lamps, shelves of books, soft jazz, cozy corners and somewhere to talk for hours.',
   },
   {
     title: 'Song or artist',
-    detail: 'Electric & social',
     text: 'The feeling of an upbeat synth-pop song: neon signs, bright colors, loud music, interesting people and a spontaneous night with friends.',
   },
   {
     title: 'Objects & colors',
-    detail: 'Dreamy & cinematic',
     text: 'Vintage cameras, cobblestone streets, golden streetlights, old bookstores and candlelit tables. Quiet, romantic and a little adventurous.',
   },
 ] as const;
@@ -51,9 +47,9 @@ export function createVibeStep(prefs: Store<InitialPreferences, PreferencesActio
   const story = h('textarea', {
     id: inputId,
     class: 'vb-textarea vb-vibe-story',
-    rows: 5,
+    rows: 6,
     maxlength: VIBE_TEXT_MAX_LENGTH,
-    placeholder: 'A place that feels like a scene from a movie: warm lights, a little rain outside, music playing, and somewhere I can talk with friends…',
+    placeholder: 'Describe a feeling, song, artist, movie or scene — even objects or colors.\n\nFor example: Warm lighting, rainy streets and soft jazz, like a cozy movie scene.',
     'aria-describedby': `${helpId} ${counterId}`,
   });
   story.addEventListener('input', () => prefs.dispatch({ type: 'setVibeText', text: story.value }));
@@ -64,7 +60,6 @@ export function createVibeStep(prefs: Store<InitialPreferences, PreferencesActio
       'button',
       { class: 'vb-vibe-example', type: 'button', title: `Use example: ${example.title}` },
       h('span', { class: 'vb-example-title' }, example.title),
-      h('span', { class: 'vb-example-subtitle' }, example.detail),
     );
     button.addEventListener('click', () => {
       prefs.dispatch({ type: 'setVibeText', text: example.text });
@@ -85,10 +80,12 @@ export function createVibeStep(prefs: Store<InitialPreferences, PreferencesActio
   const uploadButton = h(
     'button',
     { type: 'button', class: 'vb-upload-button', 'aria-controls': uploaderId },
-    icon(PHOTO_ICON, 29),
-    h('span', { class: 'vb-upload-label' }, 'Drop photos here, or browse'),
-    h('span', { class: 'vb-upload-detail' }, 'Moodboards, screenshots, movie stills, colors, places — anything that feels right'),
-    h('span', { class: 'vb-upload-limit' }, `JPG, PNG or WebP · Up to ${MAX_VIBE_IMAGES} images · ${MAX_VIBE_IMAGE_BYTES / 1024 / 1024} MB each`),
+    icon(PHOTO_ICON, 22),
+    h('span', { class: 'vb-upload-copy' },
+      h('span', { class: 'vb-upload-label' }, 'Add reference photos (optional)'),
+      h('span', { class: 'vb-upload-detail' }, 'Drag images here or click to browse'),
+    ),
+    h('span', { class: 'vb-upload-limit' }, `Up to ${MAX_VIBE_IMAGES} · ${MAX_VIBE_IMAGE_BYTES / 1024 / 1024} MB each`),
   );
   uploadButton.addEventListener('click', () => fileInput.click());
   const previews = h('div', { class: 'vb-image-previews', 'aria-label': 'Selected vibe images' });
@@ -193,32 +190,26 @@ export function createVibeStep(prefs: Store<InitialPreferences, PreferencesActio
     { class: 'vb-vibe-screen' },
     h('div', { class: 'vb-vibe-intro' },
       h('p', { class: 'vb-overline' }, 'Your inspiration'),
-      h('h3', { class: 'vb-vibe-heading' }, 'What do you want it to feel like?'),
+      h('h3', { class: 'vb-vibe-heading' }, 'What’s your vibe?'),
       h('p', { class: 'vb-vibe-lead' },
-        'Describe a mood, a movie or specific scene, a song, or the objects, colors and atmosphere you picture. There are no wrong answers.'),
+        'Use a feeling, a song, a movie scene, or anything that captures the atmosphere.'),
     ),
     h('div', { class: 'vb-field' },
-      h('label', { class: 'vb-label vb-vibe-label', for: inputId }, 'Describe your vibe ', h('span', { class: 'vb-optional' }, '(optional)')),
+      h('label', { class: 'vb-label vb-vibe-label', for: inputId }, 'Your vibe ', h('span', { class: 'vb-optional' }, '(in your own words)')),
       story,
       h('div', { class: 'vb-field-foot' },
         h('span', { class: 'vb-hint-inline', id: helpId },
-          'Mention lighting, energy, music, people, setting, memories, movie scenes or even everyday objects.'),
+          'A few words or a full description — both work.'),
         counter,
       ),
     ),
     h('div', { class: 'vb-vibe-examples' },
       h('div', { class: 'vb-vibe-section-head' },
-        h('span', { class: 'vb-vibe-section-label' }, 'Need inspiration?'),
-        h('span', { class: 'vb-vibe-section-help' }, 'Tap an example to start'),
+        h('span', { class: 'vb-vibe-section-help' }, 'Or start with an example:'),
       ),
       h('div', { class: 'vb-example-grid' }, ...exampleButtons),
     ),
     h('section', { class: 'vb-vibe-upload-section', 'aria-label': 'Photo inspiration' },
-      h('div', { class: 'vb-vibe-section-head' },
-        h('label', { class: 'vb-vibe-section-label', for: uploaderId }, 'Or show us the feeling'),
-        icon(PLUS_ICON, 18),
-      ),
-      h('p', { class: 'vb-upload-explainer' }, 'Add one photo or a whole moodboard. Your images stay on this device for now; visual matching is being built next.'),
       dropZone,
     ),
   );
