@@ -60,6 +60,68 @@
 - **Proposal:** Workstream PRs merge to `develop`; `main` remains stable.
 - **Action:** Team confirms; create branch before coding.
 
+### P-007 · Proposed · Open map stack (resolves P-002; brief §8 option 2)
+- **Date / owner:** 2026-11-21 · Map workstream
+- **Context:** P-002 left the frontend and map stack open. PROJECT_BRIEF §8 ties the map choice to review data: Google review/place content may only be shown on a Google map.
+- **Decision:** Keep the map built on `maps-draft`: **MapLibre GL JS** rendering **OpenStreetMap vector tiles from OpenFreeMap** (free, no API key), in a **Vite + TypeScript** app at `apps/web`. This is brief §8 option 2 (open basemap, no Google reviews).
+- **Why / alternatives:** It already works: custom Google-Maps-like style, 2.5D buildings, pins, search. Google Maps (option 1) would give Google reviews and photos, but means a rebuild, an API key and billing, and no storing of any Google content.
+- **Implications:** No Google Places content anywhere in the app or database. The framework question (vanilla TS vs React) and the `apps/web` vs `src/` layout are still open. Map attribution (OpenFreeMap, OpenMapTiles, OpenStreetMap) must stay visible.
+- **Revisit trigger:** The team decides third-party reviews must be Google's.
+
+### P-008 · Proposed · Review data: Yelp live display only + in-app student reviews (resolves brief §8)
+- **Date / owner:** 2026-11-21 · Map workstream, with Integration
+- **Context:** The team wants reviews. Yelp's API terms allow caching its content for at most 24 hours; only Yelp business IDs may be stored indefinitely. The API returns excerpts only (about 3 per business, first 160 characters) and is paid after a 30-day trial. Secondary sources report a ban on using Yelp content for AI/ML without written approval. Scraping Yelp is prohibited.
+- **Decision:**
+  1. Store only `yelp_business_id` in Supabase.
+  2. A Supabase Edge Function (API key server-side) fetches review excerpts live when a place card opens. Cache at most 24 hours, outside the database. Show Yelp's required logo, stars and link-back.
+  3. Yelp content, including the star rating, is **never** stored, embedded, or used for ranking or filtering.
+  4. Add **in-app student reviews** (`student_reviews` table). These are our own data, usable for display, embeddings and ranking. Seeded demo reviews are flagged `is_seed` and labeled in the UI.
+- **Why / alternatives:** Embedding or storing Yelp text would keep its content past 24 hours and build our database from it; both conflict with the terms. Google reviews are ruled out by P-007.
+- **Implications:** Review-driven ranking comes only from student reviews. Verify Yelp's current API Terms and Display Requirements before launch; this summary rests partly on secondary sources.
+- **Revisit trigger:** Yelp grants written permission, or its terms change.
+
+### P-009 · Proposed · Catalog sources and filter fields (refines P-004)
+- **Date / owner:** 2026-11-21 · Integration (catalog), with Data & routing
+- **Context:** Filters need price, distance and cuisine for every place. Live Overpass lookups from the browser proved unreliable: public servers were at capacity for most of 2026-11-21, and overpass-api.de rejects clients without a descriptive User-Agent.
+- **Decision:**
+  - **Sources:** OpenStreetMap (via Overpass, batch only, descriptive User-Agent, retry with backoff) and Foursquare OS Places (Apache 2.0). These are loaded offline into Supabase; the browser queries Supabase, not Overpass.
+  - **Distance:** PostGIS on stored coordinates, plus precomputed nearest stations (brief §3.1).
+  - **Cuisine:** OSM `cuisine`, Foursquare categories and scraped menus.
+  - **Price:** `price_band` from scraped menu prices where found, else an LLM estimate, with `price_source` recorded and estimates labeled "(est.)" in the UI. Money in USD cents (CONTRACTS.md).
+  - **Unknowns:** hours and price stay `null` / `'unknown'` and are never shown as known.
+  - Schema in [DATA_MODEL.md](DATA_MODEL.md).
+- **Why / alternatives:** Google/Yelp data can't be stored (P-007, P-008). OSM alone has no prices and patchy hours, so menu scraping and labeled estimates fill the gap.
+- **Implications:** The map's current live Overpass lookups are a prototype stand-in, to be replaced by Supabase queries. `price_source`, `hours` and `cuisines` need a CONTRACTS.md change to reach `Place`.
+- **Revisit trigger:** Price estimates prove too inaccurate in testing.
+
+### P-010 · Proposed · Ambience / vibe layer (amends PROJECT_BRIEF §5)
+- **Date / owner:** 2026-11-21 · Intelligence (Vibe), with Integration
+- **Context:** The brief keeps restaurant profiles cuisine- and dish-focused ("menus, not moods") so query and document embeddings stay comparable. But the flagship Vibe feature and the Living Map need *atmosphere*: "cozy rainy-night spot" can't be answered from menus alone.
+- **Decision:** Keep the menu profile and its embedding exactly as the brief specifies. **Add a separate ambience layer** per place:
+  - `vibe_scores` on a fixed, versioned vocabulary of 10 dimensions in [0,1] (DATA_MODEL.md §3);
+  - an `ambience_description`, embedded separately (`ambience_embedding`, same text model);
+  - `vibe_confidence` and `vibe_sources`.
+  These are produced offline by one LLM step from: the restaurant's own website text, descriptions of its interior photos (words kept, images never stored), OSM tags, computed neighborhood context, and student reviews.
+  The Gemini query step also outputs `vibe_scores` and an ambience sentence. Ranking adds ambience similarity and vibe-score overlap to the brief's hybrid search.
+- **Why / alternatives:** A separate embedding keeps mood words from diluting dish matching, which is the brief's concern. A fixed vocabulary also drives map themes (M4) and explainable matches. Folding mood into the menu description was rejected for that reason.
+- **Implications:** Extra schema columns and one extra LLM call per place offline. Places without websites get low-confidence vibe data, down-weighted in ranking. `VibeProfile.tags` in CONTRACTS.md uses the same vocabulary keys.
+- **Revisit trigger:** Evaluation (brief §13) shows the ambience layer doesn't improve vibe queries.
+
+### P-011 · Proposed · In-browser image/audio vibe models (complements Gemini)
+- **Date / owner:** 2026-11-21 · Intelligence (Vibe), with Map
+- **Context:** Gemini is the decided multimodal translator (brief §4). Free image-text models (CLIP/SigLIP) and audio-text models (CLAP) run in the browser via Transformers.js.
+- **Decision:**
+  - Run a **CLIP or SigLIP** model in the browser for image input. It produces `vibe_scores` (image vs one prompt sentence per vocabulary key) and an image vector matched against `ambience_clip_embedding` (CLIP text vectors of each place's ambience description, computed offline with the same CLIP model).
+  - Optionally, run **CLAP** for song mood scores.
+  - Gemini still provides cuisine, dishes and price feel.
+  - Small generative vision-language models (SmolVLM, Florence-2, Moondream) are fallback-only, because of large downloads and weaker quality.
+- **Why / alternatives:** Instant Living Map reaction without an API round-trip; uploaded photos stay on the device; no per-request cost; image queries keep working if Gemini is slow or down. Using Gemini alone was the alternative.
+- **Implications:**
+  - A separate vector column with the CLIP model's dimension. CLIP vectors are never compared with the text-model vectors (brief §4 "never mix" rule).
+  - Pin exact model IDs.
+  - Preload the model before demos: the first download is large, and speed depends on WebGPU support.
+- **Revisit trigger:** Model download or speed hurts the demo on judging hardware.
+
 ## How to add a decision
 ~~~md
 ### D-007 · Accepted/Proposed/Superseded · Short title

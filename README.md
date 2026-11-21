@@ -21,6 +21,7 @@ This is the **full product vision**, not a claim that every feature is already c
 | [Product brief](docs/PRODUCT.md) | Goals, complete features, what judges should experience |
 | [Architecture](docs/ARCHITECTURE.md) | Modules and data flow; proposed tech choices |
 | [Contracts](docs/CONTRACTS.md) | `Place`, `TransitRequest`, `TransitResponse`, map ↔ route handoff |
+| [Data model](docs/DATA_MODEL.md) | Proposed Supabase schema, vibe vocabulary, enrichment pipeline, review/data compliance |
 | [Workstreams](docs/WORKSTREAMS.md) | Who owns map, transit, vibe and integration; branch rules |
 | [Roadmap](docs/ROADMAP.md) | Ordered milestones and acceptance tests |
 | [Decision log](docs/DECISIONS.md) | What's accepted vs still proposed |
