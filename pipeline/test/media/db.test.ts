@@ -1,22 +1,38 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { fetchEnrichPlaces, fetchHiddenKeys, writePlaceMedia } from '../../src/media/db.ts';
+import {
+  fetchEnrichPlaces, fetchHiddenKeys, fetchPhotosToStore, recordStored, storedBytesTotal, uploadCopy, writePlaceMedia,
+} from '../../src/media/db.ts';
 import type { PhotoCandidate } from '../../src/media/types.ts';
 
 type Call = { table: string; op: string; args: unknown[] };
+type Result = { data?: unknown; error: null | { message: string } };
 
-/** A chainable fake of the supabase-js query builder that records every call and resolves to `result`. */
-function fakeClient(resultFor: (table: string, calls: Call[]) => { data?: unknown; error: null | { message: string } }) {
+/**
+ * A chainable fake of the supabase-js query builder that records every call. `resultFor` gets the table, all calls
+ * so far and the ops of this one query (e.g. ['select', 'eq', 'eq']). Storage calls are recorded as table `storage:<bucket>`.
+ */
+function fakeClient(resultFor: (table: string, calls: Call[], ops: string[]) => Result) {
   const calls: Call[] = [];
   const client = {
     from(table: string) {
+      const ops: string[] = [];
       const builder: Record<string, unknown> = {};
       for (const op of ['select', 'delete', 'insert', 'upsert', 'update', 'eq', 'neq', 'is', 'order', 'range', 'in', 'not']) {
-        builder[op] = (...args: unknown[]) => { calls.push({ table, op, args }); return builder; };
+        builder[op] = (...args: unknown[]) => { calls.push({ table, op, args }); ops.push(op); return builder; };
       }
-      builder.then = (resolve: (v: unknown) => unknown) => resolve(resultFor(table, calls));
+      builder.then = (resolve: (v: unknown) => unknown) => resolve(resultFor(table, calls, ops));
       return builder;
+    },
+    storage: {
+      from(bucket: string) {
+        const table = `storage:${bucket}`;
+        return {
+          async upload(...args: unknown[]) { calls.push({ table, op: 'upload', args }); return resultFor(table, calls, ['upload']); },
+          async remove(...args: unknown[]) { calls.push({ table, op: 'remove', args }); return resultFor(table, calls, ['remove']); },
+        };
+      },
     },
   };
   return { client: client as unknown as SupabaseClient, calls };
@@ -102,4 +118,69 @@ test('writePlaceMedia with no inputs and nothing kept removes all of the place i
   const del = calls.findIndex((c) => c.table === 'place_vibe_inputs' && c.op === 'delete');
   assert.ok(del >= 0);
   assert.equal(calls.slice(del + 1).some((c) => c.table === 'place_vibe_inputs' && c.op === 'not'), false);
+});
+
+const OLD_ROWS = [
+  { url: 'https://a/1.jpg', storage_path: 'pipeline/7/aa.webp', stored_at: 't1', stored_bytes: 50000 },
+  { url: 'https://a/2.jpg', storage_path: 'pipeline/7/bb.webp', stored_at: 't2', stored_bytes: 40000 },
+  { url: 'https://a/3.jpg', storage_path: null, stored_at: null, stored_bytes: null },
+];
+const oldRowsClient = () => fakeClient((table, _calls, ops) =>
+  (table === 'place_photos' && ops[0] === 'select' ? { data: OLD_ROWS, error: null } : { error: null }));
+
+test('writePlaceMedia keeps the stored copy of a photo whose URL survives', async () => {
+  const { client, calls } = oldRowsClient();
+  await writePlaceMedia(client, 7, [PHOTO], [], 'now');
+  const ins = calls.find((c) => c.table === 'place_photos' && c.op === 'insert')!;
+  const row = (ins.args[0] as Array<Record<string, unknown>>)[0]!;
+  assert.deepEqual([row.storage_path, row.stored_at, row.stored_bytes], ['pipeline/7/aa.webp', 't1', 50000]);
+  const sel = calls.findIndex((c) => c.table === 'place_photos' && c.op === 'select');
+  const del = calls.findIndex((c) => c.table === 'place_photos' && c.op === 'delete');
+  assert.ok(sel >= 0 && sel < del, 'existing rows are read before the delete');
+});
+
+test('writePlaceMedia removes stored files whose photo dropped out', async () => {
+  const { client, calls } = oldRowsClient();
+  await writePlaceMedia(client, 7, [PHOTO], [], 'now');
+  const rm = calls.filter((c) => c.table === 'storage:place-photos' && c.op === 'remove');
+  assert.deepEqual(rm.map((c) => c.args[0]), [['pipeline/7/bb.webp']]);
+});
+
+test('writePlaceMedia makes no storage call when nothing is orphaned', async () => {
+  const { client, calls } = fakeClient(() => ({ error: null }));
+  await writePlaceMedia(client, 7, [PHOTO], [], 'now');
+  assert.equal(calls.some((c) => c.table.startsWith('storage:')), false);
+});
+
+test('fetchPhotosToStore filters to visible, unstored, non-Mapillary pipeline photos with a URL', async () => {
+  const { client, calls } = fakeClient(() => ({ data: [{ id: 1, restaurant_id: 7, url: 'https://a/1.jpg' }], error: null }));
+  assert.deepEqual(await fetchPhotosToStore(client, { limit: null }), [{ id: 1, restaurantId: 7, url: 'https://a/1.jpg' }]);
+  const f = calls.map((c) => [c.op, ...c.args]);
+  assert.ok(f.some((x) => x[0] === 'eq' && x[1] === 'hidden' && x[2] === false));
+  assert.ok(f.some((x) => x[0] === 'in' && x[1] === 'kind' && JSON.stringify(x[2]) === '["website","licensed"]'));
+  assert.ok(f.some((x) => x[0] === 'neq' && x[1] === 'source' && x[2] === 'mapillary'));
+  assert.ok(f.some((x) => x[0] === 'not' && x[1] === 'url' && x[2] === 'is' && x[3] === null));
+  assert.ok(f.some((x) => x[0] === 'is' && x[1] === 'storage_path' && x[2] === null));
+});
+
+test('recordStored writes the path, size and time and clears the error', async () => {
+  const { client, calls } = fakeClient(() => ({ error: null }));
+  await recordStored(client, 5, 'pipeline/7/aa.webp', 1234, 'now');
+  const upd = calls.find((c) => c.op === 'update')!;
+  assert.deepEqual(upd.args[0], { storage_path: 'pipeline/7/aa.webp', stored_bytes: 1234, stored_at: 'now', store_error: null });
+  assert.ok(calls.some((c) => c.op === 'eq' && c.args[0] === 'id' && c.args[1] === 5));
+});
+
+test('storedBytesTotal sums stored_bytes', async () => {
+  const { client } = fakeClient(() => ({ data: [{ stored_bytes: 1000 }, { stored_bytes: 2500 }], error: null }));
+  assert.equal(await storedBytesTotal(client), 3500);
+});
+
+test('uploadCopy uploads WebP with upsert to the place-photos bucket', async () => {
+  const { client, calls } = fakeClient(() => ({ error: null }));
+  await uploadCopy(client, 'pipeline/7/aa.webp', new Uint8Array([1]));
+  const up = calls.find((c) => c.op === 'upload')!;
+  assert.equal(up.table, 'storage:place-photos');
+  assert.equal(up.args[0], 'pipeline/7/aa.webp');
+  assert.deepEqual(up.args[2], { contentType: 'image/webp', upsert: true });
 });
