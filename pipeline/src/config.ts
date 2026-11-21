@@ -18,3 +18,8 @@ export const DEFAULT_FSQ_RELEASE = '2026-01-12';
 export const ATTRIBUTION_OSM = '© OpenStreetMap contributors (ODbL)';
 export const ATTRIBUTION_FSQ = 'Foursquare OS Places (Apache 2.0)';
 export const ATTRIBUTION_MERGED = '© OpenStreetMap contributors (ODbL); Foursquare OS Places (Apache 2.0)';
+
+// TODO(verify): confirm against FSQ categories parquet (release 2026-01-12)
+export const FSQ_CAFE_SEGMENTS = ['Cafe, Coffee, and Tea House'] as const;
+// TODO(verify): confirm against FSQ categories parquet (release 2026-01-12)
+export const FSQ_NIGHTLIFE_SEGMENTS = ['Bar', 'Brewery', 'Lounge', 'Night Club'] as const;
