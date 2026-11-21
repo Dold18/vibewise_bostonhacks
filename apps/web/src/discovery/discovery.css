@@ -3,10 +3,9 @@
  * map's design tokens (--surface, --text, --accent, ...) with fallbacks, so
  * no map styles are overridden.
  *
- * Stacking, relative to the map UI (style.css):
- *   expanded             z 1   below the search results (top bar, z 2)
- *   collapsed + card     z 0   docked bottom-left; the destination card wins any overlap
- *   expanded over card   z 2   the user explicitly opened it on top of the card
+ * Only the user collapses or expands the panel; map overlays never change it.
+ * Stacking: panel z 1 (phone sheet z 2) < destination popup < trip planner z 3.
+ * The map moves the camera so a popup clears the panel where it can.
  */
 
 /* Shared tokens and base styles for every Vibenta overlay (panel, trip planner, popups). */
@@ -74,17 +73,7 @@
   outline-offset: 2px;
 }
 
-/* ---------- Collapsed / card states ---------- */
-
-.vb-discovery.is-collapsed.card-open {
-  top: auto;
-  bottom: 40px;
-  z-index: 0;
-}
-
-.vb-discovery.is-expanded.card-open {
-  z-index: 2;
-}
+/* ---------- Collapsed summary ---------- */
 
 .vb-summary-btn {
   position: relative;
@@ -959,14 +948,6 @@
     z-index: 1;
   }
 
-  /* With a destination popup open, dock the summary at the top, clear of the popup and controls. */
-  .vb-discovery.is-collapsed.card-open:not(.overlay-planner) {
-    top: var(--vb-top, 72px);
-    bottom: auto;
-    right: 12px;
-    z-index: 1;
-  }
-
   .vb-handle {
     display: block;
     position: absolute;
@@ -991,7 +972,7 @@
     rotate: 0deg;
   }
 
-  .vb-discovery:not(.card-open) .vb-summary-chevron {
+  .vb-discovery .vb-summary-chevron {
     rotate: 180deg;
   }
 

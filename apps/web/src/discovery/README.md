@@ -19,7 +19,6 @@ const discovery = mountDiscoveryPanel(document.body, {
   saved: { store, onSelect },
   onRecenter,
 });
-discovery.setOverlayOpen('popup' | 'planner' | null);  // collapse/restore around map overlays
 ```
 
 - **Quick Tools.** A slim Search / Saved / Recenter row sits directly above
@@ -33,8 +32,10 @@ discovery.setOverlayOpen('popup' | 'planner' | null);  // collapse/restore aroun
     are no accounts or sync.
 - **Layout.**
   - The panel sits at the top-left. There is no separate search bar any more.
-  - It collapses to a one-line summary while a destination popup or the trip
-    planner is open, and restores when they close.
+  - It's independent of map overlays. Opening or closing a destination popup
+    or the trip planner never collapses, hides or moves it, so every field
+    (including the vibe box and Quick Tools) stays usable while a popup is
+    open. Only the user's minimize/expand buttons change it.
   - On phones it's a bottom sheet.
 - **What the panel touches.** It never changes map state directly. The map
   subscribes with `subscribe()` / `getPreferences()`, for example for the
@@ -154,4 +155,4 @@ npm run build    # tsc && vite build
 ```
 
 The tests run in Node with no DOM. DOM behaviour (keyboard, focus,
-collapse/restore, mobile layout) was checked manually in Chrome.
+minimize/expand, mobile layout) was checked in headless Chrome.

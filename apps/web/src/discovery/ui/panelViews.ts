@@ -34,7 +34,7 @@ export function createQuickTools(actions: {
     saved: tool('Saved', ICONS.bookmark, actions.saved, badge),
     recenter: tool('Recenter', ICONS.recenter, actions.recenter),
   };
-  buttons.recenter.title = 'Back to your starting point (or Boston)';
+  buttons.recenter.title = 'Back to your starting point (or Boston Common)';
   const root = h('div', { class: 'vb-quick-tools', role: 'group', 'aria-label': 'Quick tools' }, buttons.search, buttons.saved, buttons.recenter);
   return {
     root,

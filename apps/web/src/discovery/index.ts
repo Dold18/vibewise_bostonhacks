@@ -2,12 +2,12 @@
  * Discovery panel: public entry point.
  *
  *   import { mountDiscoveryPanel } from './discovery';
- *   mountDiscoveryPanel(document.body, { placeCard: card });
+ *   mountDiscoveryPanel(document.body, { mapLayers, search, saved, onRecenter });
  *
- * The panel only *reads* the map's DOM: it watches the destination card's
- * `hidden` attribute (to collapse while a card is open) and measures the
- * search bar (to sit just below it). It never changes map state; consumers
- * read preferences through `getPreferences()` / `subscribe()`.
+ * The panel is independent of map overlays: opening or closing a destination
+ * popup or the trip planner never collapses, hides or moves it. It never
+ * changes map state itself; consumers read preferences through
+ * `getPreferences()` / `subscribe()`.
  */
 import './discovery.css';
 import { BOSTON_LOCATIONS } from './data/bostonLocations.generated';
@@ -15,7 +15,7 @@ import { createLocalSuggestionProvider, type GeolocationEnvironment, type Locati
 import { createMapLayerNotifier, type MapLayer, type MapLayerSelection } from './mapLayers';
 import { initialPreferences, preferencesReducer, type InitialPreferences } from './preferences';
 import { createStore, initialLayout, layoutReducer } from './store';
-import { createPanel, type OverlayKind, type PanelDeps, type PanelView } from './ui/panel';
+import { createPanel, type PanelDeps, type PanelView } from './ui/panel';
 
 export type { InitialPreferences } from './preferences';
 export { rankPlaces, evaluatePlace, type RankResult, type RankedPlace } from './filter';
@@ -27,14 +27,10 @@ export { combineProviders, createPlaceListProvider, type PlaceLike } from './loc
 /** The bundled offline Boston list (MBTA stations, universities, landmarks) as a suggestion provider. */
 export const createBostonSuggestionProvider = () => createLocalSuggestionProvider(BOSTON_LOCATIONS);
 export { createSavedStore, savedToPlace, type SavedPlace, type SavedStore } from './saved';
-export type { OverlayKind, PanelView } from './ui/panel';
+export { bostonCommon } from './landmarks';
+export type { PanelView } from './ui/panel';
 
 export interface DiscoveryPanelOptions {
-  /**
-   * Legacy: a destination card element whose `hidden` attribute is watched.
-   * Prefer calling `setOverlayOpen()` from the map.
-   */
-  placeCard?: HTMLElement | null;
   /** Elements the panel must sit below (default: none, so the panel sits at the top). */
   topAnchors?: () => Element[];
   /** Quick Tools (Search / Saved / Recenter), shown above the vibe box. */
@@ -57,12 +53,9 @@ export interface DiscoveryPanelOptions {
 }
 
 export interface DiscoveryPanelHandle {
-  /**
-   * A map overlay (destination popup or trip planner) opened or closed. The
-   * panel collapses to its summary while one is open and restores afterwards.
-   */
-  setOverlayOpen(kind: OverlayKind): void;
   showView(view: PanelView): void;
+  /** The panel's root element (read-only use, e.g. keeping map popups clear of it). */
+  element(): HTMLElement;
   getPreferences(): InitialPreferences;
   subscribe(listener: (prefs: InitialPreferences) => void): () => void;
   destroy(): void;
@@ -113,16 +106,6 @@ export function mountDiscoveryPanel(container: HTMLElement, options: DiscoveryPa
   window.addEventListener('resize', syncTop);
   cleanups.push(() => window.removeEventListener('resize', syncTop));
 
-  // Collapse while the destination card is open; restore when it closes.
-  const card = options.placeCard;
-  if (card) {
-    const syncCard = () => layout.dispatch({ type: card.hidden ? 'cardClosed' : 'cardOpened' });
-    const mo = new MutationObserver(syncCard);
-    mo.observe(card, { attributes: true, attributeFilter: ['hidden'] });
-    syncCard();
-    cleanups.push(() => mo.disconnect());
-  }
-
   // Tell the map which categories to load: now, then after changes settle.
   if (options.mapLayers) {
     const { available, onChange, debounceMs } = options.mapLayers;
@@ -132,11 +115,8 @@ export function mountDiscoveryPanel(container: HTMLElement, options: DiscoveryPa
   }
 
   const handle: DiscoveryPanelHandle = {
-    setOverlayOpen(kind) {
-      panel.setOverlayKind(kind);
-      layout.dispatch({ type: kind ? 'cardOpened' : 'cardClosed' });
-    },
     showView: panel.showView,
+    element: () => panel.root,
     getPreferences: prefs.getState,
     subscribe: (listener) => prefs.subscribe((state) => listener(state)),
     destroy() {

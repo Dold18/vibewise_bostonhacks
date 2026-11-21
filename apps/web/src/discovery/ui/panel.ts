@@ -1,7 +1,8 @@
 /**
  * The floating "Plan your outing" panel. Renders preference state, sends every
- * change through the preferences store, and collapses to a one-line summary
- * (never disappears) while the map's destination card is open.
+ * change through the preferences store. Only the user collapses it to a
+ * one-line summary; map interactions (destination popups, the trip planner)
+ * never change it.
  *
  * The body is a `data-step="preferences"` section so the Vibe Quiz can later
  * replace it inside the same panel without touching the map.
@@ -51,15 +52,12 @@ export interface PanelDeps {
 }
 
 export type PanelView = 'preferences' | 'search' | 'saved';
-export type OverlayKind = 'popup' | 'planner' | null;
 
 export interface Panel {
   root: HTMLElement;
   /** Close any open dropdown or search inside the panel. */
   closePopups(): void;
   showView(view: PanelView): void;
-  /** Which map overlay is open (for placing the collapsed summary). */
-  setOverlayKind(kind: OverlayKind): void;
   destroy(): void;
 }
 
@@ -260,7 +258,6 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     const expanded = isExpanded(s);
     root.classList.toggle('is-expanded', expanded);
     root.classList.toggle('is-collapsed', !expanded);
-    root.classList.toggle('card-open', s.cardOpen);
     body.hidden = !expanded;
     summaryBtn.hidden = expanded;
     summaryBtn.setAttribute('aria-expanded', String(expanded));
@@ -334,10 +331,6 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     closePopups,
     showView: (next) => {
       if (next !== view) showView(next);
-    },
-    setOverlayKind(kind) {
-      root.classList.toggle('overlay-popup', kind === 'popup');
-      root.classList.toggle('overlay-planner', kind === 'planner');
     },
     destroy() {
       unsubPrefs();

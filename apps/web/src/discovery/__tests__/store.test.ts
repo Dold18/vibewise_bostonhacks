@@ -18,32 +18,27 @@ describe('createStore', () => {
   });
 });
 
-describe('panel layout while a destination card is open', () => {
-  it('collapses (not hides) when the card opens and restores when it closes', () => {
-    const open = run(initialLayout('expanded'), { type: 'cardOpened' });
-    expect(isExpanded(open)).toBe(false);
-    expect(isExpanded(run(open, { type: 'cardClosed' }))).toBe(true);
-  });
-
-  it('returns to a collapsed panel if the user had collapsed it before', () => {
-    const s = run(initialLayout('expanded'), { type: 'collapse' }, { type: 'cardOpened' }, { type: 'cardClosed' });
-    expect(isExpanded(s)).toBe(false);
-  });
-
-  it('can be expanded on top of the card without changing the preferred state', () => {
-    const peek = run(initialLayout('collapsed'), { type: 'cardOpened' }, { type: 'expand' });
-    expect(isExpanded(peek)).toBe(true);
-    const closed = run(peek, { type: 'cardClosed' });
-    expect(isExpanded(closed)).toBe(false);
-  });
-
-  it('a newly opened card collapses the panel again', () => {
-    const s = run(initialLayout('expanded'), { type: 'cardOpened' }, { type: 'expand' }, { type: 'cardClosed' }, { type: 'cardOpened' });
-    expect(isExpanded(s)).toBe(false);
+describe('panel layout: only the user collapses or expands it', () => {
+  it('minimize and expand change the state; repeats are no-ops', () => {
+    const start = initialLayout('expanded');
+    const collapsed = run(start, { type: 'collapse' });
+    expect(isExpanded(collapsed)).toBe(false);
+    expect(run(collapsed, { type: 'collapse' })).toBe(collapsed);
+    expect(isExpanded(run(collapsed, { type: 'expand' }))).toBe(true);
+    expect(run(start, { type: 'expand' })).toBe(start);
   });
 
   it('toggle flips the visible state', () => {
     expect(isExpanded(run(initialLayout('expanded'), { type: 'toggle' }))).toBe(false);
-    expect(isExpanded(run(initialLayout('collapsed'), { type: 'cardOpened' }, { type: 'toggle' }))).toBe(true);
+    expect(isExpanded(run(initialLayout('collapsed'), { type: 'toggle' }))).toBe(true);
+  });
+
+  it('has no map-overlay actions: popups and the trip planner cannot collapse the panel', () => {
+    const state = initialLayout('expanded');
+    for (const type of ['cardOpened', 'cardClosed', 'overlayOpened', 'overlayClosed']) {
+      // Unknown actions (e.g. the removed cardOpened/cardClosed) leave the layout untouched.
+      expect(layoutReducer(state, { type } as unknown as LayoutAction)).toBe(state);
+    }
+    expect(Object.keys(state)).toEqual(['preferred']);
   });
 });

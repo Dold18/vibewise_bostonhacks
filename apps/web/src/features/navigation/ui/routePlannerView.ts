@@ -31,7 +31,7 @@ export interface RoutePlannerConfig {
   /** Null until live routing is switched on. */
   provider: RouteProvider | null;
   geolocation?: GeolocationEnvironment;
-  /** Told when the planner opens or closes (e.g. to collapse the discovery panel). */
+  /** Told when the planner opens or closes. (The discovery panel is never collapsed for it.) */
   onOpenChange?(open: boolean): void;
 }
 
