@@ -227,7 +227,7 @@ search_restaurants(
 ## 7. Compliance rules this model encodes
 - **Yelp:** only `yelp_business_id` is stored. Review excerpts are fetched live by a Supabase Edge Function (API key server-side), cached at most 24 hours outside the database, shown with Yelp's required attribution, and **never** stored, embedded or used for ranking or filtering. Neither is Yelp's star rating.
 - **Google:** no Google Places content anywhere in this database (brief §11).
-- **Images:** third-party photos are analyzed offline for descriptive words only; they are not stored or displayed.
+- **Images:** photos from a place's own website may be displayed, stored and embedded (P-013, decided 2026-11-21), credited to the site's domain with a link back. Photos from third-party platforms (Google, Yelp, Tripadvisor, social media, delivery apps) are never used. Licensed photos keep their license and credit.
 - **OSM (ODbL):** attribution in the app (already shown on the map). If the database itself is ever published, share-alike applies.
 - **Foursquare OS Places (Apache 2.0):** keep its attribution notice.
 - **Honesty:** unknown hours or price are stored as `null` / `'unknown'` and shown as such. Seeded reviews are flagged `is_seed` and labeled.

@@ -1,6 +1,6 @@
 # Place photos and vibe sources — design
 
-> **Status:** Draft for team review, 2026-11-21. Records proposed decision P-013 (to be added to DECISIONS.md on approval). Showing website photos departs from AGENTS.md §5 and PRODUCT.md ("images must be licensed/authorized"); the team must ratify that part before it ships.
+> **Status:** Approved 2026-11-21; pipeline part built (§0). Records decision P-013. Showing, storing and embedding photos from a place's own website departs from AGENTS.md §5 and PRODUCT.md ("images must be licensed/authorized"). The project lead decided this on 2026-11-21: website photos may be shown, stored and embedded.
 
 ## 0. Scope of this build
 
@@ -35,7 +35,7 @@ Each place card should show real photos of the place, the way Beli does, and eac
 **Anti-goals** (failures even if the code works)
 - A photo of the wrong place. A card with no photo is better than a card with a neighbour's storefront.
 - Team-written reviews or photos presented as real student content. Seeded content is flagged `is_seed` and labeled.
-- Storing copies of website images. They are linked, credited and linked back, never re-hosted.
+- Photos from third-party platforms (Google, Yelp, Tripadvisor, social media, delivery apps). Only a place's own website counts. *(The earlier anti-goal "never store copies of website images" was lifted on 2026-11-21: website photos may be stored and embedded. The current pipeline still stores URLs only.)*
 - Vibe scores that claim confidence they don't have. Thin evidence gives `vibe_confidence = 'low'`.
 
 ## 3. Constraints
@@ -64,7 +64,7 @@ Ranking is my call: explicitly linked photos are near-certain to be correct; web
 ### 4.2 Details
 
 - **Website photos:** skip logos, icons, sprites and images under 400 px on the short side (from HTML attributes or a HEAD/size probe). Store the absolute image URL and the page it came from. If the image fails to load on the card, hide it (the `<img>` `onerror` handler), don't show a broken frame.
-- **Website photos switch:** a build-time web flag `VITE_SHOW_WEBSITE_PHOTOS` (default `true`). If the team rejects P-013's website-photo part, it is set to `false` and the rows stay unused for display. They can still be sent to the vibe step.
+- **Website photos switch:** a build-time web flag `VITE_SHOW_WEBSITE_PHOTOS` (default `true`). Showing website photos is decided (P-013). The switch remains as a quick off-switch if a site owner or the team objects.
 - **Removal on request:** `place_photos.hidden = true` removes a photo from cards without deleting the row, so the batch job doesn't re-add it.
 - **Mapillary:** its thumbnail URLs expire, so only the image ID is stored. The browser resolves the thumbnail through the Mapillary Graph API with a public client token (`VITE_MAPILLARY_TOKEN`; Mapillary client tokens are meant for browser use). Without a token, Mapillary photos are skipped. Mapillary is the first thing to cut if time runs short.
 
@@ -213,8 +213,9 @@ Sources ruled out: Google Places (P-007; storage and non-Google-map bans), Yelp 
 **My calls (correct me):** display ranking in §4.1; hotlinking website photos instead of copying them; the website-photo switch and `hidden` flag; Mapillary as optional; EXIF stripping; up to 5 photos per card; batched scoring with photos sent straight into the vibe call (up to 3 per place, priority places only); a second Gemini model when the first hits its quota; neighbourhood input dropped; extending ingest's OSM tag list; priority order and branch order in §6.4 and §8.
 
 **Open for the team:**
-1. Ratify P-013, including showing website photos despite AGENTS.md §5. The pipeline can collect website photos before ratification, since display is switched by `VITE_SHOW_WEBSITE_PHOTOS`.
+1. ~~Ratify P-013's website-photo part.~~ Decided 2026-11-21: website photos may be shown, stored and embedded.
 2. Map (A) and Vibe (C) pick up their parts from this doc.
+3. Whether to actually store copies of website photos (in the `place-photos` bucket or a separate one) and compute image embeddings. Both are now allowed, but neither is built.
 
 **Left to the builder:** HTML parsing library, exact size and match thresholds, the carousel UI, Commons API query details, address normalization for city license matching.
 

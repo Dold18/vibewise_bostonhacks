@@ -178,12 +178,12 @@
     4. Commons photos near the place that match its name;
     5. Mapillary street photos.
   - **Licensed photos** keep their license and credit. Allowed: CC0, Public Domain, CC BY, CC BY-SA.
-  - **Website photos** are hotlinked with the domain credited and a link back, never copied. A `hidden` flag removes any photo.
+  - **Website photos** are shown on cards with the domain credited and a link back. They may also be stored (copied into our storage) and embedded (e.g. CLIP image vectors). The current pipeline stores only their URLs. A `hidden` flag removes any photo.
   - **Vibe inputs** come from website text, Wikipedia/Wikivoyage, OSM tags, Boston entertainment and alcohol license data, and student reviews. They are collected offline by `npm run enrich:media` into `place_vibe_inputs`.
   - New tables `place_photos`, `place_vibe_inputs` and `student_reviews`, plus a `place-photos` storage bucket (migration `20261121200000_create_place_media.sql`).
-- **Departure from AGENTS.md §5 / PRODUCT.md:** showing website photos without the owner's permission departs from the "images must be licensed/authorized" rule.
-  - The team must ratify this part.
-  - Until then the web app keeps a switch, `VITE_SHOW_WEBSITE_PHOTOS`, and can turn the display off without touching the pipeline.
+- **Departure from AGENTS.md §5 / PRODUCT.md:** showing, storing and embedding website photos without the owner's permission departs from the "images must be licensed/authorized" rule.
+  - **Decided 2026-11-21 by the project lead:** cards can show website photos, and website photos can be stored and embedded. This exception covers photos from a place's own website only. Third-party platforms (Google, Yelp, Tripadvisor, social media, delivery apps) stay excluded.
+  - The `VITE_SHOW_WEBSITE_PHOTOS` switch stays, defaulting to on, so display can be turned off quickly if needed.
 - **Why / alternatives:**
   - Batch resolution keeps cards fast and rankings reproducible.
   - Rejected: a live photo lookup per card (latency, live demo dependency) and third-party reviews (terms or cost).
@@ -191,7 +191,7 @@
   - `Place` gains `images?: PlaceImage[]`, which is a CONTRACTS.md change for Map and Integration.
   - The vibe scoring step and card/upload UI are handed to Vibe (C) and Map (A).
   - No Gemini calls in `enrich:media`.
-- **Revisit trigger:** a site owner objects (hide their photos), or the team rejects showing website photos (turn the switch off).
+- **Revisit trigger:** a site owner objects (hide their photos and delete any stored copies), or the team reverses the website-photo decision (turn the switch off).
 
 ## How to add a decision
 ~~~md
