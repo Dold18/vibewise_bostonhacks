@@ -16,7 +16,7 @@ import {
   type TilePoi,
 } from './osm';
 import { mountDiscoveryPanel, type DiscoveryPanelHandle } from './discovery';
-import { catalogPlacesNear, isCatalogCategory } from './catalog';
+import { catalogPlacesNear, isCatalogCategory, priceLabel } from './catalog';
 import { clearRoute, drawRoute, fetchRoute, renderRouteState, type LatLng, type RouteState } from './transitRoute';
 
 const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
@@ -199,6 +199,8 @@ function openCard(place: Place, color: string, icon?: string) {
   const rows: [string, string | undefined][] = [
     ['📍', address],
     ['🕒', place.tags.opening_hours],
+    // Catalog places only, once their details loaded; Overpass places have no price data.
+    ['💲', place.tags['catalog:price_band'] ? priceLabel(place.tags['catalog:price_band'], place.tags['catalog:price_source']) : undefined],
     ['📞', place.tags.phone ?? place.tags['contact:phone']],
   ];
   for (const [glyph, value] of rows) {
