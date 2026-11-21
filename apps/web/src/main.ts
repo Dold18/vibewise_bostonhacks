@@ -7,12 +7,13 @@ import {
   formatAddress,
   osmUrl,
   placesFromTiles,
-  placesNear,
+  placesNearAny,
   searchPlaces,
   type Category,
   type Place,
   type TilePoi,
 } from './osm';
+import { mountDiscoveryPanel } from './discovery';
 
 const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
 const TILTED = { pitch: 60, bearing: -20 };
@@ -104,7 +105,8 @@ function pinElement(): HTMLElement {
   return el;
 }
 
-function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: string) {
+/** `icon` is the card icon: one for every place, or chosen per place (mixed categories). */
+function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: string | ((place: Place) => string | undefined)) {
   clearPins();
   // Shadows first so every pin draws above every shadow.
   shadows = places.map((place) =>
@@ -121,7 +123,7 @@ function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: 
     el.addEventListener('click', (e) => {
       e.stopPropagation();
       selectPin(el);
-      openCard(place, look.color, icon);
+      openCard(place, look.color, typeof icon === 'function' ? icon(place) : icon);
     });
     return new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
   });
@@ -313,101 +315,91 @@ function renderResults(places: Place[]) {
 }
 
 // ---------------------------------------------------------------------------
-// Side panel (opened by the ☰ button in the search bar)
-// ---------------------------------------------------------------------------
-
-const panel = $<HTMLElement>('side-panel');
-const menuBtn = $<HTMLButtonElement>('menu-toggle');
-const typeSelect = $<HTMLSelectElement>('location-type');
-
-function setPanelOpen(open: boolean) {
-  panel.classList.toggle('open', open);
-  menuBtn.setAttribute('aria-expanded', String(open));
-  if (open) typeSelect.focus();
-}
-
-menuBtn.addEventListener('click', () => setPanelOpen(!panel.classList.contains('open')));
-$('panel-close').addEventListener('click', () => {
-  setPanelOpen(false);
-  menuBtn.focus();
-});
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && panel.classList.contains('open')) {
-    setPanelOpen(false);
-    menuBtn.focus();
-  }
-});
-
-// ---------------------------------------------------------------------------
-// Location type (tile POIs + Overpass)
+// Place categories (tile POIs + Overpass), chosen by the discovery panel
 // ---------------------------------------------------------------------------
 
 let categoryAbort: AbortController | undefined;
 
-for (const category of CATEGORIES) {
-  typeSelect.append(new Option(`${category.icon}  ${category.label}`, category.id));
-}
-
-typeSelect.addEventListener('change', () => {
-  showCategory(CATEGORIES.find((c) => c.id === typeSelect.value));
-  // On phones the panel covers the map; get it out of the way so the pins are visible.
-  if (window.innerWidth <= 640) setPanelOpen(false);
-});
-
-/** Reflect the active type in the dropdown and badge the ☰ button while a filter is on. */
-function setActiveCategory(id: string | undefined) {
-  typeSelect.value = id ?? '';
-  menuBtn.classList.toggle('has-filter', id !== undefined);
-}
-
-/** Drop the active type and any lookup still in flight (so it can't overwrite newer pins). */
+/** Stop any category lookup still in flight, so it can't overwrite newer pins (e.g. search results). */
 function cancelCategory() {
   categoryAbort?.abort();
-  setActiveCategory(undefined);
 }
 
-async function showCategory(category: Category | undefined) {
+/**
+ * Show places from several categories at once, each pin in its category's
+ * color. `detail: 'tiles'` uses only what's already in the loaded map tiles
+ * (no network); `'full'` then upgrades to one combined Overpass lookup.
+ * A newer call aborts an older one, and every await re-checks that signal,
+ * so a late response can never replace newer pins.
+ */
+async function showCategories(categories: Category[], detail: 'tiles' | 'full') {
   categoryAbort?.abort();
   closeCard();
   resultsList.hidden = true;
-  setActiveCategory(category?.id);
-  if (!category) {
+  if (categories.length === 0) {
     clearPins();
     hideToast();
     return;
   }
   const abort = (categoryAbort = new AbortController());
-  const label = category.label.toLowerCase();
-  const color = CATEGORY_COLORS[category.id] ?? CATEGORY_COLORS.search;
+  const label = categories.length === 1 ? categories[0].label.toLowerCase() : 'places';
   const c = map.getCenter();
   const center = { lat: c.lat, lon: c.lng };
   // Roughly the visible area around the centre; wider when zoomed out.
   const radius = Math.min(4000, Math.max(400, 1200 * 2 ** (16 - map.getZoom())));
+  // Share the pin budget between categories so mixed views stay responsive.
+  const perCategory = categories.length === 1 ? 60 : Math.max(20, Math.floor(100 / categories.length));
+
+  // Which category each shown place belongs to (first match wins; dedupes by place id).
+  let categoryOf = new Map<string, Category>();
+  const merge = (groups: [Category, Place[]][]): Place[] => {
+    categoryOf = new Map();
+    const merged: Place[] = [];
+    for (const [category, places] of groups) {
+      for (const place of places) {
+        if (categoryOf.has(place.id)) continue;
+        categoryOf.set(place.id, category);
+        merged.push(place);
+      }
+    }
+    return merged;
+  };
+  const lookFor = (place: Place): PinLook => ({
+    color: CATEGORY_COLORS[categoryOf.get(place.id)?.id ?? ''] ?? CATEGORY_COLORS.search,
+    scale: 1,
+  });
+  const iconFor = (place: Place) => categoryOf.get(place.id)?.icon;
 
   // 1) Instant: OSM places already inside the loaded map tiles (name + type only).
   let quickCount = 0;
   let haveDetailed = false;
   const showQuick = () => {
     if (abort.signal.aborted || haveDetailed) return;
-    const quick = placesFromTiles(tilePois(category), center, radius);
+    const quick = merge(categories.map((cat) => [cat, placesFromTiles(tilePois(cat), center, radius, perCategory)]));
     quickCount = quick.length;
-    showPlaces(quick, uniformLook(color), category.icon);
+    showPlaces(quick, lookFor, iconFor);
     if (quickCount > 0) hideToast();
   };
   showQuick();
   if (quickCount === 0) {
-    showToast(`Finding ${label} nearby…`, true);
+    if (detail === 'full') showToast(`Finding ${label} nearby…`, true);
     // Tiles may still be streaming in (e.g. right after page load); retry once they're in.
     if (!map.loaded()) map.once('idle', showQuick);
   }
+  if (detail === 'tiles') return;
 
-  // 2) Richer: ask Overpass for full OSM tags (hours, website, address...).
+  // 2) Richer: one Overpass request for full OSM tags (hours, website, address...).
   try {
-    const detailed = await placesNear(category, center, radius, abort.signal);
+    const detailed = await placesNearAny(categories, center, radius, abort.signal, perCategory);
     if (abort.signal.aborted) return;
     if (detailed.length > 0) {
       haveDetailed = true;
-      showPlaces(detailed, uniformLook(color), category.icon);
+      const byId = new Map(categories.map((cat) => [cat.id, cat]));
+      showPlaces(
+        merge(detailed.map(({ place, categoryId }) => [byId.get(categoryId)!, [place]])),
+        lookFor,
+        iconFor,
+      );
       hideToast();
     } else if (quickCount === 0) {
       showToast(`No ${label} found here. Try moving the map.`);
@@ -415,7 +407,6 @@ async function showCategory(category: Category | undefined) {
   } catch {
     if (abort.signal.aborted) return;
     if (quickCount === 0) {
-      setActiveCategory(undefined);
       showToast(`Couldn't find ${label} here, and the OSM details service is busy. Try again shortly.`);
     } else {
       showToast('Showing basic info. The OSM details service is busy right now.');
@@ -484,3 +475,21 @@ map.on('pitch', () => {
 });
 syncControls();
 syncDepth();
+
+// ---------------------------------------------------------------------------
+// Discovery panel: the left-hand interface. Its Activity choice decides which
+// categories the map loads; it only reads the map's DOM otherwise.
+// ---------------------------------------------------------------------------
+
+mountDiscoveryPanel(document.body, {
+  placeCard: card,
+  mapLayers: {
+    available: CATEGORIES,
+    onChange: ({ layerIds, detail }) => {
+      void showCategories(
+        CATEGORIES.filter((c) => layerIds.includes(c.id)),
+        detail,
+      );
+    },
+  },
+});
