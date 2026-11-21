@@ -1,3 +1,7 @@
+## Expanded v2 library
+
+In addition to this initial pack, the branch now includes **192 further generated SVG variations across 12 vector atlases** at `/scene-assets/v2/` (see `v2/gallery.html` and `v2/manifest.json`). The separate, more nuanced **WebP atlas ZIP** was generated and is downloadable from the conversation, but is **not** checked into this branch. A reproducible offline Poly Haven CC0 material importer is available in `scripts/import-polyhaven-textures.mjs`; its PBR files have not been imported yet.
+
 # Scene Asset Starter Pack v1
 
 This directory provides **33 original generated 256×256 SVG assets** for potential use by the Vibenta Scene Composer.
