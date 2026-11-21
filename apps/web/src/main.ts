@@ -15,8 +15,9 @@ import {
   type Place,
   type TilePoi,
 } from './osm';
-import { mountDiscoveryPanel } from './discovery';
+import { mountDiscoveryPanel, type DiscoveryPanelHandle } from './discovery';
 import { catalogPlacesNear, isCatalogCategory } from './catalog';
+import { clearRoute, drawRoute, fetchRoute, renderRouteState, type LatLng, type RouteState } from './transitRoute';
 
 const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
 const TILTED = { pitch: 60, bearing: -20 };
@@ -127,6 +128,7 @@ function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: 
       e.stopPropagation();
       selectPin(el);
       openCard(place, look.color, typeof icon === 'function' ? icon(place) : icon);
+      void showRouteTo(place);
     });
     return new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
   });
@@ -213,6 +215,9 @@ function openCard(place: Place, color: string, icon?: string) {
 
   if (details.childElementCount > 0) body.append(details);
   body.append(actions);
+  routeBox = el('div', 'route-box');
+  routeBox.setAttribute('aria-live', 'polite');
+  body.append(routeBox);
   // Foursquare OS Places is Apache 2.0: keep its attribution with its data (OSM's is on the map).
   const attribution = place.tags['catalog:attribution'];
   if (attribution?.includes('Foursquare')) body.append(el('p', 'card-category', `Data: ${attribution}`));
@@ -229,9 +234,52 @@ function linkButton(label: string, href: string) {
 }
 
 function closeCard() {
+  cancelRoute();
   card.hidden = true;
   setPinSelected(selectedPin, false);
   selectedPin = null;
+}
+
+// ---------------------------------------------------------------------------
+// Transit route for the selected place (server API; see transitRoute.ts)
+// ---------------------------------------------------------------------------
+
+let routeBox: HTMLElement | null = null;
+let routeSeq = 0; // id of the current selection's request; anything older is stale
+let routeAbort: AbortController | undefined;
+let routePlace: Place | null = null;
+let discovery: DiscoveryPanelHandle | undefined; // assigned when the panel mounts, at the bottom
+
+const currentOrigin = (): LatLng | null => discovery?.getPreferences().origin?.location ?? null;
+
+/** Invalidate any in-flight request and remove the drawn route. */
+function cancelRoute() {
+  routeSeq++;
+  routeAbort?.abort();
+  routePlace = null;
+  clearRoute(map);
+}
+
+async function showRouteTo(place: Place) {
+  cancelRoute();
+  routePlace = place;
+  const box = routeBox; // this selection's own box; a newer card replaces routeBox
+  if (!box) return;
+  const seq = routeSeq;
+  const show = (state: RouteState) => renderRouteState(box, state, () => void showRouteTo(place));
+
+  const origin = currentOrigin();
+  if (!origin) return show({ kind: 'origin_required' });
+  show({ kind: 'loading' });
+  const abort = (routeAbort = new AbortController());
+  try {
+    const state = await fetchRoute(origin, { lat: place.lat, lng: place.lon }, abort.signal);
+    if (seq !== routeSeq) return; // a different pin was picked meanwhile: drop this response
+    show(state);
+    if (state.kind === 'result' && state.result.status === 'ok') drawRoute(map, state.result.option.legs);
+  } catch {
+    /* aborted: a newer selection owns the card now */
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -313,6 +361,7 @@ function renderResults(places: Place[]) {
       const offset: [number, number] = window.innerWidth > 640 ? [200, 40] : [0, -window.innerHeight * 0.22];
       map.flyTo({ center: [place.lon, place.lat], zoom: 17, ...TILTED, offset, essential: true });
       openCard(place, color);
+      void showRouteTo(place);
     });
     li.append(btn);
     resultsList.append(li);
@@ -549,7 +598,7 @@ syncDepth();
 // categories the map loads; it only reads the map's DOM otherwise.
 // ---------------------------------------------------------------------------
 
-mountDiscoveryPanel(document.body, {
+discovery = mountDiscoveryPanel(document.body, {
   placeCard: card,
   mapLayers: {
     available: CATEGORIES,
@@ -560,4 +609,13 @@ mountDiscoveryPanel(document.body, {
       );
     },
   },
+});
+
+// A different starting point makes the shown route wrong: re-plan for the open card's place.
+let lastOrigin = currentOrigin();
+discovery.subscribe((prefs) => {
+  const next = prefs.origin?.location ?? null;
+  if (next?.lat === lastOrigin?.lat && next?.lng === lastOrigin?.lng) return;
+  lastOrigin = next;
+  if (routePlace && !card.hidden) void showRouteTo(routePlace);
 });
