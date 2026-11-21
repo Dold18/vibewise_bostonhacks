@@ -16,7 +16,7 @@ it('uses a separate layer below routes and changes the camera only for navigatio
   // Tile loading after camera movement does not make an installed style uneditable.
   map.isStyleLoaded=()=>false;
   controller.apply({navigationOpen:false,searchOpen:true});
-  expect(pitch.lock).not.toHaveBeenCalled(); expect(map.setPaintProperty).toHaveBeenLastCalledWith(FOCUS_LAYER,'fill-opacity',.23);
+  expect(pitch.lock).not.toHaveBeenCalled(); expect(map.setPaintProperty).toHaveBeenLastCalledWith(FOCUS_LAYER,'fill-opacity',.44);
   controller.apply({navigationOpen:true,searchOpen:true});controller.apply({navigationOpen:true,searchOpen:false});
   expect(pitch.lock).toHaveBeenCalledOnce();expect(layers.findIndex(l=>l.id===FOCUS_LAYER)).toBeLessThan(layers.findIndex(l=>l.id==='transit-route-ride'));
   controller.apply({navigationOpen:false,searchOpen:false}); expect(pitch.unlock).toHaveBeenCalledOnce();

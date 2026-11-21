@@ -34,8 +34,10 @@ import { initialTripState, tripReducer, createTripRouter } from './features/navi
 import { createTripSearch } from './features/navigation/ui/searchView';
 import { createPitchLock } from './features/map/pitchLock';
 import { createFocusController } from './features/map/focusMode';
+import { markerVisible, setMarkerVisible } from './features/map/markerVisibility';
+import { createRouteHubs } from './features/map/routeHubs';
 import { paddingAround } from './features/map/routeFrame';
-import { drawRoute, clearRoute, routeBounds } from './transitRoute';
+import { drawRoute, clearRoute, routeBounds, routeStations } from './transitRoute';
 import { catalogPlacesNear, isCatalogCategory } from './catalog';
 
 const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
@@ -133,6 +135,7 @@ function pinElement(): HTMLElement {
 let shownPlaces: Place[] = [];
 const pinLooks = new Map<string, { color: string; icon?: string }>();
 const pinById = new Map<string, HTMLElement>();
+const searchMarkers = new Map<string, { place: Place; marker: Marker }>();
 
 /** `icon` is the popup icon: one for every place, or chosen per place (mixed categories). */
 function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: string | ((place: Place) => string | undefined)) {
@@ -167,10 +170,8 @@ function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: 
   const open = placePopup?.current();
   const openPin = open ? pinById.get(open.id) : undefined;
   if (openPin) { selectPin(openPin); temporaryPlaceMarker?.remove(); temporaryPlaceMarker = null; }
+  syncMarkerVisibility();
 }
-
-/** Every pin the same: what search results and location types use until match scores exist. */
-const uniformLook = (color: string) => (): PinLook => ({ color, scale: 1 });
 
 function clearPins() {
   [...markers, ...shadows].forEach((m) => m.remove());
@@ -209,6 +210,8 @@ const placePopup = createPlacePopup(map, {
   onClose: () => {
     setPinSelected(selectedPin, false);
     selectedPin = null;
+    for (const { marker } of searchMarkers.values()) marker.getElement().classList.remove('selected');
+    queueMicrotask(syncTrip);
     temporaryPlaceMarker?.remove(); temporaryPlaceMarker = null;
   },
 });
@@ -217,12 +220,13 @@ const placePopup = createPlacePopup(map, {
 // instead the camera keeps the popup clear of the panel where it can.
 function openPlace(place: Place, look: { color: string; icon?: string }) {
   temporaryPlaceMarker?.remove(); temporaryPlaceMarker = null;
-  if (!pinById.has(place.id)) {
+  if (!pinById.has(place.id) && !searchMarkers.has(place.id)) {
     const el = pinElement(); el.classList.add('selected', 'vb-temporary-place'); el.setAttribute('aria-label', place.name);
     el.style.setProperty('--pin-color', look.color);
     temporaryPlaceMarker = new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
   }
   placePopup.open(place, look);
+  syncMarkerVisibility();
 }
 
 function closePopup() {
@@ -289,15 +293,41 @@ const searchProvider: PlaceSearchProvider = {
 };
 
 function showSearchResults(places: Place[]) {
-  cancelCategory();
-  closePopup();
-  hideToast();
-  showPlaces(places, uniformLook(CATEGORY_COLORS.search));
+  closePopup(); hideToast();
+  for (const { marker } of searchMarkers.values()) marker.remove();
+  searchMarkers.clear();
+  for (const place of places) {
+    const el = pinElement(); el.dataset.markerKind = 'search'; el.setAttribute('aria-label', place.name);
+    el.style.setProperty('--pin-color', CATEGORY_COLORS.search);
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      trip.dispatch({ type: 'setTo', endpoint: endpointFor(place) });
+      openSearchResult(place);
+    });
+    const marker = new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
+    searchMarkers.set(place.id, { place, marker });
+  }
+  syncMarkerVisibility();
+}
+function syncMarkerVisibility() {
+  const s = trip.getState();
+  const relevant = [placePopup.current()?.id, s.from?.placeId, s.to?.placeId].filter((id): id is string => !!id);
+  const mode = focus.mode();
+  for (const [id, pin] of pinById) {
+    const visible = markerVisible(mode, 'discovery', id, relevant) && !(mode === 'search' && searchMarkers.has(id));
+    setMarkerVisible(pin, visible);
+    const shadow = shadows[Number(pin.dataset.index)]?.getElement();
+    if (shadow) setMarkerVisible(shadow, visible);
+  }
+  for (const [id, { marker }] of searchMarkers) setMarkerVisible(marker.getElement(), markerVisible(mode, 'search', id, mode === 'discovery' ? [placePopup.current()?.id ?? ''] : relevant));
+  if (temporaryPlaceMarker) setMarkerVisible(temporaryPlaceMarker.getElement(), mode !== 'navigation');
 }
 
 function openSearchResult(place: Place) {
   const pin = pinById.get(place.id);
   if (pin) selectPin(pin);
+  if (!pin) { setPinSelected(selectedPin, false); selectedPin = null; }
+  for (const [id, { marker }] of searchMarkers) marker.getElement().classList.toggle('selected', id === place.id);
   openPlace(place, pinLooks.get(place.id) ?? { color: CATEGORY_COLORS.search });
   focusPlace(place);
 }
@@ -321,12 +351,6 @@ let categoryAbort: AbortController | undefined;
 let currentSelection: { categories: Category[]; detail: 'tiles' | 'full' } | null = null;
 /** Where the category pins were last loaded. */
 let lastView: { center: { lat: number; lon: number }; zoom: number } | null = null;
-
-/** Stop any category lookup still in flight, so it can't overwrite newer pins (e.g. search results). */
-function cancelCategory() {
-  categoryAbort?.abort();
-  currentSelection = null;
-}
 
 /** Roughly the visible area around the centre; wider when zoomed out. */
 const radiusFor = (zoom: number) => Math.min(4000, Math.max(400, 1200 * 2 ** (16 - zoom)));
@@ -548,7 +572,7 @@ syncDepth();
 // Shared Search / Navigation state and MBTA route provider
 // ---------------------------------------------------------------------------
 
-const mapPlaceSuggestions = createPlaceListProvider(() => shownPlaces, {
+const mapPlaceSuggestions = createPlaceListProvider(() => [...shownPlaces, ...[...searchMarkers.values()].map(x => x.place)], {
   description: 'Places on the map',
   source: 'map_place',
   kind: 'place',
@@ -566,13 +590,13 @@ const trip = createStore(tripReducer, initialTripState());
 const fromSuggestions = combineProviders([bostonSuggestions, savedSuggestions, mapPlaceSuggestions], 'Offline Boston list, saved places and places on the map');
 const toSuggestions = combineProviders([mapPlaceSuggestions, savedSuggestions, bostonSuggestions], 'Places on the map, saved places and the offline Boston list');
 const pitchLock = createPitchLock(map, { reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches, onChange: () => queueMicrotask(syncControls) });
-const focus = createFocusController(map, pitchLock);
+const focus = createFocusController(map, pitchLock, { reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches });
 const resolvePlaceId = (id: string) => {
   const p = shownPlaces.find(p => p.id === id) ?? saved.list().map(savedToPlace).find(p => p.id === id);
   return p ? placeIdFor(p) : undefined;
 };
 const planner = createRoutePlanner({ store: trip, fromSuggestions, toSuggestions, resolvePlaceId, provider: createApiRouteProvider() });
-document.body.append(planner.root);
+
 syncControls();
 const endpointFor = (place: Place): RouteEndpoint => ({ label: place.name, location: { lat: place.lat, lng: place.lon }, source: 'map_place', placeId: placeIdFor(place) });
 const discoveryEndpoint = (): RouteEndpoint | null => {
@@ -610,6 +634,7 @@ const loadLayers = (selection: MapLayerSelection) => {
 const discovery = mountDiscoveryPanel(document.body, {
   mapLayers: { available: CATEGORIES, onChange: loadLayers },
   search: tripSearch,
+  directions: { panel: planner.root, control: planner.control },
   saved: {
     store: saved,
     onSelect: (s) => openSavedPlace(savedToPlace(s), s.categoryId),
@@ -644,17 +669,27 @@ syncOrigin();
 
 // Trip markers and route layers follow only the current generation.
 const tripOrigin = createOriginMarker(mapLibreOriginDeps(map));
+const hubs = createRouteHubs(map);
 let destinationMarker: Marker | null = null;
 let renderedGeneration = -1;
 let userMovedWhileLoading = false;
+let navigationWasOpen = false;
 let routeStyleReady = map.isStyleLoaded();
 map.on('movestart', e => { if (e.originalEvent && trip.getState().route.kind === 'loading') userMovedWhileLoading = true; });
 const syncTrip = () => {
   const s = trip.getState();
+  if (s.navigationOpen && !navigationWasOpen) { navigationWasOpen = true; closePopup(); }
+  if (!s.navigationOpen) navigationWasOpen = false;
   focus.apply(s);
+  syncMarkerVisibility();
+  discovery.setDirectionsExpanded(s.navigationOpen && s.directionsExpanded);
   if (!s.searchOpen && discovery.element().dataset.panelView === 'search') discovery.showView('preferences');
-  tripOrigin.update(s.navigationOpen && s.from && !sameLocation(s.from.location, discovery.getPreferences().origin?.location) ? s.from : null);
-  if (s.navigationOpen && s.to) {
+  const discoveryOrigin = discovery.getPreferences().origin;
+  const focused = focus.mode() !== 'discovery';
+  originMarker.update(!focused || (s.from && sameLocation(s.from.location, discoveryOrigin?.location)) ? discoveryOrigin : null);
+  tripOrigin.update(focused && s.from && !sameLocation(s.from.location, discoveryOrigin?.location) ? s.from : null);
+  const needsDestinationMarker = s.navigationOpen || (s.searchOpen && s.to && !placePopup.isOpen() && !pinById.has(s.to.placeId ?? '') && !searchMarkers.has(s.to.placeId ?? ''));
+  if (needsDestinationMarker && s.to) {
     if (!destinationMarker) {
       const el = document.createElement('div'); el.className = 'vb-trip-destination'; el.setAttribute('role', 'img');
       destinationMarker = new Marker({ element: el }).setLngLat([s.to.location.lng, s.to.location.lat]).addTo(map);
@@ -666,17 +701,17 @@ const syncTrip = () => {
   if (!routeStyleReady) return;
   if (s.navigationOpen && s.route.kind === 'done' && s.route.result.status === 'ok') {
     const legs = s.route.result.route.option.legs;
-    drawRoute(map, legs); focus.refresh();
+    drawRoute(map, legs); hubs.update(routeStations(legs)); focus.refresh();
     if (renderedGeneration !== -s.generation - 2) {
       renderedGeneration = -s.generation - 2;
       const bounds = routeBounds(legs, [s.from!.location, s.to!.location]);
       if (bounds && !userMovedWhileLoading) {
         const container = map.getContainer().getBoundingClientRect();
-        const obstacles = [discovery.element(), planner.root].map(el => el.getBoundingClientRect());
+        const obstacles = [discovery.element()].map(el => el.getBoundingClientRect());
         map.fitBounds(bounds, { padding: paddingAround(container, obstacles), pitch: 0, bearing: 0, duration: 650, maxZoom: 16 });
       }
     }
-  } else clearRoute(map);
+  } else { clearRoute(map); hubs.update([]); }
 };
 trip.subscribe(syncTrip);
 discovery.subscribe(syncTrip);
