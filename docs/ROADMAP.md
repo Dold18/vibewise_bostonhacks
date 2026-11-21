@@ -36,14 +36,20 @@
 ### M2 — Actual transit integration
 **Owner:** Transit teammate + integration lead.
 - [ ] Implement and validate `TransitRequest` → `TransitResponse`.
-- [ ] Route provider computes feasible walking and MBTA-connected journey; all geometry normalized.
+- [ ] **Tier 0 (required):** nearest stop(s), walk estimate and next departures for every place; feeds ranking. See [PROJECT_BRIEF.md §9](../PROJECT_BRIEF.md) and D-007.
+- [ ] **Tier 1 (required for M2):** same-route-pattern journey drawn from provider `/shapes`, direction from stop sequence, per-branch matching (never per line color), with the service-running check and last-train label.
+- [ ] Anything Tier 1 cannot verify degrades to Tier 0 (labeled estimate), never a drawn guess.
+- [ ] *Tier 2 (greedy single transfer, pattern-validated on both legs) is a deferred bonus: build it only after M3 works end to end.*
+- [ ] Transit service computes a feasible walking and MBTA-connected journey for the Tier 0/1 cases; all geometry normalized.
 - [ ] Origin required; selecting place triggers asynchronous route request.
 - [ ] Map displays route geometry, walking/transit legs, estimated duration, transfers and origin.
 - [ ] Correct loading, no-route, error and retry handling.
 - [ ] Rapidly selecting A then B never leaves A's route visible.
 - [ ] Show any provider freshness or schedule-vs-prediction qualification.
 
-**Done when:** two verified origin/destination pairs yield valid transit instructions, plus a failure path handled gracefully.
+**Done when:** Tier 0 works for every place; two verified same-pattern origin/destination pairs yield drawn, direction-correct routes; a failure path and a "no single-pattern connection → Tier 0" fallback are handled gracefully.
+
+**Parallel build:** transit (Tier 0/1) and the vibe/embedding pipeline start together. M2 drawing work must not block the start of M3.
 
 ### M3 — Simple vibe quiz and scoring
 **Owner:** Vibe owner.

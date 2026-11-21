@@ -42,7 +42,7 @@
 - **Evaluation:** Speed, custom map styles, cost/API access, licensing, team familiarity.
 - **Action:** Decide before M0 scaffold.
 
-### P-003 · Proposed · Routing provider
+### P-003 · Proposed · Routing provider *(resolved-by-D-007, pending team ratification)*
 - **Options:** Provider with end-to-end transit directions, or independent transit routing engine integrating MBTA/schedule data.
 - **Risk:** MBTA API alone is not a door-to-door routing engine.
 - **Action:** Choose and test a real origin/destination pair before UI integration.
@@ -59,6 +59,14 @@
 ### P-006 · Proposed · Develop integration branch
 - **Proposal:** Workstream PRs merge to `develop`; `main` remains stable.
 - **Action:** Team confirms; create branch before coding.
+
+### D-007 · Proposed · Tiered MBTA routing, no routing engine for the MVP
+- **Date / owner:** 2026-11-21 / transit workstream. **Flagged for team ratification.**
+- **Context:** MBTA V3 alone is not a door-to-door engine (P-003), the basemap is OpenFreeMap/MapLibre so Google transit content cannot be drawn on it, and routing is supporting cast to the vibe differentiator.
+- **Decision:** Use MBTA V3 + GTFS static only, in tiers. **Tier 0** feasibility (nearest stop, next departures, walk estimate; feeds ranking) always ships. **Tier 1** same-route-pattern journeys drawn from `/shapes`, time from `/schedules`. **Tier 2** greedy single transfer at a fixed hub, deferred until the vibe finder works end to end. Matching and direction are per route pattern (branch), and Tier 2 validates both legs at pattern level. Drawn routes pass the service-running check and carry the last-train label. Anything unverifiable degrades to Tier 0 and is never drawn. No general multi-transfer routing; OpenTripPlanner remains the labeled stretch.
+- **Why / alternatives:** Honest provider geometry without an engine. Rejected: Google Directions (cannot be shown on a non-Google map), manually connected polylines labeled as verified journeys.
+- **Implications:** Resolves P-003 for the MVP. **Refines the routing scope of D-004 without superseding it**: routing is still integrated before vibe features, but Tier 0/1 and the vibe/embedding pipeline are built in parallel, and Tier 2 follows M3. No change to the types in [CONTRACTS.md](CONTRACTS.md) (see §3.1 there). Spec: PROJECT_BRIEF §9.
+- **Revisit trigger:** Tier 1 misses a large share of demo origin/destination pairs, or time allows OpenTripPlanner.
 
 ## How to add a decision
 ~~~md

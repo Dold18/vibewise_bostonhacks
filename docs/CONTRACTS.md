@@ -1,5 +1,5 @@
 # Shared Contracts — Vibenta
-> **Status:** **Proposed v0.1 integration contract** for map/cards and transit. Review and accept together **before** independent implementation.  
+> **Status:** **Proposed v0.1 integration contract** for map/cards and transit. Review and accept together **before** independent implementation.
 > Purpose: prevent different teammate/AI-agent implementations from inventing incompatible place IDs, coordinates, routes or callback payloads.
 
 ## 1. Universal conventions
@@ -131,6 +131,15 @@ export interface Recommendation {
 7. Coordinator accepts result only if `destinationPlaceId === selectedPlaceId` and request is the latest. Late/stale results are ignored.
 8. Map renders each leg geometry, differentiating walking/transit, and shows itinerary detail card.
 9. If provider returns `no_route` or `error`, map explains it without inventing a route.
+
+### 3.1 Tiered MBTA routing mapped onto the existing types (documentation only, no type change)
+Proposed in D-007; spec in [PROJECT_BRIEF.md §9](../PROJECT_BRIEF.md).
+- **Tier 1 (same route pattern):** one `TransitOption` with `transfers: 0`, legs walk → subway → walk.
+- **Tier 2 (single transfer, deferred):** `transfers: 1`, legs walk → subway → subway → walk. Each subway leg carries its own `geometry`, `routeShortName`, `routeColor`, `fromStopName` and `toStopName`.
+- **Tier 0 fallback (nothing is drawn as a transit line):** `status: "ok"` with one walk-to-stop leg, no transit leg, and `notes` carrying the nearest stop, next departures and, if applicable, "multi-leg trip, ~X min (schedule-derived estimate)". Departures must be omitted if `/predictions` is unavailable.
+- Walk-leg `geometry` is approximate (a straight line unless a walking router is used). Mark it in the leg's `source`, e.g. `"approx: straight-line walk, ~80 m/min"` (see §1, approximate geometry).
+- `geometry` is non-optional on every returned leg (at least 2 points). The "if provided" comment on `TransitLeg.geometry` means a leg without drawable geometry is not returned as a leg.
+- A drawn option only exists if the service-running check passed; otherwise return the late-night/no-service message, not a route.
 
 ## 4. Suggested API boundary (only if using a backend)
 The team may choose direct in-app service calls instead. This JSON shape is the agreed boundary in either design.
