@@ -225,3 +225,25 @@ Sources ruled out: Google Places (P-007; storage and non-Google-map bans), Yelp 
 - Manual check: every place on the demo list shows a correct photo and a plausible ambience description. Wrong photos get `hidden`.
 - Card states: no photos, image fails to load, seeded content labeled, licensed credit visible.
 - Success: every demo place has a correct photo and `vibe_confidence` of `medium` or better; credits are visible on every photo.
+
+### Run record (2026-11-21, local Supabase)
+
+Run against a local Supabase (Docker) loaded by `npm run ingest` from the cached OSM/Foursquare data (7,864 places). The hosted project wasn't touched: the migration isn't applied there yet.
+
+- **Tiers:** 3,613 places fall in tiers 1–2 (no demo list yet, so all of them are tier 2). 4,251 are tier 3.
+- **OSM tags after re-ingest:**
+  - `wikidata` on 34 places;
+  - `image` on 5;
+  - `live_music` on 1;
+  - `wikimedia_commons` on none.
+- **Real run, 100 tier-2 places, 73 s, no Mapillary token:**
+  - 45 places got at least one photo: 117 website photos, 2 Commons photos.
+  - Vibe inputs: website 55, wiki 4, osm_tags 85, city_licenses 19.
+  - Website failures: robots 10, http 7. No per-place errors.
+  - At this rate, tiers 1–2 take about 45 minutes.
+- **Spot check of 12 photos:**
+  - About half show the place: storefront, interior, kitchen, the restaurant's own food.
+  - The rest are logos, ads or tiny blurred CDN thumbnails.
+  - Thumbnails, avatars and app icons are now filtered by the size the URL declares.
+  - Logos, ads and chains' corporate images still get through, so the card or vibe step should judge photo content. Hiding website photos for chains is an option.
+- **Linked licensed photos are rare** in this catalog. OSM `wikidata` links are scarce, so licensed photos are mostly Commons geosearch matches.
