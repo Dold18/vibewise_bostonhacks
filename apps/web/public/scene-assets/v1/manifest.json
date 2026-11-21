@@ -1,0 +1,510 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "asset_files_only_not_live_renderers",
+  "assetCount": 33,
+  "assetRoot": "/scene-assets/v1",
+  "provenance": "original_generated_vector_assets",
+  "usageNote": "Individual SVGs are reusable 256px textures, masks and sprite fields. They do not implement 3D façade geometry, PBR maps, effects logic or full Boston scene renders. Runtime must load, cache, tint and animate them.",
+  "assets": [
+    {
+      "id": "film-grain",
+      "file": "film-grain.svg",
+      "category": "overlay",
+      "usedBy": [
+        "air_and_atmosphere.grain",
+        "cinematic_and_artistic.analog_aging"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "paper-grain",
+      "file": "paper-grain.svg",
+      "category": "overlay",
+      "usedBy": [
+        "cinematic_and_artistic.paper_texture"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "concrete-pores",
+      "file": "concrete-pores.svg",
+      "category": "material",
+      "usedBy": [
+        "building_surfaces.facade_look",
+        "roads_and_ground.street_material"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "brick-illustrated",
+      "file": "brick-illustrated.svg",
+      "category": "material",
+      "usedBy": [
+        "building_surfaces.facade_look"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "stone-blocks",
+      "file": "stone-blocks.svg",
+      "category": "material",
+      "usedBy": [
+        "building_surfaces.facade_look"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "facade-glass-grid",
+      "file": "facade-glass-grid.svg",
+      "category": "material",
+      "usedBy": [
+        "building_surfaces.facade_look"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "windows-amber",
+      "file": "windows-amber.svg",
+      "category": "mask",
+      "usedBy": [
+        "building_surfaces.window_pattern",
+        "building_surfaces.window_glow"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "windows-ice",
+      "file": "windows-ice.svg",
+      "category": "mask",
+      "usedBy": [
+        "building_surfaces.window_pattern",
+        "building_surfaces.window_glow"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "asphalt-grit",
+      "file": "asphalt-grit.svg",
+      "category": "material",
+      "usedBy": [
+        "roads_and_ground.street_material"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "wet-sheen",
+      "file": "wet-sheen.svg",
+      "category": "material",
+      "usedBy": [
+        "roads_and_ground.wet_sheen",
+        "roads_and_ground.road_reflections"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "cobblestone-hatch",
+      "file": "cobblestone-hatch.svg",
+      "category": "material",
+      "usedBy": [
+        "roads_and_ground.street_material"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "blueprint-grid",
+      "file": "blueprint-grid.svg",
+      "category": "pattern",
+      "usedBy": [
+        "cinematic_and_artistic.grid_overlay"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "scanlines",
+      "file": "scanlines.svg",
+      "category": "pattern",
+      "usedBy": [
+        "cinematic_and_artistic.render_aesthetic",
+        "air_and_atmosphere.scanlines"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "halftone",
+      "file": "halftone.svg",
+      "category": "pattern",
+      "usedBy": [
+        "cinematic_and_artistic.halftone"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "topographic",
+      "file": "topographic.svg",
+      "category": "pattern",
+      "usedBy": [
+        "natural_land.hillshade_style"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "water-ripples",
+      "file": "water-ripples.svg",
+      "category": "water",
+      "usedBy": [
+        "water_and_coast.water_texture",
+        "water_and_coast.surface_motion"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "water-shimmer",
+      "file": "water-shimmer.svg",
+      "category": "water",
+      "usedBy": [
+        "water_and_coast.water_reflectivity",
+        "water_and_coast.shimmer_speed"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "stars-sparse",
+      "file": "stars-sparse.svg",
+      "category": "sky",
+      "usedBy": [
+        "sky_and_horizon.starfield"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "stars-dense",
+      "file": "stars-dense.svg",
+      "category": "sky",
+      "usedBy": [
+        "sky_and_horizon.starfield"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "cloud-puffs",
+      "file": "cloud-puffs.svg",
+      "category": "sky",
+      "usedBy": [
+        "sky_and_horizon.cloud_form"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "fog-gradient",
+      "file": "fog-gradient.svg",
+      "category": "sky",
+      "usedBy": [
+        "air_and_atmosphere.fog_volume",
+        "sky_and_horizon.fog_horizon_color"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "glow-amber",
+      "file": "glow-amber.svg",
+      "category": "lighting",
+      "usedBy": [
+        "lighting_and_shadows.bloom",
+        "lighting_and_shadows.local_spotlights",
+        "marker_recommendations.pin_glow"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "glow-cyan",
+      "file": "glow-cyan.svg",
+      "category": "lighting",
+      "usedBy": [
+        "lighting_and_shadows.bloom",
+        "lighting_and_shadows.local_spotlights",
+        "marker_recommendations.pin_glow"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "light-shaft",
+      "file": "light-shaft.svg",
+      "category": "lighting",
+      "usedBy": [
+        "lighting_and_shadows.rim_light",
+        "air_and_atmosphere.light_shafts"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "rain-streaks",
+      "file": "rain-streaks.svg",
+      "category": "weather",
+      "usedBy": [
+        "air_and_atmosphere.rain"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "snow-particles",
+      "file": "snow-particles.svg",
+      "category": "weather",
+      "usedBy": [
+        "air_and_atmosphere.snow"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "petals",
+      "file": "petals.svg",
+      "category": "particle",
+      "usedBy": [
+        "air_and_atmosphere.petals",
+        "natural_land.leaf_particles"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "autumn-leaves",
+      "file": "autumn-leaves.svg",
+      "category": "particle",
+      "usedBy": [
+        "natural_land.leaf_particles"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "fireflies",
+      "file": "fireflies.svg",
+      "category": "particle",
+      "usedBy": [
+        "air_and_atmosphere.fireflies"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "sparks",
+      "file": "sparks.svg",
+      "category": "particle",
+      "usedBy": [
+        "air_and_atmosphere.sparkle"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "vignette",
+      "file": "vignette.svg",
+      "category": "overlay",
+      "usedBy": [
+        "air_and_atmosphere.vignette"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "film-scratches",
+      "file": "film-scratches.svg",
+      "category": "overlay",
+      "usedBy": [
+        "cinematic_and_artistic.analog_aging"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    },
+    {
+      "id": "neon-circuit",
+      "file": "neon-circuit.svg",
+      "category": "pattern",
+      "usedBy": [
+        "cinematic_and_artistic.grid_overlay"
+      ],
+      "format": "image/svg+xml",
+      "size": [
+        256,
+        256
+      ],
+      "status": "generated_not_integrated"
+    }
+  ],
+  "sourcingCandidates": [
+    {
+      "name": "ambientCG",
+      "url": "https://ambientcg.com/",
+      "license": "CC0",
+      "licenseUrl": "https://docs.ambientcg.com/license/",
+      "status": "not_downloaded"
+    },
+    {
+      "name": "Poly Haven",
+      "url": "https://polyhaven.com/",
+      "license": "CC0",
+      "licenseUrl": "https://polyhaven.com/license",
+      "status": "not_downloaded"
+    },
+    {
+      "name": "Kenney",
+      "url": "https://kenney.nl/assets",
+      "license": "CC0",
+      "licenseUrl": "https://kenney.nl/support",
+      "status": "not_downloaded"
+    }
+  ]
+}
