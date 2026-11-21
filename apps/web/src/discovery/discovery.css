@@ -1,0 +1,861 @@
+/*
+ * Discovery panel. Everything is scoped under .vb-discovery and reuses the
+ * map's design tokens (--surface, --text, --accent, ...) with fallbacks, so
+ * no map styles are overridden.
+ *
+ * Stacking, relative to the map UI (style.css):
+ *   expanded             z 1   below the search results (top bar, z 2)
+ *   collapsed + card     z 0   docked bottom-left; the destination card wins any overlap
+ *   expanded over card   z 2   the user explicitly opened it on top of the card
+ */
+
+.vb-discovery {
+  --vb-surface: var(--surface, #fff);
+  --vb-hover: var(--surface-hover, #f1f3f4);
+  --vb-text: var(--text, #202124);
+  --vb-muted: var(--text-muted, #5f6368);
+  --vb-accent: var(--accent, #1a73e8);
+  --vb-border: var(--border, #dadce0);
+  --vb-shadow: var(--shadow, 0 2px 4px rgba(60, 64, 67, 0.3), 0 2px 8px 2px rgba(60, 64, 67, 0.12));
+  --vb-accent-soft: #e8f0fe;
+  --vb-warning: #b3261e;
+  --vb-radius: 16px;
+
+  position: absolute;
+  top: var(--vb-top, 72px);
+  left: 12px;
+  width: 392px;
+  /* Leaves the bottom-left map attribution uncovered. */
+  max-height: calc(100% - var(--vb-top, 72px) - 48px);
+  display: flex;
+  flex-direction: column;
+  background: var(--vb-surface);
+  border-radius: var(--vb-radius);
+  box-shadow: var(--vb-shadow);
+  color: var(--vb-text);
+  font-family: inherit;
+  font-size: 14px;
+  z-index: 1;
+  animation: vb-enter 0.22s ease-out;
+}
+
+.vb-discovery [hidden] {
+  display: none !important;
+}
+
+.vb-discovery *,
+.vb-discovery *::before,
+.vb-discovery *::after {
+  box-sizing: border-box;
+}
+
+.vb-discovery button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.vb-discovery :focus-visible {
+  outline: 2px solid var(--vb-accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Collapsed / card states ---------- */
+
+.vb-discovery.is-collapsed.card-open {
+  top: auto;
+  bottom: 40px;
+  z-index: 0;
+}
+
+.vb-discovery.is-expanded.card-open {
+  z-index: 2;
+}
+
+.vb-summary-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 14px 10px 16px;
+  border: 0;
+  border-radius: var(--vb-radius);
+  background: transparent;
+  text-align: left;
+}
+
+.vb-summary-btn:hover {
+  background: var(--vb-hover);
+}
+
+.vb-summary-icon {
+  flex-shrink: 0;
+  fill: var(--vb-accent);
+}
+
+.vb-summary-stack {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.vb-summary-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.vb-summary-text {
+  font-size: 13px;
+  color: var(--vb-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vb-summary-chevron {
+  flex-shrink: 0;
+  fill: var(--vb-muted);
+}
+
+/* ---------- Body ---------- */
+
+.vb-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+.vb-header {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 18px 10px 6px 20px;
+}
+
+.vb-header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.vb-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.vb-subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--vb-muted);
+}
+
+.vb-minimize svg {
+  rotate: 180deg;
+}
+
+.vb-step {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 10px 20px 8px;
+  scrollbar-width: thin;
+}
+
+.vb-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px 10px 20px;
+  border-top: 1px solid var(--vb-border);
+}
+
+.vb-footer-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--vb-muted);
+}
+
+.vb-handle {
+  display: none;
+}
+
+/* ---------- Fields ---------- */
+
+.vb-field {
+  margin-bottom: 16px;
+}
+
+.vb-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--vb-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.vb-optional {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+.vb-control {
+  position: relative;
+}
+
+.vb-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 12px 6px 14px;
+  border: 1px solid var(--vb-border);
+  border-radius: 12px;
+  background: var(--vb-surface);
+  color: var(--vb-text);
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.vb-trigger:hover {
+  border-color: #bdc1c6;
+}
+
+.vb-field.is-open .vb-trigger,
+.vb-trigger:focus-visible {
+  outline: none;
+  border-color: var(--vb-accent);
+  box-shadow: 0 0 0 1px var(--vb-accent);
+}
+
+.vb-trigger-value {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vb-trigger-value.is-placeholder {
+  color: var(--vb-muted);
+}
+
+.vb-chevron {
+  flex-shrink: 0;
+  fill: var(--vb-muted);
+  transition: rotate 0.15s ease;
+}
+
+.vb-field.is-open .vb-chevron {
+  rotate: 180deg;
+}
+
+.vb-lead-icon {
+  flex-shrink: 0;
+  fill: var(--vb-muted);
+}
+
+.vb-field.has-value .vb-lead-icon {
+  fill: var(--vb-accent);
+}
+
+.vb-trigger-stack {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.vb-trigger-sub {
+  font-size: 12px;
+  color: var(--vb-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vb-hint {
+  margin: 6px 2px 0;
+  font-size: 12px;
+  color: var(--vb-muted);
+}
+
+.vb-hint.is-warning {
+  color: var(--vb-warning);
+}
+
+/* ---------- Popovers ---------- */
+
+.vb-popover {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 5;
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+  background: var(--vb-surface);
+  border-radius: 12px;
+  box-shadow: var(--vb-shadow);
+  max-height: 300px;
+  overflow-y: auto;
+  animation: vb-pop 0.12s ease-out;
+}
+
+.vb-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.vb-option.is-active {
+  background: var(--vb-hover);
+}
+
+.vb-option[aria-selected='true'] {
+  color: var(--vb-accent);
+  font-weight: 500;
+}
+
+.vb-option-check {
+  fill: var(--vb-accent);
+  visibility: hidden;
+}
+
+.vb-option[aria-selected='true'] .vb-option-check {
+  visibility: visible;
+}
+
+/* Multi-select */
+
+.vb-multi {
+  padding: 8px 0 0;
+  max-height: none;
+  overflow: visible;
+}
+
+.vb-checklist {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 0 8px 8px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.vb-check {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.vb-check:hover {
+  background: var(--vb-hover);
+}
+
+/* The real checkbox stays focusable and clickable; only its look is replaced. */
+.vb-checkbox-input {
+  position: absolute;
+  opacity: 0;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  left: 8px;
+  cursor: pointer;
+}
+
+.vb-checkbox {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--vb-muted);
+  border-radius: 4px;
+  transition:
+    background 0.12s,
+    border-color 0.12s;
+}
+
+.vb-checkbox svg {
+  fill: #fff;
+  visibility: hidden;
+}
+
+.vb-checkbox-input:checked + .vb-checkbox {
+  background: var(--vb-accent);
+  border-color: var(--vb-accent);
+}
+
+.vb-checkbox-input:checked + .vb-checkbox svg {
+  visibility: visible;
+}
+
+.vb-checkbox-input:focus-visible + .vb-checkbox {
+  outline: 2px solid var(--vb-accent);
+  outline-offset: 2px;
+}
+
+.vb-popover-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-top: 1px solid var(--vb-border);
+}
+
+/* ---------- Location ---------- */
+
+.vb-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 4px 0 12px;
+  border: 2px solid var(--vb-accent);
+  border-radius: 12px;
+  background: var(--vb-surface);
+}
+
+.vb-search-box > .vb-icon {
+  flex-shrink: 0;
+  fill: var(--vb-muted);
+}
+
+.vb-search-box:focus-within {
+  box-shadow: 0 0 0 1px var(--vb-accent);
+}
+
+/* The surrounding box shows focus. */
+.vb-search-input:focus-visible {
+  outline: none;
+}
+
+.vb-search-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 15px;
+  color: var(--vb-text);
+}
+
+.vb-location-popover {
+  padding: 4px 0 6px;
+  max-height: 340px;
+}
+
+.vb-geo-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--vb-accent) !important;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.vb-geo-btn svg {
+  fill: var(--vb-accent);
+}
+
+.vb-geo-btn:hover:not(:disabled) {
+  background: var(--vb-hover);
+}
+
+.vb-geo-btn:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.vb-geo-status {
+  margin: 0;
+  padding: 0 14px;
+  font-size: 13px;
+  color: var(--vb-muted);
+}
+
+.vb-geo-status:empty {
+  display: none;
+}
+
+.vb-geo-status.is-error {
+  color: var(--vb-warning);
+  padding-bottom: 6px;
+}
+
+.vb-suggest-caption {
+  margin: 4px 0 0;
+  padding: 8px 14px 4px;
+  border-top: 1px solid var(--vb-border);
+  font-size: 11px;
+  color: var(--vb-muted);
+}
+
+.vb-suggestions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.vb-suggestion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.vb-suggestion.is-active {
+  background: var(--vb-hover);
+}
+
+.vb-suggestion-icon {
+  flex-shrink: 0;
+  fill: var(--vb-muted);
+}
+
+.vb-suggestion-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.vb-suggestion-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.vb-suggestion-sub {
+  font-size: 12px;
+  color: var(--vb-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vb-empty {
+  margin: 0;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--vb-muted);
+}
+
+/* ---------- Timing ---------- */
+
+.vb-custom-time {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.vb-sublabel {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: var(--vb-muted);
+}
+
+.vb-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--vb-border);
+  border-radius: 10px;
+  background: var(--vb-surface);
+  font: inherit;
+  font-size: 14px;
+  color: var(--vb-text);
+}
+
+.vb-input:focus-visible {
+  outline: none;
+  border-color: var(--vb-accent);
+  box-shadow: 0 0 0 1px var(--vb-accent);
+}
+
+.vb-input[aria-invalid='true'] {
+  border-color: var(--vb-warning);
+}
+
+/* ---------- Vibe ---------- */
+
+.vb-textarea {
+  display: block;
+  width: 100%;
+  min-height: 84px;
+  padding: 10px 12px;
+  border: 1px solid var(--vb-border);
+  border-radius: 12px;
+  background: var(--vb-surface);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--vb-text);
+  resize: vertical;
+}
+
+.vb-textarea::placeholder {
+  color: #80868b;
+}
+
+.vb-textarea:focus-visible {
+  outline: none;
+  border-color: var(--vb-accent);
+  box-shadow: 0 0 0 1px var(--vb-accent);
+}
+
+.vb-field-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--vb-muted);
+}
+
+/* ---------- Notes ---------- */
+
+.vb-notes {
+  margin: 4px 0 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f8f9fa;
+}
+
+.vb-notes-title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.vb-notes-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--vb-muted);
+}
+
+/* ---------- Buttons ---------- */
+
+.vb-icon-btn {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.vb-icon-btn svg {
+  fill: var(--vb-muted);
+}
+
+.vb-icon-btn:hover {
+  background: var(--vb-hover);
+}
+
+.vb-icon-btn.vb-small {
+  width: 32px;
+  height: 32px;
+}
+
+.vb-text-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--vb-accent) !important;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.vb-text-btn:hover:not(:disabled) {
+  background: #f6fafe;
+}
+
+.vb-text-btn:disabled {
+  color: var(--vb-muted) !important;
+  opacity: 0.6;
+  cursor: default;
+}
+
+.vb-primary-btn {
+  height: 36px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--vb-accent);
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.vb-primary-btn:hover {
+  background: #1765cc;
+}
+
+.vb-primary-btn.vb-small {
+  height: 32px;
+  padding: 0 16px;
+}
+
+/* ---------- Motion ---------- */
+
+.vb-reveal:not([hidden]) {
+  animation: vb-pop 0.18s ease-out;
+}
+
+@keyframes vb-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes vb-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vb-discovery,
+  .vb-discovery * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---------- Phones: compact bottom sheet ---------- */
+
+@media (max-width: 640px) {
+  .vb-discovery {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-height: min(78%, calc(100% - var(--vb-top, 72px)));
+    border-radius: 20px 20px 0 0;
+    z-index: 2;
+    animation-name: vb-sheet;
+  }
+
+  /* Peek bar: clear of the attribution (bottom-left) and map controls (right). */
+  .vb-discovery.is-collapsed {
+    left: 12px;
+    right: 64px;
+    bottom: 40px;
+    border-radius: var(--vb-radius);
+    z-index: 1;
+  }
+
+  /* With the destination card filling the bottom, dock the summary under the search bar. */
+  .vb-discovery.is-collapsed.card-open {
+    top: var(--vb-top, 72px);
+    bottom: auto;
+    right: 12px;
+    z-index: 1;
+  }
+
+  .vb-handle {
+    display: block;
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    translate: -50% 0;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--vb-border);
+  }
+
+  .vb-discovery.is-collapsed .vb-handle {
+    display: none;
+  }
+
+  .vb-header {
+    padding-top: 22px;
+  }
+
+  .vb-minimize svg {
+    rotate: 0deg;
+  }
+
+  .vb-discovery:not(.card-open) .vb-summary-chevron {
+    rotate: 180deg;
+  }
+
+  .vb-step {
+    padding: 8px 16px 8px;
+  }
+
+  .vb-footer {
+    padding: 8px 8px calc(10px + env(safe-area-inset-bottom, 0px)) 16px;
+  }
+
+  .vb-checklist {
+    max-height: 220px;
+  }
+
+  .vb-popover:not(.vb-multi) {
+    max-height: 240px;
+  }
+
+  /* 16px avoids iOS zoom-on-focus. */
+  .vb-search-input,
+  .vb-textarea,
+  .vb-input {
+    font-size: 16px;
+  }
+}
+
+@keyframes vb-sheet {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}
