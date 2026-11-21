@@ -2,7 +2,7 @@
 //   node apps/web/scripts/transit/test-tier2.ts
 import assert from "node:assert/strict";
 import { getStop, lineOf, nearestStop, patternsServing } from "../../src/features/transit/engine.ts";
-import { HUB_TABLE } from "../../src/features/transit/hubs.ts";
+import { candidateTransfers, HUB_TABLE, MAX_TRANSFER_WALK_METERS } from "../../src/features/transit/hubs.ts";
 import { fmtBoston } from "../../src/features/transit/mbta.ts";
 import { planTripLive, TRANSFER_BUFFER_SEC, type LivePlanResult } from "../../src/features/transit/ride.ts";
 import { planTier2, validateHub } from "../../src/features/transit/tier2.ts";
@@ -31,6 +31,27 @@ for (const e of HUB_TABLE) {
     }
   }
 }
+
+// P-012: the single walk transfer, audited from the data (not hand-typed distances).
+console.log("  walk transfers:");
+const walks = HUB_TABLE.flatMap((e) => (e.walks ?? []).map((w) => ({ e, w })));
+assert.equal(walks.length, 1, "P-012 is scoped to exactly one walk transfer");
+for (const { e, w } of walks) {
+  for (const line of e.lines) {
+    const st = getStop(w.at[line].stop_id)!;
+    assert.ok(st && st.name === w.at[line].name, `walk stop ${w.at[line].stop_id}`);
+    assert.ok(patternsServing(st).some((p) => lineOf(p.route_id) === line && p.typicality === 1), `${st.name} has no canonical ${line} pattern`);
+  }
+}
+const og = candidateTransfers("Orange", "Green"), go = candidateTransfers("Green", "Orange");
+console.log("   ", og.map((t) => `${t.exit.name}→${t.entry.name} ${t.walkMeters}m`).join(" | "));
+assert.deepEqual(og.map((t) => [t.exit.stop_id, t.entry.stop_id]), [["place-haecl", "place-haecl"], ["place-north", "place-north"], ["place-haecl", "place-gover"]]);
+assert.deepEqual(go.map((t) => [t.exit.stop_id, t.entry.stop_id]).at(-1), ["place-gover", "place-haecl"], "walk is directional");
+assert.ok(og[2].walkMeters > 0 && og[2].walkMeters <= MAX_TRANSFER_WALK_METERS);
+assert.equal(candidateTransfers("Red", "Orange").length, 1, "no walk transfers beyond the one pair");
+assert.equal(candidateTransfers("Red", "Green").length, 1);
+assert.equal(candidateTransfers("Green", "Blue").length, 1);
+assert.equal(candidateTransfers("Orange", "Blue").length, 1);
 
 // ---------- 2. Validation is by pattern, not by color (offline) ----------
 console.log("\n#### 2. pattern-level validation proofs (hub is on the right COLOR but wrong BRANCH)");
@@ -108,13 +129,23 @@ function show(label: string, r: LivePlanResult, at: Date) {
 const live = async (label: string, o: ReturnType<typeof pt>, d: ReturnType<typeof pt>, at: Date) => {
   const r = await planTripLive(o, d, { now: at }); show(label, r, at); return r;
 };
-function assertOk2(r: LivePlanResult, hub: string) {
+function assertOk2(r: LivePlanResult, hub: string, walkTo?: string) {
   assert.ok(r.status === "ok" && r.tier === 2 && r.plan.hub.name === hub, `expected tier-2 ok via ${hub}`);
-  assert.equal(r.option.transfers, 1); assert.equal(r.option.legs.length, 4);
+  assert.equal(r.option.transfers, 1); assert.equal(r.option.legs.length, walkTo ? 5 : 4);
+  if (walkTo) {
+    assert.equal(r.plan.entry.name, walkTo);
+    const w = r.option.legs[2];
+    assert.equal(w.mode, "walk"); assert.equal(w.fromStopName, hub); assert.equal(w.toStopName, walkTo);
+    assert.ok(w.durationSec > 0 && w.durationSec === r.plan.transferWalkSec && r.plan.transferWalkMeters <= MAX_TRANSFER_WALK_METERS);
+    assert.ok(r.option.legs.filter((l) => l.mode === "subway").length === 2 && r.option.legs[1].mode === "subway" && r.option.legs[3].mode === "subway");
+    // B departs after A arrives + walk + buffer.
+    assert.ok(Date.parse(r.timings[1].departsAt) >= Date.parse(r.timings[0].arrivesAt) + (r.plan.transferWalkSec + TRANSFER_BUFFER_SEC) * 1000, "B must leave after A + walk + buffer");
+    assert.equal(r.option.durationSec, r.option.legs.reduce((a, l) => a + l.durationSec, 0) + r.transferWaitSeconds);
+  } else assert.equal(r.plan.transferWalkSec, 0);
   assert.ok(r.option.legs.every((l) => Number.isInteger(l.durationSec)));
   assert.ok(Date.parse(r.timings[1].departsAt) >= Date.parse(r.timings[0].arrivesAt), "leg B must depart after leg A arrives");
   assert.ok(r.transferWaitSeconds >= TRANSFER_BUFFER_SEC, `hub wait ${r.transferWaitSeconds}s is under the ${TRANSFER_BUFFER_SEC}s buffer`);
-  assert.equal(r.transferWaitSeconds, Math.round((Date.parse(r.timings[1].departsAt) - Date.parse(r.timings[0].arrivesAt)) / 1000));
+  assert.equal(r.transferWaitSeconds, Math.round((Date.parse(r.timings[1].departsAt) - Date.parse(r.timings[0].arrivesAt)) / 1000) - r.plan.transferWalkSec);
 }
 
 assertOk2(await live("Harvard (Red) → Ruggles (Orange)", HARVARD, RUGGLES, MIDDAY), "Downtown Crossing");
@@ -129,17 +160,28 @@ assert.ok(rb.status === "no_tier1_route" && rb.reason === "no_candidate_hub");
 const bc = await live("BU (Green-B) → Cleveland Circle (Green-C)  [same line, different branch: not in table]", BU, CLEVE, MIDDAY);
 assert.ok(bc.status === "no_tier1_route" && bc.reason === "no_candidate_hub");
 
-// Per-leg service gate. Orange → Green-B via Haymarket validates by pattern only through the
-// time-limited Green-B-816 ('early mornings only').
-const OG = await live("Oak Grove (Orange) → BU (Green-B) via Haymarket: A running, B only on a mornings-only pattern", OAKGROVE, BU, MIDDAY);
-assert.ok(OG.status === "no_service" && OG.failedLeg === "B", "leg A running but leg B not → must not be drawn");
-// Green-B-816-0 has exactly one weekday departure from Haymarket (06:39). Leaving Oak Grove at 06:15 reaches it.
+// Per-leg service gate. Orange ↔ Green-B via Haymarket validates by pattern only through the
+// time-limited Green-B-816 ('early mornings only'). P-012: when that hub fails the service gate the
+// live layer falls through to the next pattern-valid transfer, Orange@Haymarket ↔ Green@Government Center.
+const OG = await live("Oak Grove (Orange) → BU (Green-B): Haymarket's Green-B is mornings-only → walk to Government Center", OAKGROVE, BU, MIDDAY);
+assertOk2(OG, "Haymarket", "Government Center");
+assert.ok(OG.status === "ok" && OG.tier === 2 && OG.timings[1].routeId === "Green-B" && OG.timings[1].patternId === "Green-B-812-0");
+// Green-B-816-0 has exactly one weekday departure from Haymarket (06:39). Leaving Oak Grove at 06:15 reaches it,
+// and the in-station hub (first in greedy order) wins again: no walk.
 const OGearly = await live("Oak Grove (Orange) → BU (Green-B): same pair when Green-B-816-0's one trip is catchable", OAKGROVE, BU, new Date("2026-11-23T06:15:00-05:00"));
 assertOk2(OGearly, "Haymarket");
 assert.equal(OGearly.status === "ok" && OGearly.tier === 2 && OGearly.timings[1].patternId, "Green-B-816-0");
-const BC = await live("BU (Green-B) → Chinatown (Orange) via Haymarket: leg A only on a mornings-only pattern", BU, CHINATOWN, MIDDAY);
-assert.ok(BC.status === "no_service" && BC.failedLeg === "A");
+// The originally reported case: BU (Green-B) → Orange on Sat 3:35 PM was no_service (Green-B-816-1 runs once, 05:42).
+const SAT = new Date("2026-11-21T15:35:00-05:00");
+const BCsat = await live("BU (Green-B) → Chinatown (Orange) Sat 3:35 PM: reported no_service case", BU, CHINATOWN, SAT);
+assertOk2(BCsat, "Government Center", "Haymarket");
+assert.ok(BCsat.status === "ok" && BCsat.tier === 2 && BCsat.timings[0].patternId === "Green-B-812-1" && BCsat.timings[1].routeId === "Orange");
+const BC = await live("BU (Green-B) → Chinatown (Orange) midday", BU, CHINATOWN, MIDDAY);
+assertOk2(BC, "Government Center", "Haymarket");
 await live("BU (Green-B) → Chinatown (Orange): same pair while Green-B-816 runs", BU, CHINATOWN, EARLY);
+// No walk is invented where it can't help: with the walk hub also failing, the first hub's failure is reported.
+const BClate = await live("BU (Green-B) → Chinatown (Orange) at 02:30: nothing runs on either hub", BU, CHINATOWN, LATE);
+assert.ok(BClate.status === "no_service" && BClate.failedLeg === "A");
 const late = await live("Harvard (Red) → Ruggles (Orange) after service ends", HARVARD, RUGGLES, LATE);
 assert.ok(late.status === "no_service" && late.failedLeg === "A");
 console.log("\nAll Tier 2 checks passed");
