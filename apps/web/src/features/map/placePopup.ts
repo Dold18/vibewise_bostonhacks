@@ -53,6 +53,10 @@ export function popupDetails(place: Place): PopupDetails {
  * scale, anchored at its tip) on whichever side MapLibre places the popup.
  */
 const PIN_TOP = 54;
+/** Distance from the pin's map point to the popup's tip when it sits above the pin. */
+export const POPUP_PIN_GAP = PIN_TOP;
+/** Height of MapLibre's popup tip (10 px border triangle). */
+const TIP_PX = 10;
 export const POPUP_OFFSETS: Offset = {
   center: [0, 0],
   top: [0, 8],
@@ -80,7 +84,7 @@ const ICON = {
 export interface PlacePopupDeps {
   onNavigate(place: Place): void;
   saved: { has(id: string): boolean; toggle(place: Place): boolean };
-  /** Called whenever the popup closes (close button, Esc, map click, replacement by `close()`). */
+  /** Called whenever the popup closes (close button, Esc, map click, `close()`); not when it switches places. */
   onClose(place: Place): void;
 }
 
@@ -92,6 +96,8 @@ export interface PlacePopup {
   /** Re-read saved state (e.g. after the Saved list removes this place). */
   refreshSaved(): void;
   element(): HTMLElement | null;
+  /** Rendered size of the open popup, tip included (for camera placement). */
+  size(): { width: number; height: number } | null;
 }
 
 let popupSeq = 0;
@@ -227,6 +233,7 @@ export function createPlacePopup(map: MapLibreMap, deps: PlacePopupDeps): PlaceP
     current: () => place,
     refreshSaved: renderSave,
     element: () => content,
+    size: () => (content ? { width: content.offsetWidth, height: content.offsetHeight + TIP_PX } : null),
   };
   return api;
 }

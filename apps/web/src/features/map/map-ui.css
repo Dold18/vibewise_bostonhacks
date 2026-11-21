@@ -6,7 +6,16 @@
 /* ---------- Destination popup (MapLibre Popup with Vibenta content) ---------- */
 
 .vb-place-popup {
-  z-index: 2;
+  z-index: 2; /* above the desktop panel (z 1) if a pin sits right beside it */
+}
+
+/* Phones: the expanded bottom sheet is z 2; when it leaves too little map,
+   the popup may overlap it rather than hide beneath it. The sheet's state is
+   never changed. */
+@media (max-width: 640px) {
+  .vb-place-popup {
+    z-index: 3;
+  }
 }
 
 .vb-place-popup .maplibregl-popup-content {

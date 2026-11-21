@@ -12,6 +12,7 @@ import {
   type TilePoi,
 } from './osm';
 import {
+  bostonCommon,
   combineProviders,
   createBostonSuggestionProvider,
   createPlaceListProvider,
@@ -22,7 +23,8 @@ import {
   type PlaceSearchProvider,
 } from './discovery';
 import { createOriginMarker, mapLibreOriginDeps, recenterTarget, shouldRevealOrigin } from './features/map/originMarker';
-import { createPlacePopup } from './features/map/placePopup';
+import { createPlacePopup, POPUP_PIN_GAP } from './features/map/placePopup';
+import { pinTarget, popupRevealShift } from './features/map/popupPlacement';
 import { realPlaceId, type RouteEndpoint } from './features/navigation/routing';
 import { createRoutePlanner } from './features/navigation/ui/routePlannerView';
 
@@ -145,9 +147,8 @@ function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: 
     el.addEventListener('click', (e) => {
       e.stopPropagation();
       selectPin(el);
-      // Phones: centre the pin low on screen so the popup fits above it, not squeezed beside it.
-      if (window.innerWidth <= 640) map.easeTo({ center: [place.lon, place.lat], offset: [0, 150], duration: 400 });
       openPlace(place, popupLook);
+      revealPopup(place);
     });
     return new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
   });
@@ -193,22 +194,50 @@ const placePopup = createPlacePopup(map, {
   onClose: () => {
     setPinSelected(selectedPin, false);
     selectedPin = null;
-    syncOverlay();
   },
 });
 
+// The popup never changes the discovery panel (no collapse/expand/move);
+// instead the camera keeps the popup clear of the panel where it can.
 function openPlace(place: Place, look: { color: string; icon?: string }) {
   placePopup.open(place, look);
-  syncOverlay();
 }
 
 function closePopup() {
   placePopup.close();
 }
 
-/** Move the camera so a place (and the popup above it) is clear of the panel. */
+/** Screen rects (relative to the map) for camera placement around the discovery panel. */
+function placementFrame() {
+  const box = map.getContainer().getBoundingClientRect();
+  const container = { left: 0, top: 0, right: box.width, bottom: box.height };
+  const panelEl = discovery?.element();
+  const p = panelEl?.getBoundingClientRect();
+  const panel = p && p.width > 0 ? { left: p.left - box.left, top: p.top - box.top, right: p.right - box.left, bottom: p.bottom - box.top } : null;
+  return { container, panel };
+}
+
+/** After a pin tap: pan only if the popup above the pin would overlap the panel or leave the map. */
+function revealPopup(place: Place) {
+  const size = placePopup.size();
+  if (!size) return;
+  const { container, panel } = placementFrame();
+  const pin = map.project([place.lon, place.lat]);
+  const shift = popupRevealShift(pin, size, POPUP_PIN_GAP, container, panel);
+  if (!shift) return;
+  // Ease the pin itself to its target point. (panBy moves the map centre by
+  // pixels, which on the tilted map moves a pin lower on screen by a
+  // different amount.)
+  const offset: [number, number] = [pin.x + shift.x - container.right / 2, pin.y + shift.y - container.bottom / 2];
+  map.easeTo({ center: [place.lon, place.lat], offset, duration: 400 });
+}
+
+/** Fly to a place (search result, saved place) so it and its open popup land clear of the panel. */
 function focusPlace(place: Place) {
-  const offset: [number, number] = window.innerWidth > 640 ? [196, 120] : [0, 150];
+  const size = placePopup.size() ?? { width: 304, height: 240 };
+  const { container, panel } = placementFrame();
+  const target = pinTarget(size, POPUP_PIN_GAP, container, panel);
+  const offset: [number, number] = [target.x - container.right / 2, target.y - container.bottom / 2];
   map.flyTo({ center: [place.lon, place.lat], zoom: Math.max(map.getZoom(), 16.5), ...TILTED, offset, essential: true });
 }
 
@@ -247,8 +276,8 @@ function showSearchResults(places: Place[]) {
 function openSearchResult(place: Place) {
   const pin = pinById.get(place.id);
   if (pin) selectPin(pin);
-  focusPlace(place);
   openPlace(place, pinLooks.get(place.id) ?? { color: CATEGORY_COLORS.search });
+  focusPlace(place);
 }
 
 /** Show a saved place: reuse its pin if it's on the map, otherwise add it to the current pins. */
@@ -456,7 +485,6 @@ const planner = createRoutePlanner({
   toSuggestions: combineProviders([mapPlaceSuggestions, savedSuggestions, bostonSuggestions], 'Places on the map, saved places and the offline Boston list'),
   // Live routing (transit's planTripLive via createTransitRouteProvider) is switched on in a later step.
   provider: null,
-  onOpenChange: () => syncOverlay(),
 });
 document.body.append(planner.root);
 
@@ -505,7 +533,9 @@ const discovery = mountDiscoveryPanel(document.body, {
     onSelect: (s) => openSavedPlace(savedToPlace(s), s.categoryId),
   },
   onRecenter: () => {
-    const target = recenterTarget(discovery.getPreferences().origin, BOSTON);
+    // No starting point: Boston Common, from the bundled OpenStreetMap list.
+    const common = bostonCommon()?.location;
+    const target = recenterTarget(discovery.getPreferences().origin, common ?? BOSTON);
     const flat = map.getPitch() < 5;
     map.flyTo({
       center: target.center,
@@ -517,10 +547,6 @@ const discovery = mountDiscoveryPanel(document.body, {
   },
 });
 saved.subscribe(() => placePopup.refreshSaved());
-
-function syncOverlay() {
-  discovery?.setOverlayOpen(planner?.isOpen() ? 'planner' : placePopup.isOpen() ? 'popup' : null);
-}
 
 // Starting-point marker, driven by the panel's origin preference.
 const originMarker = createOriginMarker(mapLibreOriginDeps(map));
