@@ -87,3 +87,18 @@ test('retries a timed-out or dropped request like a 503', async () => {
   assert.equal(calls, 3);
   assert.deepEqual(sleeps.filter((ms) => ms >= 10000), [10000, 20000]);
 });
+
+test('turns thinking off or down per model family', async () => {
+  const sent = async (model: string) => {
+    let body: { generationConfig: { thinkingConfig?: unknown } } | undefined;
+    const fetchImpl = (async (_u: string, init: RequestInit) => {
+      body = JSON.parse(init.body as string);
+      return new Response(JSON.stringify(okBody('[]')), { status: 200 });
+    }) as unknown as typeof fetch;
+    await createPriceEstimator({ apiKey: 'k', model, rpm: 600, fetchImpl, sleep: async () => {} })(PLACES);
+    return body!.generationConfig.thinkingConfig;
+  };
+  assert.deepEqual(await sent('gemini-2.5-flash'), { thinkingBudget: 0 });
+  assert.deepEqual(await sent('gemini-3.5-flash'), { thinkingLevel: 'low' });
+  assert.equal(await sent('custom-model'), undefined);
+});

@@ -5,6 +5,8 @@
  */
 import { PRICE_SYSTEM_PROMPT, type PromptPlace } from './price.ts';
 
+// Chosen 2026-11-21: answered a test batch in under a second with thinking off;
+// gemini-3.5-flash gave the same bands ten times slower and gemini-3.8-flash timed out.
 export const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 const BACKOFF_MS = [10_000, 20_000, 40_000]; // between the 4 attempts
@@ -24,6 +26,13 @@ export interface GeminiOptions {
   now?: () => number;
   /** Per-request timeout; default 180 s. */
   timeoutMs?: number;
+}
+
+/** Banding needs no reasoning: thinking off for 2.5 models, lowest level for 3.x; untouched for others. */
+function thinkingConfigFor(model: string): Record<string, unknown> | undefined {
+  if (/^gemini-2\.5-/.test(model)) return { thinkingBudget: 0 };
+  if (/^gemini-3/.test(model)) return { thinkingLevel: 'low' };
+  return undefined;
 }
 
 const RESPONSE_SCHEMA = {
@@ -58,7 +67,10 @@ export function createPriceEstimator(o: GeminiOptions): (places: PromptPlace[]) 
     const body = JSON.stringify({
       systemInstruction: { parts: [{ text: PRICE_SYSTEM_PROMPT }] },
       contents: [{ role: 'user', parts: [{ text: JSON.stringify(places) }] }],
-      generationConfig: { temperature: 0, responseMimeType: 'application/json', responseSchema: RESPONSE_SCHEMA },
+      generationConfig: {
+        temperature: 0, responseMimeType: 'application/json', responseSchema: RESPONSE_SCHEMA,
+        thinkingConfig: thinkingConfigFor(o.model),
+      },
     });
     for (let attempt = 0; ; attempt++) {
       await paced();
