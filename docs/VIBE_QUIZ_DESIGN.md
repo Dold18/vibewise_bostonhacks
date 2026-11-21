@@ -18,7 +18,7 @@ For example, after “I want something like the city nights in Blade Runner 2049
 4. **Update:** infer both positive and negative preference shifts from the answer, retain provenance, and re-rank viable Boston places.
 5. **Feedback:** visually de-emphasize weaker map pins and promote stronger options; show useful explanations such as “More atmospheric and low-key, less formal.” Do not invent a venue's aesthetic if its data lacks evidence.
 6. **Next:** re-evaluate candidate places and choose the next question *based on remaining ambiguity and expected discrimination*, not a static sequence. Avoid duplicate question meaning and repeated formats.
-7. **Stop:** recommend when user chooses, after diminishing information gain, or after a soft limit (target 3–7 questions; hard cap TBD). Don't force every dimension.
+7. **Stop:** aim to reach useful matches in **3–4 questions** for a well-specified vibe, while allowing **up to 10 questions total (absolute hard cap)** for ambiguous or nuanced requests. Stop sooner when further questions are unlikely to change the ranking, or whenever the user selects **Show my matches**. Never force all 10.
 
 ## Question families: broad and esoteric but interpretable
 The question form is the *presentation*; answer options are grounded in semantic signals. The question library should contain multiple distinct forms:
@@ -184,7 +184,7 @@ A creative quiz cannot generate honest recommendations from generic OSM POI type
 - Test that opposing answers re-rank candidate places and visibly update map pins; preserve normal transit selection.
 
 **Stage B — Rich quiz**
-- Expand to 40–80 culturally broad and esoteric questions, more distinctive original imagery, image moodboards, meaningful skip/familiarity handling, stable 3–7 question sessions.
+- Expand to 40–80 culturally broad and esoteric questions, more distinctive original imagery, image moodboards and meaningful skip/familiarity handling. Sessions usually take 3–4 questions, but may continue to **10 maximum** when answers keep resolving meaningful uncertainty.
 - Add animations showing convergence without collapsing all options prematurely.
 
 **Stage C — AI and media**
@@ -207,5 +207,7 @@ A creative quiz cannot generate honest recommendations from generic OSM POI type
 Adaptive preference elicitation and maximizing information from questions are established recommender approaches. Useful sources:
 - https://ssanner.github.io/papers/umap21_bayprefkey.pdf
 - https://pubsonline.informs.org/doi/10.1287/mksc.1110.0660
+
+**Quiz-cap implementation note:** PR #23 currently provides seven unique questions and a four-question default, and caps the count to the size of its bank. It does **not yet support ten distinct questions**. Before connecting the final quiz UI, expand the candidate question pool, change the hard cap to 10, and add no-repeat and early-stop tests at 10 questions. Do not accomplish this by repeating earlier questions.
 
 **Integration hold:** don't merge/extend PR #23 as though its seven-axis fixed bank were the finished experience. Review this product direction and the map team's place-tag coverage first.
