@@ -117,3 +117,6 @@
 
 .vb-line-chip { display: inline-block; padding: 3px 8px; margin-top: 8px; background: #f1f3f4; color: #202124; border-radius: 4px; }
 .vb-route-legs li { padding: 6px 0; line-height: 1.5; }
+
+.vb-directions-pill-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.vb-directions-estimates { font-size: 10px; color: #345577; font-weight: 500; }

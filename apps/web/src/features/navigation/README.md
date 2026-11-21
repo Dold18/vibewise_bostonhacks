@@ -15,7 +15,8 @@ Requests abort on edits/exit and late results cannot replace a newer trip.
 `routing.ts` calls the existing Express API through `transitRoute.ts`; no browser
 import of the server transit engine. `itinerary.ts` labels scheduled rides,
 straight-line walking estimates, transfer waits and last-train availability.
-Unverified walking geometry is omitted from the map.
+Known straight-line walking estimates appear as labeled, curved diagrammatic
+connections, never as pedestrian paths. Unknown walking provenance is omitted.
 
 Map focus is centralized in `features/map/focusMode.ts`: Search preserves pitch;
 Navigation locks it to zero until exit. A basemap fill dims below routes.
@@ -44,7 +45,10 @@ currently has no destination-pin map layers to hide. Rail overlays keep provider
 colors with a diffuse glow and a thin luminous center, without dark outlines.
 Station names sit on light labels rather than black text halos. Marker glow is
 scoped to focus modes; Discovery pins and origin markers have no glow. Verified pedestrian paths
-use dark dashes with light casing; all unverified walking remains text-only.
+use dark dashes with light casing and a subtle icy-blue glow. Known straight-line estimates use separate
+blue-slate, widely spaced dashed arcs, labeled “Walk · estimate.” Expanded
+Directions explains that these are not pedestrian directions; the collapsed
+control retains a Walking estimates note. Unknown provenance stays text-only.
 
 Route hub icons are keyed by station identity/coordinates and reused on panel
 collapse/expansion. Distinct stations on either side of a walking transfer remain

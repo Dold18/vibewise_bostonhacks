@@ -61,12 +61,13 @@ check('missing origin focused with explicit GPS action',await js('document.activ
 await js(`vibentaTrip.dispatch({type:'setFrom',endpoint:${JSON.stringify(from)}})`);await waitFor('vibentaTrip.getState().route.kind==="done"');await sleep(700);
 check('Navigation dark and locked',await js('map.getPaintProperty("vb-map-focus","fill-opacity")===.60&&map.getPitch()===0&&map.getMaxPitch()===0'));
 check('all ordinary pins hidden in Navigation',await hiddenPins());
-check('estimated walking omitted and labeled',!(await routeData()).some(f=>f.properties.kind==='walk')&&await js('document.querySelector(".vb-planner-results").textContent.includes("route not verified")'));
+check('initial, transfer and final estimated walking connections are visible and labeled',(await routeData()).filter(f=>f.properties.kind==='walk_estimate'&&f.properties.label==='Walk · estimate'&&f.geometry.coordinates.length===21).length===3&&await js('document.querySelector(".vb-planner-results").textContent.includes("not verified pedestrian directions")'));
 check('board, exit and both walking-transfer stations',await js('document.querySelectorAll(".vb-route-hub").length===4&&document.querySelectorAll(".vb-route-hub.is-transfer").length===2&&[...document.querySelectorAll(".vb-route-hub")].every(e=>e.getAttribute("aria-label")&&e.querySelector("svg"))'));
 check('no black route casing or pin outlines',await js('!map.getLayer("transit-route-ride-casing")&&getComputedStyle(document.querySelector(".pin path")).stroke==="none"&&document.querySelectorAll(".vb-hub-label").length===4'));
 check('neon rail glow preserves MBTA color',await js('map.getPaintProperty("transit-route-ride-glow","line-blur")===6&&map.getPaintProperty("transit-route-ride-highlight","line-opacity")===.75&&map.getPaintProperty("transit-route-ride","line-color")[1]==="color"'));
 check('route layer above focus',await js('(()=>{const ids=map.getStyle().layers.map(l=>l.id);return ids.indexOf("transit-route-ride")>ids.indexOf("vb-map-focus")})()'));
 const gen=await js('vibentaTrip.getState().generation'),calls=routes;await click('[aria-label="Collapse directions"]');await sleep(500);
+check('collapsed Directions retains the walking-estimates disclosure',await js('!document.querySelector(".vb-directions-estimates").hidden'));
 check('collapse retains navigation, route, hubs and request',routes===calls&&await js(`vibentaTrip.getState().generation===${gen}&&vibentaTrip.getState().navigationOpen&&map.getPitch()===0&&document.querySelectorAll('.vb-route-hub').length===4&&!document.querySelector('.vb-preferences-widget').hidden&&!document.querySelector('.vb-directions-control').hidden`));
 await shot('navigation-compact');await click('.vb-directions-pill');await sleep(300);
 for(const width of [1440,1366,1280]){await send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false});await sleep(250);const l=await layout();check('Directions replaces card '+width,Object.values(l).every(Boolean)&&await js('document.querySelector(".vb-preferences-widget").hidden'),l);await shot('directions-'+width);}
@@ -93,6 +94,7 @@ await click('.vb-image-remove');check('individual image removal works',await js(
 // A verified-walk fixture exercises initial, transfer and final walking paths.
 routeBody=verified;await nav();const lines=await routeData();
 check('three verified walking legs and correct rail colors',lines.filter(f=>f.properties.kind==='walk').length===3&&lines.some(f=>f.properties.color==='#DA291C')&&lines.some(f=>f.properties.color==='#00843D'));
+check('walking has a subtle neon glow',await js('map.getPaintProperty("transit-route-walk-glow","line-color")==="#73C7FF"&&map.getPaintProperty("transit-route-walk-glow","line-opacity")===.5'));
 check('walking dark dashes with light casing',await js('map.getPaintProperty("transit-route-walk","line-color")==="#17212E"&&map.getPaintProperty("transit-route-walk-casing","line-color")==="#F7FAFC"&&map.getPaintProperty("transit-route-walk","line-dasharray").length===2'));
 await shot('verified-walking-fixture');await click('[aria-label="Collapse directions"]');
 await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await sleep(400);await shot('mobile-compact');await click('.vb-directions-pill');await sleep(400);
@@ -112,7 +114,7 @@ await click('.vb-tool');await sleep(400);
 check('Discovery removes route-only markers and restores normal pins',await js('document.body.dataset.focus==="discovery"&&document.querySelectorAll(".vb-route-hub").length===0&&map.getPaintProperty("vb-map-focus","fill-opacity")===0'));
 routeBody=estimated;
 for(let i=0;i<3;i++){await nav();await exit();}
-check('repeated navigation removes every hub and destination marker',await js('document.querySelectorAll(".vb-route-hub,.vb-trip-destination").length===0&&new Set(map.getStyle().layers.filter(l=>l.id.startsWith("transit-route-")).map(l=>l.id)).size===6'));
+check('repeated navigation removes every hub and destination marker',await js('document.querySelectorAll(".vb-route-hub,.vb-trip-destination").length===0&&new Set(map.getStyle().layers.filter(l=>l.id.startsWith("transit-route-")).map(l=>l.id)).size===10'));
 routeBody={status:'no_tier1_route',reason:'same_stop'};await nav();
 check('Directions no-route state',await js('document.querySelector(".vb-planner-results").textContent.includes("same one")'));
 routeBody={status:'no_service',message:'TEST FIXTURE no service',nextScheduledDepartureAt:'2026-11-22T12:00:00Z'};await click('.vb-planner-results .vb-text-btn');await sleep(500);

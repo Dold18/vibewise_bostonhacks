@@ -3,6 +3,7 @@ import { createStore, type Store } from '../../../discovery/store';
 import { h, icon, ICONS } from '../../../discovery/ui/dom';
 import { createTripFields, type TripFieldsConfig } from './tripFields';
 import { initialTripState, tripReducer, createTripRouter, missingEndpoint, type TripState, type TripAction } from '../trip';
+import { estimatedWalkArc } from '../../../transitRoute';
 import { buildItinerary, bostonTime } from '../itinerary';
 import type { RouteEndpoint, RouteProvider } from '../routing';
 import '../navigation.css';
@@ -18,7 +19,8 @@ export function createRoutePlanner(c: RoutePlannerConfig) {
   const fields = createTripFields({ ...c, store });
   const close = h('button', { type: 'button', class: 'vb-icon-btn', 'aria-label': 'Collapse directions' }, icon(ICONS.close, 20));
   const exit = h('button', { type: 'button', class: 'vb-text-btn vb-exit-navigation', 'aria-label': 'Exit Navigation' }, 'Exit');
-  const pill = h('button', { type: 'button', class: 'vb-directions-pill', 'aria-expanded': 'false' }, icon(ICONS.directions, 20), 'Directions');
+  const estimateNote = h('small', { class: 'vb-directions-estimates', hidden: true }, 'Walking estimates');
+  const pill = h('button', { type: 'button', class: 'vb-directions-pill', 'aria-expanded': 'false' }, icon(ICONS.directions, 20), h('span', { class: 'vb-directions-pill-copy' }, h('span', {}, 'Directions'), estimateNote));
   const compactExit = h('button', { type: 'button', class: 'vb-text-btn vb-exit-navigation', 'aria-label': 'Exit Navigation' }, 'Exit');
   const control = h('div', { class: 'vb-directions-control', hidden: true }, pill, compactExit);
   const results = h('div', { class: 'vb-planner-results', 'aria-live': 'polite' });
@@ -35,6 +37,7 @@ export function createRoutePlanner(c: RoutePlannerConfig) {
     root.hidden = !s.navigationOpen || !s.directionsExpanded;
     control.hidden = !s.navigationOpen || s.directionsExpanded;
     pill.setAttribute("aria-expanded", String(s.directionsExpanded));
+    estimateNote.hidden = !(s.route.kind === 'done' && s.route.result.status === 'ok' && s.route.result.route.option.legs.some(l => !!estimatedWalkArc(l)));
     results.replaceChildren();
     const missing = missingEndpoint(s);
     const p = (text: string) => h('p', { class: 'vb-planner-notice' }, text);
@@ -44,6 +47,7 @@ export function createRoutePlanner(c: RoutePlannerConfig) {
       const r = s.route.result;
       if (r.status === 'ok') {
         const itinerary = buildItinerary(r.route, { fromLabel: s.from!.label, toLabel: s.to!.label });
+        if (!estimateNote.hidden) results.append(p('Dashed arcs are estimated walking connections, not verified pedestrian directions. Follow streets and crossings; the arcs do not show a walking path.'));
         results.append(h('p', { class: 'vb-route-summary' }, itinerary.summary), p(itinerary.summaryNote));
         if (itinerary.departure) results.append(p(itinerary.departure));
         const steps = h('ol', { class: 'vb-route-legs' });
