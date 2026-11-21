@@ -17,6 +17,7 @@ export function choosePinLabels(candidates: LabelCandidate[], pins: Rect[], obst
 
 export function createPinLabels(container: HTMLElement, getObstacles: () => Element[]) {
   let frame: number | undefined;
+  let destroyed = false;
   const previous = new WeakSet<HTMLElement>();
   function render() {
     frame = undefined;
@@ -54,10 +55,12 @@ export function createPinLabels(container: HTMLElement, getObstacles: () => Elem
       if (visible) previous.add(pin); else previous.delete(pin);
     });
   }
-  const schedule = () => { if(frame===undefined) frame=requestAnimationFrame(render); };
+  const schedule = () => { if(!destroyed && frame===undefined) frame=requestAnimationFrame(render); };
+  document.fonts.addEventListener('loadingdone',schedule);
+  void document.fonts.ready.then(schedule);
   const observer = new MutationObserver(schedule); observer.observe(container,{childList:true,subtree:true});
   const resize = new ResizeObserver(schedule); resize.observe(container); getObstacles().forEach(el=>resize.observe(el));
   for (const event of ['pointerover','pointerout','focusin','focusout','transitionend']) container.addEventListener(event,schedule);
   schedule();
-  return { schedule, destroy() { if(frame!==undefined) cancelAnimationFrame(frame); observer.disconnect(); resize.disconnect(); for(const event of ['pointerover','pointerout','focusin','focusout','transitionend']) container.removeEventListener(event,schedule); } };
+  return { schedule, destroy() { destroyed=true; document.fonts.removeEventListener('loadingdone',schedule); if(frame!==undefined) cancelAnimationFrame(frame); observer.disconnect(); resize.disconnect(); for(const event of ['pointerover','pointerout','focusin','focusout','transitionend']) container.removeEventListener(event,schedule); } };
 }
