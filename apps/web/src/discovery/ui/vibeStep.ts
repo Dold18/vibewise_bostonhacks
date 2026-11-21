@@ -18,19 +18,19 @@ const REMOVE_ICON = 'M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.
 
 const EXAMPLES = [
   {
-    title: 'Warm & nostalgic',
-    detail: 'Rainy-day café',
-    text: 'Like a cozy movie scene on a rainy afternoon: warm lamps, books, jazz, soft conversation, and somewhere comfortable to stay a while.',
+    title: 'Movie scene',
+    detail: 'Warm & nostalgic',
+    text: 'Like a rainy bookshop scene in a romantic movie: warm lamps, shelves of books, soft jazz, cozy corners and somewhere to talk for hours.',
   },
   {
-    title: 'Electric & social',
-    detail: 'Neon night out',
-    text: 'An energetic, neon-lit night with friends. Think bright signs, great music, lots of people, colorful drinks and spontaneous adventures.',
+    title: 'Song or artist',
+    detail: 'Electric & social',
+    text: 'The feeling of an upbeat synth-pop song: neon signs, bright colors, loud music, interesting people and a spontaneous night with friends.',
   },
   {
-    title: 'Dreamy & cinematic',
-    detail: 'Old-city magic',
-    text: 'Like wandering through an old European street at dusk: historic buildings, little shops, golden lights, a romantic dinner and hidden corners.',
+    title: 'Objects & colors',
+    detail: 'Dreamy & cinematic',
+    text: 'Vintage cameras, cobblestone streets, golden streetlights, old bookstores and candlelit tables. Quiet, romantic and a little adventurous.',
   },
 ] as const;
 
