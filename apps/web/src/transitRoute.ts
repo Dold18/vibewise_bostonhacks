@@ -4,8 +4,8 @@
 // Two parts:
 // - fetchRoute(): the request, with cancellation and a checked response shape.
 // - The map overlay: route lines in their real MBTA colours with a soft neon glow, boarding /
-//   transfer / exit stations, and walking legs only when their geometry is a verified
-//   pedestrian path (straight-line estimates are never drawn as streets).
+//   transfer / exit stations, verified pedestrian paths, and clearly labeled
+//   diagrammatic walking estimates (never presented as street directions).
 import type { GeoJSONSource, Map as MapLibreMap } from 'maplibre-gl';
 
 export type LatLng = { lat: number; lng: number };
@@ -182,12 +182,30 @@ export function lineName(leg: Pick<RouteLeg, 'routeShortName' | 'mode'>): string
  * path. Proposed convention for the transit workstream: a walk leg whose
  * `source` starts with "pedestrian-route:" carries routed street/sidewalk
  * geometry. Everything else (today: "approx: straight-line walk …") is an
- * estimate and is shown only as text in the itinerary.
+ * estimate; a known straight-line estimate may be shown as a labeled diagrammatic
+ * connector, never as pedestrian geometry.
  */
 export const VERIFIED_WALK_SOURCE = /^pedestrian-route:/i;
 
 export function isVerifiedWalkGeometry(leg: RouteLeg): boolean {
   return leg.mode === 'walk' && !!leg.source && VERIFIED_WALK_SOURCE.test(leg.source) && leg.geometry.length >= 2;
+}
+
+/** Diagrammatic arc between known endpoints, never a street or sidewalk route. */
+export function estimatedWalkArc(leg: RouteLeg): [number, number][] | null {
+  if (leg.mode !== 'walk' || !/^approx: straight-line walk/i.test(leg.source ?? '') || leg.geometry.length < 2) return null;
+  const a = leg.geometry[0], b = leg.geometry[leg.geometry.length - 1];
+  const latMeters = 111320, lngMeters = latMeters * Math.cos((a[1] + b[1]) * Math.PI / 360);
+  if (Math.abs(lngMeters) < 1) return null;
+  const dx = (b[0] - a[0]) * lngMeters, dy = (b[1] - a[1]) * latMeters;
+  const length = Math.hypot(dx, dy);
+  if (length < 1) return null;
+  const bend = Math.min(45, length * .2);
+  const cx = dx / 2 - dy / length * bend * 2, cy = dy / 2 + dx / length * bend * 2;
+  return Array.from({ length: 21 }, (_, i): [number, number] => {
+    const t = i / 20, k = 2 * (1 - t) * t;
+    return [a[0] + (k * cx + t * t * dx) / lngMeters, a[1] + (k * cy + t * t * dy) / latMeters];
+  });
 }
 
 const isRide = (leg: RouteLeg) => leg.mode !== 'walk';
@@ -236,7 +254,7 @@ export function routeStations(legs: RouteLeg[]): RouteStation[] {
 
 export interface RouteLineFeature {
   type: 'Feature';
-  properties: { kind: 'ride' | 'walk'; color: string; order: number };
+  properties: { kind: 'ride' | 'walk' | 'walk_estimate'; color: string; order: number; label?: string; provenance?: string };
   geometry: { type: 'LineString'; coordinates: [number, number][] };
 }
 export interface RouteStationFeature {
@@ -245,13 +263,17 @@ export interface RouteStationFeature {
   geometry: { type: 'Point'; coordinates: [number, number] };
 }
 
-/** Each ride leg in its own colour; walking legs only with verified geometry. */
+/** Real paths retain geometry; known walking estimates use labeled diagrammatic arcs. */
 export function routeLineFeatures(legs: RouteLeg[]): { type: 'FeatureCollection'; features: RouteLineFeature[] } {
   const features: RouteLineFeature[] = [];
   legs.forEach((leg, order) => {
     if (!Array.isArray(leg.geometry) || leg.geometry.length < 2) return;
     if (leg.mode === 'walk') {
-      if (!isVerifiedWalkGeometry(leg)) return; // estimate: itinerary text only
+      if (!isVerifiedWalkGeometry(leg)) {
+        const arc = estimatedWalkArc(leg);
+        if (arc) features.push({ type: 'Feature', properties: { kind: 'walk_estimate', color: '#315B7E', order, label: 'Walk · estimate', provenance: leg.source }, geometry: { type: 'LineString', coordinates: arc } });
+        return; // Unknown provenance is still omitted; straight-line estimates become labeled diagrams only.
+      }
       features.push({ type: 'Feature', properties: { kind: 'walk', color: '#17212E', order }, geometry: { type: 'LineString', coordinates: leg.geometry } });
       return;
     }
@@ -296,8 +318,12 @@ export const ROUTE_LAYERS = {
   rideGlow: 'transit-route-ride-glow',
   ride: 'transit-route-ride',
   rideHighlight: 'transit-route-ride-highlight',
+  walkGlow: 'transit-route-walk-glow',
   walkCasing: 'transit-route-walk-casing',
   walk: 'transit-route-walk',
+  estimatedWalkCasing: 'transit-route-walk-estimate-casing',
+  estimatedWalk: 'transit-route-walk-estimate',
+  estimatedWalkLabels: 'transit-route-walk-estimate-labels',
   stations: 'transit-route-station-dots',
 } as const;
 const EMPTY = { type: 'FeatureCollection', features: [] } as const;
@@ -337,6 +363,11 @@ function ensureLayers(map: MapLibreMap): { lines: GeoJSONSource; stations: GeoJS
       paint: { 'line-color': '#FFFFFF', 'line-opacity': 0.75,
         'line-width': ['interpolate', ['linear'], ['zoom'], 11, 1, 16, 1.8] },
     }, before);
+    map.addLayer({
+      id: ROUTE_LAYERS.walkGlow, type: 'line', source: LINE_SRC,
+      filter: ['match', ['get', 'kind'], ['walk', 'walk_estimate'], true, false], layout: round,
+      paint: { 'line-color': '#73C7FF', 'line-opacity': .5, 'line-width': 13, 'line-blur': 4 },
+    }, before);
     map.addLayer(
       {
         id: ROUTE_LAYERS.walkCasing,
@@ -359,6 +390,22 @@ function ensureLayers(map: MapLibreMap): { lines: GeoJSONSource; stations: GeoJS
       },
       before,
     );
+    map.addLayer({
+      id: ROUTE_LAYERS.estimatedWalkCasing, type: 'line', source: LINE_SRC,
+      filter: ['==', ['get', 'kind'], 'walk_estimate'], layout: round,
+      paint: { 'line-color': '#E5F0FF', 'line-opacity': .8, 'line-width': 7, 'line-blur': .5 },
+    }, before);
+    map.addLayer({
+      id: ROUTE_LAYERS.estimatedWalk, type: 'line', source: LINE_SRC,
+      filter: ['==', ['get', 'kind'], 'walk_estimate'], layout: round,
+      paint: { 'line-color': '#315B7E', 'line-width': 4, 'line-dasharray': [.8, 1.6] },
+    }, before);
+    map.addLayer({
+      id: ROUTE_LAYERS.estimatedWalkLabels, type: 'symbol', source: LINE_SRC,
+      filter: ['==', ['get', 'kind'], 'walk_estimate'],
+      layout: { 'symbol-placement': 'line-center', 'text-field': ['get', 'label'], 'text-font': ['Noto Sans Bold'], 'text-size': 12, 'text-offset': [0, -1] },
+      paint: { 'text-color': '#EAF4FF' },
+    });
     // Stations sit above everything (including labels) so they stay readable.
     map.addLayer({
       id: ROUTE_LAYERS.stations,

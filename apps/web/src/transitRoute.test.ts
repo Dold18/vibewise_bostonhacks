@@ -1,6 +1,7 @@
 import type { Map as MapLibreMap } from 'maplibre-gl';
 import { describe, expect, it, vi } from 'vitest';
 import {
+  estimatedWalkArc,
   drawRoute,
   clearRoute,
   ROUTE_LAYERS,
@@ -69,7 +70,7 @@ describe('line colours', () => {
 
 describe('route geometry', () => {
   it('draws a Red → Green transfer as two segments in their own colours, in order', () => {
-    const f = routeLineFeatures(TRANSFER_TRIP).features;
+    const f = routeLineFeatures(TRANSFER_TRIP).features.filter(f => f.properties.kind === 'ride');
     expect(f.map((x) => [x.properties.kind, x.properties.color])).toEqual([
       ['ride', '#DA291C'],
       ['ride', '#00843D'],
@@ -77,7 +78,7 @@ describe('route geometry', () => {
     expect(f[0].geometry.coordinates).toEqual(RED.geometry);
   });
 
-  it('never draws straight-line walking estimates', () => {
+  it('never draws straight-line estimates as verified pedestrian paths', () => {
     const f = routeLineFeatures(TRANSFER_TRIP).features;
     expect(f.some((x) => x.properties.kind === 'walk')).toBe(false);
     expect(isVerifiedWalkGeometry(TRANSFER_TRIP[0])).toBe(false);
@@ -189,4 +190,15 @@ it('keeps neon rail identity and high-contrast walking above the focus layer wit
   expect(layers.find(l=>l.id===ROUTE_LAYERS.walkCasing)?.paint['line-color']).toBe('#F7FAFC');
   clearRoute(map as unknown as MapLibreMap);
   expect(sources.get('transit-route')!.setData).toHaveBeenLastCalledWith({type:'FeatureCollection',features:[]});
+});
+
+it('shows known estimates as labeled diagrammatic arcs while preserving endpoint/provenance data', () => {
+  const leg=TRANSFER_TRIP[0],arc=estimatedWalkArc(leg)!;
+  expect(arc).toHaveLength(21);expect(arc[0]).toEqual(leg.geometry[0]);expect(arc[20]).toEqual(leg.geometry[1]);
+  expect(arc[10]).not.toEqual([(leg.geometry[0][0]+leg.geometry[1][0])/2,(leg.geometry[0][1]+leg.geometry[1][1])/2]);
+  expect(leg.geometry).toHaveLength(2);
+  const feature=routeLineFeatures([leg]).features[0];
+  expect(feature.properties).toMatchObject({kind:'walk_estimate',label:'Walk · estimate',provenance:STRAIGHT_WALK});
+  expect(estimatedWalkArc({...leg,source:'unknown'})).toBeNull();
+  expect(routeLineFeatures([{...leg,source:'unknown'}]).features).toEqual([]);
 });
