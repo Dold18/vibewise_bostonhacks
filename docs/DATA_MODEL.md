@@ -220,6 +220,18 @@ search_restaurants(
 - **Foursquare OS Places (Apache 2.0):** keep its attribution notice.
 - **Honesty:** unknown hours or price are stored as `null` / `'unknown'` and shown as such. Seeded reviews are flagged `is_seed` and labeled.
 
+## 7a. User accounts (proposed, P-012)
+Migration `supabase/migrations/20261121180000_create_accounts.sql`. Users sign in with Supabase Auth (email + password).
+
+| Table | Columns | Access |
+|---|---|---|
+| `profiles` | `id` (= `auth.users.id`), `effects_enabled` (default true), `created_at`, `updated_at` | Owner reads, creates and updates their own row. Created automatically by a trigger on sign-up. |
+| `vibe_events` | `id`, `user_id` (default `auth.uid()`), `created_at`, `source` (`quiz`/`text`/`image`/`song`/`place`/`dev`), `scores` (section 3 keys, values in [0,1], checked by `is_valid_vibe_scores`), `vocab_version`, optional `place_id` | Owner reads, adds and deletes (clears) their own rows. No updates. `anon` has no access. |
+
+- No location is stored: no origin, no GPS, no movement history.
+- `dev` rows are sample data from the dev-only hook and are ignored by production builds.
+- The browser derives a decayed taste from the newest 200 events (two-week half-life). That taste tints the map; it is not used for ranking.
+
 ## 8. Open questions for the team
 1. Accept the ambience layer, which amends the brief's "menus, not moods" guidance (P-010)?
 2. Pin the models: the text embedding model (MiniLM vs BGE, brief §4) and the CLIP/SigLIP model, which sets the `ambience_clip_embedding` dimension.

@@ -119,6 +119,16 @@ export interface Recommendation {
   score: number;                 // normalized [0,1]
   reasons: string[];
 }
+
+// Proposed (DECISIONS.md P-012), not yet ratified.
+// One vibe reading for the signed-in user, sent by the Vibe Engine to the
+// account module's recordVibe(). Keys are the DATA_MODEL.md §3 vocabulary
+// (VibeKey), values in [0,1]; unknown keys are dropped, out-of-range values clamped.
+export interface VibeSignal {
+  scores: Partial<Record<VibeKey, number>>;
+  source: 'quiz' | 'text' | 'image' | 'song' | 'place' | 'dev';
+  placeId?: string;              // a catalog Place.id the signal came from, if any
+}
 ~~~
 
 ## 3. Map → Transit handshake
