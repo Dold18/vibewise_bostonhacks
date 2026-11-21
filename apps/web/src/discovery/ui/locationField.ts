@@ -20,6 +20,14 @@ import { h, icon, ICONS, onOutsideInteraction, uid } from './dom';
 
 export interface LocationFieldConfig {
   provider: LocationSuggestionProvider;
+  /** Field label (default "Starting point"). */
+  label?: string;
+  /** Collapsed placeholder (default "Choose a starting point"). */
+  placeholder?: string;
+  /** Search box placeholder. */
+  searchPlaceholder?: string;
+  /** Offer "Use current location" (default true). */
+  allowCurrentLocation?: boolean;
   onSelect(origin: Origin, meta: { outsideBoston?: boolean }): void;
   geolocation?: GeolocationEnvironment;
 }
@@ -35,6 +43,8 @@ const KIND_ICON: Record<string, string> = {
   station: ICONS.train,
   university: ICONS.school,
   landmark: ICONS.landmark,
+  place: ICONS.landmark,
+  saved: ICONS.bookmark,
 };
 
 const SEARCH_DEBOUNCE_MS = 120;
@@ -46,7 +56,8 @@ export function createLocationField(config: LocationFieldConfig): LocationField 
   const optionId = (i: number) => `${listId}-opt-${i}`;
 
   // Collapsed state
-  const valueText = h('span', { class: 'vb-trigger-value is-placeholder', id: valueId }, 'Choose a starting point');
+  const placeholder = config.placeholder ?? 'Choose a starting point';
+  const valueText = h('span', { class: 'vb-trigger-value is-placeholder', id: valueId }, placeholder);
   const valueSub = h('span', { class: 'vb-trigger-sub', hidden: true });
   const trigger = h(
     'button',
@@ -66,7 +77,7 @@ export function createLocationField(config: LocationFieldConfig): LocationField 
     'aria-controls': listId,
     'aria-labelledby': labelId,
     'aria-describedby': `${listId}-caption`,
-    placeholder: 'T station, campus or landmark',
+    placeholder: config.searchPlaceholder ?? 'T station, campus or landmark',
     autocomplete: 'off',
     autocapitalize: 'off',
     spellcheck: 'false',
@@ -75,7 +86,7 @@ export function createLocationField(config: LocationFieldConfig): LocationField 
   const cancelBtn = h('button', { type: 'button', class: 'vb-icon-btn vb-small', 'aria-label': 'Cancel' }, icon(ICONS.close, 18));
   const geoBtn = h(
     'button',
-    { type: 'button', class: 'vb-geo-btn' },
+    { type: 'button', class: 'vb-geo-btn', hidden: config.allowCurrentLocation === false },
     icon(ICONS.myLocation, 20, 'vb-icon'),
     h('span', {}, 'Use current location'),
   );
@@ -87,6 +98,7 @@ export function createLocationField(config: LocationFieldConfig): LocationField 
   );
   const list = h('ul', { id: listId, role: 'listbox', class: 'vb-suggestions', 'aria-label': 'Starting point suggestions', hidden: true });
   const emptyMsg = h('p', { class: 'vb-empty', hidden: true });
+  const listLabel = config.provider.live ? 'list' : 'offline list';
   const editor = h(
     'div',
     { class: 'vb-location-editor', hidden: true },
@@ -98,7 +110,7 @@ export function createLocationField(config: LocationFieldConfig): LocationField 
   const root = h(
     'div',
     { class: 'vb-field' },
-    h('span', { class: 'vb-label', id: labelId }, 'Starting point'),
+    h('span', { class: 'vb-label', id: labelId }, config.label ?? 'Starting point'),
     h('div', { class: 'vb-control' }, trigger, editor),
     warning,
   );
@@ -158,7 +170,7 @@ export function createLocationField(config: LocationFieldConfig): LocationField 
     const trimmed = query.trim();
     emptyMsg.hidden = !trimmed || items.length > 0;
     emptyMsg.textContent = trimmed
-      ? `No matches for "${trimmed}" in the offline list. Try a nearby T station, campus or landmark.`
+      ? `No matches for "${trimmed}" in the ${listLabel}. Try a nearby T station, campus or landmark.`
       : '';
   }
 
@@ -262,7 +274,7 @@ export function createLocationField(config: LocationFieldConfig): LocationField 
   return {
     root,
     setValue(origin) {
-      valueText.textContent = origin ? origin.label : 'Choose a starting point';
+      valueText.textContent = origin ? origin.label : placeholder;
       valueText.classList.toggle('is-placeholder', !origin);
       valueSub.textContent = origin?.secondaryLabel ?? '';
       valueSub.hidden = !origin?.secondaryLabel;

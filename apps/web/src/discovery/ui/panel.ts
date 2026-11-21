@@ -28,6 +28,13 @@ import { createLocationField } from './locationField';
 import { createMultiSelectField } from './multiSelectField';
 import { createSelectField } from './selectField';
 import { createTimingField } from './timingField';
+import {
+  createQuickTools,
+  createSavedView,
+  createSearchView,
+  type SavedViewConfig,
+  type SearchViewConfig,
+} from './panelViews';
 
 export interface PanelDeps {
   prefs: Store<InitialPreferences, PreferencesAction>;
@@ -37,16 +44,26 @@ export interface PanelDeps {
   now: () => Date;
   /** The map's place categories, when the panel drives what the map loads. */
   mapLayers?: readonly MapLayer[];
+  /** Quick Tools: each tool appears only if provided. */
+  search?: Omit<SearchViewConfig, 'onBack'>;
+  saved?: Omit<SavedViewConfig, 'onBack'>;
+  onRecenter?: () => void;
 }
+
+export type PanelView = 'preferences' | 'search' | 'saved';
+export type OverlayKind = 'popup' | 'planner' | null;
 
 export interface Panel {
   root: HTMLElement;
   /** Close any open dropdown or search inside the panel. */
   closePopups(): void;
+  showView(view: PanelView): void;
+  /** Which map overlay is open (for placing the collapsed summary). */
+  setOverlayKind(kind: OverlayKind): void;
   destroy(): void;
 }
 
-export function createPanel({ prefs, layout, provider, geolocation, now, mapLayers }: PanelDeps): Panel {
+export function createPanel({ prefs, layout, provider, geolocation, now, mapLayers, search, saved, onRecenter }: PanelDeps): Panel {
   const dispatch = prefs.dispatch;
   const bodyId = uid('panel-body');
   const titleId = uid('panel-title');
@@ -147,6 +164,45 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     icon(ICONS.chevronDown, 20, 'vb-icon vb-summary-chevron'),
   );
 
+  // --- Quick Tools and secondary views ---------------------------------------
+  const searchView = search ? createSearchView({ ...search, onBack: () => showView('preferences', 'search') }) : null;
+  const savedView = saved ? createSavedView({ ...saved, onBack: () => showView('preferences', 'saved') }) : null;
+  const quickTools = createQuickTools({
+    search: searchView ? () => showView('search') : undefined,
+    saved: savedView ? () => showView('saved') : undefined,
+    recenter: onRecenter,
+  });
+  const hasTools = !!(searchView || savedView || onRecenter);
+  quickTools.setSavedCount(saved?.store.list().length ?? 0);
+  const unsubSavedCount = saved?.store.subscribe((items) => quickTools.setSavedCount(items.length));
+
+  const subtitle = h('p', { class: 'vb-subtitle' }, 'Set the basics. The map stays live while you choose.');
+  const stepSection = h(
+    'section',
+    { class: 'vb-step', 'data-step': 'preferences', 'aria-labelledby': titleId },
+    activity.root,
+    cuisines.root,
+    activityTypes.root,
+    origin.root,
+    budget.root,
+    timing.root,
+    hasTools ? quickTools.root : null,
+    vibeField,
+    notes,
+  );
+  const footer = h(
+    'footer',
+    { class: 'vb-footer' },
+    h(
+      'p',
+      { class: 'vb-footer-note' },
+      mapLayers
+        ? "Activity sets which places the map loads. Other choices are saved but don't filter pins yet."
+        : "Preview: preferences are saved but don't filter map pins yet.",
+    ),
+    resetBtn,
+  );
+
   const body = h(
     'div',
     { class: 'vb-body', id: bodyId },
@@ -158,35 +214,32 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
         'div',
         { class: 'vb-header-text' },
         h('h2', { class: 'vb-title', id: titleId }, 'Plan your outing'),
-        h('p', { class: 'vb-subtitle' }, 'Set the basics. The map stays live while you choose.'),
+        subtitle,
       ),
       minimizeBtn,
     ),
-    h(
-      'section',
-      { class: 'vb-step', 'data-step': 'preferences', 'aria-labelledby': titleId },
-      activity.root,
-      cuisines.root,
-      activityTypes.root,
-      origin.root,
-      budget.root,
-      timing.root,
-      vibeField,
-      notes,
-    ),
-    h(
-      'footer',
-      { class: 'vb-footer' },
-      h(
-        'p',
-        { class: 'vb-footer-note' },
-        mapLayers
-          ? "Activity sets which places the map loads. Other choices are saved but don't filter pins yet."
-          : "Preview: preferences are saved but don't filter map pins yet.",
-      ),
-      resetBtn,
-    ),
+    stepSection,
+    searchView?.root ?? null,
+    savedView?.root ?? null,
+    footer,
   );
+
+  let view: PanelView = 'preferences';
+  /** Switch views; returning to preferences puts focus back on the tool that opened the view. */
+  function showView(next: PanelView, from?: 'search' | 'saved') {
+    if (next !== 'preferences' && !isExpanded(layout.getState())) layout.dispatch({ type: 'expand' });
+    view = next;
+    closePopups();
+    stepSection.hidden = next !== 'preferences';
+    footer.hidden = next !== 'preferences';
+    subtitle.hidden = next !== 'preferences';
+    if (searchView) searchView.root.hidden = next !== 'search';
+    if (savedView) savedView.root.hidden = next !== 'saved';
+    root.dataset.panelView = next; // data-panel-view (views themselves carry data-view)
+    if (next === 'search') searchView?.focus();
+    else if (next === 'saved') savedView?.focus();
+    else if (from) quickTools.focus(from);
+  }
 
   const root = h('aside', { class: 'vb-discovery', 'aria-label': 'Plan your outing' }, summaryBtn, body);
 
@@ -279,10 +332,20 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   return {
     root,
     closePopups,
+    showView: (next) => {
+      if (next !== view) showView(next);
+    },
+    setOverlayKind(kind) {
+      root.classList.toggle('overlay-popup', kind === 'popup');
+      root.classList.toggle('overlay-planner', kind === 'planner');
+    },
     destroy() {
       unsubPrefs();
       unsubLayout();
       fields.forEach((f) => f.destroy());
+      searchView?.destroy();
+      savedView?.destroy();
+      unsubSavedCount?.();
     },
   };
 }

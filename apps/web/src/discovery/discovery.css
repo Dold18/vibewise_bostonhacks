@@ -9,7 +9,9 @@
  *   expanded over card   z 2   the user explicitly opened it on top of the card
  */
 
-.vb-discovery {
+/* Shared tokens and base styles for every Vibenta overlay (panel, trip planner, popups). */
+.vb-discovery,
+.vb-ui {
   --vb-surface: var(--surface, #fff);
   --vb-hover: var(--surface-hover, #f1f3f4);
   --vb-text: var(--text, #202124);
@@ -21,6 +23,12 @@
   --vb-warning: #b3261e;
   --vb-radius: 16px;
 
+  color: var(--vb-text);
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.vb-discovery {
   position: absolute;
   top: var(--vb-top, 72px);
   left: 12px;
@@ -39,23 +47,29 @@
   animation: vb-enter 0.22s ease-out;
 }
 
-.vb-discovery [hidden] {
+.vb-discovery [hidden],
+.vb-ui [hidden] {
   display: none !important;
 }
 
 .vb-discovery *,
 .vb-discovery *::before,
-.vb-discovery *::after {
+.vb-discovery *::after,
+.vb-ui *,
+.vb-ui *::before,
+.vb-ui *::after {
   box-sizing: border-box;
 }
 
-.vb-discovery button {
+.vb-discovery button,
+.vb-ui button {
   font: inherit;
   color: inherit;
   cursor: pointer;
 }
 
-.vb-discovery :focus-visible {
+.vb-discovery :focus-visible,
+.vb-ui :focus-visible {
   outline: 2px solid var(--vb-accent);
   outline-offset: 2px;
 }
@@ -741,6 +755,158 @@
   padding: 0 16px;
 }
 
+/* ---------- Quick Tools ---------- */
+
+.vb-quick-tools {
+  display: flex;
+  gap: 6px;
+  margin: -2px 0 14px;
+}
+
+.vb-tool {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--vb-border);
+  border-radius: 17px;
+  background: var(--vb-surface);
+  color: var(--vb-muted) !important;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.vb-tool svg {
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.vb-tool:hover {
+  background: var(--vb-hover);
+  color: var(--vb-text) !important;
+}
+
+.vb-tool-badge {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--vb-accent-soft);
+  color: #174ea6;
+  font-size: 11px;
+  line-height: 18px;
+}
+
+/* ---------- Secondary views (Search, Saved) ---------- */
+
+.vb-view {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 20px 16px;
+}
+
+.vb-view-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px -8px;
+}
+
+.vb-view-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.vb-search-form {
+  border-width: 1px;
+  border-color: var(--vb-border);
+  padding-right: 2px;
+}
+
+.vb-search-form:focus-within {
+  border-color: var(--vb-accent);
+}
+
+.vb-search-form .vb-search-input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.vb-search-submit svg {
+  fill: var(--vb-accent);
+}
+
+.vb-view-note {
+  margin: 6px 2px 8px;
+  font-size: 11px;
+  color: var(--vb-muted);
+}
+
+.vb-view-status {
+  margin: 8px 2px;
+  font-size: 13px;
+  color: var(--vb-muted);
+}
+
+.vb-view-status:empty {
+  display: none;
+}
+
+.vb-result-list {
+  list-style: none;
+  margin: 0 -8px;
+  padding: 0;
+}
+
+.vb-result {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  min-width: 0;
+  padding: 9px 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+}
+
+.vb-result:hover {
+  background: var(--vb-hover);
+}
+
+.vb-result-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.vb-result-sub {
+  font-size: 12px;
+  color: var(--vb-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vb-saved-item {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.vb-saved-item .vb-result {
+  flex: 1;
+}
+
 /* ---------- Motion ---------- */
 
 .vb-reveal:not([hidden]) {
@@ -793,8 +959,8 @@
     z-index: 1;
   }
 
-  /* With the destination card filling the bottom, dock the summary under the search bar. */
-  .vb-discovery.is-collapsed.card-open {
+  /* With a destination popup open, dock the summary at the top, clear of the popup and controls. */
+  .vb-discovery.is-collapsed.card-open:not(.overlay-planner) {
     top: var(--vb-top, 72px);
     bottom: auto;
     right: 12px;

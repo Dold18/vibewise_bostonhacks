@@ -15,18 +15,32 @@ import { createLocalSuggestionProvider, type GeolocationEnvironment, type Locati
 import { createMapLayerNotifier, type MapLayer, type MapLayerSelection } from './mapLayers';
 import { initialPreferences, preferencesReducer, type InitialPreferences } from './preferences';
 import { createStore, initialLayout, layoutReducer } from './store';
-import { createPanel } from './ui/panel';
+import { createPanel, type OverlayKind, type PanelDeps, type PanelView } from './ui/panel';
 
 export type { InitialPreferences } from './preferences';
 export { rankPlaces, evaluatePlace, type RankResult, type RankedPlace } from './filter';
 export type { LocationSuggestionProvider, LocationSuggestion } from './locations';
 export type { MapLayer, MapLayerSelection } from './mapLayers';
+export type { PlaceSearchProvider } from './placeSearch';
+export { combineProviders, createPlaceListProvider, type PlaceLike } from './locations';
+
+/** The bundled offline Boston list (MBTA stations, universities, landmarks) as a suggestion provider. */
+export const createBostonSuggestionProvider = () => createLocalSuggestionProvider(BOSTON_LOCATIONS);
+export { createSavedStore, savedToPlace, type SavedPlace, type SavedStore } from './saved';
+export type { OverlayKind, PanelView } from './ui/panel';
 
 export interface DiscoveryPanelOptions {
-  /** The map's destination card. While it's visible the panel collapses to a summary. */
+  /**
+   * Legacy: a destination card element whose `hidden` attribute is watched.
+   * Prefer calling `setOverlayOpen()` from the map.
+   */
   placeCard?: HTMLElement | null;
-  /** Elements the panel must sit below (default: the map's search form and chips, if present). */
+  /** Elements the panel must sit below (default: none, so the panel sits at the top). */
   topAnchors?: () => Element[];
+  /** Quick Tools (Search / Saved / Recenter), shown above the vibe box. */
+  search?: PanelDeps['search'];
+  saved?: PanelDeps['saved'];
+  onRecenter?: () => void;
   /** Swap in a live geocoder later; defaults to the bundled offline Boston list. */
   locationProvider?: LocationSuggestionProvider;
   geolocation?: GeolocationEnvironment;
@@ -43,6 +57,12 @@ export interface DiscoveryPanelOptions {
 }
 
 export interface DiscoveryPanelHandle {
+  /**
+   * A map overlay (destination popup or trip planner) opened or closed. The
+   * panel collapses to its summary while one is open and restores afterwards.
+   */
+  setOverlayOpen(kind: OverlayKind): void;
+  showView(view: PanelView): void;
   getPreferences(): InitialPreferences;
   subscribe(listener: (prefs: InitialPreferences) => void): () => void;
   destroy(): void;
@@ -51,8 +71,7 @@ export interface DiscoveryPanelHandle {
 const MOBILE_QUERY = '(max-width: 640px)';
 const GAP_PX = 12;
 
-const defaultAnchors = () =>
-  ['search-form'].map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
+const defaultAnchors = (): Element[] => [];
 
 export function mountDiscoveryPanel(container: HTMLElement, options: DiscoveryPanelOptions = {}): DiscoveryPanelHandle {
   const now = options.now ?? (() => new Date());
@@ -68,6 +87,9 @@ export function mountDiscoveryPanel(container: HTMLElement, options: DiscoveryPa
     geolocation: options.geolocation,
     now,
     mapLayers: options.mapLayers?.available,
+    search: options.search,
+    saved: options.saved,
+    onRecenter: options.onRecenter,
   });
   container.append(panel.root);
 
@@ -79,7 +101,7 @@ export function mountDiscoveryPanel(container: HTMLElement, options: DiscoveryPa
     const bottoms = anchors()
       .filter((el) => (el as HTMLElement).offsetParent !== null)
       .map((el) => el.getBoundingClientRect().bottom);
-    const top = bottoms.length ? Math.max(...bottoms) + GAP_PX : 72;
+    const top = bottoms.length ? Math.max(...bottoms) + GAP_PX : GAP_PX;
     panel.root.style.setProperty('--vb-top', `${Math.round(top)}px`);
   };
   syncTop();
@@ -110,6 +132,11 @@ export function mountDiscoveryPanel(container: HTMLElement, options: DiscoveryPa
   }
 
   const handle: DiscoveryPanelHandle = {
+    setOverlayOpen(kind) {
+      panel.setOverlayKind(kind);
+      layout.dispatch({ type: kind ? 'cardOpened' : 'cardClosed' });
+    },
+    showView: panel.showView,
     getPreferences: prefs.getState,
     subscribe: (listener) => prefs.subscribe((state) => listener(state)),
     destroy() {

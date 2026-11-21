@@ -10,32 +10,35 @@ to the map pins.
 
 ## Mounting
 
-`main.ts` (map-owned) mounts the panel as the primary left-hand interface. Callum's
-slide-out sidebar, its ☰ button and its Location type dropdown were removed.
+`main.ts` (map-owned) mounts the panel as the primary left-hand interface:
 
 ```ts
-mountDiscoveryPanel(document.body, {
-  placeCard: card,
-  mapLayers: {
-    available: CATEGORIES,                    // the map's own place categories
-    onChange: ({ layerIds, detail }) => showCategories(/* those categories */, detail),
-  },
+const discovery = mountDiscoveryPanel(document.body, {
+  mapLayers: { available: CATEGORIES, onChange },  // Activity → map categories
+  search: { provider, onResults, onSelect, onDismiss },
+  saved: { store, onSelect },
+  onRecenter,
 });
+discovery.setOverlayOpen('popup' | 'planner' | null);  // collapse/restore around map overlays
 ```
 
-The panel never touches map state directly. The map keeps doing all the
-loading (tile POIs, Overpass) and drawing. The panel reads the map's DOM in
-two ways:
-
-- It watches `#place-card`'s `hidden` attribute. While a destination card is
-  open, the panel collapses to a one-line summary, and it returns to its
-  previous state when the card closes.
-- It measures `#search-form` to sit just below it.
-
-Both hooks are optional. The search bar and cards are temporary and will be
-replaced later, so nothing here depends on them being present.
-
-On phones (≤640px) the panel is a bottom sheet that starts collapsed.
+- **Quick Tools.** A slim Search / Saved / Recenter row sits directly above
+  "Describe your vibe":
+  - **Search** and **Saved** open as views inside the panel. Back or Esc
+    returns to preferences.
+  - Search runs only on submit, through the injected `PlaceSearchProvider`
+    (today: Nominatim via `osm.ts`). Leaving search restores the Activity's
+    places on the map.
+  - Saved places stay in this browser only (`saved.ts`, localStorage). There
+    are no accounts or sync.
+- **Layout.**
+  - The panel sits at the top-left. There is no separate search bar any more.
+  - It collapses to a one-line summary while a destination popup or the trip
+    planner is open, and restores when they close.
+  - On phones it's a bottom sheet.
+- **What the panel touches.** It never changes map state directly. The map
+  subscribes with `subscribe()` / `getPreferences()`, for example for the
+  starting-point marker.
 
 ## What the map loads (`mapLayers.ts`)
 

@@ -1,0 +1,145 @@
+/* Trip planner overlay. Shares tokens/controls with the discovery panel via .vb-ui (discovery.css). */
+
+.vb-planner {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 392px;
+  max-height: calc(100% - 64px);
+  overflow-y: auto;
+  background: var(--vb-surface);
+  border-radius: var(--vb-radius);
+  box-shadow: var(--vb-shadow);
+  z-index: 3;
+  animation: vb-enter 0.2s ease-out;
+}
+
+.vb-planner[hidden] {
+  display: none !important;
+}
+
+.vb-planner-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 8px 4px 18px;
+}
+
+.vb-planner-icon {
+  fill: var(--vb-accent);
+  flex-shrink: 0;
+}
+
+.vb-planner-title {
+  flex: 1;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.vb-planner-fields {
+  position: relative;
+  padding: 6px 18px 0;
+}
+
+.vb-planner-fields .vb-field {
+  margin-bottom: 10px;
+  /* Leave room on the right for the swap button. */
+  padding-right: 44px;
+}
+
+.vb-planner-swap {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  translate: 0 -40%;
+  border: 1px solid var(--vb-border) !important;
+  background: var(--vb-surface) !important;
+}
+
+.vb-planner-actions {
+  padding: 2px 18px 10px;
+}
+
+.vb-planner-find {
+  width: 100%;
+}
+
+.vb-planner-find:disabled {
+  background: #e8eaed;
+  color: var(--vb-muted) !important;
+  cursor: not-allowed;
+}
+
+.vb-planner-results {
+  padding: 0 18px 16px;
+}
+
+.vb-planner-results:empty {
+  display: none;
+}
+
+.vb-planner-hint {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--vb-muted);
+}
+
+.vb-planner-notice {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f8f9fa;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--vb-muted);
+}
+
+.vb-planner-notice strong {
+  color: var(--vb-text);
+  font-weight: 500;
+}
+
+.vb-route-option {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--vb-border);
+}
+
+.vb-route-summary {
+  margin: 0 0 4px;
+  font-weight: 500;
+}
+
+.vb-route-legs {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--vb-muted);
+}
+
+.vb-planner-source {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--vb-muted);
+}
+
+@media (max-width: 640px) {
+  .vb-planner {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    width: auto;
+    max-height: 62%;
+  }
+
+  .vb-planner-header {
+    padding-left: 16px;
+  }
+
+  .vb-planner-fields,
+  .vb-planner-actions,
+  .vb-planner-results {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

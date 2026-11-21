@@ -98,7 +98,9 @@ export const TONIGHT_END_HOUR = 3;
 // State
 // ---------------------------------------------------------------------------
 
-export type OriginSource = 'local_suggestion' | 'device_geolocation' | 'live_geocoder';
+/** Where a location came from. Map and saved places carry their real OSM coordinates. */
+export type OriginSource = 'local_suggestion' | 'device_geolocation' | 'live_geocoder' | 'map_place' | 'saved_place';
+export const ORIGIN_SOURCES: readonly OriginSource[] = ['local_suggestion', 'device_geolocation', 'live_geocoder', 'map_place', 'saved_place'];
 
 export interface Origin {
   label: string;
@@ -408,8 +410,9 @@ export function normalizePreferences(input: unknown, now: Date = new Date()): In
 
   const origin = raw.origin as Partial<Origin> | null | undefined;
   if (origin && typeof origin === 'object' && typeof origin.label === 'string' && isValidGeoPoint(origin.location)) {
-    const source: OriginSource =
-      origin.source === 'device_geolocation' || origin.source === 'live_geocoder' ? origin.source : 'local_suggestion';
+    const source: OriginSource = ORIGIN_SOURCES.includes(origin.source as OriginSource)
+      ? (origin.source as OriginSource)
+      : 'local_suggestion';
     state = {
       ...state,
       origin: {
