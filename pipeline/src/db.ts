@@ -48,11 +48,18 @@ export async function upsertRows(
   }
 }
 
-export async function countNotSeen(client: SupabaseClient, runStart: string): Promise<number> {
-  const { count, error } = await client
-    .from('restaurants')
-    .select('id', { count: 'exact', head: true })
-    .or(`last_seen_at.lt.${runStart},last_seen_at.is.null`);
-  if (error) throw new Error(`countNotSeen failed: ${error.message}`);
-  return count ?? 0;
+/** place_ids of rows not refreshed by this run (spec 6.7): counted and listed, never deleted. */
+export async function listNotSeen(client: SupabaseClient, runStart: string): Promise<string[]> {
+  const out: string[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await client
+      .from('restaurants')
+      .select('place_id')
+      .or(`last_seen_at.lt.${runStart},last_seen_at.is.null`)
+      .order('id', { ascending: true })
+      .range(from, from + PAGE_SIZE - 1);
+    if (error) throw new Error(`listNotSeen failed at offset ${from}: ${error.message}`);
+    out.push(...(data as Array<{ place_id: string }>).map((r) => r.place_id));
+    if (data.length < PAGE_SIZE) return out;
+  }
 }

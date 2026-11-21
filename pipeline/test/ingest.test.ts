@@ -41,8 +41,8 @@ test('summarize counts inserted vs updated from existing keys and lists collapse
   });
   const lines = text.split('\n');
   assert.ok(lines.includes('OSM places: 3'));
-  assert.ok(lines.includes('Inserted: 2'));
-  assert.ok(lines.includes('Updated: 1'));
+  assert.ok(lines.includes('Inserted: 1')); // row 2 is a promote of an existing row, so it counts as updated
+  assert.ok(lines.includes('Updated: 2'));
   assert.ok(lines.includes('Promoted: 1'));
   assert.ok(lines.includes('Collapsed: 1 (lost: fsq-abc)'));
   assert.ok(lines.includes('Not seen this run: 4'));

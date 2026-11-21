@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { DEFAULT_FSQ_RELEASE } from './config.ts';
-import { applyRekey, connect, countNotSeen, fetchExisting, upsertRows } from './db.ts';
+import { applyRekey, connect, fetchExisting, listNotSeen, upsertRows } from './db.ts';
 import { loadFsqRows } from './foursquare.ts';
 import { mergePlaces } from './merge.ts';
 import { loadOsmElements } from './osm.ts';
@@ -58,9 +58,13 @@ export interface SummaryInput {
 }
 
 export function summarize(input: SummaryInput): string {
-  const inserted = input.rows.filter((r) => !input.existingKeys.has(`${r.source}:${r.source_id}`)).length;
   const collapsed = input.actions.flatMap((a) => (a.kind === 'collapse' ? [a.fsqId] : []));
   const promoted = input.actions.filter((a) => a.kind === 'promote').length;
+  // A promoted row already exists (re-keyed in place), so it is an update even though its new key is unseen.
+  const inserted = Math.max(
+    0,
+    input.rows.filter((r) => !input.existingKeys.has(`${r.source}:${r.source_id}`)).length - promoted,
+  );
   const collapsedText = collapsed.length > 0 ? `${collapsed.length} (lost: ${collapsed.join(', ')})` : '0';
   return [
     `OSM places: ${input.osm}`,
@@ -136,7 +140,10 @@ async function main(): Promise<void> {
   const actions = planRekey(existing, merged.rows);
   await applyRekey(client, actions);
   await upsertRows(client, merged.rows);
-  const notSeen = await countNotSeen(client, runStart);
+  const notSeenIds = await listNotSeen(client, runStart);
+  await fs.mkdir(CACHE_DIR, { recursive: true });
+  await fs.writeFile(path.join(CACHE_DIR, 'not-seen.json'), JSON.stringify(notSeenIds, null, 2));
+  const notSeen = notSeenIds.length;
   const existingKeys = new Set(existing.map((e) => `${e.source}:${e.source_id}`));
   console.log(summarize({ ...base, existingKeys, rows: merged.rows, actions, notSeen }));
 }
