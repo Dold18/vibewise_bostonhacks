@@ -25,6 +25,8 @@ const KEPT_TAGS = [
   'contact:website',
   'cuisine',
   'amenity',
+  'catalog:place_id',
+  'catalog:attribution',
   'tourism',
   'leisure',
 ] as const;

@@ -150,3 +150,8 @@
     padding-right: 16px;
   }
 }
+
+.vb-line-chip { display: inline-block; padding: 3px 8px; margin-top: 8px; background: #f1f3f4; color: #202124; border-radius: 4px; }
+.vb-route-legs li { padding: 6px 0; line-height: 1.5; }
+@media (min-width: 641px) and (max-width: 859px) { .vb-planner { left: 416px; width: calc(100% - 428px); } }
+@media (max-width: 640px) { .vb-planner { max-height: 52%; } }

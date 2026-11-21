@@ -32,9 +32,7 @@ import { createTimingField } from './timingField';
 import {
   createQuickTools,
   createSavedView,
-  createSearchView,
   type SavedViewConfig,
-  type SearchViewConfig,
 } from './panelViews';
 
 export interface PanelDeps {
@@ -46,7 +44,7 @@ export interface PanelDeps {
   /** The map's place categories, when the panel drives what the map loads. */
   mapLayers?: readonly MapLayer[];
   /** Quick Tools: each tool appears only if provided. */
-  search?: Omit<SearchViewConfig, 'onBack'>;
+  search?: { root: HTMLElement; focus(): void; onOpen(): void; onClose(): void; destroy(): void };
   saved?: Omit<SavedViewConfig, 'onBack'>;
   onRecenter?: () => void;
 }
@@ -163,11 +161,11 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   );
 
   // --- Quick Tools and secondary views ---------------------------------------
-  const searchView = search ? createSearchView({ ...search, onBack: () => showView('preferences', 'search') }) : null;
+  const searchView = search ?? null;
   const savedView = saved ? createSavedView({ ...saved, onBack: () => showView('preferences', 'saved') }) : null;
   const quickTools = createQuickTools({
-    search: searchView ? () => showView('search') : undefined,
-    saved: savedView ? () => showView('saved') : undefined,
+    search: searchView ? () => showView(view === 'search' ? 'preferences' : 'search', 'search') : undefined,
+    saved: savedView ? () => showView(view === 'saved' ? 'preferences' : 'saved', 'saved') : undefined,
     recenter: onRecenter,
   });
   const hasTools = !!(searchView || savedView || onRecenter);
@@ -184,7 +182,6 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     origin.root,
     budget.root,
     timing.root,
-    hasTools ? quickTools.root : null,
     vibeField,
     notes,
   );
@@ -217,29 +214,40 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
       minimizeBtn,
     ),
     stepSection,
-    searchView?.root ?? null,
-    savedView?.root ?? null,
     footer,
   );
 
+  const expansionId = uid('tools-content');
+  const expansionInner = h('div', { class: 'vb-tools-inner' }, searchView?.root ?? null, savedView?.root ?? null);
+  const expansion = h('div', { class: 'vb-tools-expansion', id: expansionId }, expansionInner);
+  expansion.inert = true;
+  const toolsWidget = h('section', { class: 'vb-widget vb-tools-widget', 'aria-label': 'Quick Tools' }, quickTools.root, expansion);
+  const preferencesWidget = h('section', { class: 'vb-widget vb-preferences-widget', 'aria-label': 'Discovery Preferences' }, summaryBtn, body);
+  const root = h('aside', { class: 'vb-discovery', 'aria-label': 'Plan your outing', 'data-panel-view': 'preferences' }, hasTools ? toolsWidget : null, preferencesWidget);
   let view: PanelView = 'preferences';
-  /** Switch views; returning to preferences puts focus back on the tool that opened the view. */
+  let collapseTimer: number | undefined;
+  quickTools.setExpanded('preferences', expansionId);
   function showView(next: PanelView, from?: 'search' | 'saved') {
-    if (next !== 'preferences' && !isExpanded(layout.getState())) layout.dispatch({ type: 'expand' });
+    const previous = view;
     view = next;
+    if (previous === 'search' && next !== 'search') searchView?.onClose();
     closePopups();
-    stepSection.hidden = next !== 'preferences';
-    footer.hidden = next !== 'preferences';
-    subtitle.hidden = next !== 'preferences';
-    if (searchView) searchView.root.hidden = next !== 'search';
-    if (savedView) savedView.root.hidden = next !== 'saved';
-    root.dataset.panelView = next; // data-panel-view (views themselves carry data-view)
-    if (next === 'search') searchView?.focus();
+    window.clearTimeout(collapseTimer);
+    if (searchView) { if (next !== 'preferences') searchView.root.hidden = next !== 'search'; searchView.root.inert = next !== 'search'; }
+    if (savedView) { if (next !== 'preferences') savedView.root.hidden = next !== 'saved'; savedView.root.inert = next !== 'saved'; }
+    if (next === 'preferences') collapseTimer = window.setTimeout(() => {
+      if (searchView) searchView.root.hidden = true;
+      if (savedView) savedView.root.hidden = true;
+    }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 300);
+    expansion.setAttribute('aria-hidden', String(next === 'preferences'));
+    expansion.classList.toggle('is-open', next !== 'preferences');
+    expansion.inert = next === 'preferences';
+    quickTools.setExpanded(next, expansionId);
+    root.dataset.panelView = next;
+    if (next === 'search') { searchView?.onOpen(); searchView?.focus(); }
     else if (next === 'saved') savedView?.focus();
-    else if (from) quickTools.focus(from);
+    else { const returnTool = from ?? (previous === 'preferences' ? undefined : previous); if (returnTool) quickTools.focus(returnTool); }
   }
-
-  const root = h('aside', { class: 'vb-discovery', 'aria-label': 'Plan your outing' }, summaryBtn, body);
 
   // --- Layout ---------------------------------------------------------------
   const fields = [activity, cuisines, activityTypes, origin, budget, timing];
@@ -333,6 +341,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
       if (next !== view) showView(next);
     },
     destroy() {
+      window.clearTimeout(collapseTimer);
       unsubPrefs();
       unsubLayout();
       fields.forEach((f) => f.destroy());

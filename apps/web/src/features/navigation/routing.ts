@@ -1,51 +1,49 @@
 /**
  * Navigation's routing boundary.
  *
- * The route planner talks only to a `RouteProvider`. Endpoints are resolved
+ * The trip router talks only to a `RouteProvider`. Endpoints are resolved
  * coordinates (`RouteEndpoint`); a catalog/OSM place id is carried when the
  * endpoint really is a place, and never invented otherwise.
  *
  * This is a navigation-specific request shape, not the shared `TransitRequest`
  * in docs/CONTRACTS.md: that contract requires `destinationPlaceId`, which
- * stations, landmarks and chosen locations don't have. Options reuse the
- * contract's `TransitOption` unchanged. If the shared contract should change
- * instead, that needs team approval (flagged, not done here).
+ * stations, landmarks and chosen locations don't have. If the shared contract
+ * should change instead, that needs team approval (flagged, not done here).
  *
- * Live routing is OFF this milestone: the app passes no provider, so the
- * planner shows "not connected". `createTransitRouteProvider` adapts the
- * transit workstream's `planTripLive` for when it's switched on; it imports
- * transit *types* only, so no transit code or data is bundled until then.
+ * The live provider calls the transit server (`POST /api/transit/route` via
+ * transitRoute.ts). The browser never imports the transit engine.
  */
-import type { LivePlanResult } from '../transit/ride';
-import type { TransitOption } from '../transit/types';
+import { fetchRoute, NO_ROUTE_TEXT, type FetchRouteResult, type LatLng, type RouteOk } from '../../transitRoute';
 
 export type GeoPoint = { lat: number; lng: number };
 
 export interface RouteEndpoint {
   label: string;
   location: GeoPoint;
-  /** e.g. 'discovery_origin', 'map_place', 'saved_place', 'local_suggestion', 'device_geolocation'. */
+  /** e.g. 'discovery_origin', 'map_place', 'saved_place', 'local_suggestion', 'device_geolocation', 'search_result'. */
   source: string;
   /** Real OSM/catalog id, only when the endpoint is a known place. */
   placeId?: string;
+  /** Only for a real browser geolocation fix. */
+  accuracyMeters?: number;
 }
 
 export interface RouteRequest {
   origin: RouteEndpoint;
   destination: RouteEndpoint;
-  /** ISO 8601; defaults to now in the provider. */
-  departureAt?: string;
 }
 
 export type RouteResult =
-  | { status: 'ok'; options: TransitOption[]; provider: string; retrievedAt: string; notes?: string[] }
-  | { status: 'no_route' | 'no_service' | 'error'; message: string; provider?: string; retrievedAt: string };
+  | { status: 'ok'; route: RouteOk; provider: string; retrievedAt: string }
+  | { status: 'no_route'; message: string; provider: string; retrievedAt: string }
+  | { status: 'no_service'; message: string; nextScheduledDepartureAt?: string; provider: string; retrievedAt: string }
+  | { status: 'error'; reason: 'unreachable' | 'invalid_response' | 'server'; message: string; provider: string; retrievedAt: string };
 
 export interface RouteProvider {
-  /** Shown with results, e.g. "MBTA V3 (subway, tiered)". */
+  /** Shown with results. */
   readonly name: string;
-  /** Underlying requests may not be cancellable; callers must ignore stale results. */
-  plan(request: RouteRequest): Promise<RouteResult>;
+  /** Rejects with an AbortError when `signal` aborts; callers drop those. */
+  plan(request: RouteRequest, signal: AbortSignal): Promise<RouteResult>;
 }
 
 export function isValidEndpoint(e: RouteEndpoint | null | undefined): e is RouteEndpoint {
@@ -65,51 +63,52 @@ export function isValidEndpoint(e: RouteEndpoint | null | undefined): e is Route
 export const realPlaceId = (id: string | undefined): string | undefined =>
   id && /^(node|way|relation)\/\d+$/.test(id) ? id : undefined;
 
+/** The place id worth carrying: an OSM element id, or our Supabase catalog's own id. Never synthetic. */
+export function placeIdFor(place: { id: string; tags?: Record<string, string | undefined> }): string | undefined {
+  return realPlaceId(place.id) ?? (place.tags?.['catalog:place_id'] === place.id ? place.id : undefined);
+}
+
+export const sameLocation = (a: GeoPoint | null | undefined, b: GeoPoint | null | undefined) =>
+  !!a && !!b && Math.abs(a.lat - b.lat) < 1e-6 && Math.abs(a.lng - b.lng) < 1e-6;
+
 // ---------------------------------------------------------------------------
-// Transit adapter (prepared; not wired into the app this milestone)
+// Live provider: the transit API server
 // ---------------------------------------------------------------------------
 
-export type PlanTripLive = (
-  origin: GeoPoint,
-  destination: GeoPoint,
-  opts?: { now?: Date },
-) => Promise<LivePlanResult>;
+export function toRouteResult(r: FetchRouteResult, provider: string, retrievedAt: string): RouteResult {
+  if (r.kind === 'error') return { status: 'error', reason: r.reason, message: r.message, provider, retrievedAt };
+  const res = r.result;
+  switch (res.status) {
+    case 'ok':
+      return { status: 'ok', route: res, provider, retrievedAt };
+    case 'no_tier1_route':
+      return {
+        status: 'no_route',
+        message: (res.reason && NO_ROUTE_TEXT[res.reason]) || 'No MBTA subway route connects these places.',
+        provider,
+        retrievedAt,
+      };
+    case 'no_service':
+      return {
+        status: 'no_service',
+        message: res.message,
+        ...(res.nextScheduledDepartureAt ? { nextScheduledDepartureAt: res.nextScheduledDepartureAt } : {}),
+        provider,
+        retrievedAt,
+      };
+    case 'error':
+      return { status: 'error', reason: 'server', message: res.message, provider, retrievedAt };
+  }
+}
 
-const NO_ROUTE_MESSAGES: Record<string, string> = {
-  same_stop: "Both points are nearest the same station, so there's no subway ride to plan.",
-  no_shared_pattern: 'No single subway line connects the stations nearest these points.',
-  no_pattern_in_travel_direction: 'No subway service runs in that direction between these stations.',
-  no_candidate_hub: 'No subway trip with at most one transfer connects these stations.',
-  no_valid_hub: 'No subway trip with at most one transfer connects these stations.',
-};
-
-export function createTransitRouteProvider(planTripLive: PlanTripLive, now: () => Date = () => new Date()): RouteProvider {
-  const name = 'MBTA V3 (subway, tiered)';
+export function createApiRouteProvider(fetchImpl?: typeof fetch, now: () => Date = () => new Date()): RouteProvider {
+  const name = 'MBTA V3 via the Vibenta transit API';
+  const point = (e: RouteEndpoint): LatLng => ({ lat: e.location.lat, lng: e.location.lng });
   return {
     name,
-    async plan({ origin, destination, departureAt }) {
-      const when = departureAt ? new Date(departureAt) : now();
-      let result: LivePlanResult;
-      try {
-        result = await planTripLive(origin.location, destination.location, { now: when });
-      } catch (e) {
-        return { status: 'error', message: `Routing failed: ${(e as Error).message}`, provider: name, retrievedAt: now().toISOString() };
-      }
-      const retrievedAt = now().toISOString();
-      switch (result.status) {
-        case 'ok': {
-          const notes: string[] = [];
-          if (result.lastTrainBack) notes.push(`Last scheduled train back: ${result.lastTrainBack.departsAt}`);
-          if (result.lastTrainBackNote) notes.push(result.lastTrainBackNote);
-          return { status: 'ok', options: [result.option], provider: name, retrievedAt, ...(notes.length ? { notes } : {}) };
-        }
-        case 'no_tier1_route':
-          return { status: 'no_route', message: NO_ROUTE_MESSAGES[result.reason] ?? 'No subway route found.', provider: name, retrievedAt };
-        case 'no_service':
-          return { status: 'no_service', message: result.message, provider: name, retrievedAt };
-        case 'error':
-          return { status: 'error', message: result.message, provider: name, retrievedAt };
-      }
+    async plan({ origin, destination }, signal) {
+      const r = await fetchRoute(point(origin), point(destination), signal, fetchImpl);
+      return toRouteResult(r, name, now().toISOString());
     },
   };
 }

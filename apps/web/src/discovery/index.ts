@@ -33,7 +33,7 @@ export type { PanelView } from './ui/panel';
 export interface DiscoveryPanelOptions {
   /** Elements the panel must sit below (default: none, so the panel sits at the top). */
   topAnchors?: () => Element[];
-  /** Quick Tools (Search / Saved / Recenter), shown above the vibe box. */
+  /** Quick Tools (Search / Saved / Recenter), in an independent widget above the complete preferences card. */
   search?: PanelDeps['search'];
   saved?: PanelDeps['saved'];
   onRecenter?: () => void;

@@ -15,21 +15,22 @@ to the map pins.
 ```ts
 const discovery = mountDiscoveryPanel(document.body, {
   mapLayers: { available: CATEGORIES, onChange },  // Activity → map categories
-  search: { provider, onResults, onSelect, onDismiss },
+  search: tripSearch, // injected root, focus, onOpen, onClose, destroy
   saved: { store, onSelect },
   onRecenter,
 });
 ```
 
-- **Quick Tools.** A slim Search / Saved / Recenter row sits directly above
-  "Describe your vibe":
-  - **Search** and **Saved** open as views inside the panel. Back or Esc
-    returns to preferences.
-  - Search runs only on submit, through the injected `PlaceSearchProvider`
-    (today: Nominatim via `osm.ts`). Leaving search restores the Activity's
-    places on the map.
-  - Saved places stay in this browser only (`saved.ts`, localStorage). There
-    are no accounts or sync.
+- **Quick Tools.** An independent rounded card above the entire Discovery
+  Preferences card, with Search / Saved / Recenter and an animated expansion.
+  Opening tools never hides or restructures preferences or the vibe textbox.
+  - Search receives its shared two-endpoint UI from navigation; the discovery
+    panel imports no navigation module. Destination Enter runs Nominatim only
+    on submit. Autocomplete picks preview the destination while Search stays
+    open; choosing a broader search result closes Search and opens its popup.
+  - Saved places stay in this browser (`saved.ts`, localStorage), with original
+    attribution. Selecting one opens the normal popup, then closes Saved.
+  - Recenter uses the stored discovery origin or Boston Common, without GPS.
 - **Layout.**
   - The panel sits at the top-left. There is no separate search bar any more.
   - It's independent of map overlays. Opening or closing a destination popup

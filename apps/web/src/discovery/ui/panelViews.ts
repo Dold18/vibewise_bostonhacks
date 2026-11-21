@@ -15,6 +15,7 @@ import { h, icon, ICONS, uid } from './dom';
 export interface QuickTools {
   root: HTMLElement;
   setSavedCount(n: number): void;
+  setExpanded(view: string, controls: string): void;
   focus(tool: 'search' | 'saved' | 'recenter'): void;
 }
 
@@ -38,6 +39,9 @@ export function createQuickTools(actions: {
   const root = h('div', { class: 'vb-quick-tools', role: 'group', 'aria-label': 'Quick tools' }, buttons.search, buttons.saved, buttons.recenter);
   return {
     root,
+    setExpanded(view, controls) {
+      for (const name of ['search', 'saved'] as const) { buttons[name].setAttribute('aria-expanded', String(view === name)); buttons[name].setAttribute('aria-controls', controls); }
+    },
     setSavedCount(n) {
       badge.textContent = String(n);
       badge.hidden = n === 0;
@@ -52,7 +56,7 @@ export function createQuickTools(actions: {
 // ---------------------------------------------------------------------------
 
 function viewHeader(title: string, titleId: string, onBack: () => void) {
-  const back = h('button', { type: 'button', class: 'vb-icon-btn vb-small', 'aria-label': 'Back to preferences' }, icon(ICONS.arrowBack, 20));
+  const back = h('button', { type: 'button', class: 'vb-icon-btn vb-small', 'aria-label': `Close ${title.toLowerCase()}` }, icon(ICONS.close, 20));
   back.addEventListener('click', onBack);
   return { el: h('div', { class: 'vb-view-header' }, back, h('h3', { class: 'vb-view-title', id: titleId }, title)), back };
 }

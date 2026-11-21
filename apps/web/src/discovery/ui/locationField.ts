@@ -30,11 +30,15 @@ export interface LocationFieldConfig {
   allowCurrentLocation?: boolean;
   onSelect(origin: Origin, meta: { outsideBoston?: boolean }): void;
   geolocation?: GeolocationEnvironment;
+  onClear?(): void;
+  onSubmitText?(query: string): void;
+  onEdit?(): void;
 }
 
 export interface LocationField {
   root: HTMLElement;
   setValue(origin: Origin | null): void;
+  open(): void;
   close(): void;
   destroy(): void;
 }
@@ -115,6 +119,12 @@ export function createLocationField(config: LocationFieldConfig): LocationField 
     warning,
   );
 
+  if (config.onClear) {
+    const clear = h('button', { type: 'button', class: 'vb-text-btn', 'aria-label': `Clear ${config.label ?? 'location'}` }, 'Clear');
+    clear.addEventListener('click', () => { config.onClear?.(); setEditing(true); });
+    root.append(clear);
+  }
+
   let editing = false;
   let suggestions: LocationSuggestion[] = [];
   let active = -1;
@@ -127,6 +137,7 @@ export function createLocationField(config: LocationFieldConfig): LocationField 
   function setEditing(next: boolean, { restoreFocus = false } = {}) {
     if (next === editing) return;
     editing = next;
+    ++searchSeq;
     trigger.hidden = next;
     editor.hidden = !next;
     root.classList.toggle('is-open', next);
@@ -196,12 +207,12 @@ export function createLocationField(config: LocationFieldConfig): LocationField 
   function search(query: string) {
     window.clearTimeout(searchTimer);
     searchAbort?.abort();
+    const seq = ++searchSeq;
     if (!query.trim()) {
       renderSuggestions([], '');
       return;
     }
     searchTimer = window.setTimeout(async () => {
-      const seq = ++searchSeq;
       const abort = (searchAbort = new AbortController());
       try {
         const items = await config.provider.search(query, { limit: 8, signal: abort.signal });
@@ -245,7 +256,7 @@ export function createLocationField(config: LocationFieldConfig): LocationField 
   trigger.addEventListener('click', () => setEditing(true));
   cancelBtn.addEventListener('click', () => setEditing(false, { restoreFocus: true }));
   geoBtn.addEventListener('click', useCurrentLocation);
-  input.addEventListener('input', () => search(input.value));
+  input.addEventListener('input', () => { config.onEdit?.(); search(input.value); });
   input.addEventListener('keydown', (e) => {
     switch (e.key) {
       case 'ArrowDown':
@@ -259,6 +270,7 @@ export function createLocationField(config: LocationFieldConfig): LocationField 
       case 'Enter':
         e.preventDefault();
         if (active >= 0) choose(active);
+        else if (config.onSubmitText) config.onSubmitText(input.value);
         else if (suggestions.length === 1) choose(0);
         break;
       case 'Escape':
@@ -281,6 +293,7 @@ export function createLocationField(config: LocationFieldConfig): LocationField 
       root.classList.toggle('has-value', !!origin);
       if (!origin) warning.hidden = true;
     },
+    open: () => { setEditing(true); input.focus(); },
     close: () => setEditing(false),
     destroy() {
       destroyed = true;

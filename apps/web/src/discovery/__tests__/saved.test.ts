@@ -45,6 +45,12 @@ describe('saved places', () => {
     expect(savedToPlace(s)).toMatchObject({ id: 'node/2', lat: 42.35, lon: -71.06, tags: { website: 'https://example.org' } });
   });
 
+  it('retains catalog identity and attribution for saved popups', () => {
+    const s = toSavedPlace(place('catalog-fixture', { 'catalog:place_id': 'catalog-fixture', 'catalog:attribution': 'Foursquare TEST FIXTURE' }));
+    expect(savedToPlace(s).tags['catalog:attribution']).toBe('Foursquare TEST FIXTURE');
+    expect(s.tags['catalog:place_id']).toBe('catalog-fixture');
+  });
+
   it('persists across store instances (reload)', () => {
     const storage = memoryStorage();
     createSavedStore(storage).toggle(place('way/3'));

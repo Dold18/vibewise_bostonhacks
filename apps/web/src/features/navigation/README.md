@@ -1,58 +1,28 @@
-# Navigation: trip planner
+# Search and Navigation
 
-The **Navigate** button on a destination popup opens "Plan a trip", an
-overlay on top of the map. It's a separate mode, not part of the discovery
-panel.
+Quick Tools Search and the Directions card share `ui/tripFields.ts` and the
+existing discovery autocomplete (offline Boston locations, map places, saved
+places). Typed text invalidates an endpoint until a coordinate-backed suggestion
+is selected. Destination Enter submits Nominatim explicitly, never on typing.
+Geolocation is requested only by the Use current location button.
 
-- `routing.ts`: the routing boundary.
-  - `RouteEndpoint` is a label plus resolved `{lat, lng}`, a `source`, and an
-    optional *real* `placeId`.
-  - `RouteRequest` and `RouteResult` are navigation-specific types.
-  - `RouteProvider` is the interface a routing service implements.
-  - `createTransitRouteProvider(planTripLive)` adapts the transit
-    workstream's engine.
-- `routePlanner.ts`: planner state.
-  - It's a pure reducer, separate from the discovery preferences: editing
-    "From" never changes the saved starting point.
-  - Routes are requested only on demand. Generation checks discard stale
-    results.
-- `ui/routePlannerView.ts`: the overlay.
-  - The From/To fields reuse the discovery location field, with suggestions
-    from map places, saved places and the offline Boston list.
-  - Swap and close buttons.
-  - A results area.
+`trip.ts` owns temporary endpoints and the request generation. Navigate prefers
+the temporary user-selected start, then discovery origin, then an empty field.
+Discovery preferences are never overwritten. Search alone never requests routes.
+Navigate / Get Directions enter navigation; valid endpoint changes then reroute.
+Requests abort on edits/exit and late results cannot replace a newer trip.
 
-## Why not the shared `TransitRequest`
-`docs/CONTRACTS.md` requires `TransitRequest.destinationPlaceId`. Planner
-endpoints can be stations, landmarks or "current location", which have no
-place id, and we don't invent one.
+`routing.ts` calls the existing Express API through `transitRoute.ts`; no browser
+import of the server transit engine. `itinerary.ts` labels scheduled rides,
+straight-line walking estimates, transfer waits and last-train availability.
+Unverified walking geometry is omitted from the map.
 
-`RouteResult` reuses the contract's `TransitOption` unchanged. If the shared
-contract should change instead (for example, making `destinationPlaceId`
-optional), that needs both owners' approval. It isn't done here.
+Map focus is centralized in `features/map/focusMode.ts`: Search preserves pitch;
+Navigation locks it to zero until exit. A basemap fill dims below routes.
 
-## Live routing is OFF (this milestone)
-`main.ts` passes `provider: null`, so:
-- the planner shows "MBTA routing isn't connected yet";
-- "Find MBTA routes" is disabled;
-- no MBTA request is ever made;
-- nothing is drawn on the map.
+The existing coordinate-based API differs from the proposed shared contract's
+required destinationPlaceId. No shared contract was changed. The proposed
+pedestrian-route: provenance prefix still needs the transit owner's agreement.
 
-`routing.ts` imports only transit **types**, so no transit code or data is
-bundled.
-
-To switch it on (with the transit teammate):
-
-```ts
-const { planTripLive } = await import('./features/transit/ride');
-provider: createTransitRouteProvider(planTripLive),
-```
-
-Before doing that, settle these with the transit owner:
-- **Rate limit:** without a key, MBTA allows 20 requests a minute in the
-  browser. Any key must stay server-side.
-- **Cancellation:** `planTripLive` can't be cancelled, so stale answers are
-  ignored instead.
-- **Drawing:** a route-overlay layer on the map is map-owned work.
-
-Tests: `__tests__/routing.test.ts` and `__tests__/routePlanner.test.ts`.
+Preview: `cd apps/web && npm run dev:all` → http://localhost:5173.
+Verification: `npm test`, `npx tsc --noEmit -p .`, `npm run build`.

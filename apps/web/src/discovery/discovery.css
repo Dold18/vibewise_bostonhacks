@@ -1006,3 +1006,25 @@
     opacity: 0;
   }
 }
+
+/* Quick Tools and the complete, original preferences form are independent cards. */
+.vb-discovery { background: transparent; box-shadow: none; gap: 12px; }
+.vb-widget { background: var(--vb-surface); border-radius: var(--vb-radius); box-shadow: var(--vb-shadow); min-height: 0; }
+.vb-preferences-widget { display: flex; flex-direction: column; min-height: 80px; flex: 1 1 auto; }
+.vb-tools-widget { flex: 0 0 auto; padding: 8px; }
+.vb-tools-widget .vb-quick-tools { margin: 0; border: 0; padding: 0; }
+.vb-tools-expansion { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 300ms ease, opacity 300ms ease; }
+.vb-tools-expansion.is-open { grid-template-rows: 1fr; opacity: 1; }
+.vb-tools-inner { min-height: 0; overflow: hidden; }
+.vb-tools-widget .vb-view { max-height: min(48vh, 470px); overflow-y: auto; padding: 8px; }
+.vb-tools-widget .vb-planner-fields { padding: 0; }
+.vb-tools-widget .vb-view-header { position: sticky; top: 0; background: var(--vb-surface); z-index: 2; }
+.vb-tools-widget .vb-view-header .vb-view-title { flex: 1; }
+@media (max-width: 640px) {
+  .vb-discovery { max-height: calc(100% - 64px); gap: 8px; }
+  .vb-preferences-widget { max-height: 55vh; }
+  .vb-tools-widget .vb-view { max-height: 34vh; }
+  body[data-focus="navigation"] .vb-discovery { max-height: 40vh; }
+  body[data-focus="navigation"] .vb-preferences-widget { max-height: 28vh; }
+}
+@media (prefers-reduced-motion: reduce) { .vb-tools-expansion { transition: none; } }
