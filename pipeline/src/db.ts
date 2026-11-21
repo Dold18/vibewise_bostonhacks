@@ -5,7 +5,9 @@ import type { ExistingRow, RekeyAction, RestaurantRow } from './types.ts';
 const PAGE_SIZE = 1000; // PostgREST max_rows
 
 export function connect(url: string, secretKey: string): SupabaseClient {
-  return createClient(url, secretKey, { auth: { persistSession: false } });
+  // Accept the REST URL the dashboard also shows (…/rest/v1/); supabase-js adds that path itself.
+  const projectUrl = url.trim().replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '');
+  return createClient(projectUrl, secretKey, { auth: { persistSession: false } });
 }
 
 export async function fetchExisting(client: SupabaseClient): Promise<ExistingRow[]> {

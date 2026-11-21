@@ -248,7 +248,7 @@ export function placesFromTiles(pois: TilePoi[], center: { lat: number; lon: num
     .map(({ distance: _distance, ...place }) => place);
 }
 
-function metersBetween(a: { lat: number; lon: number }, b: { lat: number; lon: number }): number {
+export function metersBetween(a: { lat: number; lon: number }, b: { lat: number; lon: number }): number {
   const rad = Math.PI / 180;
   const x = (b.lon - a.lon) * rad * Math.cos(((a.lat + b.lat) / 2) * rad);
   const y = (b.lat - a.lat) * rad;

@@ -14,6 +14,7 @@ import {
   type TilePoi,
 } from './osm';
 import { mountDiscoveryPanel } from './discovery';
+import { catalogPlacesNear, isCatalogCategory } from './catalog';
 
 const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
 const TILTED = { pitch: 60, bearing: -20 };
@@ -210,6 +211,9 @@ function openCard(place: Place, color: string, icon?: string) {
 
   if (details.childElementCount > 0) body.append(details);
   body.append(actions);
+  // Foursquare OS Places is Apache 2.0: keep its attribution with its data (OSM's is on the map).
+  const attribution = place.tags['catalog:attribution'];
+  if (attribution?.includes('Foursquare')) body.append(el('p', 'card-category', `Data: ${attribution}`));
   card.append(hero, body);
   card.hidden = false;
 }
@@ -388,10 +392,17 @@ async function showCategories(categories: Category[], detail: 'tiles' | 'full') 
   }
   if (detail === 'tiles') return;
 
-  // 2) Richer: one Overpass request for full OSM tags (hours, website, address...).
+  // 2) Richer: our Supabase catalog for food & drink, Overpass for everything
+  //    else (or for everything, when the catalog can't answer).
+  const fromCatalog = await catalogPlacesNear(categories.filter(isCatalogCategory), center, radius, perCategory);
+  if (abort.signal.aborted) return;
+  const overpassCategories = fromCatalog ? categories.filter((c) => !isCatalogCategory(c)) : categories;
   try {
-    const detailed = await placesNearAny(categories, center, radius, abort.signal, perCategory);
+    const fromOverpass = overpassCategories.length
+      ? await placesNearAny(overpassCategories, center, radius, abort.signal, perCategory)
+      : [];
     if (abort.signal.aborted) return;
+    const detailed = [...(fromCatalog ?? []), ...fromOverpass];
     if (detailed.length > 0) {
       haveDetailed = true;
       const byId = new Map(categories.map((cat) => [cat.id, cat]));
@@ -406,6 +417,14 @@ async function showCategories(categories: Category[], detail: 'tiles' | 'full') 
     }
   } catch {
     if (abort.signal.aborted) return;
+    if (fromCatalog?.length) {
+      // Overpass failed for the other categories; still show what the catalog has.
+      haveDetailed = true;
+      const byId = new Map(categories.map((cat) => [cat.id, cat]));
+      showPlaces(merge(fromCatalog.map(({ place, categoryId }) => [byId.get(categoryId)!, [place]])), lookFor, iconFor);
+      showToast('Showing food & drink only. The OSM details service is busy right now.');
+      return;
+    }
     if (quickCount === 0) {
       showToast(`Couldn't find ${label} here, and the OSM details service is busy. Try again shortly.`);
     } else {
