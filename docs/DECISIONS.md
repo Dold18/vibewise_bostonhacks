@@ -164,6 +164,35 @@
 - **Implications:** Workstream C owns "Vibe DNA"; it may replace the account module's taste calculation, and the theme reads only `VibeProfile.tags`. `mapStyle.ts` becomes `buildMapStyle(palette)`.
 - **Revisit trigger:** The Vibe Engine defines its own profile, or the team wants taste to affect ranking.
 
+### P-013 · Proposed · Place photos and free vibe sources
+- **Date / owner:** 2026-11-21 · Integration (pipeline), with Map (cards, uploads) and Vibe (scoring). **Flagged for team ratification.** Spec: `docs/superpowers/specs/2026-11-21-place-photos-vibe-sources-design.md`.
+- **Context:**
+  - Cards should show real photos of each place, Beli-style.
+  - The vibe score (P-010) needs free evidence of how a place feels.
+  - Free third-party review sources can't be stored or used for AI: Google, Yelp, Tripadvisor, Reddit. Foursquare tips and photos are paid.
+- **Decision:**
+  - **Card photos** from three kinds of source, in display rank order:
+    1. student uploads;
+    2. openly licensed photos linked from OSM/Wikidata;
+    3. photos from the place's own website;
+    4. Commons photos near the place that match its name;
+    5. Mapillary street photos.
+  - **Licensed photos** keep their license and credit. Allowed: CC0, Public Domain, CC BY, CC BY-SA.
+  - **Website photos** are hotlinked with the domain credited and a link back, never copied. A `hidden` flag removes any photo.
+  - **Vibe inputs** come from website text, Wikipedia/Wikivoyage, OSM tags, Boston entertainment and alcohol license data, and student reviews. They are collected offline by `npm run enrich:media` into `place_vibe_inputs`.
+  - New tables `place_photos`, `place_vibe_inputs` and `student_reviews`, plus a `place-photos` storage bucket (migration `20261121200000_create_place_media.sql`).
+- **Departure from AGENTS.md §5 / PRODUCT.md:** showing website photos without the owner's permission departs from the "images must be licensed/authorized" rule.
+  - The team must ratify this part.
+  - Until then the web app keeps a switch, `VITE_SHOW_WEBSITE_PHOTOS`, and can turn the display off without touching the pipeline.
+- **Why / alternatives:**
+  - Batch resolution keeps cards fast and rankings reproducible.
+  - Rejected: a live photo lookup per card (latency, live demo dependency) and third-party reviews (terms or cost).
+- **Implications:**
+  - `Place` gains `images?: PlaceImage[]`, which is a CONTRACTS.md change for Map and Integration.
+  - The vibe scoring step and card/upload UI are handed to Vibe (C) and Map (A).
+  - No Gemini calls in `enrich:media`.
+- **Revisit trigger:** a site owner objects (hide their photos), or the team rejects showing website photos (turn the switch off).
+
 ## How to add a decision
 ~~~md
 ### D-007 · Accepted/Proposed/Superseded · Short title

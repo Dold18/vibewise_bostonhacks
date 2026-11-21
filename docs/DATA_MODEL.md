@@ -160,6 +160,18 @@ The MBTA routing tables (`pattern_stops`, `line_shapes`, `transfer_hubs`) are de
 
 `vibe_scores`, `price_source`, `hours` and `cuisines` are not in `Place` v0.1 yet. Adding them is a contract change (CONTRACTS.md §7).
 
+## 4b. Place photos and vibe inputs (proposed, P-013)
+Migration `supabase/migrations/20261121200000_create_place_media.sql`. Full design: `docs/superpowers/specs/2026-11-21-place-photos-vibe-sources-design.md` §7.
+
+| Table / object | Purpose | Access |
+|---|---|---|
+| `student_reviews` | As in §4 above, plus `hidden` | Everyone reads non-hidden rows; signed-in users add and delete their own |
+| `place_photos` | Ranked card photos: uploads, licensed (OSM/Wikidata/Commons/Mapillary) and website photos, with license, credit and link-back | Everyone reads non-hidden rows; signed-in users add and delete their own uploads |
+| `place_vibe_inputs` | Collected text per place and source (`website`, `wiki`, `osm_tags`, `city_licenses`, `student_reviews`) for the vibe step | Pipeline only |
+| `restaurants.media_checked_at` | When `enrich:media` last processed the place | — |
+| `restaurant_points` view | `restaurants` with plain `lat`/`lng` for the pipeline | Service role only |
+| Storage bucket `place-photos` | Student uploads under `<user_id>/…`, JPEG/PNG/WebP, 5 MB max | Public read; users write their own folder |
+
 ## 5. Offline enrichment pipeline
 Extends brief §3.1. All steps run as a batch job, never from the browser.
 
