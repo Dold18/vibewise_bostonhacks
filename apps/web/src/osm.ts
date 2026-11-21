@@ -136,6 +136,59 @@ export async function placesNear(
   });
 }
 
+/** A place and the requested category it belongs to. */
+export interface CategorizedPlace {
+  place: Place;
+  categoryId: string;
+}
+
+/**
+ * `placesNear` for several categories in a single Overpass request: one
+ * query + `out` per category, so each category gets its own result limit.
+ * Elements matching more than one category are returned once, under the
+ * first requested category they match.
+ */
+export async function placesNearAny(
+  categories: Category[],
+  center: { lat: number; lon: number },
+  radiusMeters: number,
+  signal?: AbortSignal,
+  limitPerCategory = 60,
+): Promise<CategorizedPlace[]> {
+  if (categories.length === 0) return [];
+  const around = `(around:${Math.round(radiusMeters)},${center.lat},${center.lon})`;
+  const statements = categories.map((c) => `nwr${c.selector}["name"]${around};out center tags ${limitPerCategory};`);
+  const json = await overpass(`[out:json][timeout:25];${statements.join('')}`, signal);
+  const seen = new Set<string>();
+  return json.elements.flatMap((el) => {
+    const id = `${el.type}/${el.id}`;
+    const lat = el.lat ?? el.center?.lat;
+    const lon = el.lon ?? el.center?.lon;
+    if (seen.has(id) || lat === undefined || lon === undefined || !el.tags?.name) return [];
+    const tags = el.tags;
+    const category = categories.find((c) => matchesSelector(tags, c.selector));
+    if (!category) return [];
+    seen.add(id);
+    return [{ categoryId: category.id, place: { id, name: tags.name, lat, lon, category: describe(tags) ?? category.label, tags } }];
+  });
+}
+
+/**
+ * Evaluate a category selector such as `["amenity"="cafe"]` or
+ * `["tourism"~"^(museum|gallery)$"]` against an element's tags, to tell which
+ * category a combined Overpass result came from.
+ */
+export function matchesSelector(tags: Record<string, string>, selector: string): boolean {
+  const filters = [...selector.matchAll(/\["([^"]+)"(=|~)"([^"]*)"\]/g)];
+  return (
+    filters.length > 0 &&
+    filters.every(([, key, op, value]) => {
+      const v = tags[key];
+      return v !== undefined && (op === '=' ? v === value : new RegExp(value).test(v));
+    })
+  );
+}
+
 async function overpass(query: string, signal?: AbortSignal): Promise<{ elements: OverpassElement[] }> {
   let lastError: unknown;
   for (const endpoint of OVERPASS_MIRRORS) {
