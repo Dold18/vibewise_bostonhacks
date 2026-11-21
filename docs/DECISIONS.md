@@ -130,6 +130,11 @@
   - Preload the model before demos: the first download is large, and speed depends on WebGPU support.
 - **Revisit trigger:** Model download or speed hurts the demo on judging hardware.
 
+### D-008 · Accepted · Branch-agnostic stretches in Tier 1 matching
+- **Date / owner:** 2026-11-21 / transit workstream. Implemented and tested in commit 34f79f6. Refines the matching rule in D-007 (itself still proposed).
+- **Context:** Several route patterns can cover the identical stop stretch in the same direction (e.g. `Red-1-0` Ashmont, `Red-3-0` Braintree and `Red-R-0` between Harvard and Kendall/MIT). Picking one by sort order would label an Alewife-trunk trip with a branch it does not belong to.
+- **Decision:** When more than one rideable pattern covers the same stops between origin and destination (same `route_id` and `direction_id`), the engine returns the trip as `branchAgnostic: true` with every match in `equivalentPatterns`. The chosen `pattern` is only a representative, and the option id and leg `source` name the route and direction, not a branch. A stretch served by a single pattern stays pinned to that pattern.
+- **Implications:** `/schedules` and service-running lookups for branch-agnostic trips must key on `route_id` + `direction_id` (then filter trips to `equivalentPatterns`), never on the representative `pattern`. Pattern-specific trips are queried by their pattern.
 
 ## How to add a decision
 ~~~md
