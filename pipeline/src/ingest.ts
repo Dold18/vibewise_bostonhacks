@@ -13,7 +13,7 @@ import type { FsqPlace, OsmPlace, RekeyAction, RestaurantRow } from './types.ts'
 const CACHE_DIR = path.resolve(import.meta.dirname, '..', '.cache');
 
 export type SourcesChoice = 'osm' | 'fsq' | 'all';
-export interface CliArgs { dryRun: boolean; sources: SourcesChoice; refresh: boolean }
+export interface CliArgs { dryRun: boolean; sources: SourcesChoice; refresh: boolean; allowPartial?: true }
 
 export function parseCliArgs(argv: string[]): CliArgs {
   const { values } = parseArgs({
@@ -22,6 +22,7 @@ export function parseCliArgs(argv: string[]): CliArgs {
       'dry-run': { type: 'boolean', default: false },
       sources: { type: 'string', default: 'all' },
       refresh: { type: 'boolean', default: false },
+      'allow-partial': { type: 'boolean', default: false },
     },
     strict: true,
   });
@@ -29,7 +30,26 @@ export function parseCliArgs(argv: string[]): CliArgs {
   if (sources !== 'osm' && sources !== 'fsq' && sources !== 'all') {
     throw new Error(`invalid --sources '${sources}' (expected osm, fsq or all)`);
   }
-  return { dryRun: values['dry-run'], sources, refresh: values.refresh };
+  return {
+    dryRun: values['dry-run'], sources, refresh: values.refresh,
+    ...(values['allow-partial'] ? { allowPartial: true as const } : {}),
+  };
+}
+
+/**
+ * A non-dry run with only one source loaded would clear links and null out merged fields,
+ * so it must be opted into with --allow-partial. Returns a warning to print when the opt-in is used.
+ */
+export function assertWritable(input: { osmLoaded: boolean; fsqLoaded: boolean; allowPartial: boolean }): string | null {
+  if (input.osmLoaded && input.fsqLoaded) return null;
+  const missing = !input.osmLoaded && !input.fsqLoaded ? 'OSM and Foursquare' : input.osmLoaded ? 'Foursquare' : 'OSM';
+  const effect = !input.osmLoaded
+    ? 'existing OSM rows will not be refreshed and existing OSM-Foursquare links may be cleared, creating duplicate pins'
+    : 'every OSM-Foursquare link will be cleared and Foursquare-filled address/website/phone overwritten with null';
+  if (!input.allowPartial) {
+    throw new Error(`refusing to write: ${missing} data not loaded (${effect}); pass --allow-partial to write anyway`);
+  }
+  return `WARNING: --allow-partial with ${missing} not loaded: ${effect}`;
 }
 
 export interface SummaryInput {
@@ -72,19 +92,23 @@ async function main(): Promise<void> {
 
   let osm: OsmPlace[] = [];
   let fsq: FsqPlace[] = [];
+  let osmLoaded = false;
+  let fsqLoaded = false;
   if (args.sources !== 'fsq') {
     const { elements, fromCache } = await loadOsmElements({ refresh: args.refresh, cacheDir: CACHE_DIR, today });
     if (fromCache) console.log('OSM: using cached Overpass response');
     osm = parseOverpass(elements);
+    osmLoaded = elements.length > 0;
   }
   if (args.sources !== 'osm') {
-    const { rows } = await loadFsqRows({
+    const { rows, skipped } = await loadFsqRows({
       hfToken: process.env.HF_TOKEN,
       release: process.env.FSQ_RELEASE || DEFAULT_FSQ_RELEASE,
       refresh: args.refresh,
       cacheDir: CACHE_DIR,
     });
     fsq = parseFsqRows(rows);
+    fsqLoaded = !skipped;
   }
 
   const merged = mergePlaces(osm, fsq, { runStart, today });
@@ -103,6 +127,9 @@ async function main(): Promise<void> {
     console.log(summarize({ ...base, existingKeys: new Set(), rows: merged.rows, actions: [], notSeen: null }));
     return;
   }
+
+  const warning = assertWritable({ osmLoaded, fsqLoaded, allowPartial: args.allowPartial === true });
+  if (warning !== null) console.warn(warning);
 
   const client = connect(requireEnv('SUPABASE_URL'), requireEnv('SUPABASE_SECRET_KEY'));
   const existing = await fetchExisting(client);

@@ -1,3 +1,6 @@
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildFsqQuery, loadFsqRows } from '../src/foursquare.ts';
@@ -19,4 +22,15 @@ test('buildFsqQuery rejects a malformed release', () => {
 test('loadFsqRows without a token skips', async () => {
   const r = await loadFsqRows({ hfToken: undefined, release: '2026-01-12', refresh: false, cacheDir: '.cache-unused' });
   assert.deepEqual(r, { rows: [], skipped: true, fromCache: false });
+});
+
+test('loadFsqRows returns cached rows without a token', async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'fsq-cache-'));
+  try {
+    await fs.writeFile(path.join(dir, 'fsq-2026-01-12.json'), JSON.stringify([{ fsq_place_id: 'a' }]));
+    const r = await loadFsqRows({ hfToken: undefined, release: '2026-01-12', refresh: false, cacheDir: dir });
+    assert.deepEqual(r, { rows: [{ fsq_place_id: 'a' }], skipped: false, fromCache: true });
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
 });

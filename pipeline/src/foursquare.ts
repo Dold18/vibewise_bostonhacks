@@ -19,10 +19,6 @@ export function buildFsqQuery(release: string, bbox: Bbox): string {
 export async function loadFsqRows(
   opts: { hfToken: string | undefined; release: string; refresh: boolean; cacheDir: string },
 ): Promise<{ rows: Record<string, unknown>[]; skipped: boolean; fromCache: boolean }> {
-  if (!opts.hfToken) {
-    console.warn('HF_TOKEN not set: skipping Foursquare source');
-    return { rows: [], skipped: true, fromCache: false };
-  }
   const query = buildFsqQuery(opts.release, STUDY_BBOX);
   const file = path.join(opts.cacheDir, `fsq-${opts.release}.json`);
   if (!opts.refresh) {
@@ -32,6 +28,10 @@ export async function loadFsqRows(
     } catch {
       // no usable cache: fall through to a live query
     }
+  }
+  if (!opts.hfToken) {
+    console.warn('HF_TOKEN not set: skipping Foursquare source');
+    return { rows: [], skipped: true, fromCache: false };
   }
   const { DuckDBInstance } = await import('@duckdb/node-api');
   const instance = await DuckDBInstance.create(':memory:');

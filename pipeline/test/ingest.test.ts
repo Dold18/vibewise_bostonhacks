@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseCliArgs, summarize } from '../src/ingest.ts';
+import { assertWritable, parseCliArgs, summarize } from '../src/ingest.ts';
 import type { RekeyAction, RestaurantRow } from '../src/types.ts';
 
 function row(n: number, extra: Partial<RestaurantRow> = {}): RestaurantRow {
@@ -53,4 +53,18 @@ test('summarize counts inserted vs updated from existing keys and lists collapse
 
 test('summarize in dry run reports not seen as n/a', () => {
   assert.ok(summarize({ ...baseInput, notSeen: null }).split('\n').includes('Not seen this run: n/a (dry run)'));
+});
+
+test('parseCliArgs accepts --allow-partial', () => {
+  assert.equal(parseCliArgs(['--allow-partial']).allowPartial, true);
+  assert.equal(parseCliArgs([]).allowPartial, undefined);
+});
+
+test('assertWritable refuses single-source writes unless allowed', () => {
+  assert.equal(assertWritable({ osmLoaded: true, fsqLoaded: true, allowPartial: false }), null);
+  assert.throws(() => assertWritable({ osmLoaded: true, fsqLoaded: false, allowPartial: false }), /--allow-partial/);
+  assert.throws(() => assertWritable({ osmLoaded: false, fsqLoaded: true, allowPartial: false }), /--allow-partial/);
+  assert.throws(() => assertWritable({ osmLoaded: false, fsqLoaded: false, allowPartial: false }), /--allow-partial/);
+  assert.match(assertWritable({ osmLoaded: true, fsqLoaded: false, allowPartial: true })!, /link will be cleared/);
+  assert.match(assertWritable({ osmLoaded: false, fsqLoaded: true, allowPartial: true })!, /duplicate pins/);
 });
