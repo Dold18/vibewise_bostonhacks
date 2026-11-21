@@ -1,0 +1,2060 @@
+{
+  "schemaVersion": "1.0.0",
+  "catalogRef": "docs/scene/scene-effect-catalog.v1.json in PR #32",
+  "assetPackRef": "/scene-assets/v1/manifest.json",
+  "status": "planning_inventory_not_runtime_capabilities",
+  "totalProperties": 178,
+  "summaryByAssetStrategy": {
+    "palette_or_style_parameter": 58,
+    "procedural_layer_or_css": 49,
+    "generated_svg": 30,
+    "shader_or_custom_geometry": 10,
+    "pbr_or_custom_material": 4,
+    "procedural_reference_plus_pbr": 4,
+    "camera_parameter": 10,
+    "licensed_font_or_icon": 2,
+    "locked_logic": 11
+  },
+  "properties": [
+    {
+      "key": "global_grade.palette_family",
+      "group": "global_grade",
+      "property": "palette_family",
+      "variations": 12,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "global_grade.hue_bias",
+      "group": "global_grade",
+      "property": "hue_bias",
+      "variations": 11,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "global_grade.saturation",
+      "group": "global_grade",
+      "property": "saturation",
+      "variations": 6,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "global_grade.contrast_curve",
+      "group": "global_grade",
+      "property": "contrast_curve",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "global_grade.temperature",
+      "group": "global_grade",
+      "property": "temperature",
+      "variations": 6,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "global_grade.shadow_tint",
+      "group": "global_grade",
+      "property": "shadow_tint",
+      "variations": 6,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "global_grade.highlight_tint",
+      "group": "global_grade",
+      "property": "highlight_tint",
+      "variations": 7,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "global_grade.selective_color",
+      "group": "global_grade",
+      "property": "selective_color",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "global_grade.grade_finish",
+      "group": "global_grade",
+      "property": "grade_finish",
+      "variations": 6,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "sky_and_horizon.sky_mode",
+      "group": "sky_and_horizon",
+      "property": "sky_mode",
+      "variations": 9,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "sky_and_horizon.horizon_glow",
+      "group": "sky_and_horizon",
+      "property": "horizon_glow",
+      "variations": 6,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "sky_and_horizon.horizon_blend",
+      "group": "sky_and_horizon",
+      "property": "horizon_blend",
+      "variations": 3,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "sky_and_horizon.fog_horizon_color",
+      "group": "sky_and_horizon",
+      "property": "fog_horizon_color",
+      "variations": 6,
+      "implementationTier": "foundation",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "fog-gradient"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "sky_and_horizon.celestial_symbol",
+      "group": "sky_and_horizon",
+      "property": "celestial_symbol",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "sky_and_horizon.cloud_form",
+      "group": "sky_and_horizon",
+      "property": "cloud_form",
+      "variations": 6,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "cloud-puffs"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "sky_and_horizon.cloud_motion",
+      "group": "sky_and_horizon",
+      "property": "cloud_motion",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "sky_and_horizon.starfield",
+      "group": "sky_and_horizon",
+      "property": "starfield",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "stars-sparse",
+        "stars-dense"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "sky_and_horizon.sky_illustration",
+      "group": "sky_and_horizon",
+      "property": "sky_illustration",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "lighting_and_shadows.light_preset",
+      "group": "lighting_and_shadows",
+      "property": "light_preset",
+      "variations": 8,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "lighting_and_shadows.light_color",
+      "group": "lighting_and_shadows",
+      "property": "light_color",
+      "variations": 8,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "lighting_and_shadows.light_angle",
+      "group": "lighting_and_shadows",
+      "property": "light_angle",
+      "variations": 6,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "lighting_and_shadows.light_intensity",
+      "group": "lighting_and_shadows",
+      "property": "light_intensity",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "lighting_and_shadows.ambient_fill",
+      "group": "lighting_and_shadows",
+      "property": "ambient_fill",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "lighting_and_shadows.shadow_character",
+      "group": "lighting_and_shadows",
+      "property": "shadow_character",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "lighting_and_shadows.rim_light",
+      "group": "lighting_and_shadows",
+      "property": "rim_light",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "light-shaft"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "lighting_and_shadows.bounce_light",
+      "group": "lighting_and_shadows",
+      "property": "bounce_light",
+      "variations": 5,
+      "implementationTier": "custom",
+      "assetStrategy": "shader_or_custom_geometry",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Custom runtime shader/mesh/geometry, not a pre-rendered image per option."
+    },
+    {
+      "key": "lighting_and_shadows.local_spotlights",
+      "group": "lighting_and_shadows",
+      "property": "local_spotlights",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "glow-amber",
+        "glow-cyan"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "lighting_and_shadows.bloom",
+      "group": "lighting_and_shadows",
+      "property": "bloom",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "glow-amber",
+        "glow-cyan"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "lighting_and_shadows.shadow_projection",
+      "group": "lighting_and_shadows",
+      "property": "shadow_projection",
+      "variations": 3,
+      "implementationTier": "custom",
+      "assetStrategy": "shader_or_custom_geometry",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Custom runtime shader/mesh/geometry, not a pre-rendered image per option."
+    },
+    {
+      "key": "building_surfaces.wall_palette",
+      "group": "building_surfaces",
+      "property": "wall_palette",
+      "variations": 12,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "building_surfaces.roof_palette",
+      "group": "building_surfaces",
+      "property": "roof_palette",
+      "variations": 8,
+      "implementationTier": "foundation",
+      "assetStrategy": "pbr_or_custom_material",
+      "availableAssetIds": [],
+      "assetStatus": "partial_assets_only",
+      "note": "Stylized SVG reference exists in some cases; detailed material needs real source maps and geometry-aware rendering."
+    },
+    {
+      "key": "building_surfaces.wall_vertical_gradient",
+      "group": "building_surfaces",
+      "property": "wall_vertical_gradient",
+      "variations": 6,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "building_surfaces.height_color_treatment",
+      "group": "building_surfaces",
+      "property": "height_color_treatment",
+      "variations": 6,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "building_surfaces.building_outline",
+      "group": "building_surfaces",
+      "property": "building_outline",
+      "variations": 7,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "building_surfaces.corner_appearance",
+      "group": "building_surfaces",
+      "property": "corner_appearance",
+      "variations": 3,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "building_surfaces.building_opacity",
+      "group": "building_surfaces",
+      "property": "building_opacity",
+      "variations": 3,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "building_surfaces.building_highlight",
+      "group": "building_surfaces",
+      "property": "building_highlight",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "building_surfaces.facade_look",
+      "group": "building_surfaces",
+      "property": "facade_look",
+      "variations": 7,
+      "implementationTier": "custom",
+      "assetStrategy": "procedural_reference_plus_pbr",
+      "availableAssetIds": [
+        "concrete-pores",
+        "brick-illustrated",
+        "stone-blocks",
+        "facade-glass-grid"
+      ],
+      "assetStatus": "partial_assets_only",
+      "note": "Stylized SVG reference exists in some cases; detailed material needs real source maps and geometry-aware rendering."
+    },
+    {
+      "key": "building_surfaces.window_pattern",
+      "group": "building_surfaces",
+      "property": "window_pattern",
+      "variations": 6,
+      "implementationTier": "custom",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "windows-amber",
+        "windows-ice"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "building_surfaces.window_glow",
+      "group": "building_surfaces",
+      "property": "window_glow",
+      "variations": 6,
+      "implementationTier": "custom",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "windows-amber",
+        "windows-ice"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "building_surfaces.emissive_trim",
+      "group": "building_surfaces",
+      "property": "emissive_trim",
+      "variations": 5,
+      "implementationTier": "custom",
+      "assetStrategy": "shader_or_custom_geometry",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Custom runtime shader/mesh/geometry, not a pre-rendered image per option."
+    },
+    {
+      "key": "building_surfaces.roof_details",
+      "group": "building_surfaces",
+      "property": "roof_details",
+      "variations": 4,
+      "implementationTier": "custom",
+      "assetStrategy": "pbr_or_custom_material",
+      "availableAssetIds": [],
+      "assetStatus": "partial_assets_only",
+      "note": "Stylized SVG reference exists in some cases; detailed material needs real source maps and geometry-aware rendering."
+    },
+    {
+      "key": "building_surfaces.building_material_finish",
+      "group": "building_surfaces",
+      "property": "building_material_finish",
+      "variations": 5,
+      "implementationTier": "custom",
+      "assetStrategy": "pbr_or_custom_material",
+      "availableAssetIds": [],
+      "assetStatus": "partial_assets_only",
+      "note": "Stylized SVG reference exists in some cases; detailed material needs real source maps and geometry-aware rendering."
+    },
+    {
+      "key": "building_surfaces.silhouette_style",
+      "group": "building_surfaces",
+      "property": "silhouette_style",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "roads_and_ground.road_color",
+      "group": "roads_and_ground",
+      "property": "road_color",
+      "variations": 7,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "roads_and_ground.major_road_emphasis",
+      "group": "roads_and_ground",
+      "property": "major_road_emphasis",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "roads_and_ground.minor_road_emphasis",
+      "group": "roads_and_ground",
+      "property": "minor_road_emphasis",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "roads_and_ground.road_casing",
+      "group": "roads_and_ground",
+      "property": "road_casing",
+      "variations": 6,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "roads_and_ground.pedestrian_paths",
+      "group": "roads_and_ground",
+      "property": "pedestrian_paths",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "roads_and_ground.rail_treatment",
+      "group": "roads_and_ground",
+      "property": "rail_treatment",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "roads_and_ground.street_material",
+      "group": "roads_and_ground",
+      "property": "street_material",
+      "variations": 6,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_reference_plus_pbr",
+      "availableAssetIds": [
+        "concrete-pores",
+        "asphalt-grit",
+        "cobblestone-hatch"
+      ],
+      "assetStatus": "partial_assets_only",
+      "note": "Stylized SVG reference exists in some cases; detailed material needs real source maps and geometry-aware rendering."
+    },
+    {
+      "key": "roads_and_ground.wet_sheen",
+      "group": "roads_and_ground",
+      "property": "wet_sheen",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "wet-sheen"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "roads_and_ground.lane_detail",
+      "group": "roads_and_ground",
+      "property": "lane_detail",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "roads_and_ground.crosswalk_treatment",
+      "group": "roads_and_ground",
+      "property": "crosswalk_treatment",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "roads_and_ground.street_lights",
+      "group": "roads_and_ground",
+      "property": "street_lights",
+      "variations": 5,
+      "implementationTier": "custom",
+      "assetStrategy": "shader_or_custom_geometry",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Custom runtime shader/mesh/geometry, not a pre-rendered image per option."
+    },
+    {
+      "key": "roads_and_ground.road_reflections",
+      "group": "roads_and_ground",
+      "property": "road_reflections",
+      "variations": 4,
+      "implementationTier": "custom",
+      "assetStrategy": "procedural_reference_plus_pbr",
+      "availableAssetIds": [
+        "wet-sheen"
+      ],
+      "assetStatus": "partial_assets_only",
+      "note": "Stylized SVG reference exists in some cases; detailed material needs real source maps and geometry-aware rendering."
+    },
+    {
+      "key": "roads_and_ground.ground_shadows",
+      "group": "roads_and_ground",
+      "property": "ground_shadows",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "natural_land.park_palette",
+      "group": "natural_land",
+      "property": "park_palette",
+      "variations": 8,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "natural_land.wood_palette",
+      "group": "natural_land",
+      "property": "wood_palette",
+      "variations": 6,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "natural_land.sand_palette",
+      "group": "natural_land",
+      "property": "sand_palette",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "natural_land.foliage_density_illusion",
+      "group": "natural_land",
+      "property": "foliage_density_illusion",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "natural_land.leaf_particles",
+      "group": "natural_land",
+      "property": "leaf_particles",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "petals",
+        "autumn-leaves"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "natural_land.seasonal_visual",
+      "group": "natural_land",
+      "property": "seasonal_visual",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "natural_land.tree_symbol_style",
+      "group": "natural_land",
+      "property": "tree_symbol_style",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "natural_land.grass_texture",
+      "group": "natural_land",
+      "property": "grass_texture",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "natural_land.floral_accents",
+      "group": "natural_land",
+      "property": "floral_accents",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "natural_land.park_glow",
+      "group": "natural_land",
+      "property": "park_glow",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "natural_land.hillshade_style",
+      "group": "natural_land",
+      "property": "hillshade_style",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "topographic"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "water_and_coast.water_palette",
+      "group": "water_and_coast",
+      "property": "water_palette",
+      "variations": 8,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "water_and_coast.coastline_line",
+      "group": "water_and_coast",
+      "property": "coastline_line",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "water_and_coast.water_texture",
+      "group": "water_and_coast",
+      "property": "water_texture",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "water-ripples"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "water_and_coast.surface_motion",
+      "group": "water_and_coast",
+      "property": "surface_motion",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "water-ripples"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "water_and_coast.water_reflectivity",
+      "group": "water_and_coast",
+      "property": "water_reflectivity",
+      "variations": 5,
+      "implementationTier": "custom",
+      "assetStrategy": "procedural_reference_plus_pbr",
+      "availableAssetIds": [
+        "water-shimmer"
+      ],
+      "assetStatus": "partial_assets_only",
+      "note": "Stylized SVG reference exists in some cases; detailed material needs real source maps and geometry-aware rendering."
+    },
+    {
+      "key": "water_and_coast.harbor_mist",
+      "group": "water_and_coast",
+      "property": "harbor_mist",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "water_and_coast.shimmer_speed",
+      "group": "water_and_coast",
+      "property": "shimmer_speed",
+      "variations": 4,
+      "implementationTier": "custom",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "water-shimmer"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "water_and_coast.reflected_colors",
+      "group": "water_and_coast",
+      "property": "reflected_colors",
+      "variations": 5,
+      "implementationTier": "custom",
+      "assetStrategy": "pbr_or_custom_material",
+      "availableAssetIds": [],
+      "assetStatus": "partial_assets_only",
+      "note": "Stylized SVG reference exists in some cases; detailed material needs real source maps and geometry-aware rendering."
+    },
+    {
+      "key": "water_and_coast.water_depth_look",
+      "group": "water_and_coast",
+      "property": "water_depth_look",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "air_and_atmosphere.fog_volume",
+      "group": "air_and_atmosphere",
+      "property": "fog_volume",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "fog-gradient"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "air_and_atmosphere.fog_hue",
+      "group": "air_and_atmosphere",
+      "property": "fog_hue",
+      "variations": 7,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "air_and_atmosphere.haze_profile",
+      "group": "air_and_atmosphere",
+      "property": "haze_profile",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "air_and_atmosphere.vignette",
+      "group": "air_and_atmosphere",
+      "property": "vignette",
+      "variations": 6,
+      "implementationTier": "foundation",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "vignette"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "air_and_atmosphere.grain",
+      "group": "air_and_atmosphere",
+      "property": "grain",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "film-grain"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "air_and_atmosphere.dust_motes",
+      "group": "air_and_atmosphere",
+      "property": "dust_motes",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "air_and_atmosphere.rain",
+      "group": "air_and_atmosphere",
+      "property": "rain",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "rain-streaks"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "air_and_atmosphere.snow",
+      "group": "air_and_atmosphere",
+      "property": "snow",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "snow-particles"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "air_and_atmosphere.sparkle",
+      "group": "air_and_atmosphere",
+      "property": "sparkle",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "sparks"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "air_and_atmosphere.fireflies",
+      "group": "air_and_atmosphere",
+      "property": "fireflies",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "fireflies"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "air_and_atmosphere.petals",
+      "group": "air_and_atmosphere",
+      "property": "petals",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "petals"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "air_and_atmosphere.light_shafts",
+      "group": "air_and_atmosphere",
+      "property": "light_shafts",
+      "variations": 4,
+      "implementationTier": "custom",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "light-shaft"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "air_and_atmosphere.lens_glare",
+      "group": "air_and_atmosphere",
+      "property": "lens_glare",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "air_and_atmosphere.chromatic_aberration",
+      "group": "air_and_atmosphere",
+      "property": "chromatic_aberration",
+      "variations": 3,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "air_and_atmosphere.scanlines",
+      "group": "air_and_atmosphere",
+      "property": "scanlines",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "scanlines"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "air_and_atmosphere.distortion",
+      "group": "air_and_atmosphere",
+      "property": "distortion",
+      "variations": 4,
+      "implementationTier": "custom",
+      "assetStrategy": "shader_or_custom_geometry",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Custom runtime shader/mesh/geometry, not a pre-rendered image per option."
+    },
+    {
+      "key": "air_and_atmosphere.volumetric_weather",
+      "group": "air_and_atmosphere",
+      "property": "volumetric_weather",
+      "variations": 4,
+      "implementationTier": "custom",
+      "assetStrategy": "shader_or_custom_geometry",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Custom runtime shader/mesh/geometry, not a pre-rendered image per option."
+    },
+    {
+      "key": "cinematic_and_artistic.render_aesthetic",
+      "group": "cinematic_and_artistic",
+      "property": "render_aesthetic",
+      "variations": 11,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "scanlines"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "cinematic_and_artistic.paper_texture",
+      "group": "cinematic_and_artistic",
+      "property": "paper_texture",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "paper-grain"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "cinematic_and_artistic.ink_edges",
+      "group": "cinematic_and_artistic",
+      "property": "ink_edges",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "cinematic_and_artistic.halftone",
+      "group": "cinematic_and_artistic",
+      "property": "halftone",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "halftone"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "cinematic_and_artistic.color_banding",
+      "group": "cinematic_and_artistic",
+      "property": "color_banding",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "cinematic_and_artistic.analog_aging",
+      "group": "cinematic_and_artistic",
+      "property": "analog_aging",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "film-grain",
+        "film-scratches"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "cinematic_and_artistic.decorative_frame",
+      "group": "cinematic_and_artistic",
+      "property": "decorative_frame",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "cinematic_and_artistic.grid_overlay",
+      "group": "cinematic_and_artistic",
+      "property": "grid_overlay",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "blueprint-grid",
+        "neon-circuit"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "cinematic_and_artistic.parallax_decoration",
+      "group": "cinematic_and_artistic",
+      "property": "parallax_decoration",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "cinematic_and_artistic.illustration_props",
+      "group": "cinematic_and_artistic",
+      "property": "illustration_props",
+      "variations": 5,
+      "implementationTier": "custom",
+      "assetStrategy": "shader_or_custom_geometry",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Custom runtime shader/mesh/geometry, not a pre-rendered image per option."
+    },
+    {
+      "key": "camera_and_perspective.pitch_preference",
+      "group": "camera_and_perspective",
+      "property": "pitch_preference",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "camera_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_adapter",
+      "note": "Native camera control or renderer, not a saved render."
+    },
+    {
+      "key": "camera_and_perspective.bearing_preference",
+      "group": "camera_and_perspective",
+      "property": "bearing_preference",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "camera_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_adapter",
+      "note": "Native camera control or renderer, not a saved render."
+    },
+    {
+      "key": "camera_and_perspective.zoom_behavior",
+      "group": "camera_and_perspective",
+      "property": "zoom_behavior",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "camera_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_adapter",
+      "note": "Native camera control or renderer, not a saved render."
+    },
+    {
+      "key": "camera_and_perspective.framing",
+      "group": "camera_and_perspective",
+      "property": "framing",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "camera_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_adapter",
+      "note": "Native camera control or renderer, not a saved render."
+    },
+    {
+      "key": "camera_and_perspective.transition_easing",
+      "group": "camera_and_perspective",
+      "property": "transition_easing",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "camera_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_adapter",
+      "note": "Native camera control or renderer, not a saved render."
+    },
+    {
+      "key": "camera_and_perspective.reveal_motion",
+      "group": "camera_and_perspective",
+      "property": "reveal_motion",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "camera_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_adapter",
+      "note": "Native camera control or renderer, not a saved render."
+    },
+    {
+      "key": "camera_and_perspective.camera_idle_motion",
+      "group": "camera_and_perspective",
+      "property": "camera_idle_motion",
+      "variations": 3,
+      "implementationTier": "extension",
+      "assetStrategy": "camera_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_adapter",
+      "note": "Native camera control or renderer, not a saved render."
+    },
+    {
+      "key": "camera_and_perspective.parallax_strength",
+      "group": "camera_and_perspective",
+      "property": "parallax_strength",
+      "variations": 3,
+      "implementationTier": "extension",
+      "assetStrategy": "camera_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_adapter",
+      "note": "Native camera control or renderer, not a saved render."
+    },
+    {
+      "key": "camera_and_perspective.focus_depth",
+      "group": "camera_and_perspective",
+      "property": "focus_depth",
+      "variations": 3,
+      "implementationTier": "custom",
+      "assetStrategy": "camera_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_adapter",
+      "note": "Native camera control or renderer, not a saved render."
+    },
+    {
+      "key": "camera_and_perspective.camera_shake",
+      "group": "camera_and_perspective",
+      "property": "camera_shake",
+      "variations": 2,
+      "implementationTier": "extension",
+      "assetStrategy": "camera_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_adapter",
+      "note": "Native camera control or renderer, not a saved render."
+    },
+    {
+      "key": "marker_recommendations.pin_shape",
+      "group": "marker_recommendations",
+      "property": "pin_shape",
+      "variations": 6,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "marker_recommendations.pin_material",
+      "group": "marker_recommendations",
+      "property": "pin_material",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "marker_recommendations.pin_color_language",
+      "group": "marker_recommendations",
+      "property": "pin_color_language",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "marker_recommendations.match_scale",
+      "group": "marker_recommendations",
+      "property": "match_scale",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "marker_recommendations.low_match_treatment",
+      "group": "marker_recommendations",
+      "property": "low_match_treatment",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "marker_recommendations.pin_glow",
+      "group": "marker_recommendations",
+      "property": "pin_glow",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "generated_svg",
+      "availableAssetIds": [
+        "glow-amber",
+        "glow-cyan"
+      ],
+      "assetStatus": "assets_available_renderer_unwired",
+      "note": "Generated SVG resource exists, but UI/effect layer must load, composite and animate it."
+    },
+    {
+      "key": "marker_recommendations.pin_pulse",
+      "group": "marker_recommendations",
+      "property": "pin_pulse",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "marker_recommendations.selected_ring",
+      "group": "marker_recommendations",
+      "property": "selected_ring",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "marker_recommendations.pin_shadow",
+      "group": "marker_recommendations",
+      "property": "pin_shadow",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "marker_recommendations.cluster_mode",
+      "group": "marker_recommendations",
+      "property": "cluster_mode",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "marker_recommendations.rank_annotation",
+      "group": "marker_recommendations",
+      "property": "rank_annotation",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "marker_recommendations.arrival_emphasis",
+      "group": "marker_recommendations",
+      "property": "arrival_emphasis",
+      "variations": 3,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "marker_recommendations.visual_match_heat",
+      "group": "marker_recommendations",
+      "property": "visual_match_heat",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "neighborhood_and_places.local_hotspots",
+      "group": "neighborhood_and_places",
+      "property": "local_hotspots",
+      "variations": 5,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "neighborhood_and_places.matched_building_outline",
+      "group": "neighborhood_and_places",
+      "property": "matched_building_outline",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "neighborhood_and_places.relevant_neighborhood_tint",
+      "group": "neighborhood_and_places",
+      "property": "relevant_neighborhood_tint",
+      "variations": 3,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "neighborhood_and_places.local_light_pools",
+      "group": "neighborhood_and_places",
+      "property": "local_light_pools",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "neighborhood_and_places.place_scene_particles",
+      "group": "neighborhood_and_places",
+      "property": "place_scene_particles",
+      "variations": 4,
+      "implementationTier": "custom",
+      "assetStrategy": "shader_or_custom_geometry",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Custom runtime shader/mesh/geometry, not a pre-rendered image per option."
+    },
+    {
+      "key": "neighborhood_and_places.venue_material_highlight",
+      "group": "neighborhood_and_places",
+      "property": "venue_material_highlight",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "neighborhood_and_places.local_fog_clearing",
+      "group": "neighborhood_and_places",
+      "property": "local_fog_clearing",
+      "variations": 3,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "neighborhood_and_places.district_story_labels",
+      "group": "neighborhood_and_places",
+      "property": "district_story_labels",
+      "variations": 3,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "neighborhood_and_places.match_connections",
+      "group": "neighborhood_and_places",
+      "property": "match_connections",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "text_and_labels.label_color_system",
+      "group": "text_and_labels",
+      "property": "label_color_system",
+      "variations": 6,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "text_and_labels.label_font_personality",
+      "group": "text_and_labels",
+      "property": "label_font_personality",
+      "variations": 6,
+      "implementationTier": "extension",
+      "assetStrategy": "licensed_font_or_icon",
+      "availableAssetIds": [],
+      "assetStatus": "source_needed",
+      "note": "Needs font/icon package and compatibility checks, not a texture."
+    },
+    {
+      "key": "text_and_labels.label_weight",
+      "group": "text_and_labels",
+      "property": "label_weight",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "text_and_labels.label_letterspacing",
+      "group": "text_and_labels",
+      "property": "label_letterspacing",
+      "variations": 3,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "text_and_labels.label_caps",
+      "group": "text_and_labels",
+      "property": "label_caps",
+      "variations": 3,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "text_and_labels.label_halo",
+      "group": "text_and_labels",
+      "property": "label_halo",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "text_and_labels.label_density",
+      "group": "text_and_labels",
+      "property": "label_density",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "text_and_labels.road_label_priority",
+      "group": "text_and_labels",
+      "property": "road_label_priority",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "text_and_labels.cartographic_icon_style",
+      "group": "text_and_labels",
+      "property": "cartographic_icon_style",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "text_and_labels.place_name_flair",
+      "group": "text_and_labels",
+      "property": "place_name_flair",
+      "variations": 3,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "interface_and_cards.panel_surface",
+      "group": "interface_and_cards",
+      "property": "panel_surface",
+      "variations": 6,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "interface_and_cards.panel_translucency",
+      "group": "interface_and_cards",
+      "property": "panel_translucency",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "interface_and_cards.panel_border",
+      "group": "interface_and_cards",
+      "property": "panel_border",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "interface_and_cards.card_surface",
+      "group": "interface_and_cards",
+      "property": "card_surface",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "interface_and_cards.card_shadow",
+      "group": "interface_and_cards",
+      "property": "card_shadow",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "interface_and_cards.accent_token",
+      "group": "interface_and_cards",
+      "property": "accent_token",
+      "variations": 8,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "interface_and_cards.button_treatment",
+      "group": "interface_and_cards",
+      "property": "button_treatment",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "interface_and_cards.progress_meter",
+      "group": "interface_and_cards",
+      "property": "progress_meter",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "interface_and_cards.icon_treatment",
+      "group": "interface_and_cards",
+      "property": "icon_treatment",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "licensed_font_or_icon",
+      "availableAssetIds": [],
+      "assetStatus": "source_needed",
+      "note": "Needs font/icon package and compatibility checks, not a texture."
+    },
+    {
+      "key": "interface_and_cards.focus_frame",
+      "group": "interface_and_cards",
+      "property": "focus_frame",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "interface_and_cards.panel_background_blur",
+      "group": "interface_and_cards",
+      "property": "panel_background_blur",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "animation_and_morph.scene_transition",
+      "group": "animation_and_morph",
+      "property": "scene_transition",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "animation_and_morph.effect_stagger",
+      "group": "animation_and_morph",
+      "property": "effect_stagger",
+      "variations": 4,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "animation_and_morph.color_wave",
+      "group": "animation_and_morph",
+      "property": "color_wave",
+      "variations": 4,
+      "implementationTier": "custom",
+      "assetStrategy": "shader_or_custom_geometry",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Custom runtime shader/mesh/geometry, not a pre-rendered image per option."
+    },
+    {
+      "key": "animation_and_morph.ambient_pace",
+      "group": "animation_and_morph",
+      "property": "ambient_pace",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "animation_and_morph.particle_motion",
+      "group": "animation_and_morph",
+      "property": "particle_motion",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "animation_and_morph.pin_update_motion",
+      "group": "animation_and_morph",
+      "property": "pin_update_motion",
+      "variations": 4,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "animation_and_morph.light_shift_motion",
+      "group": "animation_and_morph",
+      "property": "light_shift_motion",
+      "variations": 3,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "animation_and_morph.sky_shift_motion",
+      "group": "animation_and_morph",
+      "property": "sky_shift_motion",
+      "variations": 3,
+      "implementationTier": "extension",
+      "assetStrategy": "procedural_layer_or_css",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Render code or style layer is the main dependency; assets optional."
+    },
+    {
+      "key": "animation_and_morph.building_reveal_motion",
+      "group": "animation_and_morph",
+      "property": "building_reveal_motion",
+      "variations": 4,
+      "implementationTier": "custom",
+      "assetStrategy": "shader_or_custom_geometry",
+      "availableAssetIds": [],
+      "assetStatus": "renderer_required",
+      "note": "Custom runtime shader/mesh/geometry, not a pre-rendered image per option."
+    },
+    {
+      "key": "animation_and_morph.motion_texture",
+      "group": "animation_and_morph",
+      "property": "motion_texture",
+      "variations": 5,
+      "implementationTier": "foundation",
+      "assetStrategy": "palette_or_style_parameter",
+      "availableAssetIds": [],
+      "assetStatus": "existing_foundation_mapping_needed",
+      "note": "Mostly numbers/colors/style properties, no independent render asset needed."
+    },
+    {
+      "key": "navigation_safe.route_treatment",
+      "group": "navigation_safe",
+      "property": "route_treatment",
+      "variations": 2,
+      "implementationTier": "foundation",
+      "assetStrategy": "locked_logic",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_guard",
+      "note": "Safety and navigation behavior; not an image resource."
+    },
+    {
+      "key": "navigation_safe.walk_line",
+      "group": "navigation_safe",
+      "property": "walk_line",
+      "variations": 2,
+      "implementationTier": "foundation",
+      "assetStrategy": "locked_logic",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_guard",
+      "note": "Safety and navigation behavior; not an image resource."
+    },
+    {
+      "key": "navigation_safe.station_icon",
+      "group": "navigation_safe",
+      "property": "station_icon",
+      "variations": 2,
+      "implementationTier": "foundation",
+      "assetStrategy": "locked_logic",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_guard",
+      "note": "Safety and navigation behavior; not an image resource."
+    },
+    {
+      "key": "navigation_safe.focus_marker_visibility",
+      "group": "navigation_safe",
+      "property": "focus_marker_visibility",
+      "variations": 2,
+      "implementationTier": "foundation",
+      "assetStrategy": "locked_logic",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_guard",
+      "note": "Safety and navigation behavior; not an image resource."
+    },
+    {
+      "key": "navigation_safe.map_label_safety",
+      "group": "navigation_safe",
+      "property": "map_label_safety",
+      "variations": 1,
+      "implementationTier": "foundation",
+      "assetStrategy": "locked_logic",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_guard",
+      "note": "Safety and navigation behavior; not an image resource."
+    },
+    {
+      "key": "navigation_safe.reduced_motion",
+      "group": "navigation_safe",
+      "property": "reduced_motion",
+      "variations": 2,
+      "implementationTier": "foundation",
+      "assetStrategy": "locked_logic",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_guard",
+      "note": "Safety and navigation behavior; not an image resource."
+    },
+    {
+      "key": "navigation_safe.attribution",
+      "group": "navigation_safe",
+      "property": "attribution",
+      "variations": 1,
+      "implementationTier": "foundation",
+      "assetStrategy": "locked_logic",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_guard",
+      "note": "Safety and navigation behavior; not an image resource."
+    },
+    {
+      "key": "navigation_safe.geographic_accuracy",
+      "group": "navigation_safe",
+      "property": "geographic_accuracy",
+      "variations": 1,
+      "implementationTier": "foundation",
+      "assetStrategy": "locked_logic",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_guard",
+      "note": "Safety and navigation behavior; not an image resource."
+    },
+    {
+      "key": "navigation_safe.route_layer_integrity",
+      "group": "navigation_safe",
+      "property": "route_layer_integrity",
+      "variations": 1,
+      "implementationTier": "foundation",
+      "assetStrategy": "locked_logic",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_guard",
+      "note": "Safety and navigation behavior; not an image resource."
+    },
+    {
+      "key": "navigation_safe.route_highlight_priority",
+      "group": "navigation_safe",
+      "property": "route_highlight_priority",
+      "variations": 1,
+      "implementationTier": "foundation",
+      "assetStrategy": "locked_logic",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_guard",
+      "note": "Safety and navigation behavior; not an image resource."
+    },
+    {
+      "key": "navigation_safe.selection_preservation",
+      "group": "navigation_safe",
+      "property": "selection_preservation",
+      "variations": 1,
+      "implementationTier": "foundation",
+      "assetStrategy": "locked_logic",
+      "availableAssetIds": [],
+      "assetStatus": "requires_runtime_guard",
+      "note": "Safety and navigation behavior; not an image resource."
+    }
+  ]
+}
