@@ -1,0 +1,3 @@
+-- Local development seed data. Runs on `supabase db reset` only; never on production.
+-- Demo places/reviews for the data model in docs/DATA_MODEL.md go here once the
+-- schema migration exists.
