@@ -1,7 +1,7 @@
 # Vibe Convergence Quiz — Interactive Discovery Design (Proposal v1)
 
 > **Status: proposed, not approved for implementation.** Product direction from project lead, November 21, 2026.  
-> **Related:** [PRODUCT](PRODUCT.md) · [CONTRACTS](CONTRACTS.md) · [ROADMAP](ROADMAP.md) · GitHub PR #23 (initial headless seven-axis prototype), PR #20 (updated form).  
+> **Related:** [VIBE_ENGINE_ARCHITECTURE.md](VIBE_ENGINE_ARCHITECTURE.md) — per-answer embeddings, place ranking, candidate-discriminative question selection, and early stopping · [PRODUCT](PRODUCT.md) · [CONTRACTS](CONTRACTS.md) · [ROADMAP](ROADMAP.md) · GitHub PR #23 (initial headless seven-axis prototype), PR #20 (updated form).  
 > **Goal:** Akinator-style progressive inference of a user's desired *real Boston experience* using artful questions spanning film, television, music, photography, objects, metaphor, social situations, and sensory details.
 
 ## The change in direction
