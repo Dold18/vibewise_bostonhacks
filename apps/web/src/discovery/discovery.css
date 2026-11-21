@@ -916,8 +916,8 @@
 .vb-vibe-screen {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 8px 0 16px;
+  gap: 15px;
+  padding: 4px 0 12px;
 }
 
 .vb-vibe-intro {
@@ -959,11 +959,22 @@
 }
 
 .vb-vibe-story {
-  min-height: 116px;
-  padding: 13px 14px;
+  min-height: 159px;
+  padding: 14px;
   line-height: 1.5;
   border-radius: 14px;
   transition: border-color .16s ease, box-shadow .16s ease;
+}
+
+.vb-vibe-story::placeholder {
+  color: #737d8b;
+  opacity: 1;
+  white-space: pre-wrap;
+}
+
+/* Placeholder guidance clears when focused, and returns if left empty. */
+.vb-vibe-story:focus::placeholder {
+  opacity: 0;
 }
 
 .vb-vibe-story:focus-visible {
@@ -1000,22 +1011,22 @@
 
 .vb-vibe-examples {
   display: grid;
-  gap: 10px;
+  gap: 7px;
 }
 
 .vb-example-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 7px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .vb-vibe-example {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-  min-height: 75px;
-  padding: 11px 9px;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 7px 10px;
   border: 1px solid var(--vb-border);
   border-radius: 13px;
   background: linear-gradient(160deg, var(--vb-surface), var(--vb-hover));
@@ -1043,7 +1054,7 @@
 
 .vb-vibe-upload-section {
   display: grid;
-  gap: 8px;
+  gap: 7px;
   padding-bottom: 4px;
 }
 
@@ -1063,18 +1074,18 @@
 
 .vb-upload-button {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 7px;
+  justify-content: flex-start;
+  gap: 11px;
   width: 100%;
-  min-height: 155px;
-  padding: 17px 15px;
+  min-height: 88px;
+  padding: 12px 13px;
   border: 1.5px dashed #9fafd1;
-  border-radius: 17px;
-  background: linear-gradient(145deg, rgba(126, 136, 210, .11), rgba(233, 216, 245, .12) 50%, rgba(130, 184, 224, .1));
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(126, 136, 210, .065), rgba(233, 216, 245, .065));
   color: var(--vb-text);
-  text-align: center;
+  text-align: left;
   transition: border-color .18s ease, background .18s ease, transform .18s ease;
 }
 
@@ -1099,31 +1110,41 @@
 }
 
 .vb-upload-button.has-images {
-  min-height: 112px;
+  min-height: 74px;
+}
+
+.vb-upload-copy {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 4px;
 }
 
 .vb-upload-label {
-  font-size: 13.5px;
+  font-size: 12.5px;
   font-weight: 650;
 }
 
 .vb-upload-detail {
-  max-width: 275px;
-  font-size: 11.5px;
-  line-height: 1.5;
+  font-size: 11px;
+  line-height: 1.4;
   color: var(--vb-muted);
 }
 
 .vb-upload-limit {
+  flex-shrink: 0;
+  max-width: 75px;
   font-size: 10px;
-  line-height: 1.4;
+  line-height: 1.3;
+  text-align: right;
   color: var(--vb-muted);
 }
 
 .vb-image-previews {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 9px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .vb-image-preview {
@@ -1205,16 +1226,19 @@
     font-size: 19px;
   }
   .vb-vibe-screen {
-    gap: 17px;
+    gap: 14px;
   }
   .vb-vibe-example {
-    min-height: 70px;
+    min-height: 32px;
+  }
+  .vb-upload-limit {
+    display: none;
   }
 }
 
 @media (max-width: 360px) {
-  .vb-example-grid {
-    grid-template-columns: 1fr 1fr;
+  .vb-upload-button {
+    padding: 10px;
   }
   .vb-footer-actions .vb-primary-btn {
     padding-inline: 11px;
