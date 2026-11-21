@@ -183,3 +183,23 @@ export function mergePlaces(
   }
   return { rows, matches, dropped: [...o.dropped, ...f.dropped], staleFsqDropped };
 }
+
+/** Throws if two rows share a `source:source_id` or a non-null fsq_place_id (the upsert/rekey would corrupt data). */
+export function assertUniqueKeys(rows: RestaurantRow[]): void {
+  const seenKeys = new Set<string>();
+  const seenFsq = new Set<string>();
+  const dupKeys: string[] = [];
+  const dupFsq: string[] = [];
+  for (const r of rows) {
+    const key = `${r.source}:${r.source_id}`;
+    if (seenKeys.has(key)) dupKeys.push(key); else seenKeys.add(key);
+    if (r.fsq_place_id !== null) {
+      if (seenFsq.has(r.fsq_place_id)) dupFsq.push(r.fsq_place_id); else seenFsq.add(r.fsq_place_id);
+    }
+  }
+  if (dupKeys.length === 0 && dupFsq.length === 0) return;
+  const parts: string[] = [];
+  if (dupKeys.length > 0) parts.push(`${dupKeys.length} duplicate source:source_id (first: ${dupKeys.slice(0, 5).join(', ')})`);
+  if (dupFsq.length > 0) parts.push(`${dupFsq.length} duplicate fsq_place_id (first: ${dupFsq.slice(0, 5).join(', ')})`);
+  throw new Error(`refusing to write: ${parts.join('; ')}`);
+}

@@ -4,7 +4,7 @@ import { parseArgs } from 'node:util';
 import { DEFAULT_FSQ_RELEASE } from './config.ts';
 import { applyRekey, connect, fetchExisting, listNotSeen, upsertRows } from './db.ts';
 import { loadFsqRows } from './foursquare.ts';
-import { mergePlaces } from './merge.ts';
+import { assertUniqueKeys, mergePlaces } from './merge.ts';
 import { loadOsmElements } from './osm.ts';
 import { planRekey } from './rekey.ts';
 import { parseFsqRows, parseOverpass } from './sources.ts';
@@ -132,6 +132,7 @@ async function main(): Promise<void> {
     return;
   }
 
+  assertUniqueKeys(merged.rows);
   const warning = assertWritable({ osmLoaded, fsqLoaded, allowPartial: args.allowPartial === true });
   if (warning !== null) console.warn(warning);
 

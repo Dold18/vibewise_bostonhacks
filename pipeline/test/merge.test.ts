@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { dedupeWithin, matchSources, mergePlaces } from '../src/merge.ts';
+import { assertUniqueKeys, dedupeWithin, matchSources, mergePlaces } from '../src/merge.ts';
 import { ATTRIBUTION_FSQ, ATTRIBUTION_MERGED, ATTRIBUTION_OSM } from '../src/config.ts';
+import { fsqRow, osmRow } from '../src/sources.ts';
 import type { FsqPlace, OsmPlace } from '../src/types.ts';
 
 const LAT = 42.35;
@@ -148,4 +149,15 @@ test('matchSources handles 3,000 x 3,000 points in under 2 s', () => {
   const elapsed = performance.now() - start;
   assert.equal(pairs.length, n);
   assert.ok(elapsed < 2000, `took ${elapsed} ms`);
+});
+
+test('assertUniqueKeys passes unique rows and names duplicates otherwise', () => {
+  const a = osmRow(osm('node/1', 'A', LAT, LNG), runStart);
+  const b = osmRow(osm('node/2', 'B', LAT, LNG), runStart);
+  const f = fsqRow(fsq('f1', 'C', LAT, LNG), runStart);
+  assertUniqueKeys([a, b, f]);
+  assert.throws(() => assertUniqueKeys([a, { ...a }]), /duplicate source:source_id .*osm:node.1/);
+  const linkedA = { ...a, fsq_place_id: 'f1' };
+  assert.throws(() => assertUniqueKeys([linkedA, f]), /duplicate fsq_place_id .*f1/);
+  assertUniqueKeys([a, b]); // multiple null fsq ids are fine
 });
