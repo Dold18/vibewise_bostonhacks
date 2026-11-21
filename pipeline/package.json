@@ -8,6 +8,7 @@
   },
   "scripts": {
     "ingest": "node --env-file-if-exists=.env src/ingest.ts",
+    "enrich:media": "node --env-file-if-exists=.env src/enrichMedia.ts",
     "enrich:price": "node --env-file-if-exists=.env src/enrichPrice.ts",
     "test": "node --test \"test/**/*.test.ts\"",
     "typecheck": "tsc --noEmit -p ."
