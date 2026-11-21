@@ -82,7 +82,80 @@ export interface NearestStop {
 export interface NoTier1Route {
   status: "no_tier1_route";
   // Caller falls back to Tier 0 (nearest stop + walk estimate). Nothing is drawn.
-  reason: "no_shared_pattern" | "no_pattern_in_travel_direction" | "same_stop";
+  reason:
+    | "no_shared_pattern" | "no_pattern_in_travel_direction" | "same_stop"
+    // Tier 2 (transfer) outcomes: the hub table has no candidate for this line pair (Red↔Blue, or
+    // same line / different branch), or every candidate failed pattern-level validation.
+    | "no_candidate_hub" | "no_valid_hub";
   originStop: Stop;
   destinationStop: Stop;
+}
+
+// ---- Live layer (/predictions + /schedules). Every time carries its kind; nothing is guessed. ----
+/** live_predicted = MBTA /predictions; scheduled = schedule-derived (/schedules); estimate = our own math. */
+export type TimeKind = "live_predicted" | "scheduled" | "estimate";
+
+export interface Departure {
+  stop_id: string;
+  route_id: string;
+  direction_id: number;
+  destination?: string; // route.direction_destinations[direction_id], e.g. "Alewife"
+  time: string; // ISO 8601 with offset (as served by MBTA)
+  kind: "live_predicted" | "scheduled";
+  source: string;
+}
+
+export interface DeparturesResult {
+  status: "ok" | "empty" | "error"; // empty = APIs answered with nothing; error = a request failed
+  kind: "live_predicted" | "scheduled" | null; // which source the departures came from
+  departures: Departure[];
+  message?: string;
+}
+
+export interface RideTiming {
+  kind: "scheduled"; // schedule-derived, not live
+  method: "route+direction" | "pattern"; // how /schedules was keyed (see D-008)
+  routeId: string;
+  directionId: number;
+  tripId: string;
+  patternId: string; // pattern of the trip actually used
+  departsAt: string; // scheduled departure from the origin stop (ISO)
+  arrivesAt: string; // scheduled arrival at the destination stop (ISO)
+  rideSeconds: number;
+  /** Equivalent patterns that actually have a trip departing within the service window. */
+  runningPatternIds: string[];
+  /** Patterns considered but with no trip in the window (e.g. "mornings only" at midday). */
+  idlePatternIds: string[];
+}
+
+/** Last scheduled train back from the destination stop (schedule-derived). */
+export interface LastTrainBack {
+  kind: "scheduled";
+  routeId: string;
+  directionId: number;
+  patternId: string;
+  tripId: string;
+  fromStopName: string; // the stop you are at (the destination)
+  toStopName: string; // where the train heads back to (origin for Tier 1, the hub for Tier 2's final leg)
+  departsAt: string; // ISO
+  catchable: boolean; // false if that train leaves before the rider arrives
+}
+
+export interface NoServiceResult {
+  status: "no_service";
+  failedLeg?: "A" | "B"; // Tier 2: which leg had no running service
+  // Tier 0 late-night signal: nothing is drawn; show nearest stop, "no service" and the walk estimate.
+  message: string;
+  originStop: NearestStop;
+  destinationStop: NearestStop;
+  nextScheduledDepartureAt?: string; // present only if /schedules shows a later trip
+  checkedAt: string;
+}
+
+export interface LiveErrorResult {
+  status: "error"; // data unavailable → cannot verify service → nothing is drawn
+  message: string;
+  originStop: NearestStop;
+  destinationStop: NearestStop;
+  checkedAt: string;
 }

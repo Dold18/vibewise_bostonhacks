@@ -14,9 +14,12 @@ const patterns = patternsJson as RoutePattern[];
 const shapes = shapesJson as PatternShape[];
 
 export const WALK_METERS_PER_MIN = 80;
+/** Subway routes in scope (matches the precompute script). */
+export const SUBWAY_ROUTE_IDS = ["Red", "Orange", "Blue", "Green-B", "Green-C", "Green-D", "Green-E"];
 const WALK_SOURCE = `approx: straight-line walk, ~${WALK_METERS_PER_MIN} m/min`;
 
 const stopById = new Map(stops.map((s) => [s.stop_id, s]));
+export const getStop = (id: string): Stop | undefined => stopById.get(id);
 const shapeById = new Map(shapes.map((s) => [s.shape_id, s]));
 const patternsByStop = new Map<string, RoutePattern[]>();
 for (const p of patterns) {
@@ -126,20 +129,80 @@ export function buildLeg(pattern: RoutePattern, stopA: Stop, stopB: Stop, dir: D
   };
 }
 
-export interface Tier1Plan {
-  option: TransitOptionDraft;
-  pattern: RoutePattern;
-  direction: Direction;
-  originStop: NearestStop;
-  destinationStop: NearestStop;
-  /** Every rideable pattern covering the identical stop stretch (same route + direction). */
-  equivalentPatterns: RoutePattern[];
+/** One validated ride between two stops on a single route pattern (or interchangeable patterns, D-008). */
+export interface LegSelection {
+  from: Stop;
+  to: Stop;
+  pattern: RoutePattern; // representative; for branchAgnostic legs key lookups on route_id + direction_id
+  equivalentPatterns: RoutePattern[]; // every rideable pattern covering the identical stop stretch
   /**
    * true when more than one pattern covers the stretch (e.g. Harvard→Kendall is on both the Red
    * Ashmont and Braintree patterns). `pattern` is then just a representative; the trip belongs to
    * no branch. Key later /schedules lookups on route_id + direction_id, not on `pattern`.
    */
   branchAgnostic: boolean;
+}
+
+/** Rider-facing line a route belongs to: Green-B/C/D/E are all "Green". Only for hub-table lookup; never for matching. */
+export const lineOf = (routeId: string): string => (routeId.startsWith("Green-") ? "Green" : routeId);
+
+export const patternsServing = (stop: Stop): RoutePattern[] => patternsByStop.get(stop.stop_id) ?? [];
+
+/**
+ * The single place that decides "can you ride from `from` to `to` without transferring?" Pattern
+ * level, forward direction only, with D-008 equivalence. Tier 1 uses it directly; Tier 2 uses it
+ * once per leg. `onlyLine` restricts to patterns of one rider-facing line.
+ */
+export function selectRideablePattern(
+  from: Stop, to: Stop, onlyLine?: string,
+): LegSelection | { reason: "no_shared_pattern" | "no_pattern_in_travel_direction" } {
+  const shared = sharedPatterns(from, to).filter((p) => !onlyLine || lineOf(p.route_id) === onlyLine);
+  if (!shared.length) return { reason: "no_shared_pattern" };
+
+  // Only patterns that actually run from→to qualify. Never guess direction.
+  const rideable = shared
+    .filter((p) => direction(p, from, to) === "forward" && p.shape_id && shapeById.has(p.shape_id))
+    .map((p) => ({ p, hops: seqOf(p, to)! - seqOf(p, from)! }))
+    // Prefer canonical patterns (typicality 1), then fewest stops; id only for determinism.
+    .sort((x, y) => x.p.typicality - y.p.typicality || x.hops - y.hops || x.p.route_pattern_id.localeCompare(y.p.route_pattern_id));
+  if (!rideable.length) return { reason: "no_pattern_in_travel_direction" };
+
+  const pattern = rideable[0].p;
+  // Patterns that traverse the exact same stops between the two stops (same route and direction)
+  // are interchangeable for this ride; if several exist, don't claim a branch.
+  const stretch = (p: RoutePattern) =>
+    p.stops.slice(seqOf(p, from)!, seqOf(p, to)! + 1).map((s) => s.stop_id).join(">");
+  const key = stretch(pattern);
+  const equivalentPatterns = rideable
+    .map((r) => r.p)
+    .filter((p) => p.route_id === pattern.route_id && p.direction_id === pattern.direction_id && stretch(p) === key);
+  return { from, to, pattern, equivalentPatterns, branchAgnostic: equivalentPatterns.length > 1 };
+}
+
+/** Transit leg for a validated selection (real GTFS shape, duration null until timed). */
+export function buildRideLeg(sel: LegSelection): TransitLegDraft {
+  const ride = buildLeg(sel.pattern, sel.from, sel.to, "forward");
+  if (sel.branchAgnostic) {
+    ride.source = `MBTA GTFS static shape, ${sel.pattern.route_id} direction ${sel.pattern.direction_id} ` +
+      `(branch-agnostic stretch; patterns ${sel.equivalentPatterns.map((p) => p.route_pattern_id).join(", ")})`;
+  }
+  return ride;
+}
+
+export const legId = (sel: LegSelection): string =>
+  sel.branchAgnostic ? `${sel.pattern.route_id}:dir${sel.pattern.direction_id}` : sel.pattern.route_pattern_id;
+
+export const walkLegBetween = walkLeg;
+
+export interface Tier1Plan {
+  option: TransitOptionDraft;
+  pattern: RoutePattern;
+  direction: Direction;
+  originStop: NearestStop;
+  destinationStop: NearestStop;
+  equivalentPatterns: RoutePattern[];
+  branchAgnostic: boolean;
+  leg: LegSelection; // the same data as a LegSelection, for the live layer
 }
 
 /** Same as planTripSkeleton, but also reports which pattern / direction / stops were chosen. */
@@ -150,46 +213,24 @@ export function planTier1(origin: GeoPoint, destination: GeoPoint): Tier1Plan | 
     ({ status: "no_tier1_route", reason, originStop: o.stop, destinationStop: d.stop });
 
   if (o.stop.stop_id === d.stop.stop_id) return none("same_stop");
-  const shared = sharedPatterns(o.stop, d.stop);
-  if (!shared.length) return none("no_shared_pattern");
+  const sel = selectRideablePattern(o.stop, d.stop);
+  if ("reason" in sel) return none(sel.reason);
 
-  // Only patterns that actually run origin→destination qualify. Never guess direction.
-  const rideable = shared
-    .filter((p) => direction(p, o.stop, d.stop) === "forward" && p.shape_id && shapeById.has(p.shape_id))
-    .map((p) => ({ p, hops: seqOf(p, d.stop)! - seqOf(p, o.stop)! }))
-    // Prefer canonical patterns (typicality 1), then fewest stops; id only for determinism.
-    .sort((x, y) => x.p.typicality - y.p.typicality || x.hops - y.hops || x.p.route_pattern_id.localeCompare(y.p.route_pattern_id));
-  if (!rideable.length) return none("no_pattern_in_travel_direction");
-
-  const pattern = rideable[0].p;
-  const ride = buildLeg(pattern, o.stop, d.stop, "forward");
-  // Patterns that traverse the exact same stops between origin and destination (same route and
-  // direction) are interchangeable for this trip; if several exist, don't claim a branch.
-  const stretch = (p: RoutePattern) =>
-    p.stops.slice(seqOf(p, o.stop)!, seqOf(p, d.stop)! + 1).map((s) => s.stop_id).join(">");
-  const key = stretch(pattern);
-  const equivalentPatterns = rideable
-    .map((r) => r.p)
-    .filter((p) => p.route_id === pattern.route_id && p.direction_id === pattern.direction_id && stretch(p) === key);
-  const branchAgnostic = equivalentPatterns.length > 1;
-  if (branchAgnostic) {
-    ride.source = `MBTA GTFS static shape, ${pattern.route_id} direction ${pattern.direction_id} ` +
-      `(branch-agnostic stretch; patterns ${equivalentPatterns.map((p) => p.route_pattern_id).join(", ")})`;
-  }
   const legs: TransitLegDraft[] = [
     walkLeg(origin, o.stop, `Walk to ${o.stop.name}`),
-    ride,
+    buildRideLeg(sel),
     walkLeg(d.stop, destination, `Walk from ${d.stop.name}`),
   ];
   const known = legs.every((l) => l.durationSec !== null);
   return {
     option: {
-      id: `tier1:${branchAgnostic ? `${pattern.route_id}:dir${pattern.direction_id}` : pattern.route_pattern_id}:${o.stop.stop_id}>${d.stop.stop_id}`,
+      id: `tier1:${legId(sel)}:${o.stop.stop_id}>${d.stop.stop_id}`,
       durationSec: known ? legs.reduce((s, l) => s + (l.durationSec ?? 0), 0) : null, // null until timing layer
       transfers: 0,
       legs,
     },
-    pattern, direction: "forward", originStop: o, destinationStop: d, equivalentPatterns, branchAgnostic,
+    pattern: sel.pattern, direction: "forward", originStop: o, destinationStop: d,
+    equivalentPatterns: sel.equivalentPatterns, branchAgnostic: sel.branchAgnostic, leg: sel,
   };
 }
 
