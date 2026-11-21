@@ -110,3 +110,21 @@ test('scrapeWebsite adds https:// to a bare domain', async () => {
   const r = await scrapeWebsite({ ...PLACE, website: 'example.com' }, http);
   assert.equal(r.input?.content, 'Hello there.');
 });
+
+test('images whose URL declares a size under 400 px, blurred placeholders, avatars and app icons are dropped', () => {
+  const html = [
+    '<img src="https://static.wixstatic.com/media/a.jpg/v1/fill/w_147,h_98,al_c,blur_2/a.jpg" width="900" height="600">',
+    '<img src="https://static.wixstatic.com/media/b.jpg/v1/fill/w_1200,h_800,al_c,blur_2/b.jpg" width="900" height="600">',
+    '<img src="https://a.mktgcdn.com/p/x/512x62.webp" width="900" height="600">',
+    '<img src="https://cdn.test/img.jpg?w=300&h=200" width="900" height="600">',
+    '<img src="https://secure.gravatar.com/avatar/abc?s=96" width="900" height="600">',
+    '<img src="https://x.test/brands/dun/android-chrome-512x512.png" width="900" height="600">',
+    '<img src="https://x.test/apple-touch-icon-1024.png" width="900" height="600">',
+    '<img src="https://images.getbento.com/a/room.jpg?w=1200&h=600" width="900" height="600">',
+    '<img src="https://storyblok.test/f/1440x602/hero.png" width="900" height="600">',
+  ].join('');
+  assert.deepEqual(extractPage(html, PAGE).images, [
+    'https://images.getbento.com/a/room.jpg?w=1200&h=600',
+    'https://storyblok.test/f/1440x602/hero.png',
+  ]);
+});

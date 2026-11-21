@@ -6,7 +6,21 @@ const MAX_TEXT = 4000;
 const MAX_PHOTOS = 5;
 const MIN_SIDE_PX = 400;
 const MIN_SRCSET_W = 800;
-const BAD_IMAGE = /logo|icon|favicon|sprite|placeholder/i;
+const BAD_IMAGE = /logo|icon|favicon|sprite|placeholder|avatar|android-chrome|apple-touch/i;
+const BAD_HOSTS = /(^|\.)gravatar\.com$/i;
+
+/** Width and height a CDN URL declares (w_147,h_98 · ?w=300&h=200 · /512x62.), or null if it declares none. */
+function declaredSize(u: URL): { w: number; h: number } | null {
+  const s = decodeURIComponent(u.pathname);
+  const cdn = /(?:^|[/,])w_(\d+),h_(\d+)(?:[,/]|$)/.exec(s);
+  if (cdn) return { w: Number(cdn[1]), h: Number(cdn[2]) };
+  const qw = u.searchParams.get('w') ?? u.searchParams.get('width');
+  const qh = u.searchParams.get('h') ?? u.searchParams.get('height');
+  if (qw && qh && /^\d+$/.test(qw) && /^\d+$/.test(qh)) return { w: Number(qw), h: Number(qh) };
+  const path = /(?:^|[/_-])(\d{2,5})x(\d{2,5})(?:[./_-]|$)/.exec(s);
+  if (path) return { w: Number(path[1]), h: Number(path[2]) };
+  return null;
+}
 const ABOUT_LINK = /about|our-story|story|who-we-are/i;
 const STRIPPED = ['script', 'style', 'nav', 'footer', 'header', 'noscript', 'template', 'svg'];
 
@@ -20,7 +34,10 @@ function resolveImage(raw: string | undefined, base: string): string | null {
   try { u = new URL(v, base); } catch { return null; }
   if (u.protocol !== 'https:') return null;
   const path = u.pathname.toLowerCase();
-  if (path.endsWith('.svg') || path.endsWith('.gif') || BAD_IMAGE.test(u.pathname)) return null;
+  if (path.endsWith('.svg') || path.endsWith('.gif') || BAD_IMAGE.test(u.pathname) || BAD_HOSTS.test(u.hostname)) return null;
+  if (/(?:^|[/,])blur_\d+/.test(u.pathname)) return null; // low-quality placeholder variant
+  const size = declaredSize(u);
+  if (size && Math.min(size.w, size.h) < MIN_SIDE_PX) return null;
   return u.toString();
 }
 
