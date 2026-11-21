@@ -54,16 +54,24 @@ let markers: Marker[] = [];
 let shadows: Marker[] = [];
 let selectedPin: HTMLElement | null = null;
 
+/*
+ * MapLibre positions every marker by rewriting its element's inline
+ * `transform` each frame. So the marker elements below carry no transform,
+ * transition or position styling of their own; all visuals and animation
+ * live on inner elements. (A transition on the marker itself makes it lag
+ * behind the map, which detached pins from their shadows.)
+ */
+
 /**
- * A pin's shadow: the pin silhouette lying on the ground plane, its tip at the
- * pin's base, cast away from the scene light. It fades in with camera pitch.
+ * A pin's ground shadow, laid flat on the map by MapLibre: a soft contact spot
+ * under the tip plus the pin's silhouette cast away from the scene light.
+ * Fades in with camera pitch (see syncDepth).
  */
 function shadowElement(): HTMLElement {
   const el = document.createElement('div');
   el.className = 'pin-shadow';
-  el.innerHTML = `<svg class="pin-shadow-shape" viewBox="0 0 28 40" preserveAspectRatio="none" aria-hidden="true">
-    <path d="${PIN_PATH}" />
-  </svg>`;
+  el.innerHTML = `<svg class="pin-shadow-cast" viewBox="0 0 28 40" aria-hidden="true"><path d="${PIN_PATH}" /></svg>
+    <span class="pin-shadow-contact"></span>`;
   return el;
 }
 
@@ -72,13 +80,16 @@ function pinElement(color: string, icon?: string): HTMLElement {
   el.type = 'button';
   el.className = 'pin';
   el.style.setProperty('--pin-color', color);
-  el.innerHTML = `<svg viewBox="0 0 28 40" width="28" height="40" aria-hidden="true">
+  const body = document.createElement('span');
+  body.className = 'pin-body';
+  body.innerHTML = `<svg viewBox="0 0 28 40" width="28" height="40" aria-hidden="true">
     <path d="${PIN_PATH}" fill="var(--pin-color)" stroke="rgba(0,0,0,.18)" />
   </svg>`;
   const glyph = document.createElement('span');
   glyph.className = 'pin-glyph';
   glyph.textContent = icon ?? '';
-  el.append(glyph);
+  body.append(glyph);
+  el.append(body);
   return el;
 }
 
