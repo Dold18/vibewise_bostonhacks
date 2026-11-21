@@ -1,0 +1,4042 @@
+{
+  "version": "2.0.0",
+  "assetCount": 192,
+  "atlasCount": 12,
+  "origin": "Original generated illustration; no third-party material textures",
+  "technical": "12 SVG atlases; 4x4 tile grid; 256x256 viewBox cell; browser crop via background-position or UVs",
+  "limitations": "Visual stylization only; not photogrammetry, normal maps, physically-based shading, or live Boston architectural facts. No renderers are enabled by these files.",
+  "assets": [
+    {
+      "id": "brick_masonry.running_bond.warm",
+      "family": "brick_masonry",
+      "style": "running_bond",
+      "palette": "warm",
+      "atlas": "brick_masonry.svg",
+      "rect": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "brick_masonry.running_bond.cool",
+      "family": "brick_masonry",
+      "style": "running_bond",
+      "palette": "cool",
+      "atlas": "brick_masonry.svg",
+      "rect": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "brick_masonry.running_bond.nocturnal",
+      "family": "brick_masonry",
+      "style": "running_bond",
+      "palette": "nocturnal",
+      "atlas": "brick_masonry.svg",
+      "rect": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "brick_masonry.running_bond.pastel",
+      "family": "brick_masonry",
+      "style": "running_bond",
+      "palette": "pastel",
+      "atlas": "brick_masonry.svg",
+      "rect": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "brick_masonry.stacked_bond.warm",
+      "family": "brick_masonry",
+      "style": "stacked_bond",
+      "palette": "warm",
+      "atlas": "brick_masonry.svg",
+      "rect": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "brick_masonry.stacked_bond.cool",
+      "family": "brick_masonry",
+      "style": "stacked_bond",
+      "palette": "cool",
+      "atlas": "brick_masonry.svg",
+      "rect": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "brick_masonry.stacked_bond.nocturnal",
+      "family": "brick_masonry",
+      "style": "stacked_bond",
+      "palette": "nocturnal",
+      "atlas": "brick_masonry.svg",
+      "rect": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "brick_masonry.stacked_bond.pastel",
+      "family": "brick_masonry",
+      "style": "stacked_bond",
+      "palette": "pastel",
+      "atlas": "brick_masonry.svg",
+      "rect": [
+        768,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "brick_masonry.slim_bricks.warm",
+      "family": "brick_masonry",
+      "style": "slim_bricks",
+      "palette": "warm",
+      "atlas": "brick_masonry.svg",
+      "rect": [
+        0,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "brick_masonry.slim_bricks.cool",
+      "family": "brick_masonry",
+      "style": "slim_bricks",
+      "palette": "cool",
+      "atlas": "brick_masonry.svg",
+      "rect": [
+        256,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "brick_masonry.slim_bricks.nocturnal",
+      "family": "brick_masonry",
+      "style": "slim_bricks",
+      "palette": "nocturnal",
+      "atlas": "brick_masonry.svg",
+      "rect": [
+        512,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "brick_masonry.slim_bricks.pastel",
+      "family": "brick_masonry",
+      "style": "slim_bricks",
+      "palette": "pastel",
+      "atlas": "brick_masonry.svg",
+      "rect": [
+        768,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "brick_masonry.cinder_blocks.warm",
+      "family": "brick_masonry",
+      "style": "cinder_blocks",
+      "palette": "warm",
+      "atlas": "brick_masonry.svg",
+      "rect": [
+        0,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "brick_masonry.cinder_blocks.cool",
+      "family": "brick_masonry",
+      "style": "cinder_blocks",
+      "palette": "cool",
+      "atlas": "brick_masonry.svg",
+      "rect": [
+        256,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "brick_masonry.cinder_blocks.nocturnal",
+      "family": "brick_masonry",
+      "style": "cinder_blocks",
+      "palette": "nocturnal",
+      "atlas": "brick_masonry.svg",
+      "rect": [
+        512,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "brick_masonry.cinder_blocks.pastel",
+      "family": "brick_masonry",
+      "style": "cinder_blocks",
+      "palette": "pastel",
+      "atlas": "brick_masonry.svg",
+      "rect": [
+        768,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "stone_concrete.granite_blocks.warm",
+      "family": "stone_concrete",
+      "style": "granite_blocks",
+      "palette": "warm",
+      "atlas": "stone_concrete.svg",
+      "rect": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "stone_concrete.granite_blocks.cool",
+      "family": "stone_concrete",
+      "style": "granite_blocks",
+      "palette": "cool",
+      "atlas": "stone_concrete.svg",
+      "rect": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "stone_concrete.granite_blocks.nocturnal",
+      "family": "stone_concrete",
+      "style": "granite_blocks",
+      "palette": "nocturnal",
+      "atlas": "stone_concrete.svg",
+      "rect": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "stone_concrete.granite_blocks.pastel",
+      "family": "stone_concrete",
+      "style": "granite_blocks",
+      "palette": "pastel",
+      "atlas": "stone_concrete.svg",
+      "rect": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "stone_concrete.limestone_slabs.warm",
+      "family": "stone_concrete",
+      "style": "limestone_slabs",
+      "palette": "warm",
+      "atlas": "stone_concrete.svg",
+      "rect": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "stone_concrete.limestone_slabs.cool",
+      "family": "stone_concrete",
+      "style": "limestone_slabs",
+      "palette": "cool",
+      "atlas": "stone_concrete.svg",
+      "rect": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "stone_concrete.limestone_slabs.nocturnal",
+      "family": "stone_concrete",
+      "style": "limestone_slabs",
+      "palette": "nocturnal",
+      "atlas": "stone_concrete.svg",
+      "rect": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "stone_concrete.limestone_slabs.pastel",
+      "family": "stone_concrete",
+      "style": "limestone_slabs",
+      "palette": "pastel",
+      "atlas": "stone_concrete.svg",
+      "rect": [
+        768,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "stone_concrete.pitted_concrete.warm",
+      "family": "stone_concrete",
+      "style": "pitted_concrete",
+      "palette": "warm",
+      "atlas": "stone_concrete.svg",
+      "rect": [
+        0,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "stone_concrete.pitted_concrete.cool",
+      "family": "stone_concrete",
+      "style": "pitted_concrete",
+      "palette": "cool",
+      "atlas": "stone_concrete.svg",
+      "rect": [
+        256,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "stone_concrete.pitted_concrete.nocturnal",
+      "family": "stone_concrete",
+      "style": "pitted_concrete",
+      "palette": "nocturnal",
+      "atlas": "stone_concrete.svg",
+      "rect": [
+        512,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "stone_concrete.pitted_concrete.pastel",
+      "family": "stone_concrete",
+      "style": "pitted_concrete",
+      "palette": "pastel",
+      "atlas": "stone_concrete.svg",
+      "rect": [
+        768,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "stone_concrete.stucco_plaster.warm",
+      "family": "stone_concrete",
+      "style": "stucco_plaster",
+      "palette": "warm",
+      "atlas": "stone_concrete.svg",
+      "rect": [
+        0,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "stone_concrete.stucco_plaster.cool",
+      "family": "stone_concrete",
+      "style": "stucco_plaster",
+      "palette": "cool",
+      "atlas": "stone_concrete.svg",
+      "rect": [
+        256,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "stone_concrete.stucco_plaster.nocturnal",
+      "family": "stone_concrete",
+      "style": "stucco_plaster",
+      "palette": "nocturnal",
+      "atlas": "stone_concrete.svg",
+      "rect": [
+        512,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "stone_concrete.stucco_plaster.pastel",
+      "family": "stone_concrete",
+      "style": "stucco_plaster",
+      "palette": "pastel",
+      "atlas": "stone_concrete.svg",
+      "rect": [
+        768,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "pavement.smooth_asphalt.warm",
+      "family": "pavement",
+      "style": "smooth_asphalt",
+      "palette": "warm",
+      "atlas": "pavement.svg",
+      "rect": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "pavement.smooth_asphalt.cool",
+      "family": "pavement",
+      "style": "smooth_asphalt",
+      "palette": "cool",
+      "atlas": "pavement.svg",
+      "rect": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "pavement.smooth_asphalt.nocturnal",
+      "family": "pavement",
+      "style": "smooth_asphalt",
+      "palette": "nocturnal",
+      "atlas": "pavement.svg",
+      "rect": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "pavement.smooth_asphalt.pastel",
+      "family": "pavement",
+      "style": "smooth_asphalt",
+      "palette": "pastel",
+      "atlas": "pavement.svg",
+      "rect": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "pavement.coarse_asphalt.warm",
+      "family": "pavement",
+      "style": "coarse_asphalt",
+      "palette": "warm",
+      "atlas": "pavement.svg",
+      "rect": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "pavement.coarse_asphalt.cool",
+      "family": "pavement",
+      "style": "coarse_asphalt",
+      "palette": "cool",
+      "atlas": "pavement.svg",
+      "rect": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "pavement.coarse_asphalt.nocturnal",
+      "family": "pavement",
+      "style": "coarse_asphalt",
+      "palette": "nocturnal",
+      "atlas": "pavement.svg",
+      "rect": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "pavement.coarse_asphalt.pastel",
+      "family": "pavement",
+      "style": "coarse_asphalt",
+      "palette": "pastel",
+      "atlas": "pavement.svg",
+      "rect": [
+        768,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "pavement.paver_grid.warm",
+      "family": "pavement",
+      "style": "paver_grid",
+      "palette": "warm",
+      "atlas": "pavement.svg",
+      "rect": [
+        0,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "pavement.paver_grid.cool",
+      "family": "pavement",
+      "style": "paver_grid",
+      "palette": "cool",
+      "atlas": "pavement.svg",
+      "rect": [
+        256,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "pavement.paver_grid.nocturnal",
+      "family": "pavement",
+      "style": "paver_grid",
+      "palette": "nocturnal",
+      "atlas": "pavement.svg",
+      "rect": [
+        512,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "pavement.paver_grid.pastel",
+      "family": "pavement",
+      "style": "paver_grid",
+      "palette": "pastel",
+      "atlas": "pavement.svg",
+      "rect": [
+        768,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "pavement.rounded_cobbles.warm",
+      "family": "pavement",
+      "style": "rounded_cobbles",
+      "palette": "warm",
+      "atlas": "pavement.svg",
+      "rect": [
+        0,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "pavement.rounded_cobbles.cool",
+      "family": "pavement",
+      "style": "rounded_cobbles",
+      "palette": "cool",
+      "atlas": "pavement.svg",
+      "rect": [
+        256,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "pavement.rounded_cobbles.nocturnal",
+      "family": "pavement",
+      "style": "rounded_cobbles",
+      "palette": "nocturnal",
+      "atlas": "pavement.svg",
+      "rect": [
+        512,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "pavement.rounded_cobbles.pastel",
+      "family": "pavement",
+      "style": "rounded_cobbles",
+      "palette": "pastel",
+      "atlas": "pavement.svg",
+      "rect": [
+        768,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "roofing.clay_roof_tiles.warm",
+      "family": "roofing",
+      "style": "clay_roof_tiles",
+      "palette": "warm",
+      "atlas": "roofing.svg",
+      "rect": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "roofing.clay_roof_tiles.cool",
+      "family": "roofing",
+      "style": "clay_roof_tiles",
+      "palette": "cool",
+      "atlas": "roofing.svg",
+      "rect": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "roofing.clay_roof_tiles.nocturnal",
+      "family": "roofing",
+      "style": "clay_roof_tiles",
+      "palette": "nocturnal",
+      "atlas": "roofing.svg",
+      "rect": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "roofing.clay_roof_tiles.pastel",
+      "family": "roofing",
+      "style": "clay_roof_tiles",
+      "palette": "pastel",
+      "atlas": "roofing.svg",
+      "rect": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "roofing.slate_shingles.warm",
+      "family": "roofing",
+      "style": "slate_shingles",
+      "palette": "warm",
+      "atlas": "roofing.svg",
+      "rect": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "roofing.slate_shingles.cool",
+      "family": "roofing",
+      "style": "slate_shingles",
+      "palette": "cool",
+      "atlas": "roofing.svg",
+      "rect": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "roofing.slate_shingles.nocturnal",
+      "family": "roofing",
+      "style": "slate_shingles",
+      "palette": "nocturnal",
+      "atlas": "roofing.svg",
+      "rect": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "roofing.slate_shingles.pastel",
+      "family": "roofing",
+      "style": "slate_shingles",
+      "palette": "pastel",
+      "atlas": "roofing.svg",
+      "rect": [
+        768,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "roofing.standing_seam.warm",
+      "family": "roofing",
+      "style": "standing_seam",
+      "palette": "warm",
+      "atlas": "roofing.svg",
+      "rect": [
+        0,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "roofing.standing_seam.cool",
+      "family": "roofing",
+      "style": "standing_seam",
+      "palette": "cool",
+      "atlas": "roofing.svg",
+      "rect": [
+        256,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "roofing.standing_seam.nocturnal",
+      "family": "roofing",
+      "style": "standing_seam",
+      "palette": "nocturnal",
+      "atlas": "roofing.svg",
+      "rect": [
+        512,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "roofing.standing_seam.pastel",
+      "family": "roofing",
+      "style": "standing_seam",
+      "palette": "pastel",
+      "atlas": "roofing.svg",
+      "rect": [
+        768,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "roofing.shingle_granules.warm",
+      "family": "roofing",
+      "style": "shingle_granules",
+      "palette": "warm",
+      "atlas": "roofing.svg",
+      "rect": [
+        0,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "roofing.shingle_granules.cool",
+      "family": "roofing",
+      "style": "shingle_granules",
+      "palette": "cool",
+      "atlas": "roofing.svg",
+      "rect": [
+        256,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "roofing.shingle_granules.nocturnal",
+      "family": "roofing",
+      "style": "shingle_granules",
+      "palette": "nocturnal",
+      "atlas": "roofing.svg",
+      "rect": [
+        512,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "roofing.shingle_granules.pastel",
+      "family": "roofing",
+      "style": "shingle_granules",
+      "palette": "pastel",
+      "atlas": "roofing.svg",
+      "rect": [
+        768,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "timber.vertical_wood.warm",
+      "family": "timber",
+      "style": "vertical_wood",
+      "palette": "warm",
+      "atlas": "timber.svg",
+      "rect": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "timber.vertical_wood.cool",
+      "family": "timber",
+      "style": "vertical_wood",
+      "palette": "cool",
+      "atlas": "timber.svg",
+      "rect": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "timber.vertical_wood.nocturnal",
+      "family": "timber",
+      "style": "vertical_wood",
+      "palette": "nocturnal",
+      "atlas": "timber.svg",
+      "rect": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "timber.vertical_wood.pastel",
+      "family": "timber",
+      "style": "vertical_wood",
+      "palette": "pastel",
+      "atlas": "timber.svg",
+      "rect": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "timber.horizontal_planks.warm",
+      "family": "timber",
+      "style": "horizontal_planks",
+      "palette": "warm",
+      "atlas": "timber.svg",
+      "rect": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "timber.horizontal_planks.cool",
+      "family": "timber",
+      "style": "horizontal_planks",
+      "palette": "cool",
+      "atlas": "timber.svg",
+      "rect": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "timber.horizontal_planks.nocturnal",
+      "family": "timber",
+      "style": "horizontal_planks",
+      "palette": "nocturnal",
+      "atlas": "timber.svg",
+      "rect": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "timber.horizontal_planks.pastel",
+      "family": "timber",
+      "style": "horizontal_planks",
+      "palette": "pastel",
+      "atlas": "timber.svg",
+      "rect": [
+        768,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "timber.thin_laths.warm",
+      "family": "timber",
+      "style": "thin_laths",
+      "palette": "warm",
+      "atlas": "timber.svg",
+      "rect": [
+        0,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "timber.thin_laths.cool",
+      "family": "timber",
+      "style": "thin_laths",
+      "palette": "cool",
+      "atlas": "timber.svg",
+      "rect": [
+        256,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "timber.thin_laths.nocturnal",
+      "family": "timber",
+      "style": "thin_laths",
+      "palette": "nocturnal",
+      "atlas": "timber.svg",
+      "rect": [
+        512,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "timber.thin_laths.pastel",
+      "family": "timber",
+      "style": "thin_laths",
+      "palette": "pastel",
+      "atlas": "timber.svg",
+      "rect": [
+        768,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "timber.dark_grain.warm",
+      "family": "timber",
+      "style": "dark_grain",
+      "palette": "warm",
+      "atlas": "timber.svg",
+      "rect": [
+        0,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "timber.dark_grain.cool",
+      "family": "timber",
+      "style": "dark_grain",
+      "palette": "cool",
+      "atlas": "timber.svg",
+      "rect": [
+        256,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "timber.dark_grain.nocturnal",
+      "family": "timber",
+      "style": "dark_grain",
+      "palette": "nocturnal",
+      "atlas": "timber.svg",
+      "rect": [
+        512,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "timber.dark_grain.pastel",
+      "family": "timber",
+      "style": "dark_grain",
+      "palette": "pastel",
+      "atlas": "timber.svg",
+      "rect": [
+        768,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "glass_metal.window_grid.warm",
+      "family": "glass_metal",
+      "style": "window_grid",
+      "palette": "warm",
+      "atlas": "glass_metal.svg",
+      "rect": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "glass_metal.window_grid.cool",
+      "family": "glass_metal",
+      "style": "window_grid",
+      "palette": "cool",
+      "atlas": "glass_metal.svg",
+      "rect": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "glass_metal.window_grid.nocturnal",
+      "family": "glass_metal",
+      "style": "window_grid",
+      "palette": "nocturnal",
+      "atlas": "glass_metal.svg",
+      "rect": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "glass_metal.window_grid.pastel",
+      "family": "glass_metal",
+      "style": "window_grid",
+      "palette": "pastel",
+      "atlas": "glass_metal.svg",
+      "rect": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "glass_metal.glass_strips.warm",
+      "family": "glass_metal",
+      "style": "glass_strips",
+      "palette": "warm",
+      "atlas": "glass_metal.svg",
+      "rect": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "glass_metal.glass_strips.cool",
+      "family": "glass_metal",
+      "style": "glass_strips",
+      "palette": "cool",
+      "atlas": "glass_metal.svg",
+      "rect": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "glass_metal.glass_strips.nocturnal",
+      "family": "glass_metal",
+      "style": "glass_strips",
+      "palette": "nocturnal",
+      "atlas": "glass_metal.svg",
+      "rect": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "glass_metal.glass_strips.pastel",
+      "family": "glass_metal",
+      "style": "glass_strips",
+      "palette": "pastel",
+      "atlas": "glass_metal.svg",
+      "rect": [
+        768,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "glass_metal.brushed_metal.warm",
+      "family": "glass_metal",
+      "style": "brushed_metal",
+      "palette": "warm",
+      "atlas": "glass_metal.svg",
+      "rect": [
+        0,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "glass_metal.brushed_metal.cool",
+      "family": "glass_metal",
+      "style": "brushed_metal",
+      "palette": "cool",
+      "atlas": "glass_metal.svg",
+      "rect": [
+        256,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "glass_metal.brushed_metal.nocturnal",
+      "family": "glass_metal",
+      "style": "brushed_metal",
+      "palette": "nocturnal",
+      "atlas": "glass_metal.svg",
+      "rect": [
+        512,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "glass_metal.brushed_metal.pastel",
+      "family": "glass_metal",
+      "style": "brushed_metal",
+      "palette": "pastel",
+      "atlas": "glass_metal.svg",
+      "rect": [
+        768,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "glass_metal.corrugated_sheet.warm",
+      "family": "glass_metal",
+      "style": "corrugated_sheet",
+      "palette": "warm",
+      "atlas": "glass_metal.svg",
+      "rect": [
+        0,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "glass_metal.corrugated_sheet.cool",
+      "family": "glass_metal",
+      "style": "corrugated_sheet",
+      "palette": "cool",
+      "atlas": "glass_metal.svg",
+      "rect": [
+        256,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "glass_metal.corrugated_sheet.nocturnal",
+      "family": "glass_metal",
+      "style": "corrugated_sheet",
+      "palette": "nocturnal",
+      "atlas": "glass_metal.svg",
+      "rect": [
+        512,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "glass_metal.corrugated_sheet.pastel",
+      "family": "glass_metal",
+      "style": "corrugated_sheet",
+      "palette": "pastel",
+      "atlas": "glass_metal.svg",
+      "rect": [
+        768,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "nature_ground.short_grass.warm",
+      "family": "nature_ground",
+      "style": "short_grass",
+      "palette": "warm",
+      "atlas": "nature_ground.svg",
+      "rect": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "nature_ground.short_grass.cool",
+      "family": "nature_ground",
+      "style": "short_grass",
+      "palette": "cool",
+      "atlas": "nature_ground.svg",
+      "rect": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "nature_ground.short_grass.nocturnal",
+      "family": "nature_ground",
+      "style": "short_grass",
+      "palette": "nocturnal",
+      "atlas": "nature_ground.svg",
+      "rect": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "nature_ground.short_grass.pastel",
+      "family": "nature_ground",
+      "style": "short_grass",
+      "palette": "pastel",
+      "atlas": "nature_ground.svg",
+      "rect": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "nature_ground.dense_foliage.warm",
+      "family": "nature_ground",
+      "style": "dense_foliage",
+      "palette": "warm",
+      "atlas": "nature_ground.svg",
+      "rect": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "nature_ground.dense_foliage.cool",
+      "family": "nature_ground",
+      "style": "dense_foliage",
+      "palette": "cool",
+      "atlas": "nature_ground.svg",
+      "rect": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "nature_ground.dense_foliage.nocturnal",
+      "family": "nature_ground",
+      "style": "dense_foliage",
+      "palette": "nocturnal",
+      "atlas": "nature_ground.svg",
+      "rect": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "nature_ground.dense_foliage.pastel",
+      "family": "nature_ground",
+      "style": "dense_foliage",
+      "palette": "pastel",
+      "atlas": "nature_ground.svg",
+      "rect": [
+        768,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "nature_ground.moss.warm",
+      "family": "nature_ground",
+      "style": "moss",
+      "palette": "warm",
+      "atlas": "nature_ground.svg",
+      "rect": [
+        0,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "nature_ground.moss.cool",
+      "family": "nature_ground",
+      "style": "moss",
+      "palette": "cool",
+      "atlas": "nature_ground.svg",
+      "rect": [
+        256,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "nature_ground.moss.nocturnal",
+      "family": "nature_ground",
+      "style": "moss",
+      "palette": "nocturnal",
+      "atlas": "nature_ground.svg",
+      "rect": [
+        512,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "nature_ground.moss.pastel",
+      "family": "nature_ground",
+      "style": "moss",
+      "palette": "pastel",
+      "atlas": "nature_ground.svg",
+      "rect": [
+        768,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "nature_ground.sandy_ground.warm",
+      "family": "nature_ground",
+      "style": "sandy_ground",
+      "palette": "warm",
+      "atlas": "nature_ground.svg",
+      "rect": [
+        0,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "nature_ground.sandy_ground.cool",
+      "family": "nature_ground",
+      "style": "sandy_ground",
+      "palette": "cool",
+      "atlas": "nature_ground.svg",
+      "rect": [
+        256,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "nature_ground.sandy_ground.nocturnal",
+      "family": "nature_ground",
+      "style": "sandy_ground",
+      "palette": "nocturnal",
+      "atlas": "nature_ground.svg",
+      "rect": [
+        512,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "nature_ground.sandy_ground.pastel",
+      "family": "nature_ground",
+      "style": "sandy_ground",
+      "palette": "pastel",
+      "atlas": "nature_ground.svg",
+      "rect": [
+        768,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "water_surface.subtle_ripples.warm",
+      "family": "water_surface",
+      "style": "subtle_ripples",
+      "palette": "warm",
+      "atlas": "water_surface.svg",
+      "rect": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "water_surface.subtle_ripples.cool",
+      "family": "water_surface",
+      "style": "subtle_ripples",
+      "palette": "cool",
+      "atlas": "water_surface.svg",
+      "rect": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "water_surface.subtle_ripples.nocturnal",
+      "family": "water_surface",
+      "style": "subtle_ripples",
+      "palette": "nocturnal",
+      "atlas": "water_surface.svg",
+      "rect": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "water_surface.subtle_ripples.pastel",
+      "family": "water_surface",
+      "style": "subtle_ripples",
+      "palette": "pastel",
+      "atlas": "water_surface.svg",
+      "rect": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "water_surface.cross_current.warm",
+      "family": "water_surface",
+      "style": "cross_current",
+      "palette": "warm",
+      "atlas": "water_surface.svg",
+      "rect": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "water_surface.cross_current.cool",
+      "family": "water_surface",
+      "style": "cross_current",
+      "palette": "cool",
+      "atlas": "water_surface.svg",
+      "rect": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "water_surface.cross_current.nocturnal",
+      "family": "water_surface",
+      "style": "cross_current",
+      "palette": "nocturnal",
+      "atlas": "water_surface.svg",
+      "rect": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "water_surface.cross_current.pastel",
+      "family": "water_surface",
+      "style": "cross_current",
+      "palette": "pastel",
+      "atlas": "water_surface.svg",
+      "rect": [
+        768,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "water_surface.moon_shimmer.warm",
+      "family": "water_surface",
+      "style": "moon_shimmer",
+      "palette": "warm",
+      "atlas": "water_surface.svg",
+      "rect": [
+        0,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "water_surface.moon_shimmer.cool",
+      "family": "water_surface",
+      "style": "moon_shimmer",
+      "palette": "cool",
+      "atlas": "water_surface.svg",
+      "rect": [
+        256,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "water_surface.moon_shimmer.nocturnal",
+      "family": "water_surface",
+      "style": "moon_shimmer",
+      "palette": "nocturnal",
+      "atlas": "water_surface.svg",
+      "rect": [
+        512,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "water_surface.moon_shimmer.pastel",
+      "family": "water_surface",
+      "style": "moon_shimmer",
+      "palette": "pastel",
+      "atlas": "water_surface.svg",
+      "rect": [
+        768,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "water_surface.calm_pool.warm",
+      "family": "water_surface",
+      "style": "calm_pool",
+      "palette": "warm",
+      "atlas": "water_surface.svg",
+      "rect": [
+        0,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "water_surface.calm_pool.cool",
+      "family": "water_surface",
+      "style": "calm_pool",
+      "palette": "cool",
+      "atlas": "water_surface.svg",
+      "rect": [
+        256,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "water_surface.calm_pool.nocturnal",
+      "family": "water_surface",
+      "style": "calm_pool",
+      "palette": "nocturnal",
+      "atlas": "water_surface.svg",
+      "rect": [
+        512,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "water_surface.calm_pool.pastel",
+      "family": "water_surface",
+      "style": "calm_pool",
+      "palette": "pastel",
+      "atlas": "water_surface.svg",
+      "rect": [
+        768,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "art_print.watercolor_wash.warm",
+      "family": "art_print",
+      "style": "watercolor_wash",
+      "palette": "warm",
+      "atlas": "art_print.svg",
+      "rect": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "art_print.watercolor_wash.cool",
+      "family": "art_print",
+      "style": "watercolor_wash",
+      "palette": "cool",
+      "atlas": "art_print.svg",
+      "rect": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "art_print.watercolor_wash.nocturnal",
+      "family": "art_print",
+      "style": "watercolor_wash",
+      "palette": "nocturnal",
+      "atlas": "art_print.svg",
+      "rect": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "art_print.watercolor_wash.pastel",
+      "family": "art_print",
+      "style": "watercolor_wash",
+      "palette": "pastel",
+      "atlas": "art_print.svg",
+      "rect": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "art_print.comic_halftone.warm",
+      "family": "art_print",
+      "style": "comic_halftone",
+      "palette": "warm",
+      "atlas": "art_print.svg",
+      "rect": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "art_print.comic_halftone.cool",
+      "family": "art_print",
+      "style": "comic_halftone",
+      "palette": "cool",
+      "atlas": "art_print.svg",
+      "rect": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "art_print.comic_halftone.nocturnal",
+      "family": "art_print",
+      "style": "comic_halftone",
+      "palette": "nocturnal",
+      "atlas": "art_print.svg",
+      "rect": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "art_print.comic_halftone.pastel",
+      "family": "art_print",
+      "style": "comic_halftone",
+      "palette": "pastel",
+      "atlas": "art_print.svg",
+      "rect": [
+        768,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "art_print.blueprint_grid.warm",
+      "family": "art_print",
+      "style": "blueprint_grid",
+      "palette": "warm",
+      "atlas": "art_print.svg",
+      "rect": [
+        0,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "art_print.blueprint_grid.cool",
+      "family": "art_print",
+      "style": "blueprint_grid",
+      "palette": "cool",
+      "atlas": "art_print.svg",
+      "rect": [
+        256,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "art_print.blueprint_grid.nocturnal",
+      "family": "art_print",
+      "style": "blueprint_grid",
+      "palette": "nocturnal",
+      "atlas": "art_print.svg",
+      "rect": [
+        512,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "art_print.blueprint_grid.pastel",
+      "family": "art_print",
+      "style": "blueprint_grid",
+      "palette": "pastel",
+      "atlas": "art_print.svg",
+      "rect": [
+        768,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "art_print.antique_paper.warm",
+      "family": "art_print",
+      "style": "antique_paper",
+      "palette": "warm",
+      "atlas": "art_print.svg",
+      "rect": [
+        0,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "art_print.antique_paper.cool",
+      "family": "art_print",
+      "style": "antique_paper",
+      "palette": "cool",
+      "atlas": "art_print.svg",
+      "rect": [
+        256,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "art_print.antique_paper.nocturnal",
+      "family": "art_print",
+      "style": "antique_paper",
+      "palette": "nocturnal",
+      "atlas": "art_print.svg",
+      "rect": [
+        512,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "art_print.antique_paper.pastel",
+      "family": "art_print",
+      "style": "antique_paper",
+      "palette": "pastel",
+      "atlas": "art_print.svg",
+      "rect": [
+        768,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "atmosphere.soft_haze.warm",
+      "family": "atmosphere",
+      "style": "soft_haze",
+      "palette": "warm",
+      "atlas": "atmosphere.svg",
+      "rect": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "atmosphere.soft_haze.cool",
+      "family": "atmosphere",
+      "style": "soft_haze",
+      "palette": "cool",
+      "atlas": "atmosphere.svg",
+      "rect": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "atmosphere.soft_haze.nocturnal",
+      "family": "atmosphere",
+      "style": "soft_haze",
+      "palette": "nocturnal",
+      "atlas": "atmosphere.svg",
+      "rect": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "atmosphere.soft_haze.pastel",
+      "family": "atmosphere",
+      "style": "soft_haze",
+      "palette": "pastel",
+      "atlas": "atmosphere.svg",
+      "rect": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "atmosphere.starfield.warm",
+      "family": "atmosphere",
+      "style": "starfield",
+      "palette": "warm",
+      "atlas": "atmosphere.svg",
+      "rect": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "atmosphere.starfield.cool",
+      "family": "atmosphere",
+      "style": "starfield",
+      "palette": "cool",
+      "atlas": "atmosphere.svg",
+      "rect": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "atmosphere.starfield.nocturnal",
+      "family": "atmosphere",
+      "style": "starfield",
+      "palette": "nocturnal",
+      "atlas": "atmosphere.svg",
+      "rect": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "atmosphere.starfield.pastel",
+      "family": "atmosphere",
+      "style": "starfield",
+      "palette": "pastel",
+      "atlas": "atmosphere.svg",
+      "rect": [
+        768,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "atmosphere.rain_fall.warm",
+      "family": "atmosphere",
+      "style": "rain_fall",
+      "palette": "warm",
+      "atlas": "atmosphere.svg",
+      "rect": [
+        0,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "atmosphere.rain_fall.cool",
+      "family": "atmosphere",
+      "style": "rain_fall",
+      "palette": "cool",
+      "atlas": "atmosphere.svg",
+      "rect": [
+        256,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "atmosphere.rain_fall.nocturnal",
+      "family": "atmosphere",
+      "style": "rain_fall",
+      "palette": "nocturnal",
+      "atlas": "atmosphere.svg",
+      "rect": [
+        512,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "atmosphere.rain_fall.pastel",
+      "family": "atmosphere",
+      "style": "rain_fall",
+      "palette": "pastel",
+      "atlas": "atmosphere.svg",
+      "rect": [
+        768,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "atmosphere.snow_flurries.warm",
+      "family": "atmosphere",
+      "style": "snow_flurries",
+      "palette": "warm",
+      "atlas": "atmosphere.svg",
+      "rect": [
+        0,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "atmosphere.snow_flurries.cool",
+      "family": "atmosphere",
+      "style": "snow_flurries",
+      "palette": "cool",
+      "atlas": "atmosphere.svg",
+      "rect": [
+        256,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "atmosphere.snow_flurries.nocturnal",
+      "family": "atmosphere",
+      "style": "snow_flurries",
+      "palette": "nocturnal",
+      "atlas": "atmosphere.svg",
+      "rect": [
+        512,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "atmosphere.snow_flurries.pastel",
+      "family": "atmosphere",
+      "style": "snow_flurries",
+      "palette": "pastel",
+      "atlas": "atmosphere.svg",
+      "rect": [
+        768,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "city_accents.lit_windows.warm",
+      "family": "city_accents",
+      "style": "lit_windows",
+      "palette": "warm",
+      "atlas": "city_accents.svg",
+      "rect": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "city_accents.lit_windows.cool",
+      "family": "city_accents",
+      "style": "lit_windows",
+      "palette": "cool",
+      "atlas": "city_accents.svg",
+      "rect": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "city_accents.lit_windows.nocturnal",
+      "family": "city_accents",
+      "style": "lit_windows",
+      "palette": "nocturnal",
+      "atlas": "city_accents.svg",
+      "rect": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "city_accents.lit_windows.pastel",
+      "family": "city_accents",
+      "style": "lit_windows",
+      "palette": "pastel",
+      "atlas": "city_accents.svg",
+      "rect": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "city_accents.neon_circuits.warm",
+      "family": "city_accents",
+      "style": "neon_circuits",
+      "palette": "warm",
+      "atlas": "city_accents.svg",
+      "rect": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "city_accents.neon_circuits.cool",
+      "family": "city_accents",
+      "style": "neon_circuits",
+      "palette": "cool",
+      "atlas": "city_accents.svg",
+      "rect": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "city_accents.neon_circuits.nocturnal",
+      "family": "city_accents",
+      "style": "neon_circuits",
+      "palette": "nocturnal",
+      "atlas": "city_accents.svg",
+      "rect": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "city_accents.neon_circuits.pastel",
+      "family": "city_accents",
+      "style": "neon_circuits",
+      "palette": "pastel",
+      "atlas": "city_accents.svg",
+      "rect": [
+        768,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "city_accents.crosshatch.warm",
+      "family": "city_accents",
+      "style": "crosshatch",
+      "palette": "warm",
+      "atlas": "city_accents.svg",
+      "rect": [
+        0,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "city_accents.crosshatch.cool",
+      "family": "city_accents",
+      "style": "crosshatch",
+      "palette": "cool",
+      "atlas": "city_accents.svg",
+      "rect": [
+        256,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "city_accents.crosshatch.nocturnal",
+      "family": "city_accents",
+      "style": "crosshatch",
+      "palette": "nocturnal",
+      "atlas": "city_accents.svg",
+      "rect": [
+        512,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "city_accents.crosshatch.pastel",
+      "family": "city_accents",
+      "style": "crosshatch",
+      "palette": "pastel",
+      "atlas": "city_accents.svg",
+      "rect": [
+        768,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "city_accents.abstract_facade.warm",
+      "family": "city_accents",
+      "style": "abstract_facade",
+      "palette": "warm",
+      "atlas": "city_accents.svg",
+      "rect": [
+        0,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "city_accents.abstract_facade.cool",
+      "family": "city_accents",
+      "style": "abstract_facade",
+      "palette": "cool",
+      "atlas": "city_accents.svg",
+      "rect": [
+        256,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "city_accents.abstract_facade.nocturnal",
+      "family": "city_accents",
+      "style": "abstract_facade",
+      "palette": "nocturnal",
+      "atlas": "city_accents.svg",
+      "rect": [
+        512,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "city_accents.abstract_facade.pastel",
+      "family": "city_accents",
+      "style": "abstract_facade",
+      "palette": "pastel",
+      "atlas": "city_accents.svg",
+      "rect": [
+        768,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "illustrated_material",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "cinematic_fx.film_grain.warm",
+      "family": "cinematic_fx",
+      "style": "film_grain",
+      "palette": "warm",
+      "atlas": "cinematic_fx.svg",
+      "rect": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "cinematic_fx.film_grain.cool",
+      "family": "cinematic_fx",
+      "style": "film_grain",
+      "palette": "cool",
+      "atlas": "cinematic_fx.svg",
+      "rect": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "cinematic_fx.film_grain.nocturnal",
+      "family": "cinematic_fx",
+      "style": "film_grain",
+      "palette": "nocturnal",
+      "atlas": "cinematic_fx.svg",
+      "rect": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "cinematic_fx.film_grain.pastel",
+      "family": "cinematic_fx",
+      "style": "film_grain",
+      "palette": "pastel",
+      "atlas": "cinematic_fx.svg",
+      "rect": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "cinematic_fx.film_scratches.warm",
+      "family": "cinematic_fx",
+      "style": "film_scratches",
+      "palette": "warm",
+      "atlas": "cinematic_fx.svg",
+      "rect": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "cinematic_fx.film_scratches.cool",
+      "family": "cinematic_fx",
+      "style": "film_scratches",
+      "palette": "cool",
+      "atlas": "cinematic_fx.svg",
+      "rect": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "cinematic_fx.film_scratches.nocturnal",
+      "family": "cinematic_fx",
+      "style": "film_scratches",
+      "palette": "nocturnal",
+      "atlas": "cinematic_fx.svg",
+      "rect": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "cinematic_fx.film_scratches.pastel",
+      "family": "cinematic_fx",
+      "style": "film_scratches",
+      "palette": "pastel",
+      "atlas": "cinematic_fx.svg",
+      "rect": [
+        768,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "cinematic_fx.light_bloom.warm",
+      "family": "cinematic_fx",
+      "style": "light_bloom",
+      "palette": "warm",
+      "atlas": "cinematic_fx.svg",
+      "rect": [
+        0,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "cinematic_fx.light_bloom.cool",
+      "family": "cinematic_fx",
+      "style": "light_bloom",
+      "palette": "cool",
+      "atlas": "cinematic_fx.svg",
+      "rect": [
+        256,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "cinematic_fx.light_bloom.nocturnal",
+      "family": "cinematic_fx",
+      "style": "light_bloom",
+      "palette": "nocturnal",
+      "atlas": "cinematic_fx.svg",
+      "rect": [
+        512,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "cinematic_fx.light_bloom.pastel",
+      "family": "cinematic_fx",
+      "style": "light_bloom",
+      "palette": "pastel",
+      "atlas": "cinematic_fx.svg",
+      "rect": [
+        768,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "cinematic_fx.chromatic_streaks.warm",
+      "family": "cinematic_fx",
+      "style": "chromatic_streaks",
+      "palette": "warm",
+      "atlas": "cinematic_fx.svg",
+      "rect": [
+        0,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "cinematic_fx.chromatic_streaks.cool",
+      "family": "cinematic_fx",
+      "style": "chromatic_streaks",
+      "palette": "cool",
+      "atlas": "cinematic_fx.svg",
+      "rect": [
+        256,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "cinematic_fx.chromatic_streaks.nocturnal",
+      "family": "cinematic_fx",
+      "style": "chromatic_streaks",
+      "palette": "nocturnal",
+      "atlas": "cinematic_fx.svg",
+      "rect": [
+        512,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "cinematic_fx.chromatic_streaks.pastel",
+      "family": "cinematic_fx",
+      "style": "chromatic_streaks",
+      "palette": "pastel",
+      "atlas": "cinematic_fx.svg",
+      "rect": [
+        768,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "overlay",
+      "status": "asset_only_no_renderer"
+    }
+  ]
+}
