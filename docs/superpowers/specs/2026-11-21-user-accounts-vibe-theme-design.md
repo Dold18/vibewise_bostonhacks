@@ -143,7 +143,9 @@ create index vibe_events_user_time_idx on vibe_events (user_id, created_at desc)
   - date_night: dusky rose
   - group_friendly: bright, sunny warmth
 - `blendPalette(base, taste, strength)` (pure, tested):
-  - Each top vibe pulls its target entries from the base color by `weight × strength × 0.6`, so the map is never fully replaced.
+  - Each top vibe pulls its target entries from the base color by `weight × strength × 0.95`, so a strong vibe restyles the map almost completely but never entirely. *(Raised from 0.6 on 2026-11-21 at the user's request: the themes weren't stylized enough, and late_night could barely ever go dark.)*
+  - Vibes apply weakest first, so the strongest has the last word. If clashing vibes (late_night with a light one) can only be readable at strength 0, the strongest vibe is used alone.
+  - Light vibes keep `land` bright (pins), so their character comes from buildings, roads, water, parks and sky, which get bold targets.
   - **Contrast guard** *(my call: the base map already misses 4.5:1 for pins and some labels, so pins get a relative bar)*:
     - The hard-coded label colors in `mapStyle.ts` (e.g. neighbourhood `#80868b`) move into the palette.
     - After blending, `textPrimary` must stay ≥ 4.5:1 and `textSecondary` ≥ 3:1 against `land`. If not, switch to the light-text set (light text, dark halo) and re-check.

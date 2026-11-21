@@ -21,7 +21,8 @@ import type { VibeKey } from '../account/vibes';
 import { contrastRatio, mix } from './color';
 import { LIGHT_TEXT, VIBE_PALETTES } from './palettes';
 
-export const MAX_SHIFT = 0.6;
+/** How far (0–1) a vibe at full score and strength moves a color toward its target. Never all the way. */
+export const MAX_SHIFT = 0.95;
 const STEP = 0.05;
 const TEXT_PRIMARY_MIN = 4.5;
 const TEXT_SECONDARY_MIN = 3;
@@ -39,7 +40,17 @@ export interface BlendResult {
 }
 
 export function blendPalette(base: Palette, tags: Record<VibeKey, number>, strength: number): BlendResult {
-  const weakestFirst = topVibesOf(tags).reverse();
+  const top = topVibesOf(tags);
+  const all = blendVibes(base, top, strength);
+  // Clashing vibes (late_night with a light one) can only be readable at
+  // strength 0; then the strongest vibe wins on its own.
+  if (all.appliedStrength > 0 || top.length <= 1) return all;
+  return blendVibes(base, top.slice(0, 1), strength);
+}
+
+function blendVibes(base: Palette, top: { key: VibeKey; score: number }[], strength: number): BlendResult {
+  const weakestFirst = [...top].reverse();
+  if (!(strength > 0)) return { palette: { ...base }, darkMode: false, appliedStrength: 0 };
   for (let step = 0; ; step++) {
     const s = Math.max(0, Math.round((strength - step * STEP) * 1000) / 1000);
     if (s <= 0 || weakestFirst.length === 0) return { palette: { ...base }, darkMode: false, appliedStrength: 0 };

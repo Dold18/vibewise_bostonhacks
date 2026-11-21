@@ -68,6 +68,34 @@ describe('blendPalette', () => {
     }
   });
 
+  it('moves colors up to 95% of the way to a vibe', () => {
+    expect(MAX_SHIFT).toBe(0.95);
+  });
+
+  it('late_night goes dark well before full strength', () => {
+    const result = blendPalette(basePalette, tagsOf({ late_night: 1 }), 0.7);
+    expect(result.darkMode).toBe(true);
+    expect(result.appliedStrength).toBe(0.7);
+  });
+
+  it('a clashing pair falls back to the strongest vibe instead of the plain map', () => {
+    const alone = blendPalette(basePalette, tagsOf({ cozy: 1 }), 1);
+    const clash = blendPalette(basePalette, tagsOf({ cozy: 1, late_night: 0.8 }), 1);
+    expect(clash.appliedStrength).toBeGreaterThan(0);
+    expect(clash.palette).toEqual(alone.palette);
+  });
+
+  it('every vibe at full strength visibly restyles the map', () => {
+    // Mean over palette entries of the largest channel change from base.
+    for (const key of VIBE_KEYS) {
+      const { palette } = blendPalette(basePalette, tagsOf({ [key]: 1 }), 1);
+      const keys = Object.keys(basePalette) as (keyof Palette)[];
+      const moved = keys.map((k) => Math.max(...channels(palette[k]).map((c, i) => Math.abs(c - channels(basePalette[k])[i]))));
+      const mean = moved.reduce((a, b) => a + b, 0) / keys.length;
+      expect(mean, key).toBeGreaterThanOrEqual(20);
+    }
+  });
+
   it('late_night at full strength goes dark or tones itself down', () => {
     const result = blendPalette(basePalette, tagsOf({ late_night: 1 }), 1);
     expect(result.darkMode || result.appliedStrength < 1).toBe(true);
