@@ -23,3 +23,9 @@ export const ATTRIBUTION_MERGED = '© OpenStreetMap contributors (ODbL); Foursqu
 export const FSQ_CAFE_SEGMENTS = ['Cafe, Coffee, and Tea House'] as const;
 // TODO(verify): confirm against FSQ categories parquet (release 2026-01-12)
 export const FSQ_NIGHTLIFE_SEGMENTS = ['Bar', 'Brewery', 'Lounge', 'Night Club'] as const;
+
+export const OVERPASS_MIRRORS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter',
+] as const;
+export const OVERPASS_REQUEST_TIMEOUT_MS = 200_000;
