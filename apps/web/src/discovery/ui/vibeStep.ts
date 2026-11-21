@@ -175,6 +175,10 @@ export function createVibeStep(prefs: Store<InitialPreferences, PreferencesActio
       }),
     );
     previews.hidden = images.length === 0;
+    if (images.length === 0) {
+      uploadStatus.textContent = '';
+      uploadStatus.classList.remove('is-error');
+    }
     uploadButton.classList.toggle('has-images', images.length > 0);
     const full = images.length >= MAX_VIBE_IMAGES;
     uploadButton.disabled = full;
