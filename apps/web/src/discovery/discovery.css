@@ -1024,7 +1024,431 @@
   .vb-discovery { max-height: calc(100% - 64px); gap: 8px; }
   .vb-preferences-widget { max-height: 55vh; }
   .vb-tools-widget .vb-view { max-height: 34vh; }
-  body[data-focus="navigation"] .vb-discovery { max-height: 40vh; }
-  body[data-focus="navigation"] .vb-preferences-widget { max-height: 28vh; }
 }
 @media (prefers-reduced-motion: reduce) { .vb-tools-expansion { transition: none; } }
+
+/* ---------- Two-step discovery / vibe composition ---------- */
+.vb-discovery .vb-step[hidden],
+.vb-discovery .vb-footer-actions[hidden] {
+  display: none !important;
+}
+
+.vb-step-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 10px 16px 14px;
+  background: var(--vb-surface);
+}
+
+.vb-footer-actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.vb-footer-actions .vb-primary-btn {
+  min-height: 43px;
+  height: auto;
+  padding: 10px 17px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--vb-accent);
+  box-shadow: 0 4px 12px rgba(26, 115, 232, 0.16);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.vb-footer-actions .vb-primary-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(26, 115, 232, 0.21);
+}
+
+.vb-footer-actions .vb-text-btn {
+  flex: 0 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.vb-step-footnote {
+  margin: 0 2px;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--vb-muted);
+}
+
+.vb-vibe-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 4px 0 12px;
+}
+
+.vb-vibe-intro {
+  display: grid;
+  gap: 7px;
+}
+
+.vb-overline {
+  margin: 0;
+  color: var(--vb-accent);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .13em;
+}
+
+.vb-vibe-heading {
+  margin: 0;
+  color: var(--vb-text);
+  font-size: 20px;
+  font-weight: 650;
+  line-height: 1.18;
+  letter-spacing: -.035em;
+}
+
+.vb-vibe-lead {
+  margin: 0;
+  color: var(--vb-muted);
+  font-size: 13px;
+  line-height: 1.52;
+}
+
+.vb-vibe-screen .vb-field {
+  margin: 0;
+}
+
+.vb-vibe-screen .vb-vibe-label {
+  margin-bottom: 8px;
+}
+
+.vb-vibe-story {
+  min-height: 184px;
+  padding: 14px;
+  line-height: 1.5;
+  border-radius: 14px;
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+
+.vb-vibe-story::placeholder {
+  color: #737d8b;
+  opacity: 1;
+  white-space: pre-wrap;
+}
+
+/* Placeholder guidance clears when focused, and returns if left empty. */
+.vb-vibe-story:focus::placeholder {
+  opacity: 0;
+}
+
+.vb-vibe-story:focus-visible {
+  box-shadow: 0 0 0 3px rgba(74, 112, 225, .10);
+}
+
+.vb-vibe-screen .vb-field-foot {
+  align-items: flex-start;
+  line-height: 1.35;
+}
+
+.vb-vibe-screen .vb-counter {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.vb-vibe-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.vb-vibe-section-label {
+  color: var(--vb-text);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.vb-vibe-section-help {
+  font-size: 11px;
+  color: var(--vb-muted);
+}
+
+.vb-vibe-examples {
+  display: grid;
+  gap: 7px;
+}
+
+.vb-example-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.vb-vibe-example {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 7px 10px;
+  border: 1px solid var(--vb-border);
+  border-radius: 13px;
+  background: linear-gradient(160deg, var(--vb-surface), var(--vb-hover));
+  text-align: left;
+  transition: transform .17s ease, border-color .17s ease, box-shadow .17s ease;
+}
+
+.vb-vibe-example:hover {
+  transform: translateY(-2px);
+  border-color: var(--vb-accent);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .06);
+}
+
+.vb-example-title {
+  font-size: 11.5px;
+  font-weight: 650;
+  line-height: 1.18;
+}
+
+.vb-example-subtitle {
+  font-size: 10.5px;
+  line-height: 1.3;
+  color: var(--vb-muted);
+}
+
+.vb-vibe-upload-section {
+  display: grid;
+  gap: 7px;
+  padding-bottom: 4px;
+}
+
+.vb-upload-explainer {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--vb-muted);
+}
+
+.vb-upload-zone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vb-upload-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 11px;
+  width: 100%;
+  min-height: 88px;
+  padding: 12px 13px;
+  border: 1.5px dashed #9fafd1;
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(126, 136, 210, .065), rgba(233, 216, 245, .065));
+  color: var(--vb-text);
+  text-align: left;
+  transition: border-color .18s ease, background .18s ease, transform .18s ease;
+}
+
+.vb-upload-button > svg {
+  fill: var(--vb-accent);
+  opacity: .8;
+}
+
+.vb-upload-button:hover:not(:disabled),
+.vb-upload-zone.is-dragging .vb-upload-button {
+  border-color: var(--vb-accent);
+  background: linear-gradient(140deg, rgba(126, 136, 210, .18), rgba(201, 169, 246, .16), rgba(130, 184, 224, .18));
+}
+
+.vb-upload-zone.is-dragging .vb-upload-button {
+  transform: scale(1.01);
+}
+
+.vb-upload-button:disabled {
+  opacity: .65;
+  cursor: default;
+}
+
+.vb-upload-button.has-images {
+  min-height: 74px;
+}
+
+.vb-upload-copy {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 4px;
+}
+
+.vb-upload-label {
+  font-size: 12.5px;
+  font-weight: 650;
+}
+
+.vb-upload-detail {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--vb-muted);
+}
+
+.vb-upload-limit {
+  flex-shrink: 0;
+  max-width: 75px;
+  font-size: 10px;
+  line-height: 1.3;
+  text-align: right;
+  color: var(--vb-muted);
+}
+
+.vb-image-previews {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.vb-image-preview {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 24px;
+  min-width: 0;
+  aspect-ratio: 4 / 5;
+  border: 1px solid var(--vb-border);
+  border-radius: 12px;
+  background: var(--vb-hover);
+  overflow: hidden;
+}
+
+.vb-image-preview > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: cover;
+  background: var(--vb-hover);
+}
+
+.vb-image-remove {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(21, 24, 35, .76);
+  color: #fff !important;
+  transition: background .15s ease;
+}
+
+.vb-image-remove:hover {
+  background: #2c3150;
+}
+
+.vb-image-remove > svg {
+  fill: currentColor;
+}
+
+.vb-image-filename {
+  display: block;
+  min-width: 0;
+  padding: 4px 6px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 10px;
+  color: var(--vb-muted);
+}
+
+.vb-upload-status {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--vb-muted);
+}
+
+.vb-upload-status:empty {
+  display: none;
+}
+
+.vb-upload-status.is-error {
+  color: var(--vb-warning);
+}
+
+@media (max-width: 640px) {
+  .vb-step-footer {
+    padding: 10px 16px calc(13px + env(safe-area-inset-bottom, 0px));
+  }
+  .vb-vibe-heading {
+    font-size: 19px;
+  }
+  .vb-vibe-screen {
+    gap: 14px;
+  }
+  .vb-vibe-example {
+    min-height: 32px;
+  }
+  .vb-upload-limit {
+    display: none;
+  }
+}
+
+@media (max-width: 360px) {
+  .vb-upload-button {
+    padding: 10px;
+  }
+  .vb-footer-actions .vb-primary-btn {
+    padding-inline: 11px;
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vb-vibe-example,
+  .vb-footer-actions .vb-primary-btn,
+  .vb-upload-button {
+    transition: none;
+    transform: none !important;
+  }
+}
+
+/* A single interchangeable card slot beneath the independent Quick Tools. */
+.vb-directions-slot { overflow: hidden; display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.vb-discovery.directions-expanded { max-height: calc(100% - var(--vb-top, 12px) - 48px); }
+.vb-directions-control { display: flex; align-items: center; gap: 10px; align-self: flex-start; padding: 4px 10px 4px 4px; border-radius: 24px; background: var(--vb-surface); box-shadow: var(--vb-shadow); }
+.vb-directions-pill { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 22px; padding: 10px 14px; background: var(--vb-accent-soft); font-weight: 600; }
+.vb-directions-pill svg { fill: currentColor; }
+.vb-directions-footer { padding: 10px 18px; border-top: 1px solid var(--vb-border); }
+.vb-exit-navigation { color: #a82018 !important; }
+.vb-discovery.directions-expanded .vb-directions-slot { animation: vb-enter .18s ease-out; }
+@media (max-width: 640px) {
+  .vb-discovery.directions-expanded { max-height: 74dvh; bottom: env(safe-area-inset-bottom, 0px); }
+  .vb-discovery.directions-expanded.is-collapsed { left: 8px; right: 64px; bottom: 40px; }
+  body[data-focus="navigation"] .vb-discovery:not(.directions-expanded) { max-height: 70dvh; }
+  body[data-focus="navigation"] .vb-preferences-widget { max-height: 55dvh; }
+  .vb-directions-control { margin-bottom: env(safe-area-inset-bottom, 0px); }
+}
+@media (prefers-reduced-motion: reduce) { .vb-discovery.directions-expanded .vb-directions-slot { animation: none; } }
+
+/* Blue accents identify preferences and committed choices without tinting every surface. */
+.vb-preferences-widget { border: 1px solid #d3e3fd; }
+.vb-preferences-widget .vb-header { background: #f4f8ff; border-bottom: 1px solid #dce8fc; border-radius: 15px 15px 0 0; padding-bottom: 12px; }
+.vb-preferences-widget .vb-title { color: #174ea6; }
+.vb-preferences-widget .vb-label { color: #285a96; }
+.vb-preferences-widget .vb-minimize { color: #1a73e8; }
+.vb-preferences-widget .vb-field.has-value .vb-trigger { background: #eef5ff; border-color: #a9c9f7; }
+.vb-preferences-widget .vb-trigger:hover { border-color: #8bb6f7; background: #f5f9ff; }
+.vb-preferences-widget .vb-field.is-open .vb-trigger, .vb-preferences-widget .vb-trigger:focus-visible { border-color: #1a73e8; box-shadow: 0 0 0 2px #d3e3fd; }
+@media (max-width: 640px) {
+  body[data-focus="navigation"] .vb-discovery.directions-expanded { max-height: 74dvh; }
+}

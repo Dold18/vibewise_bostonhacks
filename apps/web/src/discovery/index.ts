@@ -37,6 +37,7 @@ export interface DiscoveryPanelOptions {
   search?: PanelDeps['search'];
   saved?: PanelDeps['saved'];
   onRecenter?: () => void;
+  directions?: PanelDeps['directions'];
   /** Swap in a live geocoder later; defaults to the bundled offline Boston list. */
   locationProvider?: LocationSuggestionProvider;
   geolocation?: GeolocationEnvironment;
@@ -54,6 +55,7 @@ export interface DiscoveryPanelOptions {
 
 export interface DiscoveryPanelHandle {
   showView(view: PanelView): void;
+  setDirectionsExpanded(expanded: boolean): void;
   /** The panel's root element (read-only use, e.g. keeping map popups clear of it). */
   element(): HTMLElement;
   getPreferences(): InitialPreferences;
@@ -83,6 +85,7 @@ export function mountDiscoveryPanel(container: HTMLElement, options: DiscoveryPa
     search: options.search,
     saved: options.saved,
     onRecenter: options.onRecenter,
+    directions: options.directions,
   });
   container.append(panel.root);
 
@@ -116,6 +119,7 @@ export function mountDiscoveryPanel(container: HTMLElement, options: DiscoveryPa
 
   const handle: DiscoveryPanelHandle = {
     showView: panel.showView,
+    setDirectionsExpanded: panel.setDirectionsExpanded,
     element: () => panel.root,
     getPreferences: prefs.getState,
     subscribe: (listener) => prefs.subscribe((state) => listener(state)),

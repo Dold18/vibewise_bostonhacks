@@ -1,4 +1,4 @@
-# Discovery panel: initial preferences v1
+# Two-step discovery and Quick Tools
 
 A floating "Plan your outing" panel on the left of the Living Map. It collects
 the practical preferences (activity with a cuisine or activity-type
@@ -17,6 +17,7 @@ const discovery = mountDiscoveryPanel(document.body, {
   mapLayers: { available: CATEGORIES, onChange },  // Activity → map categories
   search: tripSearch, // injected root, focus, onOpen, onClose, destroy
   saved: { store, onSelect },
+  directions: { panel: planner.root, control: planner.control },
   onRecenter,
 });
 ```
@@ -34,9 +35,9 @@ const discovery = mountDiscoveryPanel(document.body, {
 - **Layout.**
   - The panel sits at the top-left. There is no separate search bar any more.
   - It's independent of map overlays. Opening or closing a destination popup
-    or the trip planner never collapses, hides or moves it, so every field
-    (including the vibe box and Quick Tools) stays usable while a popup is
-    open. Only the user's minimize/expand buttons change it.
+    never collapses or hides it. Expanded Directions temporarily replaces the
+    preferences card, leaving its DOM and state mounted; collapsing Directions
+    restores the exact step and sheet state. Only the user's minimize/expand buttons change it.
   - On phones it's a bottom sheet.
 - **What the panel touches.** It never changes map state directly. The map
   subscribes with `subscribe()` / `getPreferences()`, for example for the
@@ -157,3 +158,20 @@ npm run build    # tsc && vite build
 
 The tests run in Node with no DOM. DOM behaviour (keyboard, focus,
 minimize/expand, mobile layout) was checked in headless Chrome.
+
+## Two-step UI source and state
+
+The vibe component, local image validation, seven example prompts and two-step
+composition were selectively integrated from origin/main at bbadf36 (PR #28,
+including the example breadth refinements). Upstream popup-driven collapse and
+removal of Quick Tools/navigation were intentionally excluded.
+
+Step 1 contains practical fields and Continue to your vibe. Step 2 has one
+“What’s your vibe?” heading, the descriptive text field, seven examples and an
+optional photo drop zone. Files stay in memory (up to five JPG/PNG/WebP images,
+8 MB each). Nothing is uploaded or analyzed; previews use revoked-on-removal
+object URLs. Back, Continue, and Directions preserve the original File objects.
+The preference normalizer intentionally does not restore File objects from JSON.
+
+The blue header, labels, selected fields and focus rings reinforce the existing
+blue action styling. Only the user controls minimizing the discovery sheet.

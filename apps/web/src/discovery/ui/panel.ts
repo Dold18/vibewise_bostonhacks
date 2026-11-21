@@ -19,7 +19,6 @@ import {
   initialPreferences,
   secondaryFieldFor,
   summarizePreferences,
-  VIBE_TEXT_MAX_LENGTH,
   type InitialPreferences,
   type PreferencesAction,
 } from '../preferences';
@@ -28,6 +27,7 @@ import { h, icon, ICONS, uid } from './dom';
 import { createLocationField } from './locationField';
 import { createMultiSelectField } from './multiSelectField';
 import { createSelectField } from './selectField';
+import { createVibeStep } from './vibeStep';
 import { createTimingField } from './timingField';
 import {
   createQuickTools,
@@ -47,6 +47,7 @@ export interface PanelDeps {
   search?: { root: HTMLElement; focus(): void; onOpen(): void; onClose(): void; destroy(): void };
   saved?: Omit<SavedViewConfig, 'onBack'>;
   onRecenter?: () => void;
+  directions?: { panel: HTMLElement; control: HTMLElement };
 }
 
 export type PanelView = 'preferences' | 'search' | 'saved';
@@ -56,10 +57,11 @@ export interface Panel {
   /** Close any open dropdown or search inside the panel. */
   closePopups(): void;
   showView(view: PanelView): void;
+  setDirectionsExpanded(expanded: boolean): void;
   destroy(): void;
 }
 
-export function createPanel({ prefs, layout, provider, geolocation, now, mapLayers, search, saved, onRecenter }: PanelDeps): Panel {
+export function createPanel({ prefs, layout, provider, geolocation, now, mapLayers, search, saved, onRecenter, directions }: PanelDeps): Panel {
   const dispatch = prefs.dispatch;
   const bodyId = uid('panel-body');
   const titleId = uid('panel-title');
@@ -110,25 +112,8 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     onCustomChange: (date, time) => dispatch({ type: 'setCustomTiming', date, time, now: now() }),
   });
 
-  const vibeId = uid('vibe');
-  const vibeCountId = uid('vibe-count');
-  const vibe = h('textarea', {
-    id: vibeId,
-    class: 'vb-textarea',
-    rows: 3,
-    maxlength: VIBE_TEXT_MAX_LENGTH,
-    placeholder: 'An intimate cafe on a rainy night, somewhere lively with friends...',
-    'aria-describedby': vibeCountId,
-  });
-  const vibeCount = h('span', { class: 'vb-counter', id: vibeCountId }, `0/${VIBE_TEXT_MAX_LENGTH}`);
-  vibe.addEventListener('input', () => dispatch({ type: 'setVibeText', text: vibe.value }));
-  const vibeField = h(
-    'div',
-    { class: 'vb-field vb-vibe' },
-    h('label', { class: 'vb-label', for: vibeId }, 'Describe your vibe ', h('span', { class: 'vb-optional' }, '(optional)')),
-    vibe,
-    h('div', { class: 'vb-field-foot' }, h('span', { class: 'vb-hint-inline' }, 'Saved for the upcoming vibe matching.'), vibeCount),
-  );
+  const vibeStep = createVibeStep(prefs);
+  let currentStep: 'plan' | 'vibe' = 'plan';
 
   // --- Notes, header, footer ------------------------------------------------
   const notesList = h('ul', { class: 'vb-notes-list' });
@@ -147,7 +132,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   const resetBtn = h('button', { type: 'button', class: 'vb-text-btn' }, 'Clear all');
   resetBtn.addEventListener('click', () => {
     dispatch({ type: 'reset' });
-    activity.focus();
+    showStep('plan');
   });
 
   const summaryText = h('span', { class: 'vb-summary-text' });
@@ -172,7 +157,8 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   quickTools.setSavedCount(saved?.store.list().length ?? 0);
   const unsubSavedCount = saved?.store.subscribe((items) => quickTools.setSavedCount(items.length));
 
-  const subtitle = h('p', { class: 'vb-subtitle' }, 'Set the basics. The map stays live while you choose.');
+  const heading = h('h2', { class: 'vb-title', id: titleId, tabindex: '-1' }, 'Plan your outing');
+  const subtitle = h('p', { class: 'vb-subtitle' }, 'First, the basics. Then we’ll find the feeling.');
   const stepSection = h(
     'section',
     { class: 'vb-step', 'data-step': 'preferences', 'aria-labelledby': titleId },
@@ -182,22 +168,16 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     origin.root,
     budget.root,
     timing.root,
-    vibeField,
     notes,
   );
-  const footer = h(
-    'footer',
-    { class: 'vb-footer' },
-    h(
-      'p',
-      { class: 'vb-footer-note' },
-      mapLayers
-        ? "Activity sets which places the map loads. Other choices are saved but don't filter pins yet."
-        : "Preview: preferences are saved but don't filter map pins yet.",
-    ),
-    resetBtn,
-  );
-
+  const vibeSection = h('section', { class: 'vb-step', 'data-step': 'vibe', 'aria-labelledby': titleId, hidden: true }, vibeStep.root);
+  const continueBtn = h('button', { type: 'button', class: 'vb-primary-btn vb-continue-btn' }, 'Continue to your vibe');
+  const backBtn = h('button', { type: 'button', class: 'vb-text-btn vb-back-btn' }, 'Back to details');
+  const doneBtn = h('button', { type: 'button', class: 'vb-primary-btn vb-continue-btn' }, 'Save my vibe');
+  const planActions = h('div', { class: 'vb-footer-actions' }, resetBtn, continueBtn);
+  const vibeActions = h('div', { class: 'vb-footer-actions', hidden: true }, backBtn, doneBtn);
+  const footerNote = h('p', { class: 'vb-step-footnote' }, 'Next: describe the atmosphere you have in mind. All these details stay saved.');
+  const footer = h('footer', { class: 'vb-footer vb-step-footer' }, footerNote, planActions, vibeActions);
   const body = h(
     'div',
     { class: 'vb-body', id: bodyId },
@@ -208,12 +188,13 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
       h(
         'div',
         { class: 'vb-header-text' },
-        h('h2', { class: 'vb-title', id: titleId }, 'Plan your outing'),
+        heading,
         subtitle,
       ),
       minimizeBtn,
     ),
     stepSection,
+    vibeSection,
     footer,
   );
 
@@ -223,7 +204,30 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   expansion.inert = true;
   const toolsWidget = h('section', { class: 'vb-widget vb-tools-widget', 'aria-label': 'Quick Tools' }, quickTools.root, expansion);
   const preferencesWidget = h('section', { class: 'vb-widget vb-preferences-widget', 'aria-label': 'Discovery Preferences' }, summaryBtn, body);
-  const root = h('aside', { class: 'vb-discovery', 'aria-label': 'Plan your outing', 'data-panel-view': 'preferences' }, hasTools ? toolsWidget : null, preferencesWidget);
+  const directionsSlot = h('section', { class: 'vb-widget vb-directions-slot', 'aria-label': 'Directions', hidden: true }, directions?.panel ?? null);
+  const root = h('aside', { class: 'vb-discovery', 'aria-label': 'Plan your outing', 'data-panel-view': 'preferences', 'data-step': currentStep }, hasTools ? toolsWidget : null, preferencesWidget, directionsSlot, directions?.control ?? null);
+  function setDirectionsExpanded(expanded: boolean) {
+    preferencesWidget.hidden = expanded;
+    preferencesWidget.inert = expanded;
+    directionsSlot.hidden = !expanded;
+    directionsSlot.inert = !expanded;
+    root.classList.toggle('directions-expanded', expanded);
+  }
+  function showStep(next: 'plan' | 'vibe') {
+    currentStep = next;
+    stepSection.hidden = next !== 'plan'; vibeSection.hidden = next !== 'vibe';
+    planActions.hidden = next !== 'plan'; vibeActions.hidden = next !== 'vibe';
+    root.dataset.step = next;
+    heading.textContent = next === 'plan' ? 'Plan your outing' : 'What’s your vibe?';
+    subtitle.hidden = next === 'vibe';
+    subtitle.textContent = 'First, the basics. Then we’ll find the feeling.';
+    footerNote.textContent = next === 'plan' ? 'Next: describe the atmosphere you have in mind. All these details stay saved.' : 'Your inspiration stays in this browser. Photo analysis and the adaptive quiz are coming next.';
+    closePopups();
+    if (next === 'vibe') heading.focus(); else activity.focus();
+  }
+  continueBtn.addEventListener('click', () => showStep('vibe'));
+  backBtn.addEventListener('click', () => showStep('plan'));
+  doneBtn.addEventListener('click', () => { layout.dispatch({ type: 'collapse' }); summaryBtn.focus(); });
   let view: PanelView = 'preferences';
   let collapseTimer: number | undefined;
   quickTools.setExpanded('preferences', expansionId);
@@ -288,8 +292,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
       state.budget && state.budget.maxCentsPerPerson !== null ? 'Estimated total per person, before transit fare.' : '',
     );
     timing.update(state);
-    if (vibe.value !== state.vibeText) vibe.value = state.vibeText;
-    vibeCount.textContent = `${state.vibeText.length}/${VIBE_TEXT_MAX_LENGTH}`;
+    vibeStep.render(state);
 
     const q = qualificationsFor(state);
     notesList.replaceChildren(...q.map((text) => h('li', {}, text)));
@@ -337,6 +340,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   return {
     root,
     closePopups,
+    setDirectionsExpanded,
     showView: (next) => {
       if (next !== view) showView(next);
     },
@@ -345,6 +349,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
       unsubPrefs();
       unsubLayout();
       fields.forEach((f) => f.destroy());
+      vibeStep.destroy();
       searchView?.destroy();
       savedView?.destroy();
       unsubSavedCount?.();
