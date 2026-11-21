@@ -70,3 +70,20 @@ test('throws GeminiRequestError when the response has no text', async () => {
   const h = harness([{ status: 200, body: { candidates: [{ finishReason: 'SAFETY' }] } }]);
   await assert.rejects(h.estimate(PLACES), GeminiRequestError);
 });
+
+test('retries a timed-out or dropped request like a 503', async () => {
+  let calls = 0;
+  const sleeps: number[] = [];
+  const fetchImpl = (async (_url: string, init: RequestInit) => {
+    calls++;
+    assert.ok(init.signal, 'request has a timeout signal');
+    if (calls === 1) throw new DOMException('The operation timed out.', 'TimeoutError');
+    if (calls === 2) throw new TypeError('fetch failed');
+    return new Response(JSON.stringify(okBody('[]')), { status: 200 });
+  }) as unknown as typeof fetch;
+  let t = 0;
+  const estimate = createPriceEstimator({ apiKey: 'k', model: 'm', rpm: 600, fetchImpl, sleep: async (ms) => { sleeps.push(ms); t += ms; }, now: () => t });
+  assert.equal(await estimate(PLACES), '[]');
+  assert.equal(calls, 3);
+  assert.deepEqual(sleeps.filter((ms) => ms >= 10000), [10000, 20000]);
+});

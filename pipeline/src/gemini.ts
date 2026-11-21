@@ -8,6 +8,7 @@ import { PRICE_SYSTEM_PROMPT, type PromptPlace } from './price.ts';
 export const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 const BACKOFF_MS = [10_000, 20_000, 40_000]; // between the 4 attempts
+const REQUEST_TIMEOUT_MS = 180_000;
 
 /** Still rate-limited or overloaded after every attempt; usually the key's quota is used up. */
 export class GeminiQuotaError extends Error {}
@@ -21,6 +22,8 @@ export interface GeminiOptions {
   fetchImpl?: typeof fetch;
   sleep?: (ms: number) => Promise<void>;
   now?: () => number;
+  /** Per-request timeout; default 180 s. */
+  timeoutMs?: number;
 }
 
 const RESPONSE_SCHEMA = {
@@ -59,15 +62,23 @@ export function createPriceEstimator(o: GeminiOptions): (places: PromptPlace[]) 
     });
     for (let attempt = 0; ; attempt++) {
       await paced();
-      const res = await fetchImpl(`${API_BASE}/${o.model}:generateContent`, {
-        method: 'POST',
-        headers: { 'x-goog-api-key': o.apiKey, 'content-type': 'application/json' },
-        body,
-      });
-      if (res.status === 429 || res.status === 503) {
+      let res: Response | null;
+      try {
+        res = await fetchImpl(`${API_BASE}/${o.model}:generateContent`, {
+          method: 'POST',
+          headers: { 'x-goog-api-key': o.apiKey, 'content-type': 'application/json' },
+          body,
+          signal: AbortSignal.timeout(o.timeoutMs ?? REQUEST_TIMEOUT_MS),
+        });
+      } catch (err) {
+        // A timeout or dropped connection is retried like an overloaded server.
+        if ((err as Error).name !== 'TimeoutError' && !(err instanceof TypeError)) throw err;
+        res = null;
+      }
+      if (res === null || res.status === 429 || res.status === 503) {
         const backoff = BACKOFF_MS[attempt];
         if (backoff === undefined) {
-          throw new GeminiQuotaError(`Gemini still returned ${res.status} after ${attempt + 1} attempts (quota used up or service overloaded)`);
+          throw new GeminiQuotaError(`Gemini still returned ${res?.status ?? 'no response'} after ${attempt + 1} attempts (quota used up or service overloaded)`);
         }
         await sleep(backoff);
         continue;
