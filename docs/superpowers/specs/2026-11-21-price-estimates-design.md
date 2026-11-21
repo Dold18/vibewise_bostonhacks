@@ -195,3 +195,18 @@ On the card branch, off `maps-supabase`: `apps/web/src/catalog.ts`, `apps/web/sr
 - Exact prompt wording within the rubric above.
 - The default `GEMINI_MODEL` name, verified with ListModels.
 - Internal module boundaries beyond §5.7, and the test fixtures.
+
+## 8. Run record (2026-11-21)
+
+- **Run 1, `gemini-2.5-flash`, batches of 100:** 2,211 rows priced. All are OpenStreetMap rows, in id order. The run stopped at the free tier's 20 requests per day per model.
+- **Run 2, `gemini-3.5-flash`, batches of 320:** the remaining 5,653 rows, 18 requests, no batch skipped, no missing answers. Rows run 1 had answered `unknown` were asked again here.
+- **Result:**
+
+  | Band | `$` | `$$` | `$$$` | `$$$$` | unknown |
+  |---|---|---|---|---|---|
+  | Rows | 3,895 | 2,460 | 1,008 | 238 | 263 |
+
+  - 7,601 of 7,864 rows (97 %) have `price_source = 'estimate'`.
+  - No `menu` rows, no `median_entree_price_cents`, and no band without a source.
+  - Unknowns: restaurant 166 of 5,996, cafe 2 of 990, nightlife 95 of 878.
+- **Two models priced the catalog**, and the database doesn't record which model priced which row. Both used the same rubric and agreed on a test sample. To make it uniform, run `npm run enrich:price -- --force` on one model once quota allows.
