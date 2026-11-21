@@ -245,3 +245,13 @@ button {
     bottom: 40px;
   }
 }
+
+/* Transit route section inside the place card */
+.route-box { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0, 0, 0, 0.1); font-size: 14px; }
+.route-title { margin: 0 0 4px; font-weight: 600; }
+.route-line, .route-note { margin: 4px 0; }
+.route-note { font-size: 12px; opacity: 0.7; }
+.route-legs { list-style: none; margin: 6px 0; padding: 0; }
+.route-legs li { padding: 2px 0 2px 10px; border-left: 4px solid var(--leg-color, #1a73e8); margin: 3px 0; }
+.route-legs li.leg-walk { border-left-style: dotted; }
+.route-retry { margin-top: 6px; cursor: pointer; }

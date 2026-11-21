@@ -4,9 +4,11 @@ import './style.css';
 import { BUILDING_3D_LAYER, BUILDING_3D_OPACITY, mapStyle } from './mapStyle';
 import {
   CATEGORIES,
+  metersBetween,
   placesFromTiles,
   placesNearAny,
   searchPlaces,
+  type CategorizedPlace,
   type Category,
   type Place,
   type TilePoi,
@@ -27,6 +29,7 @@ import { createPlacePopup, POPUP_PIN_GAP } from './features/map/placePopup';
 import { pinTarget, popupRevealShift } from './features/map/popupPlacement';
 import { realPlaceId, type RouteEndpoint } from './features/navigation/routing';
 import { createRoutePlanner } from './features/navigation/ui/routePlannerView';
+import { catalogPlacesNear, isCatalogCategory } from './catalog';
 
 const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
 const TILTED = { pitch: 60, bearing: -20 };
@@ -152,6 +155,10 @@ function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: 
     });
     return new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
   });
+  // Pins refreshed under an open popup (the map moved): keep its place highlighted.
+  const open = placePopup?.current();
+  const openPin = open ? pinById.get(open.id) : undefined;
+  if (openPin) selectPin(openPin);
 }
 
 /** Every pin the same: what search results and location types use until match scores exist. */
@@ -300,22 +307,36 @@ function openSavedPlace(place: Place, categoryId?: string) {
 // ---------------------------------------------------------------------------
 
 let categoryAbort: AbortController | undefined;
+/** What the category pins currently show, so they can follow the map; null while search results (or nothing) are shown. */
+let currentSelection: { categories: Category[]; detail: 'tiles' | 'full' } | null = null;
+/** Where the category pins were last loaded. */
+let lastView: { center: { lat: number; lon: number }; zoom: number } | null = null;
 
 /** Stop any category lookup still in flight, so it can't overwrite newer pins (e.g. search results). */
 function cancelCategory() {
   categoryAbort?.abort();
+  currentSelection = null;
 }
+
+/** Roughly the visible area around the centre; wider when zoomed out. */
+const radiusFor = (zoom: number) => Math.min(4000, Math.max(400, 1200 * 2 ** (16 - zoom)));
 
 /**
  * Show places from several categories at once, each pin in its category's
- * color. `detail: 'tiles'` uses only what's already in the loaded map tiles
- * (no network); `'full'` then upgrades to one combined Overpass lookup.
+ * color.
+ * - Food & drink (Restaurants / Coffee / Bars) always come from our Supabase
+ *   catalog when it can answer, with address, website, phone and hours,
+ *   whether or not an activity is chosen.
+ * - Other categories: `detail: 'tiles'` uses only what's already in the loaded
+ *   map tiles (no network); `'full'` upgrades them with one Overpass lookup.
  * A newer call aborts an older one, and every await re-checks that signal,
- * so a late response can never replace newer pins.
+ * so a late response can never replace newer pins. `refresh` (the map moved)
+ * keeps the open card and result list as they are.
  */
-async function showCategories(categories: Category[], detail: 'tiles' | 'full') {
+async function showCategories(categories: Category[], detail: 'tiles' | 'full', { refresh = false } = {}) {
   categoryAbort?.abort();
-  closePopup();
+  currentSelection = categories.length > 0 ? { categories, detail } : null;
+  if (!refresh) closePopup();
   if (categories.length === 0) {
     clearPins();
     hideToast();
@@ -325,8 +346,8 @@ async function showCategories(categories: Category[], detail: 'tiles' | 'full') 
   const label = categories.length === 1 ? categories[0].label.toLowerCase() : 'places';
   const c = map.getCenter();
   const center = { lat: c.lat, lon: c.lng };
-  // Roughly the visible area around the centre; wider when zoomed out.
-  const radius = Math.min(4000, Math.max(400, 1200 * 2 ** (16 - map.getZoom())));
+  lastView = { center, zoom: map.getZoom() };
+  const radius = radiusFor(map.getZoom());
   // Share the pin budget between categories so mixed views stay responsive.
   const perCategory = categories.length === 1 ? 60 : Math.max(20, Math.floor(100 / categories.length));
 
@@ -371,20 +392,45 @@ async function showCategories(categories: Category[], detail: 'tiles' | 'full') 
     // Tiles may still be streaming in (e.g. right after page load); retry once they're in.
     if (!map.loaded()) map.once('idle', showQuick);
   }
-  if (detail === 'tiles') return;
 
-  // 2) Richer: one Overpass request for full OSM tags (hours, website, address...).
+  const byId = new Map(categories.map((cat) => [cat.id, cat]));
+  const groupsOf = (list: CategorizedPlace[]): [Category, Place[]][] =>
+    list.map(({ place, categoryId }) => [byId.get(categoryId)!, [place]]);
+  const otherCategories = categories.filter((cat) => !isCatalogCategory(cat));
+
+  // 2) Food & drink from our catalog, with details, for any detail level.
+  const catalogCategories = categories.filter(isCatalogCategory);
+  const fromCatalog = catalogCategories.length
+    ? await catalogPlacesNear(catalogCategories, center, radius, perCategory)
+    : null;
+  if (abort.signal.aborted) return;
+
+  if (detail === 'tiles') {
+    if (!fromCatalog) return; // the tile pins stay
+    haveDetailed = true;
+    const showWithTiles = () => {
+      if (abort.signal.aborted) return;
+      const others = otherCategories.map((cat): [Category, Place[]] => [cat, placesFromTiles(tilePois(cat), center, radius, perCategory)]);
+      showPlaces(merge([...groupsOf(fromCatalog), ...others]), lookFor, iconFor);
+      remember();
+      hideToast();
+    };
+    showWithTiles();
+    if (!map.loaded()) map.once('idle', showWithTiles); // tile pins for the other categories may still be streaming in
+    return;
+  }
+
+  // 3) Overpass for everything else (or for everything, when the catalog can't answer).
+  const overpassCategories = fromCatalog ? otherCategories : categories;
   try {
-    const detailed = await placesNearAny(categories, center, radius, abort.signal, perCategory);
+    const fromOverpass = overpassCategories.length
+      ? await placesNearAny(overpassCategories, center, radius, abort.signal, perCategory)
+      : [];
     if (abort.signal.aborted) return;
+    const detailed = [...(fromCatalog ?? []), ...fromOverpass];
     if (detailed.length > 0) {
       haveDetailed = true;
-      const byId = new Map(categories.map((cat) => [cat.id, cat]));
-      showPlaces(
-        merge(detailed.map(({ place, categoryId }) => [byId.get(categoryId)!, [place]])),
-        lookFor,
-        iconFor,
-      );
+      showPlaces(merge(groupsOf(detailed)), lookFor, iconFor);
       remember();
       hideToast();
     } else if (quickCount === 0) {
@@ -392,6 +438,14 @@ async function showCategories(categories: Category[], detail: 'tiles' | 'full') 
     }
   } catch {
     if (abort.signal.aborted) return;
+    if (fromCatalog?.length) {
+      // Overpass failed for the other categories; still show what the catalog has.
+      haveDetailed = true;
+      showPlaces(merge(groupsOf(fromCatalog)), lookFor, iconFor);
+      remember();
+      showToast('Showing food & drink only. The OSM details service is busy right now.');
+      return;
+    }
     if (quickCount === 0) {
       showToast(`Couldn't find ${label} here, and the OSM details service is busy. Try again shortly.`);
     } else {
@@ -411,6 +465,21 @@ function tilePois(category: Category): TilePoi[] {
       : [],
   );
 }
+
+// Category pins follow the map: once it settles somewhere meaningfully new,
+// reload the same categories there (search results are left alone).
+let moveTimer: number | undefined;
+map.on('moveend', () => {
+  window.clearTimeout(moveTimer);
+  moveTimer = window.setTimeout(() => {
+    if (!currentSelection || !lastView) return;
+    const c = map.getCenter();
+    const moved = metersBetween(lastView.center, { lat: c.lat, lon: c.lng });
+    const zoomed = Math.abs(map.getZoom() - lastView.zoom);
+    if (moved < radiusFor(lastView.zoom) * 0.3 && zoomed < 0.75) return;
+    void showCategories(currentSelection.categories, currentSelection.detail, { refresh: true });
+  }, 500);
+});
 
 // Clicking empty map closes the popup.
 map.on('click', () => closePopup());

@@ -29,4 +29,6 @@ function maplibreWorker(): Plugin {
 
 export default defineConfig({
   plugins: [maplibreWorker()],
+  // The transit API runs in server/index.ts; the browser only ever talks to Vite's origin.
+  server: { proxy: { '/api': `http://127.0.0.1:${process.env.TRANSIT_API_PORT ?? 8787}` } },
 });

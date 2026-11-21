@@ -1,0 +1,22 @@
+{
+  "name": "vibenta-pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "ingest": "node --env-file-if-exists=.env src/ingest.ts",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "@duckdb/node-api": "^2.0.1-r.1",
+    "@supabase/supabase-js": "^2.119.2"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "~7.0.2"
+  }
+}
