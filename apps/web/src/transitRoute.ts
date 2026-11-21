@@ -143,6 +143,7 @@ function addRetry(box: HTMLElement, retry: () => void) {
 // ---- Map overlay ----------------------------------------------------------
 
 const SRC = 'transit-route';
+const CASING = 'transit-route-casing';
 const WALK = 'transit-route-walk';
 const RIDE = 'transit-route-ride';
 const EMPTY = { type: 'FeatureCollection', features: [] } as const;
@@ -150,6 +151,15 @@ const EMPTY = { type: 'FeatureCollection', features: [] } as const;
 function ensureLayers(map: MapLibreMap): GeoJSONSource {
   if (!map.getSource(SRC)) {
     map.addSource(SRC, { type: 'geojson', data: EMPTY });
+    // A white outline under every leg keeps the route visible on any map
+    // theme, including the dark late-night palette (src/features/vibeTheme).
+    map.addLayer({
+      id: CASING,
+      type: 'line',
+      source: SRC,
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: { 'line-color': '#ffffff', 'line-width': 9, 'line-opacity': 0.9 },
+    });
     map.addLayer({
       id: RIDE,
       type: 'line',

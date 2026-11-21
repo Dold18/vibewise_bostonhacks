@@ -2,6 +2,8 @@ import { AttributionControl, Map as MapLibreMap, Marker, setWorkerUrl } from 'ma
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
 import { BUILDING_3D_LAYER, BUILDING_3D_OPACITY, mapStyle } from './mapStyle';
+import { PIN_COLORS } from './pinColors';
+import { mountAccount } from './features/account';
 import {
   CATEGORIES,
   formatAddress,
@@ -44,14 +46,7 @@ if (import.meta.env.DEV) Object.assign(window, { map }); // handy for poking at 
 // Pins
 // ---------------------------------------------------------------------------
 
-const CATEGORY_COLORS: Record<string, string> = {
-  search: '#ea4335',
-  restaurants: '#f2711c',
-  coffee: '#a5673f',
-  bars: '#c2185b',
-  parks: '#1e8e3e',
-  museums: '#1a73e8',
-};
+const CATEGORY_COLORS = PIN_COLORS;
 
 const PIN_PATH = 'M14 0C6.3 0 0 6.2 0 13.9 0 24.3 14 40 14 40s14-15.7 14-26.1C28 6.2 21.7 0 14 0z';
 
@@ -612,6 +607,9 @@ discovery = mountDiscoveryPanel(document.body, {
     },
   },
 });
+
+// Accounts: sign-in in the top right; the map theme follows the user's vibes.
+mountAccount(document.body, { map });
 
 // A different starting point makes the shown route wrong: re-plan for the open card's place.
 let lastOrigin = currentOrigin();

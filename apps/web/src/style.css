@@ -471,7 +471,8 @@ button {
 
 @media (max-width: 640px) {
   .search-wrap {
-    width: 100%;
+    /* Leave room for the account button (48px + gap) in the top right. */
+    width: calc(100% - 60px);
   }
 
   .place-card {
