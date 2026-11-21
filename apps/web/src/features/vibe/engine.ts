@@ -1,5 +1,5 @@
 import { emptyAxis, inferTextVibe, normalizedAxisTags, type VibeEstimates, type VibeAxis } from './model';
-import { VIBE_QUESTIONS, questionById, type VibeQuestion } from './questions';
+import { VIBE_QUESTIONS, type VibeQuestion } from './questions';
 
 export type VibeAnswer = 'left' | 'right' | 'either' | 'skip';
 export interface QuizAnswer {
