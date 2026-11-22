@@ -96,3 +96,33 @@ test('each deal carries the page it was found on', async () => {
   assert.equal(r.deals.find((d) => /10%/.test(d.title))!.sourceUrl, HOME);
   assert.equal(r.deals.find((d) => /fries/i.test(d.title))!.sourceUrl, 'https://example.com/specials');
 });
+
+test('a linked page that redirects off-origin is ignored', async () => {
+  const { http } = fakeHttp({
+    [HOME]: ok(HOME, '<body><a href="/specials">Specials</a></body>'),
+    'https://example.com/specials': ok('https://www.yelp.com/biz/x', '<body><p>10% off with student ID</p></body>'),
+  });
+  const r = await scanWebsite(PLACE, http, NOW);
+  assert.ok(r.outcome === 'ok');
+  assert.equal(r.deals.length, 0);
+});
+
+for (const status of [503, 429]) {
+  test(`home HTTP ${status} is transient`, async () => {
+    const { http } = fakeHttp({ [HOME]: { ok: false, reason: 'http', detail: `HTTP ${status} from ${HOME}` } });
+    assert.equal((await scanWebsite(PLACE, http, NOW)).outcome, 'transient');
+  });
+}
+
+test('home HTTP 404 stays permanent', async () => {
+  const { http } = fakeHttp({ [HOME]: { ok: false, reason: 'http', detail: `HTTP 404 from ${HOME}` } });
+  assert.equal((await scanWebsite(PLACE, http, NOW)).outcome, 'permanent');
+});
+
+test('a linked page with HTTP 500 is transient', async () => {
+  const { http } = fakeHttp({
+    [HOME]: ok(HOME, '<body><a href="/specials">Specials</a></body>'),
+    'https://example.com/specials': { ok: false, reason: 'http', detail: 'HTTP 500 from https://example.com/specials' },
+  });
+  assert.equal((await scanWebsite(PLACE, http, NOW)).outcome, 'transient');
+});

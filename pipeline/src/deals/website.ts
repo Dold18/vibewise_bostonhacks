@@ -13,6 +13,11 @@ export type WebsiteScan =
 export const DEAL_LINK = /special|happy[\s_-]?hour|student|deal|promo|discount/i;
 const MAX_LINKED_PAGES = 2;
 const MAX_DEALS = 5;
+const TRANSIENT_HTTP = /^HTTP (5\d\d|429)\b/;
+
+type Failure = { reason: string; detail: string };
+const isTransient = (f: Failure) =>
+  f.reason === 'timeout' || f.reason === 'network' || (f.reason === 'http' && TRANSIENT_HTTP.test(f.detail));
 
 /** Same-origin pages whose href or text looks deal-related, in page order, de-duplicated. */
 function dealLinks(html: string, homeUrl: string): string[] {
@@ -41,7 +46,7 @@ export async function scanWebsite(place: EnrichPlace, http: PoliteFetcher, check
 
   const home = await http.getText(start, { checkRobots: true });
   if (!home.ok) {
-    return home.reason === 'timeout' || home.reason === 'network'
+    return isTransient(home)
       ? { outcome: 'transient', detail: home.detail }
       : permanent(`${home.reason}: ${home.detail}`);
   }
@@ -50,8 +55,10 @@ export async function scanWebsite(place: EnrichPlace, http: PoliteFetcher, check
   const pages = [{ url: home.url, body: home.body }];
   for (const link of dealLinks(home.body, home.url)) {
     const page = await http.getText(link, { checkRobots: true });
-    if (page.ok) pages.push({ url: page.url, body: page.body });
-    else if (page.reason === 'timeout' || page.reason === 'network') return { outcome: 'transient', detail: page.detail };
+    if (page.ok) {
+      // A same-origin link can redirect anywhere; only keep pages that stayed on the home origin.
+      if (new URL(page.url).origin === new URL(home.url).origin) pages.push({ url: page.url, body: page.body });
+    } else if (isTransient(page)) return { outcome: 'transient', detail: page.detail };
     // robots, http, not_html or third_party on a linked page: skip it
   }
 
