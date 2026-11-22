@@ -6,7 +6,7 @@ import { parseVibeArgs, placeFlavor, resolveModel, runVibeEnrichment, selectIds 
 import { PLACE_TYPE_CONFIG } from '../src/placeTypes.ts';
 import {
   PLACE_RESPONSE_SCHEMA, PLACE_SYSTEM_PROMPT, VIBE_RESPONSE_SCHEMA, VIBE_SYSTEM_PROMPT,
-  buildPlaceBundle, humanizeKind, parsePlaceResponse, parseVibeResponse, type VibePlace,
+  buildPlaceBundle, humanizeKind, kindWords, parsePlaceResponse, parseVibeResponse, type VibePlace,
 } from '../src/vibe.ts';
 
 const p = (o: Partial<VibePlace> = {}): VibePlace => ({
@@ -261,4 +261,44 @@ test('runner with the place flavor retries a guard rejection with the reason', a
   assert.deepEqual(s.rejections, { sensory: 1, photo: 0, other: 0 });
   assert.match(prompts[1]!, /Your previous answer was rejected: unsupported sensory claim "quiet"/);
   assert.match(prompts[0]!, /kind=park/);
+});
+
+const MUSIC_FACTS_ONLY = 'This music venue hosts live performances for local audiences. It is a lively, social spot for a night out with friends who enjoy seeing bands.';
+
+test('kindWords: the words of the place kind, plus "music" for music kinds', () => {
+  assert.deepEqual([...kindWords('music_venue')].sort(), ['music', 'venue']);
+  assert.ok(kindWords('nightclub').has('music'));
+  assert.ok(kindWords('concert_hall').has('music'));
+  assert.ok(!kindWords('art_museum').has('music'));
+  assert.equal(kindWords(null).size, 0);
+});
+
+test('a facts-only music venue may say "music"; an art museum may not', () => {
+  const venue = buildPlaceBundle(p({ name: 'Club Lido', kind: 'music_venue', osm_tags: null, context_features: null }), []);
+  assert.equal(venue.hasDescriptive, false);
+  const ok = parsePlaceResponse(JSON.stringify({ description: MUSIC_FACTS_ONLY }), { hasDescriptive: false, hasPhoto: false, allowedWords: venue.allowedWords });
+  assert.equal(ok.description, MUSIC_FACTS_ONLY);
+  const museum = buildPlaceBundle(p({ osm_tags: null, context_features: null }), []);
+  assert.throws(
+    () => parsePlaceResponse(JSON.stringify({ description: MUSIC_FACTS_ONLY }), { hasDescriptive: false, hasPhoto: false, allowedWords: museum.allowedWords }),
+    /unsupported sensory claim "music"/,
+  );
+});
+
+test('kind words exempt only themselves: other sensory words are still rejected', () => {
+  const venue = buildPlaceBundle(p({ name: 'Club Lido', kind: 'music_venue', osm_tags: null, context_features: null }), []);
+  const text = 'This music venue hosts live performances in a dim, moody room for a night out with friends who enjoy bands.';
+  assert.throws(
+    () => parsePlaceResponse(JSON.stringify({ description: text }), { hasDescriptive: false, hasPhoto: false, allowedWords: venue.allowedWords }),
+    /unsupported sensory claim "dim"/,
+  );
+});
+
+test('restaurants are unaffected: no exempt words, "music" still rejected without evidence', () => {
+  const desc = 'A casual spot with music and Thai food at an easy price, suited to a quick weeknight meal.';
+  assert.throws(
+    () => parseVibeResponse(JSON.stringify({ description: desc, profile: { cuisines: [], signature_dishes: [], dietary_options: [], price_feel: null, median_entree_price: null } }),
+      { hasDescriptive: false, hasPhoto: false, hasPrice: false }),
+    /unsupported sensory claim "music"/,
+  );
 });
