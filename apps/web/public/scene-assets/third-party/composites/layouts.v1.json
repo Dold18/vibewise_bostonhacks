@@ -1,0 +1,3825 @@
+{
+  "schemaVersion": "1.0.0",
+  "type": "offline_scene_asset_layouts",
+  "status": "transform_layouts_authored_and_asset_ids_checked_browser_visual_qa_pending",
+  "asOf": "2026-11-21",
+  "compositionCount": 40,
+  "sourceRecipeCount": 30,
+  "newLayoutRecipeCount": 10,
+  "slotCount": 2,
+  "units": "local preview units, not real-world meters",
+  "layoutNote": "Layouts and anchor scaling are preview proposals. Real 3D geometry, collisions, visual coherence and map occlusion are unverified until rendered in gallery.",
+  "globalConstraints": [
+    "Only a context hero and one ambient accent; no route or pin occlusion",
+    "Decorations are fictional and must not imply real venue features",
+    "Opt in to religious or culturally specific contexts; never infer identity",
+    "Navigation and focus modes may hide all scene props",
+    "Lazy-load only chosen assets; obey reduced motion"
+  ],
+  "scenes": [
+    {
+      "id": "italian_romantic",
+      "context": "Italian dining",
+      "mood": "romantic",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#4a2446",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-food-kit.pizza",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "kaykit.restaurant-bits.table_round_A_decorated",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-food-kit.glass_wine",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-fantasy-town-kit.lantern",
+              "slot": "ambient_accent",
+              "position": [
+                -0.32,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-nature-kit.flower_red_a",
+              "slot": "ambient_accent",
+              "position": [
+                0.32,
+                0,
+                0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.72,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "italian_retro",
+      "context": "Italian food",
+      "mood": "retro",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#51352b",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-food-kit.pizza_box",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.quaternius-junkfood.pizza",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-city-kit-commercial.detail_awning",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-retro-urban-kit.detail_light_double",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "japanese_ramen_noir",
+      "context": "Japanese ramen",
+      "mood": "noir",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#1d2942",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.quaternius-sushirestaurantkit.food_ramen",
+              "slot": "hero_installation",
+              "position": [
+                -0.475,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.quaternius-sushirestaurantkit.environment_counter_straight",
+              "slot": "hero_installation",
+              "position": [
+                0.475,
+                0,
+                0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.quaternius-sushirestaurantkit.decoration_wall_light",
+              "slot": "ambient_accent",
+              "position": [
+                -0.32,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.quaternius-sushirestaurantkit.decoration_bamboo",
+              "slot": "ambient_accent",
+              "position": [
+                0.32,
+                0,
+                0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.72,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "japanese_sushi_spring",
+      "context": "Japanese sushi",
+      "mood": "dreamy",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#4b4769",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.quaternius-sushirestaurantkit.food_salmon_roll",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.quaternius-sushirestaurantkit.food_ebi_nigiri",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.quaternius-sushirestaurantkit.environment_table",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.quaternius-sushirestaurantkit.decoration_sakura_tree",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "chinese_dim_sum_cozy",
+      "context": "Chinese dim sum",
+      "mood": "cozy",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#684a31",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-food-kit.dim_sum",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-food-kit.steamer",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-food-kit.cup_tea",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "kaykit.furniture-bits.lamp_table",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "north_african_tajine",
+      "context": "North African tajine",
+      "mood": "warm",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#69462e",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-food-kit.tajine",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-food-kit.cup_tea",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-fantasy-town-kit.wall_arch",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-fantasy-town-kit.lantern",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "french_bakery_romance",
+      "context": "French bakery",
+      "mood": "romantic",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#4a2446",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-food-kit.croissant",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-food-kit.loaf_baguette",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "kaykit.restaurant-bits.table_round_A_decorated",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-nature-kit.flower_purple_a",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "mexican_taco_market",
+      "context": "Mexican taco",
+      "mood": "lively",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#4f2a48",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-food-kit.taco",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-fantasy-town-kit.stall",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "kaykit.restaurant-bits.crate_tomatoes",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-holiday-kit.lights_colored",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "retro_diner",
+      "context": "Retro diner",
+      "mood": "nostalgic",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#514135",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.quaternius-junkfood.milkshake",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.quaternius-junkfood.hotdog",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-furniture-kit.stool_bar",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-retro-urban-kit.detail_light_double",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "brunch_garden",
+      "context": "Brunch",
+      "mood": "sunny",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#c18a51",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-food-kit.pancakes",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-food-kit.waffle",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-food-kit.cup_coffee",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-nature-kit.flower_red_a",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "seafood_coastal",
+      "context": "Seafood",
+      "mood": "coastal",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#28536b",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-food-kit.mussel_open",
+              "slot": "hero_installation",
+              "position": [
+                -0.475,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-pirate-kit.structure_platform_dock",
+              "slot": "hero_installation",
+              "position": [
+                0.475,
+                0,
+                0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-pirate-kit.palm_detailed_straight",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "vegetarian_picnic",
+      "context": "Vegetarian food",
+      "mood": "natural",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#3c664d",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-food-kit.salad",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-food-kit.skewer_vegetables",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-fantasy-town-kit.stall",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-nature-kit.flower_purple_a",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "lounge_listening",
+      "context": "Listening lounge",
+      "mood": "cozy",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#684a31",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-furniture-kit.lounge_design_sofa",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-furniture-kit.speaker",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-furniture-kit.radio",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "kaykit.furniture-bits.lamp_standing",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "folk_acoustic_cafe",
+      "context": "Acoustic music",
+      "mood": "intimate",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#4d3658",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.the-base-mesh.acoustic_guitar",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.the-base-mesh.guitar_stand",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-food-kit.cup_coffee",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "kaykit.furniture-bits.lamp_table",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "piano_romantic",
+      "context": "Piano music",
+      "mood": "romantic",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#4a2446",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.the-base-mesh.piano",
+              "slot": "hero_installation",
+              "position": [
+                -0.475,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-food-kit.glass_wine",
+              "slot": "hero_installation",
+              "position": [
+                0.475,
+                0,
+                0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-nature-kit.flower_red_a",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "haunted_street",
+      "context": "Haunted",
+      "mood": "mysterious",
+      "activation": "vibe_selected",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#302c48",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-graveyard-kit.character_ghost",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-graveyard-kit.crypt_large",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-graveyard-kit.pine_crooked",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-graveyard-kit.lantern_candle",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": false,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "haunted_feast",
+      "context": "Haunted dining",
+      "mood": "playful_spooky",
+      "activation": "vibe_selected",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#392e59",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "kaykit.restaurant-bits.table_round_A_decorated",
+              "slot": "hero_installation",
+              "position": [
+                -0.475,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-graveyard-kit.pumpkin_carved",
+              "slot": "hero_installation",
+              "position": [
+                0.475,
+                0,
+                0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-graveyard-kit.character_ghost",
+              "slot": "ambient_accent",
+              "position": [
+                -0.32,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-graveyard-kit.lantern_candle",
+              "slot": "ambient_accent",
+              "position": [
+                0.32,
+                0,
+                0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.72,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": false,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "fantasy_market",
+      "context": "Storybook market",
+      "mood": "fantasy",
+      "activation": "vibe_selected",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#374b54",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-fantasy-town-kit.stall",
+              "slot": "hero_installation",
+              "position": [
+                -0.475,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-fantasy-town-kit.fountain_round",
+              "slot": "hero_installation",
+              "position": [
+                0.475,
+                0,
+                0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-fantasy-town-kit.lantern",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": false,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "cyberpunk_night",
+      "context": "Cyberpunk",
+      "mood": "neon",
+      "activation": "vibe_selected",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#301b5b",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.quaternius-cyberpunkgamekit.computer",
+              "slot": "hero_installation",
+              "position": [
+                -0.475,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.quaternius-cyberpunkgamekit.antenna_1",
+              "slot": "hero_installation",
+              "position": [
+                0.475,
+                0,
+                0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.quaternius-cyberpunkgamekit.light_square",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": false,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "arcade_party",
+      "context": "Arcade",
+      "mood": "playful",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#40457a",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-mini-arcade.arcade_machine",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-mini-arcade.pinball",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-mini-arcade.dance_machine",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-retro-urban-kit.detail_light_double",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "winter_festive",
+      "context": "Winter holiday",
+      "mood": "cozy",
+      "activation": "explicit_or_verified_seasonal_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#684a31",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-holiday-kit.tree_decorated",
+              "slot": "hero_installation",
+              "position": [
+                -0.475,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-holiday-kit.snowman_hat",
+              "slot": "hero_installation",
+              "position": [
+                0.475,
+                0,
+                0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-holiday-kit.lights_colored",
+              "slot": "ambient_accent",
+              "position": [
+                -0.32,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-holiday-kit.gingerbread_man",
+              "slot": "ambient_accent",
+              "position": [
+                0.32,
+                0,
+                0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.72,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": false,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "hanukkah_observance",
+      "context": "Hanukkah",
+      "mood": "respectful",
+      "activation": "explicit_holiday_request_only",
+      "sceneClass": "observance_opt_in",
+      "palette": {
+        "background": "#28384a",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-holiday-kit.hanukkah_menorah",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-holiday-kit.lantern_hanging",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": false,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "kwanzaa_observance",
+      "context": "Kwanzaa",
+      "mood": "respectful",
+      "activation": "explicit_holiday_request_only",
+      "sceneClass": "observance_opt_in",
+      "palette": {
+        "background": "#28384a",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-holiday-kit.kwanzaa_kinara",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-holiday-kit.lantern_hanging",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": false,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "haunted_harbor",
+      "context": "Haunted harbor",
+      "mood": "surreal",
+      "activation": "vibe_selected",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#2f5370",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-pirate-kit.ship_ghost",
+              "slot": "hero_installation",
+              "position": [
+                -0.475,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-pirate-kit.structure_platform_dock",
+              "slot": "hero_installation",
+              "position": [
+                0.475,
+                0,
+                0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-graveyard-kit.lantern_candle",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": false,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "waterfront_romance",
+      "context": "Waterfront",
+      "mood": "romantic",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#4a2446",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-pirate-kit.boat_row_small",
+              "slot": "hero_installation",
+              "position": [
+                -0.475,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-pirate-kit.structure_platform_dock",
+              "slot": "hero_installation",
+              "position": [
+                0.475,
+                0,
+                0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-nature-kit.flower_purple_a",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "retro_book_cafe",
+      "context": "Book café",
+      "mood": "nostalgic",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#514135",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "kaykit.furniture-bits.book_set",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-furniture-kit.lounge_design_sofa",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-food-kit.cup_coffee",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-retro-urban-kit.detail_awning_wide",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "modern_city_dining",
+      "context": "City dining",
+      "mood": "modern",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#2c3d53",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-city-kit-commercial.detail_parasol_a",
+              "slot": "hero_installation",
+              "position": [
+                -0.475,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "kaykit.restaurant-bits.table_round_A_decorated",
+              "slot": "hero_installation",
+              "position": [
+                0.475,
+                0,
+                0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-city-kit-commercial.detail_awning",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "carnival_playful",
+      "context": "Carnival games",
+      "mood": "bright",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#496da0",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-mini-arcade.claw_machine",
+              "slot": "hero_installation",
+              "position": [
+                -0.475,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-mini-arcade.prize_wheel",
+              "slot": "hero_installation",
+              "position": [
+                0.475,
+                0,
+                0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.quaternius-junkfood.cupcake",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "cyberpunk_ramen",
+      "context": "Ramen",
+      "mood": "futuristic",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#26375d",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.quaternius-sushirestaurantkit.food_ramen",
+              "slot": "hero_installation",
+              "position": [
+                -0.475,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.quaternius-sushirestaurantkit.environment_counter_straight",
+              "slot": "hero_installation",
+              "position": [
+                0.475,
+                0,
+                0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.quaternius-cyberpunkgamekit.light_square",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "space_whimsy",
+      "context": "Sci-fi",
+      "mood": "playful",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#40457a",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "kaykit.space-base-bits.lander_A",
+              "slot": "hero_installation",
+              "position": [
+                -0.475,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.quaternius-cyberpunkgamekit.computer",
+              "slot": "hero_installation",
+              "position": [
+                0.475,
+                0,
+                0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.quaternius-cyberpunkgamekit.light_square",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "jazz_piano_club",
+      "context": "Jazz listening lounge",
+      "mood": "moody",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#2b3153",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.the-base-mesh.piano",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.the-base-mesh.computer_speaker",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-food-kit.glass_wine",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "kaykit.furniture-bits.lamp_standing",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "indie_stage",
+      "context": "Indie acoustic set",
+      "mood": "energetic",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#473263",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.the-base-mesh.acoustic_guitar",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.the-base-mesh.guitar_stand",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.the-base-mesh.computer_speaker",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-holiday-kit.lights_colored",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "electronic_listening_room",
+      "context": "Electronic music listening room",
+      "mood": "neon",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#301b5b",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.the-base-mesh.computer_speaker",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.the-base-mesh.computer_headphones_01",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.quaternius-cyberpunkgamekit.light_square",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-retro-urban-kit.detail_light_double",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "classical_parlor",
+      "context": "Classical music parlor",
+      "mood": "elegant",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#464253",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.the-base-mesh.piano",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.the-base-mesh.violin_bow",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-furniture-kit.lounge_design_sofa",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "kaykit.furniture-bits.lamp_table",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "evening_food_market",
+      "context": "Night market food stalls",
+      "mood": "lively",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#4f2a48",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-food-kit.sandwich",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-mini-market.display_fruit",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-fantasy-town-kit.stall",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-holiday-kit.lights_colored",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "noodle_counter_cozy",
+      "context": "Noodle counter",
+      "mood": "cozy",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#684a31",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.quaternius-sushirestaurantkit.food_udon",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.quaternius-sushirestaurantkit.environment_counter_straight",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.quaternius-sushirestaurantkit.environment_pot_1_filled",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.quaternius-sushirestaurantkit.decoration_bamboo",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "kitchen_chef_warm",
+      "context": "Culinary workshop",
+      "mood": "warm",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#69462e",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-food-kit.frying_pan",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-food-kit.meat_cooked",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-food-kit.paprika",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.quaternius-sushirestaurantkit.environment_oven",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "brunch_counter",
+      "context": "Breakfast counter",
+      "mood": "sunny",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#c18a51",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-food-kit.egg_cooked",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-food-kit.bowl",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "kaykit.restaurant-bits.table_round_A_decorated",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "kaykit.furniture-bits.lamp_table",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 0,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "rock_listening_corner",
+      "context": "Rock listening corner",
+      "mood": "retro",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#51352b",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "cc0.the-base-mesh.guitar_wall_hanger_02",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.the-base-mesh.computer_speaker",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "kaykit.furniture-bits.lamp_standing",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.the-base-mesh.guitar_stand",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 12,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    },
+    {
+      "id": "quiet_bookshop",
+      "context": "Bookshop café",
+      "mood": "calm",
+      "activation": "explicit_or_verified_context",
+      "sceneClass": "stylized_fictional",
+      "palette": {
+        "background": "#365451",
+        "ambient": "#f2d8a6",
+        "floor": "#182335"
+      },
+      "slots": {
+        "hero_installation": {
+          "center": [
+            -2.8,
+            0,
+            0
+          ],
+          "radius": 1.75,
+          "placements": [
+            {
+              "assetId": "kaykit.furniture-bits.shelf_B_large_decorated",
+              "slot": "hero_installation",
+              "position": [
+                -0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 1.45,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "kaykit.furniture-bits.table_small",
+              "slot": "hero_installation",
+              "position": [
+                0,
+                0,
+                0.18
+              ],
+              "yawDegrees": -24,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            },
+            {
+              "assetId": "cc0.kenney-food-kit.cup_coffee",
+              "slot": "hero_installation",
+              "position": [
+                0.95,
+                0,
+                -0.18
+              ],
+              "yawDegrees": -12,
+              "targetMaxDimension": 0.94,
+              "anchor": "bottom_center"
+            }
+          ]
+        },
+        "ambient_accent": {
+          "center": [
+            2.8,
+            0,
+            0
+          ],
+          "radius": 1.3,
+          "placements": [
+            {
+              "assetId": "cc0.kenney-nature-kit.flower_purple_a",
+              "slot": "ambient_accent",
+              "position": [
+                0,
+                0,
+                -0.18
+              ],
+              "yawDegrees": 24,
+              "targetMaxDimension": 0.98,
+              "anchor": "bottom_center"
+            }
+          ]
+        }
+      },
+      "displayPolicy": {
+        "fictionalDecoration": true,
+        "verifiedVenueOnly": true,
+        "occlusionFallback": "hide_both_slots",
+        "focusMode": "hide",
+        "reducedMotion": "static",
+        "noAudioAutoplay": true
+      },
+      "qa": {
+        "idReferencesChecked": true,
+        "layoutAuthored": true,
+        "modelRendered": false,
+        "collisionChecked": false,
+        "visualInspected": false,
+        "safariMobileTested": false
+      },
+      "notes": "Transforms are authored normalized preview-layout coordinates; they are not surveyed world/map coordinates and require human visual QA."
+    }
+  ]
+}
