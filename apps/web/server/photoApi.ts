@@ -5,10 +5,12 @@ import type { PhotoDescriber, PhotoInput } from './photoDescriber.ts';
 export const DAILY_PHOTO_LIMIT = 5;
 export interface PhotoDeps { auth(): PhotoAuth | null; describer(): PhotoDescriber; unlimited(): boolean }
 const MIMES = ['image/jpeg', 'image/png', 'image/webp'], B64 = /^[A-Za-z0-9+/]+={0,2}$/;
+/** A quiz prompt is up to 500 characters (validQuestion), and the question sent is the prompt. */
+const MAX_QUESTION = 500;
 function parse(body: unknown): PhotoInput | null {
  const b = body as { mimeType?: unknown; data?: unknown; question?: unknown } | null;
  if (!b || typeof b.mimeType !== 'string' || !MIMES.includes(b.mimeType) || typeof b.data !== 'string' || !b.data || !B64.test(b.data)) return null;
- if (b.question !== undefined && (typeof b.question !== 'string' || b.question.length > 300)) return null;
+ if (b.question !== undefined && (typeof b.question !== 'string' || b.question.length > MAX_QUESTION)) return null;
  return { mimeType: b.mimeType as PhotoInput['mimeType'], data: b.data, ...(b.question ? { question: b.question } : {}) };
 }
 export function createPhotoRoutes(deps: PhotoDeps): Router {

@@ -65,9 +65,10 @@ describe('photo routes',()=>{
   expect((await s.post({...ok,mimeType:'image/gif'})).status).toBe(400);
   expect((await s.post({...ok,data:''})).status).toBe(400);
   expect((await s.post({...ok,data:'not base64!'})).status).toBe(400);
-  expect((await s.post({...ok,question:'x'.repeat(301)})).status).toBe(400);
+  expect((await s.post({...ok,question:'x'.repeat(501)})).status).toBe(400);
   expect((await s.post({...ok,question:5})).status).toBe(400);expect(s.describer.describe).not.toHaveBeenCalled();});
  it('200 with description and remaining, passing the question',async()=>{const s=await serve({remaining:5});const r=await s.post({...ok,question:'Lighting?'});expect(r.status).toBe(200);expect(await r.json()).toEqual({description:'Warm light',remainingToday:4});expect(s.describer.describe.mock.calls[0][0]).toMatchObject({mimeType:'image/jpeg',data:'QUJD',question:'Lighting?'});});
+ it('accepts a 500-character question, the longest a quiz prompt can be',async()=>{const s=await serve();const question='x'.repeat(500);const r=await s.post({...ok,question});expect(r.status).toBe(200);expect(s.describer.describe.mock.calls[0][0].question).toBe(question);});
  it('429 at the pre-check without describing',async()=>{const s=await serve({remaining:0});const r=await s.post(ok);expect(r.status).toBe(429);expect(await r.json()).toEqual({error:'daily_limit',remainingToday:0});expect(s.describer.describe).not.toHaveBeenCalled();});
  it('503 when the describer throws, recording nothing and leaking nothing',async()=>{const s=await serve({describe:async()=>{throw Error('SECRET-DETAIL');}});const r=await s.post(ok);expect(r.status).toBe(503);expect(JSON.stringify(await r.json())).not.toContain('SECRET');expect(s.quota.record).not.toHaveBeenCalled();});
  it('422 for an empty description, recording nothing',async()=>{const s=await serve({describe:async()=>''});const r=await s.post(ok);expect(r.status).toBe(422);expect(await r.json()).toEqual({error:'unreadable'});expect(s.quota.record).not.toHaveBeenCalled();});

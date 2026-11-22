@@ -47,7 +47,8 @@ export function createPhotoClient(deps: { access: Pick<PhotoAccessSource, 'getAc
       }
       if (r.status === 401) return fail('signed_out');
       if (r.status === 429) return fail(body.error === 'daily_limit' ? 'limit' : 'unavailable');
-      if (r.status === 422) return fail('unreadable');
+      // 400 is a request the server can't use (e.g. the image data); retrying the same photo won't help.
+      if (r.status === 400 || r.status === 422) return fail('unreadable');
       return fail('unavailable');
     } catch { return fail('unavailable'); }
   }

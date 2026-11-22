@@ -50,6 +50,7 @@ describe('photoClient', () => {
   });
   it.each([
     [401, { error: 'x' }, 'signed_out'],
+    [400, { error: 'Invalid photo request.' }, 'unreadable'],
     [429, { error: 'daily_limit', remainingToday: 0 }, 'limit'],
     [429, { error: 'Vibe service is busy; please retry.' }, 'unavailable'],
     [422, { error: 'x' }, 'unreadable'],
