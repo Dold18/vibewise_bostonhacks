@@ -4,9 +4,9 @@
   "status": "imported_binary_integrity_verified_visual_qa_pending",
   "source": "Papyszoo/CC0-Public-Domain-Models (Modelibr CC0 GLB conversions)",
   "licenseCaveat": "Per-pack CC0 claims checked against metadata in source repository; verify author/pack terms for production. These are converted GLBs, not necessarily original publisher binary files.",
-  "modelCount": 168,
-  "totalBytes": 8407240,
-  "verification": "168/168 destination blobs matched source Git blob SHA and byte size. Imported GLB magic/version 2 header checked; structural and rendering QA not yet complete.",
+  "modelCount": 172,
+  "totalBytes": 8506688,
+  "verification": "172/172 source/destination Git blob SHA and GLB v2 header verified at import; render QA pending.",
   "packCount": 15,
   "packs": [
     {
@@ -31,7 +31,7 @@
       "sourceWebsite": "https://kenney.nl/assets/food-kit",
       "licenseClaim": "CC0",
       "sourcePackPath": "https://github.com/Papyszoo/CC0-Public-Domain-Models/tree/main/packs/kenney-food-kit",
-      "importedCount": 40
+      "importedCount": 44
     },
     {
       "id": "kenney-furniture-kit",
@@ -929,6 +929,36 @@
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/frappe/frappe.png"
     },
     {
+      "id": "cc0.kenney-food-kit.frying_pan",
+      "name": "frying_pan",
+      "pack": "kenney-food-kit",
+      "uri": "/scene-assets/third-party/modelibr/kenney-food-kit/frying_pan.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/kenney-food-kit/models/frying_pan/frying_pan.glb",
+      "creator": "Kenney",
+      "originalPackWebsite": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 29928,
+      "gitBlobSHA": "d49939de1102f18d8fb229c07c387a38e80c3a67",
+      "format": "glb",
+      "tags": [
+        "food",
+        "cooking",
+        "dining"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      },
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/frying_pan/frying_pan.png"
+    },
+    {
       "id": "cc0.kenney-food-kit.ginger_bread",
       "name": "ginger_bread",
       "pack": "kenney-food-kit",
@@ -1168,6 +1198,36 @@
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/maki_vegetable/maki_vegetable.png"
     },
     {
+      "id": "cc0.kenney-food-kit.meat_cooked",
+      "name": "meat_cooked",
+      "pack": "kenney-food-kit",
+      "uri": "/scene-assets/third-party/modelibr/kenney-food-kit/meat_cooked.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/kenney-food-kit/models/meat_cooked/meat_cooked.glb",
+      "creator": "Kenney",
+      "originalPackWebsite": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 21252,
+      "gitBlobSHA": "1503dff162e2caa58e281b27f1a30ae015fabfbb",
+      "format": "glb",
+      "tags": [
+        "food",
+        "cooking",
+        "dining"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      },
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/meat_cooked/meat_cooked.png"
+    },
+    {
       "id": "cc0.kenney-food-kit.meat_ribs",
       "name": "meat_ribs",
       "pack": "kenney-food-kit",
@@ -1379,6 +1439,36 @@
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/pizza_box/pizza_box.png"
     },
     {
+      "id": "cc0.kenney-food-kit.plate_deep",
+      "name": "plate_deep",
+      "pack": "kenney-food-kit",
+      "uri": "/scene-assets/third-party/modelibr/kenney-food-kit/plate_deep.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/kenney-food-kit/models/plate_deep/plate_deep.glb",
+      "creator": "Kenney",
+      "originalPackWebsite": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 18656,
+      "gitBlobSHA": "00dc24f5685fda7a294062ca0375a8de5fea0858",
+      "format": "glb",
+      "tags": [
+        "food",
+        "cooking",
+        "dining"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      },
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/plate_deep/plate_deep.png"
+    },
+    {
       "id": "cc0.kenney-food-kit.plate_dinner",
       "name": "plate_dinner",
       "pack": "kenney-food-kit",
@@ -1406,6 +1496,36 @@
       },
       "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/plate_dinner/plate_dinner.png"
+    },
+    {
+      "id": "cc0.kenney-food-kit.pot",
+      "name": "pot",
+      "pack": "kenney-food-kit",
+      "uri": "/scene-assets/third-party/modelibr/kenney-food-kit/pot.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/kenney-food-kit/models/pot/pot.glb",
+      "creator": "Kenney",
+      "originalPackWebsite": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 29612,
+      "gitBlobSHA": "6850f02667900ea01063ed4e27c99d9239457ae7",
+      "format": "glb",
+      "tags": [
+        "food",
+        "cooking",
+        "dining"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      },
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/pot/pot.png"
     },
     {
       "id": "cc0.kenney-food-kit.pot_stew",
