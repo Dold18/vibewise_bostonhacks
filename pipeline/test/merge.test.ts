@@ -451,3 +451,32 @@ test('findFsqSubVenues: a large similar-named area that cannot merge falls back 
   const found = findFsqSubVenues([campus, wing], [room('w1', 'Museum of Fine Arts', LAT, LNG)], 'museums', new Set(['relation/1']));
   assert.deepEqual([found.get('w1')?.outcome, found.get('w1')?.insideOf], ['dropped', 'osm:way/2']);
 });
+
+test('mergePlaces: over 20 ha a merge needs similarity >= 0.6 or a Foursquare-name subset with a non-generic word', () => {
+  const harbor = park('way/830089938', 'Old Harbor Park', LAT, LNG, BOX_33HA);
+  const loose = fsqPark('h1', 'Harbor Point Park', LAT + 0.0019, LNG, { address: '1 Harbor Point Blvd' });
+  const r = mergePlaces([harbor], [loose], { runStart, today, cfg: parks });
+  assert.deepEqual(r.rows.map((x) => x.place_id), ['osm:way/830089938']);
+  assert.equal(r.rows[0]!.fsq_place_id, null);
+  assert.deepEqual(r.subVenuesMerged, []);
+  assert.deepEqual(r.subVenuesDropped, []);
+  assert.equal(r.unmatchedFsqDropped, 1);   // parks keep no unmatched Foursquare place; it is not a sub-venue
+  const exact = fsqPark('h2', 'Old Harbor Park', LAT + 0.0019, LNG, { address: '2 Old Harbor St' });
+  const r2 = mergePlaces([harbor], [exact], { runStart, today, cfg: parks });
+  assert.equal(r2.rows[0]!.fsq_place_id, 'h2');
+  assert.equal(r2.rows[0]!.address, '2 Old Harbor St');
+});
+
+test('findFsqSubVenues: over 20 ha, Foursquare names that extend the OSM name or are only generic words do not merge', () => {
+  const sw = park('way/825058449', 'Southwest Corridor Park', LAT, LNG, BOX_33HA);
+  const fp = park('relation/65053', 'Franklin Park', LAT, LNG, BOX_33HA);
+  const one = (o: OsmPlace, name: string) => findFsqSubVenues([o], [fsqPark('x', name, LAT + 0.0019, LNG)], 'parks').get('x');
+  assert.equal(one(sw, 'Tennis courts at Southwest Corridor Park'), undefined);
+  assert.equal(one(fp, 'Franklin Park - Overlook Ruins'), undefined);
+  assert.equal(one(sw, 'Park'), undefined);                       // subset, but only a generic word
+  assert.equal(one(sw, 'Corridor')?.outcome, 'merged');           // similarity 0.33, but a subset with a non-generic word
+  assert.equal(one(fp, 'Franklin Park')?.outcome, 'merged');
+  // 20 ha or less keeps the looser rule (similarity 0.5).
+  assert.equal(findFsqSubVenues([park('way/1', 'Old Harbor Park', LAT, LNG, BOX)],
+    [fsqPark('y', 'Harbor Point Park', LAT + 0.0008, LNG)], 'parks').get('y')?.outcome, 'merged');
+});

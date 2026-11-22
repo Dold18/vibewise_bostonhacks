@@ -4,7 +4,7 @@ import {
 } from './config.ts';
 import { metersBetween } from './geo.ts';
 import { nameKey, nameSimilarity } from './normalize.ts';
-import { boundsAreaHa, isOsmRoute, type PlaceType, type PlaceTypeConfig } from './placeTypes.ts';
+import { boundsAreaHa, isOsmRoute, PLACE_TYPE_CONFIG, type PlaceType, type PlaceTypeConfig } from './placeTypes.ts';
 import { fsqRow, osmRow } from './sources.ts';
 import type { DroppedDuplicate, FsqPlace, MatchPair, OsmPlace, PlaceRow, Source } from './types.ts';
 
@@ -171,6 +171,21 @@ function sameNamedPlace(a: string, b: string): boolean {
   return subset(ta, tb) || subset(tb, ta);
 }
 
+/**
+ * Stricter rule for areas over SUB_VENUE_CONTAINER_MAX_HA (a big park holds many places that share its name):
+ * similarity at least MATCH_SIMILARITY_THRESHOLD, or every Foursquare token is in the OSM name and at least one of
+ * them is not a generic word ("Esplanade" in "Charles River Esplanade", not "Park" or "Tennis courts at X Park").
+ */
+function sameNamedLargeArea(fsqName: string, osmName: string, genericWords: ReadonlySet<string>): boolean {
+  const kf = nameKey(fsqName);
+  const ko = nameKey(osmName);
+  if (kf === '' || ko === '') return false;
+  if (nameSimilarity(fsqName, osmName) >= MATCH_SIMILARITY_THRESHOLD) return true;
+  const tf = [...tokensOf(kf)];
+  const to = tokensOf(ko);
+  return tf.every((t) => to.has(t)) && tf.some((t) => !genericWords.has(t));
+}
+
 /** An OSM area a Foursquare place can lie inside: nodes (no bounds) and routes never are one. */
 function isArea(o: OsmPlace): boolean {
   return o.bounds !== null && !isOsmRoute(o.tags);
@@ -180,7 +195,8 @@ function isArea(o: OsmPlace): boolean {
  * Non-food only: Foursquare lists rooms and wings of a place (e.g. galleries inside a museum) as places of their own,
  * and sometimes the place itself, too far from the OSM point to match. For each given Foursquare place whose point
  * lies inside the bounds of OSM areas (see isArea):
- * - 'merged' into the smallest containing area with a similar name (any size), when that place has no Foursquare
+ * - 'merged' into the smallest containing area with a similar name (any size; sameNamedPlace up to
+ *   SUB_VENUE_CONTAINER_MAX_HA, the stricter sameNamedLargeArea above it), when that place has no Foursquare
  *   match in `matchedOsm` and gains no other Foursquare place here (the one closest to the OSM point wins, then fsqId);
  * - otherwise 'dropped' when a containing area is at most SUB_VENUE_CONTAINER_MAX_HA, reported against the
  *   similar-named area if it is that small, else the smallest containing one;
@@ -192,6 +208,7 @@ export function findFsqSubVenues(
 ): Map<string, FsqSubVenue> {
   const out = new Map<string, FsqSubVenue>();
   if (type === 'restaurants') return out;
+  const genericWords = PLACE_TYPE_CONFIG[type].genericNameWords;
   const areas = osm
     .filter(isArea)
     .map((o) => ({ o, b: o.bounds!, ha: boundsAreaHa(o.bounds!) }))
@@ -203,7 +220,9 @@ export function findFsqSubVenues(
   for (const f of fsq) {
     const hits = areas.filter(({ b }) => f.lat >= b.minlat && f.lat <= b.maxlat && f.lng >= b.minlon && f.lng <= b.maxlon);
     if (hits.length === 0) continue;
-    const similar = hits.find(({ o }) => sameNamedPlace(f.name, o.name));
+    const similar = hits.find(({ o, ha }) => (ha <= SUB_VENUE_CONTAINER_MAX_HA
+      ? sameNamedPlace(f.name, o.name)
+      : sameNamedLargeArea(f.name, o.name, genericWords)));
     const small = similar !== undefined && similar.ha <= SUB_VENUE_CONTAINER_MAX_HA
       ? similar
       : hits.find(({ ha }) => ha <= SUB_VENUE_CONTAINER_MAX_HA);

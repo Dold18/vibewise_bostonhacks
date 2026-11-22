@@ -83,11 +83,11 @@ test('OSM route relations are never non-food places; restaurants classification 
 test('normalizeKind maps every source spelling to one label set', () => {
   const cases: Array<[string, string]> = [
     ['theater', 'theatre'], ['night_club', 'nightclub'], ['movie_theater', 'cinema'], ['indie_movie_theater', 'cinema'],
-    ['indie_theater', 'theatre'], ['art_gallery', 'gallery'], ['yes', 'historic_site'],
+    ['indie_theater', 'theatre'], ['art_gallery', 'gallery'],
     ['historic_and_protected_site', 'historic_site'],
   ];
   for (const [from, to] of cases) assert.equal(normalizeKind(from), to, from);
-  for (const same of ['theatre', 'nightclub', 'cinema', 'gallery', 'museum', 'park', 'memorial']) assert.equal(normalizeKind(same), same);
+  for (const same of ['theatre', 'nightclub', 'cinema', 'gallery', 'museum', 'park', 'memorial', 'yes']) assert.equal(normalizeKind(same), same);
 });
 
 test('non-food kinds are normalized for both OSM and Foursquare', () => {
@@ -112,4 +112,12 @@ test('non-food kinds are normalized for both OSM and Foursquare', () => {
 
 test('only parks drop unmatched Foursquare places', () => {
   for (const t of PLACE_TYPES) assert.equal(PLACE_TYPE_CONFIG[t].keepUnmatchedFsq, t !== 'parks', t);
+});
+
+test('historic=yes becomes historic_site only through the landmarks historic match', () => {
+  assert.equal(normalizeKind('yes'), 'yes');
+  assert.equal(PLACE_TYPE_CONFIG.landmarks.osmKind({ historic: 'yes', wikidata: 'Q5' }), 'historic_site');
+  assert.equal(PLACE_TYPE_CONFIG.landmarks.osmKind({ historic: 'memorial', wikidata: 'Q5' }), 'memorial');
+  // A tourism match keeps its own value even when historic=yes is also set.
+  assert.equal(PLACE_TYPE_CONFIG.landmarks.osmKind({ tourism: 'attraction', historic: 'yes', wikidata: 'Q5' }), 'attraction');
 });

@@ -104,7 +104,6 @@ const KIND_ALIASES: Readonly<Record<string, string>> = {
   movie_theater: 'cinema',
   indie_movie_theater: 'cinema',
   art_gallery: 'gallery',
-  yes: 'historic_site',   // OSM historic=yes
   historic_and_protected_site: 'historic_site',
 };
 
@@ -249,7 +248,8 @@ const PARKS = nonFood(
 function landmarkMatch(tags: Tags): { key: string; kind: string } | null {
   const t = matchRules(tags, [{ key: 'tourism', values: ['attraction', 'viewpoint'] }]);
   if (t) return t;
-  if (tags.historic && tags.wikidata) return { key: 'historic', kind: tags.historic };
+  // historic=yes says only "historic": name the kind historic_site, like Foursquare's Historic and Protected Site.
+  if (tags.historic && tags.wikidata) return { key: 'historic', kind: tags.historic === 'yes' ? 'historic_site' : tags.historic };
   return null;
 }
 
