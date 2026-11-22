@@ -70,14 +70,16 @@ export function createLiveQuiz(onBack:()=>void) {
   const replaced=attachment;attachment=null;
   const key=questionKey(p);if(photoDraft?.key!==key)photoDraft=key?{key,state:{file:null,description:null,status:null,busy:false}}:null;
   root.replaceChildren();root.removeAttribute('aria-busy');if(!p){replaced?.destroy();return;}
+  // Controls that answer, move or leave the question; disabled while its photo is read so the read is never discarded.
+  const locked:HTMLButtonElement[]=[];const lock=<T extends HTMLButtonElement>(b:T)=>{locked.push(b);return b;};
   // The quiz palette mirrors the latest interpretation (presentation only; the map follows the publisher).
   const moodSource=[p.question,...[...p.history].reverse().map(a=>a.question)].find(q=>q&&presentationOf(q));
   const mood=moodSource?presentationOf(moodSource)!.mood:undefined;if(mood)root.dataset.mood=mood;else delete root.dataset.mood;
-  const back=button('Back to vibe description',()=>{active=false;onBack();});
+  const back=lock(button('Back to vibe description',()=>{active=false;onBack();}));
   root.append(h('div',{class:'vb-quiz-top'},back,h('span',{class:'vb-quiz-count'},`${p.history.length} answered · up to 10`)));
   const selected=selectedCoffeeScene(p);
   if(selected)root.append(h('p',{class:'vb-scene-selected','data-selected-scene':selected},`Selected environment: ${selected==='bakery'?'bakery counter':'window nook'}. You can change it in answer history.`));
-  if(p.notice)root.append(h('p',{class:'vb-quiz-notice',role:'status'},p.notice),button('Try AI again',()=>session.retry()));
+  if(p.notice)root.append(h('p',{class:'vb-quiz-notice',role:'status'},p.notice),lock(button('Try AI again',()=>session.retry())));
   if(p.phase==='generating'){root.setAttribute('aria-busy','true');root.append(h('p',{class:'vb-quiz-loading',role:'status','aria-live':'polite'},h('span',{class:'vb-quiz-spinner','aria-hidden':'true'}),p.history.length===0?'Writing your first question…':'Finding the next detail in your scene…'));}
   const question=editing===null?p.question:p.history[editing]?.question;
   if((p.phase==='question'||editing!==null)&&question&&key&&photoDraft) {
@@ -106,15 +108,15 @@ export function createLiveQuiz(onBack:()=>void) {
     // Keep the draft (words and photo) with the reason: retry, or remove the photo and send the words.
     photo.busy=false;photo.status={text:result.message,kind:result.reason==='empty'?'info':'error'};refresh();
    };
-   const reading=(kind:'correction'|'text')=>photo.busy&&!!photo.file&&draftState.via===kind;
+   const readingVia=(kind:'correction'|'text')=>photo.busy&&!!photo.file&&draftState.via===kind;
    attachment=createPhotoAttachment({state:photo,access:photoAccess,signInLabel:'Sign in to answer with a photo',onFile:file=>{photo.file=file;photo.description=file?photoClient.cached(file,question.prompt)??null:null;refresh();}});
    // A free-text question's own box is the natural place for the photo; otherwise it sits with the own-words box.
    const photoInStage=media?.format==='free_text';
    if(media) {
     if(!mediaViews.has(key))mediaViews.set(key,emptyMediaView());
-    const freeText=photoInStage?{attachment:attachment.root,busy:photo.busy,reading:reading('text'),hasPhoto:()=>!!photo.file,send:(text:string)=>void sendOwnWords(text,'text')}:undefined;
+    const freeText=photoInStage?{attachment:attachment.root,busy:photo.busy,reading:readingVia('text'),hasPhoto:()=>!!photo.file,send:(text:string)=>void sendOwnWords(text,'text')}:undefined;
     const stage=renderMediaStage(question,mediaViews.get(key)!,respond,editing===null?undefined:p.history[editing]?.response,freeText);
-    if(stage)root.append(stage);
+    if(stage){root.append(stage);stage.querySelectorAll<HTMLButtonElement>('button[data-option]').forEach(lock);}
    } else if(presentation) {
     if(!previews.has(key))previews.set(key,emptyScenePreview());
     const previous=editing===null?undefined:p.history[editing]?.response;
@@ -124,19 +126,19 @@ export function createLiveQuiz(onBack:()=>void) {
      // preserving automatic stopping thresholds and asynchronous summary guards.
      if(presentation.step==='B2')session.showMatches();
     },previous?.kind==='choice'?previous.optionId:undefined);
-    if(stage)root.append(stage);
+    if(stage){root.append(stage);stage.querySelectorAll<HTMLButtonElement>('button[data-commit]').forEach(lock);}
    } else {
     const cards=h('div',{class:'vb-quiz-answers'});
-    for(const option of question.options)cards.append(button('',()=>respond({kind:'choice',optionId:option.id}),'vb-quiz-answer'));
+    for(const option of question.options)cards.append(lock(button('',()=>respond({kind:'choice',optionId:option.id}),'vb-quiz-answer')));
     [...cards.children].forEach((card,i)=>card.append(h('strong',{},question.options[i].label),h('span',{},question.options[i].description)));
     root.append(cards);
    }
-   const neutral=h('div',{class:'vb-quiz-neutral'},button('Skip',()=>respond({kind:'skip'})),button('Neither / something else',()=>respond({kind:'neither'})));
-   if(question.cultural)neutral.append(button('I don’t know these',()=>respond({kind:'unfamiliar'})));root.append(neutral);
+   const neutral=h('div',{class:'vb-quiz-neutral'},lock(button('Skip',()=>respond({kind:'skip'}))),lock(button('Neither / something else',()=>respond({kind:'neither'}))));
+   if(question.cultural)neutral.append(lock(button('I don’t know these',()=>respond({kind:'unfamiliar'}))));root.append(neutral);
    const correction=h('textarea',{class:'vb-textarea vb-quiz-correction',rows:2,maxlength:MAX_TYPED_TEXT,placeholder:'Or tell us what feels right…','aria-label':'Your own answer or correction',readonly:photo.busy});
    if(draft&&draftFor===question.id)correction.value=draft;
    // Always pressable, as before photos: an empty send explains what to add.
-   const correct=button(reading('correction')?'Reading your photo…':'Use my words',()=>void sendOwnWords(correction.value,'correction'),'vb-text-btn vb-quiz-use-words');
+   const correct=button(readingVia('correction')?'Reading your photo…':'Use my words',()=>void sendOwnWords(correction.value,'correction'),'vb-text-btn vb-quiz-use-words');
    if(photo.busy)correct.setAttribute('aria-disabled','true');
    root.append(correction,...(photoInStage?[]:[attachment.root]),correct);
    // A new question takes focus. Query at run time: a later render in the same tick may have replaced this title.
@@ -149,12 +151,12 @@ export function createLiveQuiz(onBack:()=>void) {
    if(p.completion.canContinue&&p.history.length<10)root.append(button('Continue Refining',()=>session.continueRefining(),'vb-primary-btn'));
   }
   const reading=p.phase==='question'&&editing===null&&p.question?presentationOf(p.question):undefined;
-  if(reading&&p.history.length&&reading.source==='gemini')root.append(h('div',{class:'vb-quiz-reading'},h('p',{},h('strong',{},'What I’ve picked up: '),reading.design.known),button('Not quite',()=>{editing=p.history.length-1;lastQuestion='';render(session.getSnapshot());root.querySelector<HTMLTextAreaElement>('.vb-quiz-correction')?.focus();})));
+  if(reading&&p.history.length&&reading.source==='gemini')root.append(h('div',{class:'vb-quiz-reading'},h('p',{},h('strong',{},'What I’ve picked up: '),reading.design.known),lock(button('Not quite',()=>{editing=p.history.length-1;lastQuestion='';render(session.getSnapshot());root.querySelector<HTMLTextAreaElement>('.vb-quiz-correction')?.focus();}))));
   if(p.history.length) {
    const last=p.history.at(-1)!;
    if(last.response.kind==='choice'&&scenePresentation(last.question)) {
     const chosen=last.question.options.find(o=>last.response.kind==='choice'&&o.id===last.response.optionId);
-    root.append(h('p',{class:'vb-scene-readback'},`You chose: ${chosen?.description??''}`),button('Not quite',()=>{editing=p.history.length-1;lastQuestion='';render(session.getSnapshot());root.querySelector<HTMLTextAreaElement>('.vb-quiz-correction')?.focus();}));
+    root.append(h('p',{class:'vb-scene-readback'},`You chose: ${chosen?.description??''}`),lock(button('Not quite',()=>{editing=p.history.length-1;lastQuestion='';render(session.getSnapshot());root.querySelector<HTMLTextAreaElement>('.vb-quiz-correction')?.focus();})));
    }
   }
   root.append(h('section',{class:'vb-quiz-summary','aria-label':'Evolving vibe summary'},h('h4',{},'Your vibe so far'),h('p',{},p.vibe_so_far||'Your scene will develop as you answer.')));
@@ -166,14 +168,17 @@ export function createLiveQuiz(onBack:()=>void) {
   const history=h('details',{class:'vb-quiz-history'},h('summary',{},'Review or edit answers'));
   p.history.forEach((answer:Answer,i)=>{
    const label=answer.response.kind==='choice'?answer.question.options.find(o=>answer.response.kind==='choice'&&o.id===answer.response.optionId)?.label:answer.response.kind==='correction'||answer.response.kind==='text'?answer.response.text:answer.response.kind;
-   history.append(button(`${i+1}. ${label??'Answer'} — Edit`,()=>{editing=i;lastQuestion='';render(session.getSnapshot());}));
+   history.append(lock(button(`${i+1}. ${label??'Answer'} — Edit`,()=>{editing=i;lastQuestion='';render(session.getSnapshot());})));
   });root.append(history);
-  root.append(button('Start over',()=>{editing=null;previews.clear();mediaViews.clear();session.start(p.originalInput.text,p.originalInput.imageCount);}));
-  const matches=button('Show My Matches',()=>{editing=null;session.showMatches();},'vb-primary-btn vb-quiz-matches');root.append(matches);
-  if(editing!==null)root.append(button('Cancel edit',()=>{editing=null;render(session.getSnapshot());}));
+  root.append(lock(button('Start over',()=>{editing=null;previews.clear();mediaViews.clear();session.start(p.originalInput.text,p.originalInput.imageCount);})));
+  const matches=lock(button('Show My Matches',()=>{editing=null;session.showMatches();},'vb-primary-btn vb-quiz-matches'));root.append(matches);
+  if(editing!==null)root.append(lock(button('Cancel edit',()=>{editing=null;render(session.getSnapshot());})));
   if(p.originalInput.imageCount>0||p.history.some(a=>(a.response.kind==='correction'||a.response.kind==='text')&&hasPhotoLine(a.response.text)))root.append(h('p',{class:'vb-quiz-photo-note'},"Photos are sent to Google Gemini to get a short text description. Vibenta doesn't store them; the description is part of what this quiz uses."));
+  if(photoDraft?.state.busy)for(const b of locked)b.disabled=true;
   replaced?.destroy();restoreFocus(root,focusKey);
  }
+ // Media and scene stages can redraw their own options (Inspect, an image error), so also refuse option clicks while a photo is read.
+ root.addEventListener('click',e=>{if(photoDraft?.state.busy&&e.target instanceof Element&&e.target.closest('button[data-option],button[data-commit]')){e.preventDefault();e.stopPropagation();}},true);
  const off=outingProfiles.subscribe(render);
  const offDisplay=mapDisplay.subscribe(()=>render(session.getSnapshot()));
  return {root,session:session as LiveVibeSession,start(text:string,imageCount:number){active=true;editing=null;previews.clear();mediaViews.clear();session.start(text,imageCount);},resume(){active=true;render(session.getSnapshot());},focus(){const target=root.querySelector<HTMLElement>('.vb-quiz-prompt[tabindex]')??root;target.focus();target.scrollIntoView?.({block:'nearest'});},destroy(){active=false;off();offDisplay();attachment?.destroy();attachment=null;photoDraft=null;session.clear();session.destroy();}};
