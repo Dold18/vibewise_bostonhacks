@@ -1,3 +1,6 @@
+// RETIRED 2026-11-22: the authored coffee opener is off by default (product decision; see
+// docs/VIBE_QUIZ_V2_ACCEPTANCE.md). This script exercises that dormant path and is kept for history.
+// Three of its checks already failed on pristine HEAD before retirement (documented in the same file).
 // Node 26 + Chrome on macOS. All quiz/embedding responses are TEST FIXTURES.
 // Start the app first; VIBENTA_QA_URL defaults to http://localhost:5174/.
 // This does not verify Gemini quality, real venue rankings, or transit providers.
@@ -41,7 +44,9 @@ async function open(width=1440) {
  await send('Emulation.setDeviceMetricsOverride',{width,height:width===390?844:1000,deviceScaleFactor:1,mobile:width===390});
  await send('Page.navigate',{url:process.env.VIBENTA_QA_URL??'http://localhost:5176/'});await waitFor('!!window.vibentaDiscovery&&!!window.vibentaOutingProfiles');
  if(width===390)await click('.vb-summary-btn');await click('.vb-continue-btn');
- await js(`{const t=document.querySelector('.vb-vibe-story');t.value="Coffee. Brain's fried.";t.dispatchEvent(new Event('input',{bubbles:true}));}`);await click('.vb-begin-quiz');
+ await js(`{const t=document.querySelector('.vb-vibe-story');t.value="Coffee. Brain's fried.";t.dispatchEvent(new Event('input',{bubbles:true}));}`);await click(width===390?'.vb-launch-quiz':'.vb-begin-quiz');
+ // DOM presence alone misses regressions where the V2 stage is hidden or offscreen.
+ await waitFor(`(()=>{const quiz=document.querySelector('.vb-live-quiz'),scene=quiz?.querySelector('[data-scene-step="B1"]');if(!quiz||!scene||quiz.closest('[hidden]'))return false;const r=scene.getBoundingClientRect();return getComputedStyle(quiz).display!=='none'&&r.height>0&&r.width>0&&r.top<innerHeight&&r.bottom>0})()`);
 }
 const stage=step=>waitFor(`document.querySelector('[data-scene-step="${step}"]')`);
 async function b1(width=1440){await open(width);await stage('B1');}

@@ -1,7 +1,9 @@
-import { describe,it,expect,vi } from 'vitest';
+import { describe,it,expect,vi,beforeAll,afterAll } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { sessionBQuestion,scenePresentation,selectedCoffeeScene } from '../sessionB';
+import { sessionBQuestion,scenePresentation,selectedCoffeeScene,setAuthoredSessionB } from '../sessionB';
+// The authored opener is retired in the product; these tests keep the dormant module correct.
+beforeAll(()=>setAuthoredSessionB(true));afterAll(()=>setAuthoredSessionB(false));
 import { validContext,validQuestion,validateGeneration } from '../validation';
 import { createLiveVibeSession,replay } from '../liveEngine';
 import { createProfilePublisher } from '../publisher';
@@ -17,6 +19,29 @@ const embedder={embed:async()=>({modelKey:MODEL_KEY,vector})};
 const ready=async(s:ReturnType<typeof createLiveVibeSession>)=>vi.waitFor(()=>expect(s.getSnapshot()?.generation).not.toBe('pending'));
 const online:GenerationProvider={generate:async c=>result(c)};
 const offline:GenerationProvider={generate:async()=>{throw Error('TEST FIXTURE Gemini unavailable');}};
+
+describe('visible quiz startup without a responding Gemini service',()=>{
+ it('makes authored B1 and B2 interactive immediately even if generation never responds',()=>{
+  const stalled:GenerationProvider={generate:()=>new Promise<GenerationResult>(()=>{})};
+  const session=createLiveVibeSession(stalled,embedder);
+  session.start(context().originalInput.text,0,'instant-scene');
+  expect(session.getSnapshot()?.phase).toBe('question');
+  expect(session.getSnapshot()?.question?.id).toBe('session-b/v1/B1');
+  session.answer({kind:'choice',optionId:'bakery'});
+  expect(session.getSnapshot()?.phase).toBe('question');
+  expect(session.getSnapshot()?.question?.id).toBe('session-b/v1/B2/bakery');
+  session.showMatches();
+  expect(session.getSnapshot()?.phase).toBe('results');
+  session.destroy();
+ });
+ it('keeps generic questions in generation state until a provider responds',()=>{
+  const stalled:GenerationProvider={generate:()=>new Promise<GenerationResult>(()=>{})};
+  const session=createLiveVibeSession(stalled,embedder);
+  session.start('A spontaneous city-night adventure',0,'generic-scene');
+  expect(session.getSnapshot()?.phase).toBe('generating');
+  session.destroy();
+ });
+});
 
 describe('bounded authored scene identity, preserving the existing wire contract',()=>{
  it('only activates for the starting brief and keeps the scene in ordinary history',()=>{

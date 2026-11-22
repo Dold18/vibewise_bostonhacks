@@ -1,4 +1,4 @@
-import { embeddingText, evidenceFrom } from '../evidence';
+import { embeddingText, evidenceFrom, negativeText } from '../evidence';
 import { createConvergence, mapDisplay } from '../convergence';
 import { describe,it,expect,vi } from 'vitest';
 import { createLiveVibeSession,replay } from '../liveEngine';
@@ -144,37 +144,38 @@ describe('replay checkpoints and convergence lifecycle',()=>{
 
 describe('fallback semantic evidence regressions',()=>{
  it('embeds each new explicit fallback answer while preserving the Gemini summary',async()=>{
-  let offline=false;const texts:string[]=[];
-  const s=createLiveVibeSession({generate:async c=>{if(offline)throw Error('TEST FIXTURE offline');return result(c);}}, {embed:async text=>{texts.push(text);return {modelKey:MODEL_KEY,vector:vector()};}});
+  let offline=false;const texts:string[]=[],negatives:string[]=[];
+  const s=createLiveVibeSession({generate:async c=>{if(offline)throw Error('TEST FIXTURE offline');return result(c);}}, {embed:async text=>{if(/^(Want|Correction|Earlier summary)/.test(text))texts.push(text);else negatives.push(text);return {modelKey:MODEL_KEY,vector:vector()};}});
   s.start('An intriguing evening, never crowded',0,'fallback-evidence');await ready(s);
   const summary=s.getSnapshot()!.vibe_so_far;offline=true;
   s.answer({kind:'choice',optionId:'a'});await ready(s);
   expect(texts.at(-1)).toContain('Warm lamplight');expect(texts.at(-1)).not.toContain('Cool sea air');
-  expect(texts.at(-1)).toContain('Dealbreaker: never crowded');
+  expect(texts.at(-1)).not.toContain('crowded');expect(negatives.at(-1)).toContain('crowded');
   const next=s.getSnapshot()!.question!,option=next.options[0];const count=texts.length;
   s.answer({kind:'choice',optionId:option.id});await ready(s);
   expect(texts.length).toBeGreaterThan(count);expect(texts.at(-1)).toContain(option.description);
   expect(s.getSnapshot()!.vibe_so_far).toBe(summary);
   expect(s.getSnapshot()!.embedding.version).toBe(s.getSnapshot()!.version);
   s.answer({kind:'correction',text:'Actually quiet acoustic music, no fluorescent lighting'});await ready(s);
-  expect(texts.at(-1)).toContain('Correction: Actually quiet acoustic music');expect(texts.at(-1)).toContain('Exclude: no fluorescent lighting');
-  expect(texts.at(-1)!.indexOf('no fluorescent lighting')).toBeLessThan(texts.at(-1)!.indexOf('Earlier summary'));
+  expect(texts.at(-1)).toContain('Correction: Actually quiet acoustic music');expect(texts.at(-1)).not.toContain('fluorescent');expect(negatives.at(-1)).toContain('fluorescent lighting');
   s.destroy();
  });
  it('updates from original text without inventing a summary when Gemini never works',async()=>{
-  const texts:string[]=[];const s=createLiveVibeSession({generate:async()=>{throw Error('TEST FIXTURE offline');}}, {embed:async text=>{texts.push(text);return {modelKey:MODEL_KEY,vector:vector()};}});
+  const texts:string[]=[],negatives:string[]=[];const s=createLiveVibeSession({generate:async()=>{throw Error('TEST FIXTURE offline');}}, {embed:async text=>{if(/^(Want|Correction|Earlier summary)/.test(text))texts.push(text);else negatives.push(text);return {modelKey:MODEL_KEY,vector:vector()};}});
   s.start('A quiet garden, no crowds',0,'always-offline');await ready(s);
   const q=s.getSnapshot()!.question!;s.answer({kind:'choice',optionId:q.options[0].id});await ready(s);
   expect(texts.at(-1)).toContain(q.options[0].description);expect(s.getSnapshot()!.vibe_so_far).toBe('A quiet garden, no crowds');
   const before=texts.at(-1);s.answer({kind:'neither'});await ready(s);expect(texts.at(-1)).toBe(before);s.destroy();
  });
- it('deduplicates exact evidence and keeps every exclusion ahead of long summary prose',()=>{
+ it('deduplicates evidence, keeps exclusions OUT of the positive query and in the negative text',()=>{
+  // Real MiniLM measurement: embedding "Exclude: loud…" pulls loud places closer, so exclusions are ranked separately.
   const evidence=evidenceFrom('No crowds, no loud music, warm lamps',[]);
-  const text=embeddingText('Warm lamps. '+ 'Long scenic context. '.repeat(200),[...evidence,...evidence]);
-  expect(text.match(/No crowds/g)).toHaveLength(1);expect(text.match(/no loud music/g)).toHaveLength(1);
-  expect(text.indexOf('no loud music')).toBeLessThan(text.indexOf('Long scenic context'));
+  const text=embeddingText('Warm lamps. No loud music here. '+ 'Long scenic context. '.repeat(200),[...evidence,...evidence]);
+  expect(text).not.toMatch(/crowds|loud/i);
+  expect(text.indexOf('warm lamps')).toBeLessThan(text.indexOf('Long scenic context'));
   expect(text.toLowerCase().match(/warm lamps/g)).toHaveLength(1);
-  const original='Quiet garden, no crowds';expect(embeddingText(original,evidenceFrom(original,[])).match(/no crowds/g)).toHaveLength(1);
+  expect(negativeText([...evidence,...evidence])).toBe('crowds\nloud music');
+  const original='Quiet garden, no crowds';expect(embeddingText(original,evidenceFrom(original,[]))).toContain('Quiet garden');expect(embeddingText(original,evidenceFrom(original,[]))).not.toMatch(/crowds/);
   expect(embeddingText('静かな庭',evidenceFrom('静かな庭',[]))).toContain('Want: 静かな庭');
  });
  it('drops obsolete fallback inference after correction and after starting over, even when abort is ignored',async()=>{

@@ -43,8 +43,15 @@ export function selectedCoffeeScene(c:Pick<GenerationContext,'history'>):CoffeeS
  const first=c.history[0];
  return first&&canonicalSceneQuestion(first.question)&&first.question.id===b1.id&&first.response.kind==='choice'&&(first.response.optionId==='bakery'||first.response.optionId==='nook')?first.response.optionId:undefined;
 }
+/** Product decision 2026-11-22: "Coffee. Brain's fried." uses the same adaptive Gemini-driven quiz as
+ * every other input. The authored opener is retired (off by default); its storyboards remain in the
+ * media registry for suitable questions, and canonical history replays still validate. */
+let authoredOpener=false;
+/** Test/prototype hook only. */
+export function setAuthoredSessionB(enabled:boolean){authoredOpener=enabled;}
 /** Bounded trigger; do not turn arbitrary café requests into this authored demo. */
 export function sessionBQuestion(c:GenerationContext):Question|undefined {
+ if(!authoredOpener)return;
  const input=c.originalInput.text.toLowerCase().replace(/[’']/g,'').replace(/[^a-z]+/g,' ').trim();
  if(input!=='coffee brains fried')return;
  if(c.history.length===0)return b1;
