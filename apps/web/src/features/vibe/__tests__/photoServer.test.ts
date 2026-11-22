@@ -3,9 +3,10 @@ import express from 'express';
 import type {Server} from 'node:http';
 import {createGeminiPhotoDescriber,PHOTO_SCHEMA,PHOTO_SYSTEM,type PhotoInput} from '../../../../server/photoDescriber';
 import {createPhotoRoutes,type PhotoDeps} from '../../../../server/photoApi';
-import {createVibeRouter} from '../../../../server/vibeApi';
-import {createSupabasePhotoAuth,normalizeSupabaseUrl,type PhotoAuth,type PhotoQuota} from '../../../../server/photoAuth';
+import {createSupabasePhotoAuth,normalizeSupabaseUrl,supabaseServerEnv,type PhotoAuth,type PhotoQuota} from '../../../../server/photoAuth';
 import type {createClient} from '@supabase/supabase-js';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 const img={mimeType:'image/jpeg' as const,data:'QUJD'};
 const reply=(text:string)=>vi.fn(async()=>new Response(JSON.stringify({candidates:[{content:{parts:[{text}]}}]}),{status:200}));
 const make=(f:ReturnType<typeof vi.fn>)=>createGeminiPhotoDescriber({apiKey:'TEST-FIXTURE-NOT-A-KEY',fetchImpl:f as unknown as typeof fetch});
@@ -87,14 +88,24 @@ describe('photo routes',()=>{
  it('GET /photo-quota reports remaining, null when unlimited, 401 without token',async()=>{
   const a=await serve({remaining:3});expect(await (await a.get()).json()).toEqual({remainingToday:3,limit:5});expect((await a.get(null)).status).toBe(401);
   const b=await serve({unlimited:true});expect(await (await b.get()).json()).toEqual({remainingToday:null,limit:5});});
- it('mounted like index.ts: a 500 KB body is not rejected as 413',async()=>{
-  const deps:PhotoDeps={auth:()=>null,describer:()=>({describe:async()=>'x'}),unlimited:()=>false};
-  const app=express();app.use('/api/vibe/describe-image',express.json({limit:'2mb'}));app.use(express.json({limit:'64kb'}));app.use('/api/vibe',createVibeRouter({generator:{generate:vi.fn()},embedder:{embed:vi.fn()},photo:deps}));
+ it('server/app.ts (local server and Vercel Function) takes a 500 KB photo body but keeps 64kb elsewhere',async()=>{
+  // Point env loading at a missing file so the test never reads the developer's .env.
+  vi.stubEnv('VIBENTA_ENV_FILE',join(tmpdir(),'vibenta-no-such-env-file'));
+  const {default:app}=await import('../../../../server/app');
   const s=app.listen(0,'127.0.0.1');running.push(s);await new Promise<void>(r=>s.once('listening',r));const a=s.address();if(!a||typeof a==='string')throw Error('no server');
-  const r=await fetch(`http://127.0.0.1:${a.port}/api/vibe/describe-image`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer good'},body:JSON.stringify({mimeType:'image/jpeg',data:'A'.repeat(500000)})});
-  expect(r.status).not.toBe(413);});
+  // No token: the route answers 401 after the body parser accepted the body, so nothing reaches Supabase or Gemini.
+  const photo=await fetch(`http://127.0.0.1:${a.port}/api/vibe/describe-image`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mimeType:'image/jpeg',data:'A'.repeat(500000)})});
+  expect(photo.status).toBe(401);
+  const other=await fetch(`http://127.0.0.1:${a.port}/api/transit/route`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pad:'A'.repeat(100000)})});
+  expect(other.status).toBe(413);
+  vi.unstubAllEnvs();});
 });
 describe('supabase photo auth',()=>{
+ it('reads SUPABASE_* first and falls back to the browser VITE_SUPABASE_* names, like catalog search',()=>{
+  expect(supabaseServerEnv({SUPABASE_URL:'https://server.supabase.co',VITE_SUPABASE_URL:'https://browser.supabase.co',SUPABASE_PUBLISHABLE_KEY:'server-key',VITE_SUPABASE_PUBLISHABLE_KEY:'browser-key'})).toEqual({url:'https://server.supabase.co',key:'server-key'});
+  expect(supabaseServerEnv({VITE_SUPABASE_URL:'https://browser.supabase.co',VITE_SUPABASE_PUBLISHABLE_KEY:'browser-key'})).toEqual({url:'https://browser.supabase.co',key:'browser-key'});
+  expect(supabaseServerEnv({SUPABASE_URL:'https://server.supabase.co',VITE_SUPABASE_PUBLISHABLE_KEY:'browser-key'})).toEqual({url:'https://server.supabase.co',key:'browser-key'});
+  expect(supabaseServerEnv({})).toEqual({url:undefined,key:undefined});});
  it('normalises the Supabase URL',()=>{for(const u of ['https://abc.supabase.co/rest/v1/','https://abc.supabase.co/rest/v1','https://abc.supabase.co/','  https://abc.supabase.co  ','https://abc.supabase.co'])expect(normalizeSupabaseUrl(u)).toBe('https://abc.supabase.co');});
  const stub=(getUser:()=>Promise<unknown>,urls:string[]=[])=>createSupabasePhotoAuth({url:'https://abc.supabase.co/rest/v1/',key:'TEST-FIXTURE',create:((u:string)=>{urls.push(u);return {auth:{getUser},rpc:async()=>({data:3,error:null})};}) as unknown as typeof createClient})!;
  it('passes a normalised URL and returns a quota for a valid user',async()=>{const urls:string[]=[];const q=await stub(async()=>({data:{user:{id:'u'}},error:null}),urls).verify('t');expect(urls).toEqual(['https://abc.supabase.co']);expect(await q!.remaining(5)).toBe(3);});

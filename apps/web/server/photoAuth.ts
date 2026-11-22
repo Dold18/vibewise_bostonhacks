@@ -2,6 +2,13 @@
 import { createClient } from '@supabase/supabase-js';
 export interface PhotoQuota { remaining(limit: number): Promise<number>; record(limit: number): Promise<number> }
 export interface PhotoAuth { verify(token: string): Promise<PhotoQuota | null> }
+/**
+ * Supabase settings for server code, the same convention as catalog search (vibeApi.ts):
+ * SUPABASE_URL / SUPABASE_PUBLISHABLE_KEY, falling back to the VITE_ names the browser uses.
+ */
+export function supabaseServerEnv(env: Record<string, string | undefined> = process.env): { url?: string; key?: string } {
+ return { url: env.SUPABASE_URL ?? env.VITE_SUPABASE_URL, key: env.SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_PUBLISHABLE_KEY };
+}
 export const normalizeSupabaseUrl = (url: string) => url.trim().replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '');
 export function createSupabasePhotoAuth(o: { url?: string; key?: string; create?: typeof createClient }): PhotoAuth | null {
  const key = o.key, url = o.url ? normalizeSupabaseUrl(o.url) : '', make = o.create ?? createClient;
