@@ -1,5 +1,5 @@
 import { Marker, type Map as MapLibreMap } from 'maplibre-gl';
-import { ICONS } from '../../discovery/ui/dom';
+import { iconMarkup } from '../../design/icons';
 import type { RouteStation } from '../../transitRoute';
 export interface HubMarker { setLngLat(p: [number, number]): unknown; remove(): void }
 /** A keyed marker set: collapse/reopen reuses hubs; route changes and exit remove obsolete hubs. */
@@ -15,7 +15,7 @@ export function createRouteHubs(map: MapLibreMap, add: (el: HTMLElement, p: [num
         let entry = markers.get(key);
         if (!entry) {
           const el = document.createElement('div'); el.className = 'vb-route-hub'; el.setAttribute('role', 'img'); el.tabIndex = 0;
-          el.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONS.train}" /></svg>`;
+          el.innerHTML = iconMarkup('train', 18, '');
           const caption = document.createElement('span'); caption.className = 'vb-hub-label'; caption.setAttribute('aria-hidden', 'true'); el.append(caption);
           entry = { el, caption, marker: add(el, [station.lng, station.lat]) }; markers.set(key, entry);
         }

@@ -1,0 +1,705 @@
+/*
+ * Vibenta identity — surfaces: widget silhouettes and every floating card
+ * (Quick Tools, Preferences, popups, directions, account, map controls).
+ * Layout, sizes and stacking stay in the owning stylesheets; this layer sets
+ * shape, color, type and motifs only.
+ */
+
+/* ---------- Floating widgets ---------- */
+.vb-widget {
+  background: var(--vx-surface);
+  color: var(--vx-text);
+  border: 1px solid var(--vx-edge);
+}
+
+/* Quick Tools: complementary die-cut, offset print in the scene accent. */
+.vb-tools-widget {
+  border-radius: var(--vx-shape-tools-r);
+  corner-shape: var(--vx-shape-tools);
+  box-shadow: var(--vx-print-scene), var(--vx-lift);
+  transition: box-shadow 0.6s ease;
+}
+.vb-tool {
+  position: relative;
+  gap: 7px;
+  height: 38px;
+  border: 0;
+  border-radius: var(--vx-shape-chip-r);
+  corner-shape: var(--vx-shape-chip);
+  background: transparent;
+  color: var(--vx-text) !important;
+  font-family: var(--vx-font-body);
+  font-size: 13.5px;
+  font-weight: 650;
+  letter-spacing: 0.005em;
+}
+.vb-tool svg {
+  fill: none;
+  width: 20px;
+  height: 20px;
+}
+.vb-tool:hover {
+  background: var(--vx-surface-hover);
+}
+/* The open tool is underlined with a marker stroke in its icon's color. */
+.vb-tool::after {
+  content: '';
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: 2px;
+  height: 6px;
+  background: var(--vx-tool-mark, var(--vx-lime));
+  mask: var(--vx-mask-squiggle) center / 100% 100% no-repeat;
+  opacity: 0;
+  transform: scaleX(0.4);
+  transition: opacity 0.16s ease, transform 0.2s var(--vx-ease);
+}
+.vb-tool[aria-expanded='true'] {
+  background: var(--vx-surface-hover);
+}
+.vb-tool[aria-expanded='true']::after {
+  opacity: 1;
+  transform: none;
+}
+.vb-quick-tools .vb-tool:nth-child(1) { --vx-tool-mark: var(--vx-cobalt); }
+.vb-quick-tools .vb-tool:nth-child(2) { --vx-tool-mark: var(--vx-coral); }
+.vb-tool-badge {
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: 50%;
+  corner-shape: superellipse(1.4);
+  background: var(--vx-coral);
+  color: var(--vx-ink);
+  font-family: var(--vx-font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 19px;
+  rotate: -6deg;
+}
+.vb-tools-widget .vb-view-header {
+  background: var(--vx-surface);
+}
+
+/* Preferences: the signature silhouette with the lime print layer. */
+.vb-preferences-widget {
+  position: relative;
+  border-radius: var(--vx-shape-signature-r);
+  corner-shape: var(--vx-shape-signature);
+  box-shadow: var(--vx-print-lime), var(--vx-lift);
+  border-color: var(--vx-edge);
+}
+.vb-preferences-widget .vb-header {
+  position: relative;
+  padding: 18px 12px 12px 22px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px dashed var(--vx-line);
+  border-radius: 0;
+}
+/* Halftone wash tucked into the header's right side: print texture, not grunge. */
+.vb-preferences-widget .vb-header::before {
+  content: '';
+  position: absolute;
+  inset: 8px 56px 10px auto;
+  width: 120px;
+  background: var(--vx-halftone);
+  mask: linear-gradient(105deg, transparent 10%, #000 70%);
+  pointer-events: none;
+  opacity: 0.8;
+}
+.vb-preferences-widget .vb-header-text {
+  position: relative;
+}
+.vb-preferences-widget .vb-title {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  color: var(--vx-text);
+  font-size: 31px;
+  line-height: 0.98;
+}
+/* Marker underline under the main heading. */
+.vb-preferences-widget .vb-title::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  right: 18%;
+  bottom: -7px;
+  height: 8px;
+  background: var(--vx-coral);
+  mask: var(--vx-mask-squiggle) center / 100% 100% no-repeat;
+}
+.vb-preferences-widget .vb-title:focus-visible {
+  outline-offset: 4px;
+}
+.vb-preferences-widget .vb-subtitle {
+  margin-top: 12px;
+  color: var(--vx-text-muted);
+  font-size: 13.5px;
+}
+.vb-preferences-widget .vb-label {
+  color: var(--vx-text-faint);
+}
+.vb-preferences-widget .vb-minimize {
+  color: var(--vx-text-muted);
+}
+.vb-preferences-widget .vb-field.has-value .vb-trigger {
+  background: var(--vx-field);
+  border-color: var(--vx-line);
+}
+.vb-preferences-widget .vb-trigger:hover {
+  border-color: var(--vx-carbon-600);
+  background: var(--vx-field);
+}
+.vb-preferences-widget .vb-field.is-open .vb-trigger,
+.vb-preferences-widget .vb-trigger:focus-visible {
+  border-color: var(--vx-focus);
+  box-shadow: 0 0 0 1px var(--vx-focus);
+}
+.vb-preferences-widget .vb-field.has-value.is-open .vb-trigger {
+  box-shadow: inset 3px 0 0 var(--vx-lime), 0 0 0 1px var(--vx-focus);
+}
+
+/* Stamped step number in the header's halftone corner, beside minimize. */
+.vb-discovery[data-step] .vb-preferences-widget::before {
+  content: '01';
+  position: absolute;
+  top: 17px;
+  right: 60px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--vx-coral);
+  color: var(--vx-ink);
+  font: 700 11px/1 var(--vx-font-mono);
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 0 3px var(--vx-surface), 0 0 0 4px var(--vx-coral);
+  rotate: -12deg;
+  pointer-events: none;
+}
+.vb-discovery[data-step='vibe'] .vb-preferences-widget::before {
+  content: '02';
+}
+.vb-discovery.is-collapsed .vb-preferences-widget::before,
+.vb-discovery.directions-expanded .vb-preferences-widget::before {
+  display: none;
+}
+
+/* Collapsed summary bar. */
+.vb-summary-btn {
+  color: var(--vx-text);
+}
+.vb-summary-btn:hover {
+  background: var(--vx-surface-hover);
+}
+.vb-summary-icon {
+  color: var(--vx-text);
+  width: 24px;
+  height: 24px;
+}
+.vb-summary-title {
+  font-family: var(--vx-font-display);
+  font-weight: 900;
+  font-size: 19px;
+  letter-spacing: 0.01em;
+}
+.vb-summary-text {
+  color: var(--vx-text-muted);
+}
+
+/* Footer: perforated edge (dashed rule), CTA with a hand-drawn arrow. */
+.vb-footer,
+.vb-step-footer {
+  background: transparent;
+  border-top: 1px dashed var(--vx-line);
+}
+.vb-step-footnote,
+.vb-footer-note {
+  color: var(--vx-text-faint);
+}
+.vb-footer-actions .vb-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: var(--vx-shape-cta-r);
+  corner-shape: var(--vx-shape-cta);
+  background: var(--vx-primary);
+  box-shadow: none;
+  font-size: 14.5px;
+}
+.vb-footer-actions .vb-primary-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--vx-paper);
+}
+.vb-continue-btn::after {
+  content: '';
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  mask: var(--vx-mask-arrow) center / contain no-repeat;
+}
+.vb-preferences-widget .vb-step {
+  scrollbar-color: var(--vx-carbon-600) transparent;
+}
+
+/* Notes */
+.vb-notes {
+  border: 1px dashed var(--vx-line);
+  border-radius: var(--vx-shape-field-r);
+  corner-shape: var(--vx-shape-field);
+  background: var(--vx-surface-raised);
+  color: var(--vx-text-muted);
+}
+
+/* ---------- Search & Saved views ---------- */
+.vb-view-title {
+  font-size: 24px;
+  line-height: 1;
+  color: var(--vx-text);
+}
+.vb-view-note,
+.vb-view-status {
+  color: var(--vx-text-faint);
+}
+.vb-search-submit svg {
+  fill: none;
+}
+.vb-result {
+  position: relative;
+  border-radius: var(--vx-shape-field-r);
+  corner-shape: var(--vx-shape-field);
+  color: var(--vx-text);
+}
+.vb-result:hover,
+.vb-result:focus-visible {
+  background: var(--vx-surface-hover);
+  box-shadow: inset 3px 0 0 var(--vx-cobalt);
+}
+.vb-saved-item .vb-result:hover {
+  box-shadow: inset 3px 0 0 var(--vx-coral);
+}
+.vb-result-name {
+  font-weight: 650;
+}
+.vb-result-sub {
+  color: var(--vx-text-faint);
+}
+
+/* ---------- Directions ---------- */
+.vb-directions-slot {
+  border-radius: var(--vx-shape-card-r);
+  corner-shape: var(--vx-shape-card);
+  box-shadow: var(--vx-print-cobalt), var(--vx-lift);
+}
+.vb-directions-control {
+  background: var(--vx-surface);
+  border: 1px solid var(--vx-edge);
+  border-radius: var(--vx-shape-tools-r);
+  corner-shape: var(--vx-shape-tools);
+  box-shadow: var(--vx-print-cobalt), var(--vx-lift);
+}
+.vb-directions-pill {
+  background: rgba(91, 124, 255, 0.16);
+  color: var(--vx-text);
+  border-radius: var(--vx-shape-chip-r);
+  corner-shape: var(--vx-shape-chip);
+}
+.vb-directions-estimates {
+  color: var(--vx-cobalt-light);
+  font-family: var(--vx-font-mono);
+}
+.vb-directions-footer {
+  border-top: 1px dashed var(--vx-line);
+}
+.vb-exit-navigation {
+  color: var(--vx-coral-soft) !important;
+}
+.vb-planner-header {
+  background: var(--vx-surface);
+}
+.vb-planner-icon {
+  color: var(--vx-text);
+  fill: none;
+}
+.vb-planner-title {
+  font-size: 24px;
+  color: var(--vx-text);
+}
+.vb-planner-swap {
+  border: 1px solid var(--vx-line) !important;
+  background: var(--vx-field) !important;
+}
+.vb-planner-find:disabled {
+  background: var(--vx-carbon-700);
+  color: var(--vx-text-faint) !important;
+}
+.vb-planner-notice {
+  background: var(--vx-surface-raised);
+  border: 1px dashed var(--vx-line);
+  color: var(--vx-text-muted);
+}
+.vb-planner-notice strong,
+.vb-route-summary {
+  color: var(--vx-text);
+}
+.vb-route-option {
+  border-bottom: 1px dashed var(--vx-line);
+}
+.vb-route-legs,
+.vb-planner-hint,
+.vb-planner-source {
+  color: var(--vx-text-muted);
+}
+.vb-line-chip {
+  background: var(--vx-carbon-800);
+  color: var(--vx-text);
+  font-family: var(--vx-font-mono);
+  font-size: 11.5px;
+  border-radius: 2px 6px 2px 6px;
+  corner-shape: bevel round bevel round;
+}
+.vb-route-legs li.vb-leg-wait {
+  border-left-color: var(--vx-carbon-600);
+}
+
+/* ---------- Venue popup: a miniature editorial card ---------- */
+.vb-place-popup .maplibregl-popup-content {
+  background: var(--vx-surface);
+  color: var(--vx-text);
+  border: 1px solid var(--vx-edge);
+  border-radius: var(--vx-shape-card-r);
+  corner-shape: var(--vx-shape-card);
+  box-shadow: var(--vx-print-paper), var(--vx-lift);
+}
+.vb-place-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+.vb-place-popup.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+.vb-place-popup.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+  border-top-color: var(--vx-surface);
+}
+.vb-place-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip,
+.vb-place-popup.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+.vb-place-popup.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+  border-bottom-color: var(--vx-surface);
+}
+.vb-place-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--vx-surface);
+}
+.vb-place-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--vx-surface);
+}
+.vb-popup {
+  padding: 15px 15px 13px 16px;
+  scrollbar-color: var(--vx-carbon-600) transparent;
+}
+/* Category badge as a stamped disc in the place's color. */
+.vb-popup-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--badge-color, var(--vx-cobalt)) 22%, var(--vx-surface));
+  box-shadow:
+    0 0 0 2px var(--vx-surface),
+    0 0 0 3.5px var(--badge-color, var(--vx-cobalt));
+  rotate: -8deg;
+}
+.vb-popup-titles h3 {
+  margin-top: 0;
+  color: var(--vx-text);
+  font-size: 22px;
+  line-height: 1.02;
+}
+.vb-popup-titles p {
+  margin-top: 5px;
+  color: color-mix(in srgb, var(--badge-color, var(--vx-coral)) 55%, var(--vx-paper));
+  font-family: var(--vx-font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.vb-popup-close {
+  color: var(--vx-text-muted);
+  border-radius: var(--vx-shape-chip-r);
+  corner-shape: var(--vx-shape-chip);
+}
+.vb-popup-close svg {
+  fill: none;
+}
+.vb-popup-close:hover {
+  background: var(--vx-surface-hover);
+  color: var(--vx-text);
+}
+.vb-popup-details {
+  border-top: 1px dashed var(--vx-line);
+  color: var(--vx-text);
+}
+.vb-popup-details svg {
+  fill: none;
+  color: var(--vx-text-muted);
+}
+.vb-popup-details li:nth-child(odd) svg { --vx-icon-pop: var(--vx-lime); }
+.vb-popup-navigate {
+  border-radius: var(--vx-shape-cta-r);
+  corner-shape: var(--vx-shape-cta);
+  background: var(--vx-primary);
+  color: var(--vx-on-primary) !important;
+  font-weight: 700;
+  transition: transform 0.16s var(--vx-ease), box-shadow 0.16s var(--vx-ease);
+}
+.vb-popup-navigate svg {
+  fill: none;
+  --vx-icon-pop: rgba(18, 20, 22, 0.18);
+}
+.vb-popup-navigate:hover {
+  background: var(--vx-lime);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--vx-paper);
+}
+.vb-popup-save {
+  border: 1.5px solid var(--vx-line);
+  border-radius: var(--vx-shape-cta-r);
+  corner-shape: var(--vx-shape-cta);
+  background: transparent;
+  color: var(--vx-text) !important;
+  font-weight: 650;
+}
+.vb-popup-save svg {
+  fill: none;
+}
+.vb-popup-save:hover {
+  background: var(--vx-surface-hover);
+  border-color: var(--vx-coral);
+}
+.vb-popup-save[aria-pressed='true'] {
+  background: rgba(255, 107, 87, 0.14);
+  border-color: var(--vx-coral);
+}
+.vb-popup-links a {
+  color: var(--vx-link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.vb-popup-section {
+  color: var(--vx-text-faint);
+}
+.vb-popup-attribution,
+.deal-when,
+.deal-meta {
+  color: var(--vx-text-faint);
+}
+.deal-active {
+  color: var(--vx-lime);
+}
+
+/* ---------- Account ---------- */
+.account-btn {
+  border: 1px solid var(--vx-edge);
+  border-radius: 14px 24px 14px 24px;
+  corner-shape: bevel round bevel round;
+  background: var(--vx-surface);
+  color: var(--vx-text);
+  box-shadow: var(--vx-print-coral), var(--vx-lift);
+  font-family: var(--vx-font-body);
+  font-weight: 700;
+}
+.account-btn:hover:not(:disabled) {
+  background: var(--vx-surface-hover);
+}
+.account-btn.is-avatar {
+  border-radius: 50%;
+  corner-shape: round;
+  background: var(--vx-coral);
+  color: var(--vx-ink);
+  font-family: var(--vx-font-display);
+  font-size: 22px;
+}
+.account-btn.is-avatar:hover {
+  background: var(--vx-coral-soft);
+}
+.account-btn-icon {
+  fill: none;
+}
+.account-popover {
+  background: var(--vx-surface);
+  color: var(--vx-text);
+  border: 1px solid var(--vx-edge);
+  border-radius: 9px 24px 16px 16px;
+  corner-shape: bevel round round scoop;
+  box-shadow: var(--vx-print-coral), var(--vx-lift);
+}
+.account-title {
+  font-size: 26px;
+  line-height: 1;
+}
+.account-subtitle,
+.account-field {
+  color: var(--vx-text-faint);
+}
+.account-field input {
+  border: 1px solid var(--vx-line);
+  border-radius: var(--vx-shape-field-r);
+  corner-shape: var(--vx-shape-field);
+  background: var(--vx-field);
+  color: var(--vx-text);
+}
+.account-field input:focus {
+  outline: 2px solid var(--vx-focus);
+}
+.account-primary {
+  border-radius: var(--vx-shape-cta-r);
+  corner-shape: var(--vx-shape-cta);
+  background: var(--vx-primary);
+  color: var(--vx-on-primary);
+  font-weight: 700;
+}
+.account-secondary {
+  border: 1px solid var(--vx-line);
+  border-radius: var(--vx-shape-cta-r);
+  corner-shape: var(--vx-shape-cta);
+  background: transparent;
+  color: var(--vx-text);
+}
+.account-danger {
+  border-radius: var(--vx-shape-cta-r);
+  corner-shape: var(--vx-shape-cta);
+  background: var(--vx-danger);
+  color: var(--vx-ink);
+  font-weight: 700;
+}
+.account-link {
+  color: var(--vx-link);
+}
+.account-error {
+  color: var(--vx-danger);
+}
+.account-notice {
+  background: rgba(91, 124, 255, 0.14);
+  color: var(--vx-text);
+}
+.account-badge {
+  background: rgba(255, 180, 74, 0.16);
+  color: var(--vx-warning);
+  font-family: var(--vx-font-mono);
+  font-size: 10.5px;
+}
+.account-chip-track {
+  background: var(--vx-carbon-800);
+}
+.account-chip-bar {
+  background: var(--vx-lime);
+}
+.account-empty {
+  color: var(--vx-text-muted);
+}
+.account-switch {
+  background: var(--vx-carbon-600);
+}
+.account-switch::after {
+  background: var(--vx-paper);
+}
+.account-switch:checked {
+  background: var(--vx-lime);
+}
+.account-switch:checked::after {
+  background: var(--vx-ink);
+}
+
+/* ---------- Map controls ---------- */
+.control {
+  color: var(--vx-text);
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--vx-edge);
+  border-radius: 8px 14px 8px 14px;
+  corner-shape: bevel round bevel round;
+  background: var(--vx-surface);
+  box-shadow: var(--vx-print-cobalt), var(--vx-lift);
+}
+.control svg {
+  fill: none;
+}
+.control:hover {
+  background: var(--vx-surface-hover);
+}
+.control.tilt {
+  color: var(--vx-text);
+  font-family: var(--vx-font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.control-stack {
+  border-radius: 8px 14px 8px 14px;
+  corner-shape: bevel round bevel round;
+  box-shadow: var(--vx-print-cobalt), var(--vx-lift);
+  overflow: visible;
+}
+.control-stack .control {
+  border-radius: 0;
+  corner-shape: round;
+  box-shadow: none;
+}
+.control-stack .control:first-child {
+  border-radius: 8px 14px 0 0;
+  corner-shape: bevel round round round;
+  border-bottom: 0;
+}
+.control-stack .control:last-child {
+  border-radius: 0 0 8px 14px;
+  corner-shape: round round bevel round;
+}
+.control-stack .control + .control {
+  border-top: 1px dashed var(--vx-line);
+}
+
+/* ---------- Toast ---------- */
+.toast {
+  background: var(--vx-carbon-950);
+  color: var(--vx-text);
+  border: 1px solid var(--vx-edge);
+  border-radius: var(--vx-shape-chip-r);
+  corner-shape: var(--vx-shape-chip);
+  box-shadow: inset 4px 0 0 var(--vx-lime), var(--vx-lift);
+  font-family: var(--vx-font-body);
+  font-weight: 600;
+}
+
+/* Attribution stays legible but quiet. */
+.maplibregl-ctrl-attrib {
+  font-family: var(--vx-font-body);
+}
+
+/* ---------- Phones ---------- */
+@media (max-width: 640px) {
+  .vb-discovery:not(.is-collapsed) .vb-preferences-widget {
+    border-radius: 24px 11px 0 0;
+    corner-shape: bevel notch round round;
+    box-shadow: 0 -5px 0 -1px var(--vx-lime), var(--vx-lift);
+  }
+  .vb-tools-widget {
+    box-shadow: var(--vx-lift);
+  }
+  .vb-preferences-widget .vb-title {
+    font-size: 27px;
+  }
+  .vb-preferences-widget .vb-header::before {
+    width: 80px;
+  }
+  .vx-brand {
+    width: 98px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vb-tool::after,
+  .vb-tools-widget,
+  .vb-popup-navigate {
+    transition: none;
+  }
+}

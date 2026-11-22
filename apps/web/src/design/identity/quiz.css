@@ -1,0 +1,350 @@
+/*
+ * Vibenta identity — vibe entry and quiz. Presentation only: question logic,
+ * media behavior and focus management live in features/vibe.
+ * Selectors are scoped under .vb-discovery so they win over the quiz's own
+ * light-theme sheet (and its mood palettes) without !important.
+ */
+
+/* ---------- Vibe entry ---------- */
+.vb-discovery .vb-overline {
+  color: var(--vx-coral);
+}
+.vb-discovery .vb-vibe-heading {
+  color: var(--vx-text);
+  font-size: 27px;
+  line-height: 1;
+}
+.vb-discovery .vb-vibe-lead,
+.vb-discovery .vb-vibe-section-help,
+.vb-discovery .vb-upload-explainer,
+.vb-discovery .vb-upload-detail,
+.vb-discovery .vb-upload-limit,
+.vb-discovery .vb-image-filename,
+.vb-discovery .vb-upload-status,
+.vb-discovery .vb-counter {
+  color: var(--vx-text-faint);
+}
+.vb-discovery .vb-vibe-section-label {
+  color: var(--vx-text-muted);
+}
+.vb-discovery .vb-vibe-story {
+  background: var(--vx-field) var(--vx-halftone);
+  background-blend-mode: normal;
+  border-radius: 14px 4px 14px 14px;
+  corner-shape: round bevel round round;
+}
+.vb-discovery .vb-vibe-story::placeholder {
+  color: var(--vx-text-faint);
+}
+.vb-discovery .vb-vibe-story:focus-visible {
+  box-shadow: 0 0 0 1px var(--vx-focus);
+}
+
+/* Example prompts: small die-cut chips that lift onto a cobalt print. */
+.vb-discovery .vb-vibe-example {
+  border: 1px solid var(--vx-line);
+  border-radius: var(--vx-shape-chip-r);
+  corner-shape: var(--vx-shape-chip);
+  background: var(--vx-surface-raised);
+  color: var(--vx-text);
+}
+.vb-discovery .vb-vibe-example:hover {
+  border-color: var(--vx-cobalt);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--vx-cobalt);
+}
+.vb-discovery .vb-example-subtitle {
+  color: var(--vx-text-faint);
+}
+
+.vb-discovery .vb-upload-button {
+  border: 1.5px dashed var(--vx-carbon-600);
+  border-radius: var(--vx-shape-card-r);
+  corner-shape: var(--vx-shape-card);
+  background: var(--vx-surface-raised);
+  color: var(--vx-text);
+}
+.vb-discovery .vb-upload-button > svg {
+  fill: none;
+  opacity: 1;
+}
+.vb-discovery .vb-upload-button:hover:not(:disabled),
+.vb-discovery .vb-upload-zone.is-dragging .vb-upload-button {
+  border-color: var(--vx-coral);
+  background: var(--vx-surface-hover);
+}
+.vb-discovery .vb-image-preview {
+  border-color: var(--vx-line);
+  background: var(--vx-surface-raised);
+  border-radius: 10px 3px 10px 10px;
+  corner-shape: round bevel round round;
+}
+.vb-discovery .vb-image-remove {
+  background: rgba(15, 18, 20, 0.82);
+  color: var(--vx-paper) !important;
+}
+.vb-discovery .vb-image-remove:hover {
+  background: var(--vx-coral);
+  color: var(--vx-ink) !important;
+}
+
+/*
+ * Quiz launch: the focal point of the vibe step. A lime sticker button with
+ * display lettering, a starburst stamp and a looping hand-drawn arrow.
+ */
+.vb-discovery .vb-begin-quiz {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 58px;
+  height: auto;
+  margin: 18px 6px 8px 0;
+  padding: 10px 20px;
+  border-radius: 6px 22px 6px 22px;
+  corner-shape: bevel round bevel scoop;
+  font-family: var(--vx-font-display);
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  box-shadow: 5px 6px 0 -1px var(--vx-coral);
+}
+.vb-discovery .vb-begin-quiz::before {
+  content: '';
+  flex: none;
+  width: 26px;
+  height: 26px;
+  background: var(--vx-ink);
+  mask: var(--vx-mask-burst) center / contain no-repeat;
+  transform: rotate(-10deg);
+}
+.vb-discovery .vb-begin-quiz::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: -24px;
+  width: 44px;
+  height: 30px;
+  background: var(--vx-accent-scene);
+  mask: var(--vx-mask-loop-arrow) center / contain no-repeat;
+  transform: rotate(8deg);
+  pointer-events: none;
+}
+.vb-discovery .vb-begin-quiz:hover:not(:disabled) {
+  box-shadow: 6px 7px 0 -1px var(--vx-coral), 3px 3px 0 var(--vx-paper);
+}
+
+/* ---------- Live quiz ---------- */
+.vb-discovery .vb-live-quiz,
+.vb-discovery .vb-live-quiz[data-mood] {
+  /* Quiz-local tokens (quiz.css and the media stage read these). */
+  --vb-accent: var(--vx-lime);
+  --vb-tint: var(--vx-surface-raised);
+  --vb-edge: var(--vx-line);
+  --vb-ink: var(--vx-text);
+  color: var(--vx-text);
+  background: transparent;
+  padding-inline: 0;
+}
+/* Mood palettes keep their hue, re-voiced bright enough for Carbon. */
+.vb-discovery .vb-live-quiz[data-mood='neon_noir'] { --vb-accent: #ff6fd0; }
+.vb-discovery .vb-live-quiz[data-mood='candlelit_gothic'] { --vb-accent: #ff9a6b; }
+.vb-discovery .vb-live-quiz[data-mood='warm_amber'] { --vb-accent: #ffc25c; }
+.vb-discovery .vb-live-quiz[data-mood='sunlit'] { --vb-accent: #5fe0c8; }
+.vb-discovery .vb-live-quiz[data-mood='electric_party'] { --vb-accent: #b78cff; }
+.vb-discovery .vb-live-quiz[data-mood='misty_blue'] { --vb-accent: #9cc3e6; }
+.vb-discovery .vb-live-quiz[data-mood='dreamy_pastel'] { --vb-accent: #ffa3cf; }
+.vb-discovery .vb-live-quiz[data-mood='deep_forest'] { --vb-accent: #8fd69a; }
+.vb-discovery .vb-live-quiz[data-mood='retro_film'] { --vb-accent: #e7c48a; }
+.vb-discovery .vb-live-quiz[data-mood='starlit'] { --vb-accent: #a3b5ff; }
+
+.vb-discovery .vb-quiz-count {
+  color: var(--vx-coral);
+}
+.vb-discovery .vb-quiz-semantic-status,
+.vb-discovery .vb-quiz-photo-note,
+.vb-discovery .vb-quiz-notice,
+.vb-discovery .vb-quiz-results-note {
+  color: var(--vx-text-faint);
+}
+.vb-discovery .vb-live-quiz .vb-quiz-prompt,
+.vb-discovery .vb-live-quiz[data-mood] .vb-quiz-prompt {
+  color: var(--vx-text);
+  font-size: 25px;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+/* Answer cards: die-cut, lift onto the quiz accent's print layer. */
+.vb-discovery .vb-live-quiz .vb-quiz-answer,
+.vb-discovery .vb-live-quiz[data-mood] .vb-quiz-answer {
+  border: 1px solid var(--vx-line);
+  border-radius: 14px 4px 14px 14px;
+  corner-shape: round bevel round round;
+  background: var(--vx-surface-raised);
+  color: var(--vx-text);
+  transition: transform 0.16s var(--vx-ease), box-shadow 0.16s var(--vx-ease), border-color 0.16s ease;
+}
+.vb-discovery .vb-live-quiz .vb-quiz-answer strong {
+  font-size: 15px;
+  font-weight: 700;
+}
+.vb-discovery .vb-live-quiz .vb-quiz-answer span {
+  color: var(--vx-text-muted);
+}
+.vb-discovery .vb-live-quiz .vb-quiz-answer:hover,
+.vb-discovery .vb-live-quiz[data-mood] .vb-quiz-answer:hover {
+  background: var(--vx-surface-hover);
+  border-color: var(--vb-accent);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--vb-accent);
+}
+.vb-discovery .vb-live-quiz .vb-quiz-answer:focus-visible {
+  outline: 2px solid var(--vx-focus);
+}
+.vb-discovery .vb-quiz-neutral button {
+  color: var(--vx-text-muted) !important;
+}
+
+.vb-discovery .vb-live-quiz .vb-quiz-summary,
+.vb-discovery .vb-live-quiz[data-mood] .vb-quiz-summary,
+.vb-discovery .vb-quiz-reading {
+  background: var(--vx-surface-raised);
+  border: 1px dashed var(--vx-line);
+  border-radius: var(--vx-shape-field-r);
+  corner-shape: var(--vx-shape-field);
+  color: var(--vx-text);
+}
+.vb-discovery .vb-quiz-summary h4 {
+  color: var(--vx-coral);
+  font-family: var(--vx-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.vb-discovery .vb-quiz-exclusions span {
+  background: rgba(255, 180, 74, 0.14);
+  color: var(--vx-warning);
+  border-radius: 2px 6px 2px 6px;
+  corner-shape: bevel round bevel round;
+}
+.vb-discovery .vb-quiz-loading {
+  color: var(--vx-text);
+}
+.vb-discovery .vb-quiz-spinner {
+  border-color: var(--vx-carbon-600);
+  border-top-color: var(--vx-lime);
+}
+
+/* Session B scene stage. */
+.vb-discovery .vb-scene-provenance,
+.vb-discovery .vb-scene-reference,
+.vb-discovery .vb-scene-option figcaption,
+.vb-discovery .vb-scene-reveal p {
+  color: var(--vx-text-muted);
+}
+.vb-discovery .vb-scene-option {
+  border: 1px solid var(--vx-line);
+  border-radius: var(--vx-shape-card-r);
+  corner-shape: var(--vx-shape-card);
+  background: var(--vx-surface-raised);
+}
+.vb-discovery .vb-scene-option h4 {
+  color: var(--vx-text);
+  font-family: var(--vx-font-display);
+  font-weight: 900;
+  font-size: 19px;
+  letter-spacing: 0.01em;
+}
+.vb-discovery .vb-scene-option img {
+  border-radius: 8px 2px 8px 8px;
+  corner-shape: round bevel round round;
+}
+.vb-discovery .vb-scene-control {
+  border: 1px solid var(--vx-line);
+  border-radius: var(--vx-shape-chip-r);
+  corner-shape: var(--vx-shape-chip);
+  background: var(--vx-carbon-800);
+  color: var(--vx-text);
+}
+.vb-discovery .vb-scene-control:hover:not(:disabled) {
+  border-color: var(--vb-accent);
+}
+.vb-discovery .vb-scene-control.vb-primary-btn {
+  background: var(--vx-primary);
+  color: var(--vx-on-primary) !important;
+  border-color: transparent;
+}
+.vb-discovery .vb-scene-control:focus-visible {
+  outline-color: var(--vx-focus);
+}
+.vb-discovery .vb-scene-selected,
+.vb-discovery .vb-scene-readback {
+  background: var(--vx-surface-raised);
+  border: 1px dashed var(--vx-line);
+  color: var(--vx-text);
+}
+.vb-discovery .vb-scene-fallback,
+.vb-discovery .vb-media-fallback {
+  background: var(--vx-surface-raised);
+  color: var(--vx-text-muted);
+}
+
+/* Media stage (vibenta-media/1). */
+.vb-discovery .vb-media-kind,
+.vb-discovery .vb-media-step {
+  color: var(--vx-coral);
+}
+.vb-discovery .vb-media-card,
+.vb-discovery .vb-media-load-player {
+  border: 1px solid var(--vx-line);
+  border-radius: var(--vx-shape-card-r);
+  corner-shape: var(--vx-shape-card);
+  background: var(--vx-surface-raised);
+  color: var(--vx-text);
+}
+.vb-discovery .vb-media-card span,
+.vb-discovery .vb-media-load-player span,
+.vb-discovery .vb-media-why,
+.vb-discovery .vb-media-soundoff,
+.vb-discovery .vb-media-credit {
+  color: var(--vx-text-muted);
+}
+.vb-discovery .vb-media-card:hover,
+.vb-discovery .vb-media-card[aria-pressed='true'] {
+  border-color: var(--vb-accent);
+  box-shadow: 4px 4px 0 var(--vb-accent);
+}
+.vb-discovery .vb-media-load-player strong,
+.vb-discovery .vb-media-slider-row span,
+.vb-discovery .vb-media-reference a {
+  color: var(--vb-accent);
+}
+.vb-discovery .vb-media-reference {
+  background: var(--vx-surface-raised);
+  color: var(--vx-text-muted);
+}
+.vb-discovery .vb-media-reveal,
+.vb-discovery .vb-media-blend,
+.vb-discovery .vb-media-player {
+  border-radius: 12px 4px 12px 12px;
+  corner-shape: round bevel round round;
+}
+
+@media (max-width: 640px) {
+  .vb-discovery .vb-begin-quiz {
+    font-size: 22px;
+  }
+  .vb-discovery .vb-live-quiz .vb-quiz-prompt {
+    font-size: 23px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vb-discovery .vb-live-quiz .vb-quiz-answer,
+  .vb-discovery .vb-vibe-example {
+    transition: none;
+    transform: none !important;
+  }
+}

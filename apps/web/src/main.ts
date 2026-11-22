@@ -54,6 +54,10 @@ import { paddingAround } from './features/map/routeFrame';
 import { drawRoute, clearRoute, routeBounds, routeStations } from './transitRoute';
 import { catalogPlacesNear, catalogSemanticCandidates, isCatalogCategory } from './catalog';
 import { activeKinds, chipText } from './deals';
+// The Vibenta identity loads last so it styles every module's existing markup.
+import './design/identity/index.css';
+import { applySceneAccent, withSceneAccent } from './design/sceneAccent';
+import { mountBaseMaterials } from './features/map/baseMaterials';
 
 const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
 const TILTED = { pitch: 60, bearing: -20 };
@@ -897,12 +901,16 @@ const discovery = mountDiscoveryPanel(document.body, {
 // Account taste and the scene composer retain ownership of map appearance.
 const account = mountAccount(document.body, { map });
 const scene = mountScene({
-  theme: account.theme,
+  // Selected interface accents (not the identity itself) follow the rendered scene.
+  theme: withSceneAccent(account.theme),
   account: account.store,
   reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)'),
   onError: (error) => console.error('[scene]', error),
 });
 if (import.meta.env.DEV) Object.assign(window, { vibentaScene: sceneDevHook(scene, map) });
+// Ground textures (water, parks, plazas) over the palette fills; loads lazily.
+const materials = mountBaseMaterials(map);
+if (import.meta.env.DEV) Object.assign(window, { vibentaMaterials: materials });
 // One publisher feeds the existing compiler/session and the existing pin system.
 scene.connectProfiles(outingProfiles);
 const convergence = createConvergence(
@@ -995,6 +1003,8 @@ if (import.meta.hot) import.meta.hot.dispose(() => {
   stopConvergence();
   convergence.destroy();
   discovery.destroy();
+  materials.destroy();
+  applySceneAccent(null);
   scene.destroy();
   account.destroy();
 });

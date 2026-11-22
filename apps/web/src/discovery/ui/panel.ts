@@ -25,6 +25,7 @@ import {
 } from '../preferences';
 import { isExpanded, type LayoutAction, type LayoutState, type Store } from '../store';
 import { h, icon, ICONS, uid } from './dom';
+import { wordmarkSvg } from '../../design/wordmark';
 import { createLocationField } from './locationField';
 import { createMultiSelectField } from './multiSelectField';
 import { createSelectField } from './selectField';
@@ -174,6 +175,8 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   quickTools.setSavedCount(saved?.store.list().length ?? 0);
   const unsubSavedCount = saved?.store.subscribe((items) => quickTools.setSavedCount(items.length));
 
+  const brand = h('span', { class: 'vx-brand' });
+  brand.innerHTML = wordmarkSvg();
   const heading = h('h2', { class: 'vb-title', id: titleId, tabindex: '-1' }, 'Plan your outing');
   const subtitle = h('p', { class: 'vb-subtitle' }, 'First, the basics. Then we’ll find the feeling.');
   const stepSection = h(
@@ -212,6 +215,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
       h(
         'div',
         { class: 'vb-header-text' },
+        brand,
         heading,
         subtitle,
       ),

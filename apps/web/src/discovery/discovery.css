@@ -237,7 +237,7 @@
 }
 
 .vb-trigger:hover {
-  border-color: #bdc1c6;
+  border-color: var(--vb-muted);
 }
 
 .vb-field.is-open .vb-trigger,
@@ -715,7 +715,7 @@
 }
 
 .vb-text-btn:hover:not(:disabled) {
-  background: #f6fafe;
+  background: var(--vb-hover);
 }
 
 .vb-text-btn:disabled {
@@ -730,13 +730,13 @@
   border: 0;
   border-radius: 18px;
   background: var(--vb-accent);
-  color: #fff !important;
+  color: var(--vb-on-accent, #fff) !important;
   font-size: 14px;
   font-weight: 500;
 }
 
 .vb-primary-btn:hover {
-  background: #1765cc;
+  background: var(--vb-accent-hover, #1765cc);
 }
 
 .vb-primary-btn.vb-small {
@@ -789,7 +789,7 @@
   padding: 0 5px;
   border-radius: 9px;
   background: var(--vb-accent-soft);
-  color: #174ea6;
+  color: var(--vb-text);
   font-size: 11px;
   line-height: 18px;
 }
@@ -1440,15 +1440,7 @@
 }
 @media (prefers-reduced-motion: reduce) { .vb-discovery.directions-expanded .vb-directions-slot { animation: none; } }
 
-/* Blue accents identify preferences and committed choices without tinting every surface. */
-.vb-preferences-widget { border: 1px solid #d3e3fd; }
-.vb-preferences-widget .vb-header { background: #f4f8ff; border-bottom: 1px solid #dce8fc; border-radius: 15px 15px 0 0; padding-bottom: 12px; }
-.vb-preferences-widget .vb-title { color: #174ea6; }
-.vb-preferences-widget .vb-label { color: #285a96; }
-.vb-preferences-widget .vb-minimize { color: #1a73e8; }
-.vb-preferences-widget .vb-field.has-value .vb-trigger { background: #eef5ff; border-color: #a9c9f7; }
-.vb-preferences-widget .vb-trigger:hover { border-color: #8bb6f7; background: #f5f9ff; }
-.vb-preferences-widget .vb-field.is-open .vb-trigger, .vb-preferences-widget .vb-trigger:focus-visible { border-color: #1a73e8; box-shadow: 0 0 0 2px #d3e3fd; }
+/* Preferences accents now come from the Vibenta identity (design/identity/surfaces.css). */
 @media (max-width: 640px) {
   body[data-focus="navigation"] .vb-discovery.directions-expanded { max-height: 74dvh; }
 }

@@ -27,6 +27,8 @@ handlers.set('Fetch.requestPaused',async p=>{let data;if(p.request.url.includes(
 await send('Fetch.fulfillRequest',{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'},{name:'Access-Control-Allow-Origin',value:'*'}],body:Buffer.from(JSON.stringify(data)).toString('base64')}).catch(()=>{});});
 const nav=async(origin=from)=>{await js(`vibentaTrip.dispatch({type:'navigateTo',destination:${JSON.stringify(to)},discoveryOrigin:${JSON.stringify(origin)}})`);await sleep(900);};
 const exit=async()=>{await js(`vibentaTrip.dispatch({type:'endNavigation'})`);await sleep(650);};
+// Software GL can run at a few fps, so 0.18 s entry animations may still be mid-flight; measure the resting layout.
+const settled=()=>js('Promise.all(document.getAnimations().filter(a=>a.effect?.getComputedTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{}))).then(()=>true)');
 const layout=()=>js(`(()=>{const a=document.querySelector('.vb-tools-widget'),b=document.querySelector('.vb-preferences-widget:not([hidden]),.vb-directions-slot:not([hidden])'),x=a.getBoundingClientRect(),y=b.getBoundingClientRect();return {independent:a.parentElement===b.parentElement,above:x.bottom<y.top,aligned:Math.abs(x.left-y.left)<1&&Math.abs(x.width-y.width)<1,onScreen:x.top>=0&&y.bottom<=innerHeight+1}})()`);
 const hiddenPins=()=>js(`[...document.querySelectorAll('.pin:not(.vb-temporary-place)')].every(e=>getComputedStyle(e).visibility==='hidden'&&getComputedStyle(e).pointerEvents==='none'&&e.inert)`);
 const routeData=()=>js(`(async()=>{const lines=await map.getSource('transit-route')?.getData();return lines?.features??[]})()`);
@@ -38,7 +40,8 @@ await send('Page.addScriptToEvaluateOnNewDocument',{source:`window.__geoCalls=0;
 await send('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});await send('Page.navigate',{url:process.env.VIBENTA_QA_URL??'http://localhost:5173/'});
 await waitFor('!!window.vibentaTrip&&!!window.map&&map.loaded()&&document.querySelectorAll(".pin").length>0');
 for(const width of [1440,1366,1280]){await send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false});await sleep(250);const l=await layout();check('Discovery cards '+width,Object.values(l).every(Boolean),l);await shot('discovery-'+width);}
-check('preferences keep blue header and field accents',await js('getComputedStyle(document.querySelector(".vb-title")).color==="rgb(23, 78, 166)"&&getComputedStyle(document.querySelector(".vb-preferences-widget .vb-label")).color==="rgb(40, 90, 150)"'));
+// Vibenta identity: tokens resolved through a probe so the check follows tokens.css, not hardcoded hex.
+check('preferences use identity header, coral marker and faint field labels',await js(`(()=>{const probe=document.createElement('i');document.body.append(probe);const tok=v=>{probe.style.color='var('+v+')';return getComputedStyle(probe).color};const text=tok('--vx-text'),faint=tok('--vx-text-faint'),coral=tok('--vx-coral');probe.remove();const t=document.querySelector('.vb-preferences-widget .vb-title'),ts=getComputedStyle(t);return ts.color===text&&ts.fontFamily.includes('Londrina')&&getComputedStyle(t,'::after').backgroundColor===coral&&getComputedStyle(document.querySelector('.vb-preferences-widget .vb-label')).color===faint})()`));
 check('Discovery pins have no glow',await js('getComputedStyle(document.querySelector(".pin-body")).filter==="none"'));
 check('Step 1 is practical only',await js('document.querySelector("[data-step=preferences]").offsetHeight>0&&document.querySelector("[data-step=vibe]").hidden&&!!document.querySelector(".vb-continue-btn")'));
 const original=await stateSnapshot();await js('document.querySelector(".pin").click()');await sleep(700);
@@ -99,7 +102,7 @@ check('walking has a subtle neon glow',await js('map.getPaintProperty("transit-r
 check('walking dark dashes with light casing',await js('map.getPaintProperty("transit-route-walk","line-color")==="#17212E"&&map.getPaintProperty("transit-route-walk-casing","line-color")==="#F7FAFC"&&map.getPaintProperty("transit-route-walk","line-dasharray").length===2'));
 await shot('verified-walking-fixture');await click('[aria-label="Collapse directions"]');
 await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await sleep(400);await shot('mobile-compact');await click('.vb-directions-pill');await sleep(400);
-const mobile=await layout();check('mobile Directions uses the same bottom sheet',Object.values(mobile).every(Boolean)&&await js('document.querySelector(".vb-preferences-widget").hidden'),mobile);await shot('mobile-directions');
+await settled();const mobile=await layout();check('mobile Directions uses the same bottom sheet',Object.values(mobile).every(Boolean)&&await js('document.querySelector(".vb-preferences-widget").hidden'),mobile);await shot('mobile-directions');
 await click('[aria-label="Collapse directions"]');await sleep(300);check('mobile collapse restores Vibe and keeps route',await js('document.querySelector(".vb-discovery").dataset.step==="vibe"&&document.querySelectorAll(".vb-route-hub").length===4&&map.getPitch()===0&&vibentaDiscovery.getPreferences().vibeImages.length===1'));
 await shot('mobile-vibe-navigation');
 await js('void map.easeTo({pitch:60,duration:0});document.getElementById("tilt-toggle").click()');

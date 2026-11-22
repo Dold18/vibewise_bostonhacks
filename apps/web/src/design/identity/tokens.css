@@ -1,0 +1,126 @@
+/*
+ * Vibenta identity — design tokens.
+ *
+ * Carbon foundation (graphite surfaces, cream type) with a small accent family
+ * used with intent: lime = the one primary action and committed choices,
+ * coral = personal/saved and stamped marks, cobalt = wayfinding and focus.
+ * The pre-existing token names (--surface, --text, --accent, ... and the
+ * panel's --vb-*) are aliased here, so every module's stylesheet adopts the
+ * identity without per-file color overrides.
+ */
+:root {
+  /* Carbon ramp (cool-leaning graphite) */
+  --vx-carbon-950: #0f1214;
+  --vx-carbon-900: #171b1e;
+  --vx-carbon-850: #1d2226;
+  --vx-carbon-800: #252b30;
+  --vx-carbon-700: #343c42;
+  --vx-carbon-600: #4a545b;
+  --vx-graphite-300: #a6aeb3;
+  --vx-graphite-400: #8e989e;
+
+  /* Paper */
+  --vx-paper: #f3eee3;
+  --vx-paper-dim: #d6d0c3;
+  --vx-ink: #121416;
+
+  /* Accents */
+  --vx-lime: #d4f24a;
+  --vx-lime-deep: #b9d82c;
+  --vx-coral: #ff6b57;
+  --vx-coral-soft: #ff9a8b;
+  --vx-cobalt: #5b7cff;
+  --vx-cobalt-light: #a3b5ff;
+  --vx-warning: #ffb44a;
+  --vx-danger: #ff6b6b;
+
+  /* What follows the scene (sceneAccent.ts); coral on the neutral map. */
+  --vx-accent-scene: var(--vx-scene-accent, var(--vx-coral));
+
+  /* Roles */
+  --vx-surface: var(--vx-carbon-900);
+  --vx-surface-raised: var(--vx-carbon-850);
+  --vx-surface-hover: var(--vx-carbon-800);
+  --vx-field: var(--vx-carbon-850);
+  --vx-line: var(--vx-carbon-700);
+  --vx-edge: rgba(243, 238, 227, 0.09);
+  --vx-text: var(--vx-paper);
+  --vx-text-muted: var(--vx-graphite-300);
+  --vx-text-faint: var(--vx-graphite-400);
+  --vx-primary: var(--vx-lime);
+  --vx-on-primary: var(--vx-ink);
+  --vx-focus: var(--vx-cobalt-light);
+  --vx-link: var(--vx-cobalt-light);
+
+  /* Type */
+  --vx-font-display: 'Londrina Solid', 'Arial Black', Impact, sans-serif;
+  --vx-font-body: 'Bricolage Grotesque', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --vx-font-mono: 'Space Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /*
+   * Silhouettes: die-cut sticker corners via CSS `corner-shape`. Borders,
+   * backgrounds, shadows, offset print layers and focus rings all follow the
+   * cut, and nothing is clipped (popovers and focus rings stay intact).
+   * Without corner-shape support the same radii render as plain rounded,
+   * still-asymmetric corners.
+   */
+  --vx-shape-signature-r: 24px 11px 34px 9px;
+  --vx-shape-signature: bevel notch scoop round;
+  --vx-shape-tools-r: 12px 22px 12px 22px;
+  --vx-shape-tools: round bevel round scoop;
+  --vx-shape-card-r: 16px 6px 16px 24px;
+  --vx-shape-card: round bevel round scoop;
+  --vx-shape-chip-r: 7px 13px 7px 13px;
+  --vx-shape-chip: bevel round bevel round;
+  --vx-shape-field-r: 10px 4px 10px 4px;
+  --vx-shape-field: round bevel round bevel;
+  --vx-shape-cta-r: 4px 17px 4px 17px;
+  --vx-shape-cta: bevel round bevel round;
+
+  /* Offset print layers + depth */
+  --vx-lift: 0 18px 40px -14px rgba(6, 8, 10, 0.55), 0 2px 6px rgba(6, 8, 10, 0.18);
+  --vx-print-lime: 6px 7px 0 -1px var(--vx-lime);
+  --vx-print-coral: 4px 5px 0 -1px var(--vx-coral);
+  --vx-print-scene: 4px 5px 0 -1px var(--vx-accent-scene);
+  --vx-print-paper: 4px 5px 0 -1px var(--vx-paper);
+  --vx-print-cobalt: 3px 4px 0 -1px var(--vx-cobalt);
+
+  /* Motion */
+  --vx-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* Legacy aliases (style.css, account.css, ... read these) */
+  --surface: var(--vx-surface);
+  --surface-hover: var(--vx-surface-hover);
+  --text: var(--vx-text);
+  --text-muted: var(--vx-text-muted);
+  --accent: var(--vx-primary);
+  --border: var(--vx-line);
+  --shadow: var(--vx-lift);
+  --radius: 22px;
+  font-family: var(--vx-font-body);
+  font-optical-sizing: auto;
+  color: var(--vx-text);
+  color-scheme: dark;
+}
+
+/* Dark scenes: the map loses contrast against Carbon, so edges strengthen. */
+:root[data-scene-tone='dark'] {
+  --vx-edge: rgba(243, 238, 227, 0.2);
+  --vx-lift: 0 18px 44px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(243, 238, 227, 0.05);
+}
+
+/* Panel and overlay token aliases (discovery.css defines these on .vb-ui / .vb-discovery). */
+.vb-discovery,
+.vb-ui {
+  --vb-surface: var(--vx-surface);
+  --vb-hover: var(--vx-surface-hover);
+  --vb-text: var(--vx-text);
+  --vb-muted: var(--vx-text-muted);
+  --vb-accent: var(--vx-primary);
+  --vb-border: var(--vx-line);
+  --vb-shadow: var(--vx-lift);
+  --vb-accent-soft: rgba(212, 242, 74, 0.12);
+  --vb-warning: var(--vx-warning);
+  --vb-radius: 18px;
+  font-family: var(--vx-font-body);
+}
