@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { nameKey, nameSimilarity, osmCategory, fsqCategory, osmCuisines, fsqCuisines, osmAddress, fsqAddress, pickOsmTags } from '../src/normalize.ts';
+import { nameKey, nameSimilarity, osmCategory, fsqCategory, osmCuisines, fsqCuisines, osmAddress, fsqAddress, pickOsmTags, OSM_TAG_KEYS } from '../src/normalize.ts';
+import { PLACE_TYPE_CONFIG } from '../src/placeTypes.ts';
 import { metersBetween, toEwkt } from '../src/geo.ts';
 
 test('nameKey folds accents, &, leading "the", punctuation, whitespace', () => {
@@ -60,15 +61,23 @@ test('addresses format from available parts, else null', () => {
   assert.equal(fsqAddress({ address: null, locality: null, postcode: null }), null);
 });
 test('pickOsmTags keeps only vibe-relevant keys', () => {
-  assert.deepEqual(pickOsmTags({ amenity: 'cafe', outdoor_seating: 'yes', 'diet:vegan': 'yes', name: 'X', 'addr:street': 'Y' }),
+  assert.deepEqual(pickOsmTags({ amenity: 'cafe', outdoor_seating: 'yes', 'diet:vegan': 'yes', name: 'X', 'addr:street': 'Y' }, OSM_TAG_KEYS),
     { amenity: 'cafe', outdoor_seating: 'yes', 'diet:vegan': 'yes' });
 });
 
 test('pickOsmTags keeps photo-link and vibe tags', () => {
-  const out = pickOsmTags({ name: 'X', wikidata: 'Q1', wikimedia_commons: 'File:A.jpg', image: 'https://x/y.jpg', live_music: 'yes', smoking: 'no', brand: 'B' });
+  const out = pickOsmTags({ name: 'X', wikidata: 'Q1', wikimedia_commons: 'File:A.jpg', image: 'https://x/y.jpg', live_music: 'yes', smoking: 'no', brand: 'B' }, OSM_TAG_KEYS);
   assert.deepEqual(out, { wikidata: 'Q1', wikimedia_commons: 'File:A.jpg', image: 'https://x/y.jpg', live_music: 'yes', smoking: 'no' });
 });
 
+test('pickOsmTags uses the given key set', () => {
+  assert.deepEqual(
+    pickOsmTags({ name: 'MFA', tourism: 'museum', fee: 'yes', 'diet:vegan': 'yes', brand: 'B' }, PLACE_TYPE_CONFIG.museums.osmTagKeys),
+    { tourism: 'museum', fee: 'yes', 'diet:vegan': 'yes' },
+  );
+  assert.deepEqual(pickOsmTags({ tourism: 'museum', amenity: 'cafe' }, OSM_TAG_KEYS), { amenity: 'cafe' });
+});
+
 test('pickOsmTags keeps happy_hours', () => {
-  assert.deepEqual(pickOsmTags({ happy_hours: 'Mo-Fr 16:00-18:00', foo: 'x' }), { happy_hours: 'Mo-Fr 16:00-18:00' });
+  assert.deepEqual(pickOsmTags({ happy_hours: 'Mo-Fr 16:00-18:00', foo: 'x' }, OSM_TAG_KEYS), { happy_hours: 'Mo-Fr 16:00-18:00' });
 });

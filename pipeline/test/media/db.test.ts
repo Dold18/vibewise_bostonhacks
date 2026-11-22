@@ -45,49 +45,52 @@ const PHOTO: PhotoCandidate & { rank: number } = {
 
 test('writePlaceMedia never deletes student or hidden photos', async () => {
   const { client, calls } = fakeClient(() => ({ error: null }));
-  await writePlaceMedia(client, 7, [PHOTO], [{ source: 'website', content: 'hi', sourceUrl: 'https://a/' }], '2026-11-21T00:00:00Z');
+  await writePlaceMedia(client, 'museums', 7, [PHOTO], [{ source: 'website', content: 'hi', sourceUrl: 'https://a/' }], '2026-11-21T00:00:00Z');
   const del = calls.findIndex((c) => c.table === 'place_photos' && c.op === 'delete');
   assert.ok(del >= 0);
   const filters = calls.slice(del + 1).filter((c) => c.table === 'place_photos' && ['eq', 'neq'].includes(c.op)).map((c) => [c.op, ...c.args]);
-  assert.deepEqual(filters.slice(0, 3).sort(), [['eq', 'hidden', false], ['eq', 'restaurant_id', 7], ['neq', 'kind', 'student']].sort());
+  assert.deepEqual(filters.slice(0, 3).sort(), [['eq', 'hidden', false], ['eq', 'place_ref', 7], ['neq', 'kind', 'student']].sort());
 });
 
-test('writePlaceMedia inserts snake_case photo rows and upserts inputs on (restaurant_id, source)', async () => {
+test('writePlaceMedia inserts snake_case photo rows and upserts inputs on (place_ref, source)', async () => {
   const { client, calls } = fakeClient(() => ({ error: null }));
-  await writePlaceMedia(client, 7, [PHOTO], [{ source: 'website', content: 'hi', sourceUrl: 'https://a/' }], '2026-11-21T00:00:00Z');
+  await writePlaceMedia(client, 'museums', 7, [PHOTO], [{ source: 'website', content: 'hi', sourceUrl: 'https://a/' }], '2026-11-21T00:00:00Z');
   const ins = calls.find((c) => c.table === 'place_photos' && c.op === 'insert')!;
   assert.deepEqual(ins.args[0], [{
-    restaurant_id: 7, kind: 'website', source: 'website', match_method: 'website', url: 'https://a/1.jpg', mapillary_id: null,
+    place_ref: 7, kind: 'website', source: 'website', match_method: 'website', url: 'https://a/1.jpg', mapillary_id: null,
     page_url: 'https://a/', license: null, credit: 'a', rank: 3, checked_at: '2026-11-21T00:00:00Z',
   }]);
   const ups = calls.find((c) => c.table === 'place_vibe_inputs' && c.op === 'upsert')!;
-  assert.deepEqual(ups.args[0], [{ restaurant_id: 7, source: 'website', content: 'hi', source_url: 'https://a/', fetched_at: '2026-11-21T00:00:00Z' }]);
-  assert.deepEqual(ups.args[1], { onConflict: 'restaurant_id,source' });
-  const upd = calls.find((c) => c.table === 'restaurants' && c.op === 'update')!;
+  assert.deepEqual(ups.args[0], [{ place_ref: 7, source: 'website', content: 'hi', source_url: 'https://a/', fetched_at: '2026-11-21T00:00:00Z' }]);
+  assert.deepEqual(ups.args[1], { onConflict: 'place_ref,source' });
+  const upd = calls.find((c) => c.table === 'museums' && c.op === 'update')!;
   assert.deepEqual(upd.args[0], { media_checked_at: '2026-11-21T00:00:00Z' });
+  const next = calls[calls.indexOf(upd) + 1]!;
+  assert.deepEqual([next.op, ...next.args], ['eq', 'id', 7]);
 });
 
 test('writePlaceMedia skips empty insert and upsert calls', async () => {
   const { client, calls } = fakeClient(() => ({ error: null }));
-  await writePlaceMedia(client, 7, [], [], '2026-11-21T00:00:00Z');
+  await writePlaceMedia(client, 'museums', 7, [], [], '2026-11-21T00:00:00Z');
   assert.equal(calls.some((c) => c.op === 'insert' || c.op === 'upsert'), false);
-  assert.ok(calls.some((c) => c.table === 'restaurants' && c.op === 'update'));
+  assert.ok(calls.some((c) => c.table === 'museums' && c.op === 'update'));
 });
 
 test('writePlaceMedia surfaces a database error', async () => {
   const { client } = fakeClient((table) => (table === 'place_photos' ? { error: { message: 'boom' } } : { error: null }));
-  await assert.rejects(writePlaceMedia(client, 7, [PHOTO], [], 'now'), /boom/);
+  await assert.rejects(writePlaceMedia(client, 'museums', 7, [PHOTO], [], 'now'), /boom/);
 });
 
 test('fetchEnrichPlaces maps view rows to EnrichPlace and filters unchecked rows unless refresh', async () => {
   const row = { id: 1, place_id: 'osm:node/1', name: 'A', lat: 42.3, lng: -71.1, website: null, address: 'x', osm_tags: { a: 'b' }, media_checked_at: null };
   const { client, calls } = fakeClient(() => ({ data: [row], error: null }));
-  const out = await fetchEnrichPlaces(client, { refresh: false });
+  const out = await fetchEnrichPlaces(client, { refresh: false, type: 'parks' });
   assert.deepEqual(out, [{ id: 1, placeId: 'osm:node/1', name: 'A', lat: 42.3, lng: -71.1, website: null, address: 'x', osmTags: { a: 'b' } }]);
-  assert.equal(calls[0]!.table, 'restaurant_points');
+  assert.equal(calls[0]!.table, 'place_points');
+  assert.ok(calls.some((c) => c.op === 'eq' && c.args[0] === 'place_type' && c.args[1] === 'parks'));
   assert.ok(calls.some((c) => c.op === 'is' && c.args[0] === 'media_checked_at' && c.args[1] === null));
   const again = fakeClient(() => ({ data: [row], error: null }));
-  await fetchEnrichPlaces(again.client, { refresh: true });
+  await fetchEnrichPlaces(again.client, { refresh: true, type: 'parks' });
   assert.equal(again.calls.some((c) => c.op === 'is'), false);
 });
 
@@ -104,17 +107,17 @@ test('fetchHiddenKeys returns URL keys and mapillary: keys', async () => {
 
 test('writePlaceMedia removes inputs whose source is absent this run, except kept ones', async () => {
   const { client, calls } = fakeClient(() => ({ error: null }));
-  await writePlaceMedia(client, 7, [], [{ source: 'osm_tags', content: 'x', sourceUrl: null }], 'now', ['website']);
+  await writePlaceMedia(client, 'museums', 7, [], [{ source: 'osm_tags', content: 'x', sourceUrl: null }], 'now', ['website']);
   const del = calls.findIndex((c) => c.table === 'place_vibe_inputs' && c.op === 'delete');
   assert.ok(del >= 0);
   const after = calls.slice(del + 1).filter((c) => c.table === 'place_vibe_inputs');
-  assert.ok(after.some((c) => c.op === 'eq' && c.args[0] === 'restaurant_id' && c.args[1] === 7));
+  assert.ok(after.some((c) => c.op === 'eq' && c.args[0] === 'place_ref' && c.args[1] === 7));
   assert.ok(after.some((c) => c.op === 'not' && c.args[0] === 'source' && c.args[1] === 'in' && c.args[2] === '("osm_tags","website")'));
 });
 
 test('writePlaceMedia with no inputs and nothing kept removes all of the place inputs', async () => {
   const { client, calls } = fakeClient(() => ({ error: null }));
-  await writePlaceMedia(client, 7, [], [], 'now');
+  await writePlaceMedia(client, 'museums', 7, [], [], 'now');
   const del = calls.findIndex((c) => c.table === 'place_vibe_inputs' && c.op === 'delete');
   assert.ok(del >= 0);
   assert.equal(calls.slice(del + 1).some((c) => c.table === 'place_vibe_inputs' && c.op === 'not'), false);
@@ -130,7 +133,7 @@ const oldRowsClient = () => fakeClient((table, _calls, ops) =>
 
 test('writePlaceMedia keeps the stored copy of a photo whose URL survives', async () => {
   const { client, calls } = oldRowsClient();
-  await writePlaceMedia(client, 7, [PHOTO], [], 'now');
+  await writePlaceMedia(client, 'museums', 7, [PHOTO], [], 'now');
   const ins = calls.find((c) => c.table === 'place_photos' && c.op === 'insert')!;
   const row = (ins.args[0] as Array<Record<string, unknown>>)[0]!;
   assert.deepEqual([row.storage_path, row.stored_at, row.stored_bytes], ['pipeline/7/aa.webp', 't1', 50000]);
@@ -141,21 +144,22 @@ test('writePlaceMedia keeps the stored copy of a photo whose URL survives', asyn
 
 test('writePlaceMedia removes stored files whose photo dropped out', async () => {
   const { client, calls } = oldRowsClient();
-  await writePlaceMedia(client, 7, [PHOTO], [], 'now');
+  await writePlaceMedia(client, 'museums', 7, [PHOTO], [], 'now');
   const rm = calls.filter((c) => c.table === 'storage:place-photos' && c.op === 'remove');
   assert.deepEqual(rm.map((c) => c.args[0]), [['pipeline/7/bb.webp']]);
 });
 
 test('writePlaceMedia makes no storage call when nothing is orphaned', async () => {
   const { client, calls } = fakeClient(() => ({ error: null }));
-  await writePlaceMedia(client, 7, [PHOTO], [], 'now');
+  await writePlaceMedia(client, 'museums', 7, [PHOTO], [], 'now');
   assert.equal(calls.some((c) => c.table.startsWith('storage:')), false);
 });
 
 test('fetchPhotosToStore filters to visible, unstored, non-Mapillary pipeline photos with a URL', async () => {
-  const { client, calls } = fakeClient(() => ({ data: [{ id: 1, restaurant_id: 7, url: 'https://a/1.jpg' }], error: null }));
-  assert.deepEqual(await fetchPhotosToStore(client, { limit: null }), [{ id: 1, restaurantId: 7, url: 'https://a/1.jpg' }]);
+  const { client, calls } = fakeClient(() => ({ data: [{ id: 1, place_ref: 7, url: 'https://a/1.jpg' }], error: null }));
+  assert.deepEqual(await fetchPhotosToStore(client, { limit: null, type: 'parks' }), [{ id: 1, placeRef: 7, url: 'https://a/1.jpg' }]);
   const f = calls.map((c) => [c.op, ...c.args]);
+  assert.ok(f.some((x) => x[0] === 'eq' && x[1] === 'places.place_type' && x[2] === 'parks'));
   assert.ok(f.some((x) => x[0] === 'eq' && x[1] === 'hidden' && x[2] === false));
   assert.ok(f.some((x) => x[0] === 'in' && x[1] === 'kind' && JSON.stringify(x[2]) === '["website","licensed"]'));
   assert.ok(f.some((x) => x[0] === 'neq' && x[1] === 'source' && x[2] === 'mapillary'));

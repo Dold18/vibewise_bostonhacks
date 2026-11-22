@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   commonsFiles, geosearchPhotos, isAllowedLicense, isDistinctiveName, linkedPhotos, nameMatches, wikipediaExtract,
 } from '../../src/media/wikimedia.ts';
+import { PLACE_TYPE_CONFIG } from '../../src/placeTypes.ts';
 import type { PoliteFetcher } from '../../src/media/http.ts';
 import type { EnrichPlace } from '../../src/media/types.ts';
 
@@ -50,6 +51,13 @@ function fakeWiki(opts: { files?: Record<string, FileSpec>; geosearch?: string[]
 test('license allowlist accepts CC0, PD, CC BY and CC BY-SA, and rejects NC and ND', () => {
   for (const l of ['CC BY-SA 4.0', 'CC0', 'Public domain', 'CC BY 2.0', 'CC BY-SA 3.0 de', 'PD-self']) assert.equal(isAllowedLicense(l), true, l);
   for (const l of ['CC BY-NC 2.0', 'CC BY-ND 4.0', 'CC BY-NC-SA 3.0', 'All rights reserved', 'GFDL', '']) assert.equal(isAllowedLicense(l), false, l);
+});
+
+test('isDistinctiveName honors per-type generic words', () => {
+  const parks = PLACE_TYPE_CONFIG.parks.genericNameWords;
+  assert.equal(isDistinctiveName('The Park'), isDistinctiveName('The Park', new Set()));
+  assert.equal(isDistinctiveName('Museum Park', parks), false);
+  assert.equal(isDistinctiveName('Franklin Park', parks), true);
 });
 
 test('isDistinctiveName needs two tokens or one long token', () => {

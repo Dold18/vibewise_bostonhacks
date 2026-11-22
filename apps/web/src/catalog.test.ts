@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Deal } from './deals';
 import { CATEGORIES, type Category } from './osm';
-import { DEALS_EMBED, fetchDetailsWith, getCachedDetails, nearestByCategory, resetDealsEmbedForTests, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
+import { DEALS_EMBED, fetchDetailsWith, isCatalogCategory, getCachedDetails, nearestByCategory, resetDealsEmbedForTests, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
 
 const cat = (id: string) => CATEGORIES.find((c) => c.id === id) as Category;
 const CENTER = { lat: 42.3555, lon: -71.0636 };
@@ -23,7 +23,8 @@ function pin(overrides: Partial<CatalogPin> = {}): CatalogPin {
     source: 'osm',
     sourceId: 'node/1',
     name: 'Tatte Bakery',
-    category: 'cafe',
+    placeType: 'restaurants',
+    kind: 'cafe',
     lat: 42.3555,
     lon: -71.0636,
     ...overrides,
@@ -71,11 +72,11 @@ describe('parsePoint', () => {
 describe('toPin', () => {
   it('keeps the catalog id and decoded location for each place', () => {
     expect(
-      toPin({ place_id: 'osm:node/1', source: 'osm', source_id: 'node/1', name: 'Tatte Bakery', category: 'cafe', location: ewkb(-71.0636, 42.3555) }),
+      toPin({ place_id: 'osm:node/1', place_type: 'restaurants', source: 'osm', source_id: 'node/1', name: 'Tatte Bakery', kind: 'cafe', location: ewkb(-71.0636, 42.3555) }),
     ).toEqual(pin());
   });
   it('drops rows without a usable location', () => {
-    expect(toPin({ place_id: 'x', source: 'osm', source_id: 'node/9', name: 'X', category: 'cafe', location: 'bad' })).toBeNull();
+    expect(toPin({ place_id: 'x', place_type: 'restaurants', source: 'osm', source_id: 'node/9', name: 'X', kind: 'cafe', location: 'bad' })).toBeNull();
   });
 });
 
@@ -119,7 +120,7 @@ describe('nearestByCategory', () => {
   const near = pin({ placeId: 'osm:node/1', name: 'Near', lat: 42.3556 });
   const far = pin({ placeId: 'osm:node/2', name: 'Far', lat: 42.36 });
   const outside = pin({ placeId: 'osm:node/3', name: 'Outside', lat: 42.38 });
-  const bar = pin({ placeId: 'osm:node/4', name: 'Bar', category: 'nightlife' });
+  const bar = pin({ placeId: 'osm:node/4', name: 'Bar', kind: 'nightlife' });
 
   it('keeps pins within the radius, nearest first, per map category', () => {
     const result = nearestByCategory([far, outside, near, bar], [cat('coffee'), cat('bars')], CENTER, 1000, 10);
@@ -134,6 +135,17 @@ describe('nearestByCategory', () => {
   });
   it('ignores map categories the catalog does not hold', () => {
     expect(nearestByCategory([near], [cat('parks')], CENTER, 1000, 10)).toEqual([]);
+  });
+  it('matches the layer place type as well as the kind', () => {
+    const other = pin({ placeId: 'osm:node/5', name: 'Other', placeType: 'entertainment', kind: 'cafe' });
+    expect(nearestByCategory([other, near], [cat('coffee')], CENTER, 1000, 10).map((r) => r.pin.name)).toEqual(['Near']);
+  });
+});
+
+describe('isCatalogCategory', () => {
+  it('backs the food layers only in PR 1', () => {
+    expect(isCatalogCategory(cat('coffee'))).toBe(true);
+    expect(isCatalogCategory({ id: 'museums', label: 'Museums' } as unknown as Category)).toBe(false);
   });
 });
 
@@ -182,12 +194,12 @@ describe('fetchDetailsWith', () => {
     const query = vi.fn(async (_columns: string, ids: string[]) => ({
       data: ids.map((id) => ({
         ...baseRow(id),
-        place_deals: [{ kind: 'student', title: 'T', timing: 'any_time', schedule: null, source: 'curated', source_url: null, checked_at: '2026-11-01T00:00:00Z' }, { junk: true }],
+        places: { place_deals: [{ kind: 'student', title: 'T', timing: 'any_time', schedule: null, source: 'curated', source_url: null, checked_at: '2026-11-01T00:00:00Z' }, { junk: true }] },
       })),
       error: null,
     }));
     await fetchDetailsWith(query, ['ok:1']);
-    expect(query.mock.calls[0][0]).toContain(DEALS_EMBED);
+    expect(query.mock.calls[0][0].endsWith(`, ${DEALS_EMBED}`)).toBe(true);
     expect(getCachedDetails('ok:1')?.deals).toHaveLength(1);
   });
 

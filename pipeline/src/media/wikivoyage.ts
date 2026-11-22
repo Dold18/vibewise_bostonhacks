@@ -116,7 +116,7 @@ export async function loadListings(http: PoliteFetcher, opts: { cacheDir: string
  * `sameNamePlaces` is how many catalog places share this place's name; a name-only match (no coordinates) is
  * refused for chains, or every branch would get the one listing.
  */
-export function matchListing(place: EnrichPlace, listings: Listing[], opts: { sameNamePlaces?: number } = {}): Listing | null {
+export function matchListing(place: EnrichPlace, listings: Listing[], opts: { sameNamePlaces?: number; extraGeneric?: ReadonlySet<string> } = {}): Listing | null {
   let best: { l: Listing; d: number } | null = null;
   for (const l of listings) {
     if (l.lat === null || l.lng === null) continue;
@@ -124,7 +124,7 @@ export function matchListing(place: EnrichPlace, listings: Listing[], opts: { sa
     if (d <= MATCH_METERS && nameSimilarity(l.name, place.name) >= MATCH_SIMILARITY && (!best || d < best.d)) best = { l, d };
   }
   if (best) return best.l;
-  if (!isDistinctiveName(place.name) || (opts.sameNamePlaces ?? 1) > 1) return null;
+  if (!isDistinctiveName(place.name, opts.extraGeneric) || (opts.sameNamePlaces ?? 1) > 1) return null;
   const key = nameKey(place.name);
   const sameName = listings.filter((l) => nameKey(l.name) === key);
   const only = sameName.length === 1 ? sameName[0]! : null;

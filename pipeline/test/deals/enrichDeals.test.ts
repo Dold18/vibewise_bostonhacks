@@ -11,18 +11,19 @@ const place = (over: Partial<DealPlace> = {}): DealPlace => ({
 });
 
 test('parseDealsArgs defaults', () => {
-  assert.deepEqual(parseDealsArgs([]), { dryRun: false, refresh: false, limit: null, concurrency: 4, only: null });
+  assert.deepEqual(parseDealsArgs(['--type', 'museums']), { type: 'museums', dryRun: false, refresh: false, limit: null, concurrency: 4, only: null });
+  assert.throws(() => parseDealsArgs([]), /missing --type/);
 });
 
 test('parseDealsArgs reads flags', () => {
   assert.deepEqual(
-    parseDealsArgs(['--dry-run', '--refresh', '--limit', '50', '--concurrency', '2', '--only', 'website']),
-    { dryRun: true, refresh: true, limit: 50, concurrency: 2, only: 'website' },
+    parseDealsArgs(['--type', 'parks', '--dry-run', '--refresh', '--limit', '50', '--concurrency', '2', '--only', 'website']),
+    { type: 'parks', dryRun: true, refresh: true, limit: 50, concurrency: 2, only: 'website' },
   );
 });
 
 test('parseDealsArgs rejects an unknown --only', () => {
-  assert.throws(() => parseDealsArgs(['--only', 'web']), /invalid --only/);
+  assert.throws(() => parseDealsArgs(['--type', 'museums', '--only', 'web']), /invalid --only/);
 });
 
 test('needsWebsiteScan: never checked', () => assert.equal(needsWebsiteScan(place(), NOW, false), true));
