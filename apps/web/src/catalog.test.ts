@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Deal } from './deals';
 import { CATEGORIES, type Category } from './osm';
-import { DEALS_EMBED, dealsByPlace, emptyCategories, noteIndex, resetIndexForTests, fetchDetailsForPins, fetchDetailsWith, isCatalogCategory, getCachedDetails, nearestByCategory, resetDealsEmbedForTests, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
+import { DEALS_EMBED, semanticCandidatesWith, dealsByPlace, emptyCategories, noteIndex, resetIndexForTests, fetchDetailsForPins, fetchDetailsWith, isCatalogCategory, getCachedDetails, nearestByCategory, resetDealsEmbedForTests, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
 
 const cat = (id: string) => CATEGORIES.find((c) => c.id === id) as Category;
 const CENTER = { lat: 42.3555, lon: -71.0636 };
@@ -309,5 +309,43 @@ describe('per-type fallback', () => {
     noteIndex([food, museumPin]);
     expect(isCatalogCategory(cat('museums'))).toBe(true);
     expect(emptyCategories([food, museumPin], [cat('coffee'), cat('museums')])).toEqual([]);
+  });
+});
+
+describe('semanticCandidatesWith', () => {
+  const vec = (x: number) => { const v = new Array(384).fill(0); v[0] = x; v[1] = Math.sqrt(1 - x * x); return v; };
+  const place = (id: string, placeId: string, lat = 42.35, lon = -71.06) =>
+    ({ id, name: id, lat, lon, category: 'x', tags: { 'catalog:place_id': placeId } });
+
+  it('reads vectors from catalog_places, so museums and parks get candidates as well as restaurants', async () => {
+    const tables: string[] = [];
+    const query = vi.fn(async (table: string, ids: string[]) => {
+      tables.push(table);
+      return { data: ids.map((place_id) => ({ place_id, embedding: JSON.stringify(vec(0.6)) })), error: null };
+    });
+    const out = await semanticCandidatesWith(query, [place('node/1', 'osm:node/1'), place('way/2', 'osm:way/2')]);
+    expect(tables).toEqual(['catalog_places']);
+    expect(out.map((c) => c.id)).toEqual(['node/1', 'way/2']);
+    expect(out[0]!.provenance).toBe('catalog');
+    expect(out[0]!.location).toEqual({ lat: 42.35, lng: -71.06 });
+  });
+
+  it('skips places without a catalog id or without a vector, and drops malformed vectors', async () => {
+    const query = vi.fn(async (_t: string, ids: string[]) => ({
+      data: ids.map((place_id) => ({ place_id, embedding: place_id === 'osm:node/1' ? null : place_id === 'osm:node/2' ? '[1,2]' : vec(0.8) })),
+      error: null,
+    }));
+    const noId = { id: 'tile/1', name: 't', lat: 0, lon: 0, category: 'x', tags: {} };
+    const out = await semanticCandidatesWith(query, [noId, place('node/1', 'osm:node/1'), place('node/2', 'osm:node/2'), place('node/3', 'osm:node/3')]);
+    expect(query).toHaveBeenCalledWith('catalog_places', ['osm:node/1', 'osm:node/2', 'osm:node/3']);
+    expect(out.map((c) => c.id)).toEqual(['node/3']);
+  });
+
+  it('asks in chunks of 100 ids and throws when the catalog cannot answer', async () => {
+    const places = Array.from({ length: 150 }, (_, i) => place(`node/${i}`, `osm:node/${i}`));
+    const query = vi.fn(async (_table: string, _ids: string[]) => ({ data: [], error: null }));
+    await semanticCandidatesWith(query, places);
+    expect(query.mock.calls.map((c) => (c[1] as string[]).length)).toEqual([100, 50]);
+    await expect(semanticCandidatesWith(async () => ({ data: null, error: { message: 'x' } }), places)).rejects.toThrow('Catalog vectors unavailable');
   });
 });
