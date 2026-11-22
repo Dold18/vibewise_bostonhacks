@@ -70,3 +70,9 @@ Once these criteria and composition coverage are met, begin the Scene Composer. 
 ## November 21 procurement pass
 
 The source branch has now added **80** verified 3D models beyond the earlier 40, for **120 total** across eight organized source folders. All 256 associated source files were verified byte-identical using official GitHub blob SHAs. These additions prioritize general-purpose food, venue props, gothic/seasonal, fictional city, fantasy/festival, nature and sci-fi assets. **No new music-instrument or cuisine-specific regional dish model is claimed as imported.** The next major pass should focus on those missing differentiated themes rather than importing hundreds of near-identical furniture/ingredient variants.
+
+## Reconciled inventory after parallel import (2026-11-21)
+
+The separate `modelibr/manifest.v1.json` lists 168 converted GLB model files from 15 source packs. A direct Git tree inspection confirms **168 .glb files**; the updated KayKit manifest and Git tree confirm **120 .gltf models**. Together these are **288 imported 3D model files**, plus the 225 existing SVG variants. This supersedes the older 120-only planning baseline above wherever inconsistent.
+
+**Stop rule:** Do not source 12 arbitrary duplicates just to hit 300. First verify mesh appearance, packaging, licensing/provenance, cuisine and music semantic coverage, and that a 3D vignette can actually be assembled without obstructing map navigation. The 30 current recipes are **unbuilt ingredient lists**; 30–50 tested composites are still required.
