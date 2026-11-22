@@ -234,6 +234,8 @@ function getClient(): SupabaseClient | null {
   const url = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim().replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '');
   const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
   client = url && key ? createClient(url, key, { auth: { persistSession: false } }) : null;
+  // Once per page load (the result is cached): without this, a missing config looks like "no places here".
+  if (!client) console.warn('[catalog] VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY are not set; using map-tile and Overpass places only.');
   return client;
 }
 

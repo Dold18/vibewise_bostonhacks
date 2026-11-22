@@ -79,7 +79,7 @@ const ACTIVITY_TYPE_TAGS: Record<Exclude<ActivityTypeId, 'student_events'>, TagR
 };
 
 /** OSM `cuisine` values (lowercase, `;`-separated in the tag) mapped to our cuisine choices. */
-const CUISINE_SYNONYMS: Record<Exclude<CuisineId, 'other'>, readonly string[]> = {
+export const CUISINE_SYNONYMS: Record<Exclude<CuisineId, 'other'>, readonly string[]> = {
   italian: ['italian', 'pizza', 'pasta', 'italian_pizza'],
   japanese: ['japanese', 'sushi', 'ramen', 'izakaya', 'udon', 'teriyaki'],
   chinese: ['chinese', 'dim_sum', 'cantonese', 'sichuan', 'szechuan', 'dumpling', 'hot_pot', 'taiwanese', 'shanghainese'],

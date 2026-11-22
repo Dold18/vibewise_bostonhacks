@@ -94,7 +94,7 @@ export function createLiveQuiz(onBack:()=>void) {
   if(p.phase==='results'&&editing===null) {
    const toggle=button(mapDisplay.showAll?'Show ranked places':'Show all places',()=>mapDisplay.setShowAll(!mapDisplay.showAll));
    toggle.setAttribute('aria-pressed',String(mapDisplay.showAll));root.append(toggle);
-   root.append(h('h3',{class:'vb-quiz-prompt'},p.completion.reason==='maximum'?'Your scene, in ten answers.':'Your outing, coming into focus.'),h('p',{class:'vb-quiz-results-note'},'You can explore the map now. Personalized venue matches will appear when compatible venue descriptions are available.'));
+   root.append(h('h3',{class:'vb-quiz-prompt'},p.completion.reason==='maximum'?'Your scene, in ten answers.':'Your outing, coming into focus.'),h('p',{class:'vb-quiz-results-note'},'You can explore the map now. Your final matches load from the venue catalog using your budget, starting point and cuisine choices.'));
    if(p.completion.canContinue&&p.history.length<10)root.append(button('Continue Refining',()=>session.continueRefining(),'vb-primary-btn'));
   }
   const reading=p.phase==='question'&&editing===null&&p.question?presentationOf(p.question):undefined;

@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { GeminiQuotaError } from '../src/gemini.ts';
 import { runVibeEnrichment, type VibeDeps } from '../src/enrichVibe.ts';
+import { withRetry } from '../src/dbVibe.ts';
+import { createVibeGenerator } from '../src/geminiVibe.ts';
 import {
   DESCRIPTIVE_CAP, buildBundle, descriptiveLength, capText, cleanText, parseVibeResponse, sample, seededRandom, type VibeRestaurant,
 } from '../src/vibe.ts';
@@ -220,4 +222,128 @@ test('parse rejects photo narration but keeps photo-derived detail', () => {
   assert.doesNotThrow(() => parseVibeResponse(mk('A cheap pizza counter for takeout, with a wood-fired oven, a long marble counter and glass cases behind the register, serving crisp-crusted pies topped with pepperoni and peppers.'), ctx));
   // The word "photo" in other roles is not narration.
   assert.doesNotThrow(() => parseVibeResponse(mk('A cheap pizza counter for takeout and delivery, popular for photo-friendly slices and quick dinners with friends around town.'), ctx));
+});
+
+test('withRetry retries transient network errors and gives up on others', async () => {
+  let n = 0;
+  const ok = await withRetry(async () => { n++; if (n < 3) throw new TypeError('fetch failed'); return 'done'; }, [0, 0, 0], async () => {});
+  assert.equal(ok, 'done');
+  assert.equal(n, 3);
+  let m = 0;
+  await assert.rejects(withRetry(async () => { m++; throw new Error('permission denied for table'); }, [0, 0], async () => {}), /permission denied/);
+  assert.equal(m, 1);
+  let k = 0;
+  await assert.rejects(withRetry(async () => { k++; throw new TypeError('fetch failed'); }, [0, 0], async () => {}), /fetch failed/);
+  assert.equal(k, 3);
+});
+
+test('runner records a failing database check and keeps going', async () => {
+  const d = deps({ isStillUnenriched: async (id) => { if (id === 2) throw new TypeError('fetch failed'); return true; } });
+  const s = await runVibeEnrichment(d);
+  assert.equal(s.succeeded, 2);
+  assert.equal(s.failed.length, 1);
+  assert.match(s.failed[0]!.reason, /db check: fetch failed/);
+  assert.equal(s.stoppedEarly, null);
+});
+
+const tick = (ms = 5) => new Promise<void>((r) => setTimeout(r, ms));
+const manyRows = (n: number) => Array.from({ length: n }, (_, i) => r({ id: i + 1, name: `R${i + 1}` }));
+
+test('concurrency: rows overlap up to the limit, each is written exactly once', async () => {
+  let inFlight = 0, maxInFlight = 0;
+  const writes: number[] = [];
+  const logs: string[] = [];
+  const d = deps({
+    rows: manyRows(40), concurrency: 6, chunk: 10, log: (l) => logs.push(l),
+    generate: async () => { inFlight++; maxInFlight = Math.max(maxInFlight, inFlight); await tick(); inFlight--; return good; },
+    write: async (id) => { writes.push(id); return true; },
+  });
+  const s = await runVibeEnrichment(d);
+  assert.equal(s.succeeded, 40);
+  assert.equal(s.failed.length, 0);
+  assert.ok(maxInFlight > 1, `expected overlap, got ${maxInFlight}`);
+  assert.ok(maxInFlight <= 6, `exceeded the limit: ${maxInFlight}`);
+  assert.deepEqual([...writes].sort((a, b) => a - b), Array.from({ length: 40 }, (_, i) => i + 1)); // each id once
+  assert.ok(logs.length >= 3 && logs.every((l) => l.startsWith('progress ')));
+});
+
+test('concurrency: the embedding model is never run by two rows at once', async () => {
+  let active = 0, maxActive = 0;
+  const d = deps({
+    rows: manyRows(24), concurrency: 8,
+    embed: async () => { active++; maxActive = Math.max(maxActive, active); await tick(2); active--; return [0.1, 0.2]; },
+  });
+  const s = await runVibeEnrichment(d);
+  assert.equal(s.succeeded, 24);
+  assert.equal(maxActive, 1);
+});
+
+test('concurrency: rows already enriched are skipped, not regenerated', async () => {
+  const done = new Set([3, 8, 9, 15]);
+  let generated = 0;
+  const d = deps({
+    rows: manyRows(20), concurrency: 5,
+    isStillUnenriched: async (id) => { await tick(1); return !done.has(id); },
+    generate: async () => { generated++; await tick(); return good; },
+  });
+  const s = await runVibeEnrichment(d);
+  assert.equal(s.skippedAlreadyDone, 4);
+  assert.equal(s.succeeded, 16);
+  assert.equal(generated, 16);
+});
+
+test('concurrency: one failing row is recorded and the others still finish', async () => {
+  const d = deps({
+    rows: manyRows(12), concurrency: 4,
+    generate: async (prompt) => { await tick(); if (prompt.includes('name=R5,')) throw new Error('boom'); return good; },
+  });
+  const s = await runVibeEnrichment(d);
+  assert.equal(s.succeeded, 11);
+  assert.equal(s.failed.length, 1);
+  assert.equal(s.failed[0]!.id, 5);
+  assert.equal(s.stoppedEarly, null);
+});
+
+test('concurrency: sustained quota failures stop the run before the whole queue is burned', async () => {
+  const d = deps({
+    rows: manyRows(80), concurrency: 4,
+    generate: async () => { await tick(); throw new GeminiQuotaError('429'); },
+  });
+  const s = await runVibeEnrichment(d);
+  assert.match(s.stoppedEarly ?? '', /in a row failed on quota/);
+  assert.ok(s.failed.length < 80, `should stop early, attempted ${s.failed.length}`);
+  assert.equal(d.written.length, 0);
+});
+
+test('concurrency: a bad key (4xx) stops every worker', async () => {
+  const { GeminiRequestError } = await import('../src/gemini.ts');
+  const d = deps({ rows: manyRows(40), concurrency: 6, generate: async () => { await tick(); throw new GeminiRequestError('401 bad key'); } });
+  const s = await runVibeEnrichment(d);
+  assert.match(s.stoppedEarly ?? '', /401/);
+  assert.ok(s.failed.length + s.succeeded < 40);
+});
+
+test('Gemini client spaces simultaneous callers by the rpm limit', async () => {
+  const starts: number[] = [];
+  const fetchImpl = (async () => {
+    starts.push(Date.now());
+    return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: '{}' }] } }] }), { status: 200 });
+  }) as typeof fetch;
+  const gen = createVibeGenerator({ apiKey: 'TEST-FIXTURE-NOT-A-KEY', model: 'gemini-3.8-flash', rpm: 600, fetchImpl }); // 100 ms apart
+  await Promise.all(Array.from({ length: 5 }, () => gen('Facts: name=X')));
+  starts.sort((a, b) => a - b);
+  assert.equal(starts.length, 5);
+  for (let i = 1; i < starts.length; i++) assert.ok(starts[i]! - starts[i - 1]! >= 85, `gap ${starts[i]! - starts[i - 1]!} ms`);
+});
+
+test('sensory guard does not mistake "dim sum" (a cuisine) for dim lighting', () => {
+  const ctx = { hasDescriptive: false, hasPhoto: false, hasPrice: true };
+  const mk = (description: string) => JSON.stringify({ description, profile: { cuisines: ['chinese'], signature_dishes: [], dietary_options: [], price_feel: 'moderate', median_entree_price: null } });
+  for (const ok of [
+    'A casual, unpretentious Chinese restaurant serving dim sum and noodle dishes at a moderate price, suited to group meals.',
+    'This moderately priced Dim Sum House offers a straightforward place for weekend family brunch and everyday meals.',
+  ]) assert.doesNotThrow(() => parseVibeResponse(mk(ok), ctx), ok);
+  // Genuine dim-lighting claims are still rejected, including next to dim sum.
+  assert.throws(() => parseVibeResponse(mk('A casual Chinese restaurant serving dim sum in a dim, moody room that suits late dinners with friends.'), ctx), /unsupported sensory claim "dim"/);
+  assert.throws(() => parseVibeResponse(mk('A casual Chinese restaurant with dim lighting and an unpretentious feel for everyday meals and groups.'), ctx), /unsupported sensory claim/);
 });

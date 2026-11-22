@@ -305,7 +305,7 @@ export const MIN_DESCRIPTION = 40;
 export const PHOTO_NARRATION = /\b(?:(?:the|this|a|an|attached|provided)\s+(?:photo|photograph|image|picture|pic)s?\s+(?:shows?|displays?|depicts?|features?|captures?|reveals?|presents?|illustrates?)|pictured|in\s+(?:the|this)\s+(?:photo|photograph|image|picture)|as\s+seen\s+in\s+(?:the|this)\s+(?:photo|image|picture))\b/i;
 
 /** Sensory words that need evidence. Unevidenced use is rejected in code, not only discouraged in the prompt. */
-export const SENSORY_WORDS = /\b(dim|dimly|dimmed|bright|brightly|moody|lighting|lit|candlelit|candlelight|dark|loud|noisy|noise|quiet|hushed|buzz|buzzing|bustling|music|decor|d[ée]cor|brick|neon|crowd|crowded)\b/i;
+export const SENSORY_WORDS = /\b(dim(?!\s+sum)|dimly|dimmed|bright|brightly|moody|lighting|lit|candlelit|candlelight|dark|loud|noisy|noise|quiet|hushed|buzz|buzzing|bustling|music|decor|d[ée]cor|brick|neon|crowd|crowded)\b/i;
 export const MAX_DESCRIPTION = 900;
 
 function strings(v: unknown): string[] {
