@@ -39,14 +39,15 @@ export function createVibeGenerator(o: VibeGeminiOptions): (prompt: string, imag
   const now = o.now ?? Date.now;
   const backoff = o.backoffMs ?? BACKOFF_MS;
   const minIntervalMs = 60_000 / o.rpm;
-  let lastStart: number | undefined;
+  let nextSlot: number | undefined;
 
+  // Each call reserves its start slot synchronously before waiting, so concurrent callers are spaced
+  // `minIntervalMs` apart instead of all waking at once. Sequential use behaves exactly as before.
   async function paced(): Promise<void> {
-    if (lastStart !== undefined) {
-      const wait = lastStart + minIntervalMs - now();
-      if (wait > 0) await sleep(wait);
-    }
-    lastStart = now();
+    const t = now();
+    const slot = nextSlot === undefined ? t : Math.max(t, nextSlot);
+    nextSlot = slot + minIntervalMs;
+    if (slot > t) await sleep(slot - t);
   }
 
   return async (prompt, image) => {
