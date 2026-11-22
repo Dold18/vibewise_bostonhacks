@@ -1,7 +1,7 @@
 import { AttributionControl, Map as MapLibreMap, Marker, setWorkerUrl } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
-import { BUILDING_3D_LAYER, BUILDING_3D_OPACITY, mapStyle } from './mapStyle';
+import { BUILDING_3D_LAYERS, BUILDING_3D_OPACITY, mapStyle } from './mapStyle';
 import { PIN_COLORS } from './pinColors';
 import { mountAccount } from './features/account';
 import { mountScene, sceneDevHook } from './features/scene';
@@ -667,8 +667,8 @@ function syncControls() {
 function syncDepth() {
   const depth = Math.min(1, Math.max(0, (map.getPitch() - 3) / 22));
   map.getContainer().style.setProperty('--depth', depth.toFixed(3));
-  if (map.getLayer(BUILDING_3D_LAYER)) {
-    map.setPaintProperty(BUILDING_3D_LAYER, 'fill-extrusion-opacity', BUILDING_3D_OPACITY * depth);
+  for (const id of BUILDING_3D_LAYERS) {
+    if (map.getLayer(id)) map.setPaintProperty(id, 'fill-extrusion-opacity', BUILDING_3D_OPACITY * depth);
   }
 }
 map.on('style.load', syncDepth);
@@ -709,7 +709,7 @@ scene = mountScene({
   reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)'),
   onError: (error) => console.error('[scene]', error),
 });
-if (import.meta.env.DEV) Object.assign(window, { vibentaScene: sceneDevHook(scene) });
+if (import.meta.env.DEV) Object.assign(window, { vibentaScene: sceneDevHook(scene, map) });
 
 // A different starting point makes the shown route wrong: re-plan for the open card's place.
 let lastOrigin = currentOrigin();

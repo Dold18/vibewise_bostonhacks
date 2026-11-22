@@ -147,9 +147,12 @@ export function mountScene(options: SceneMountOptions): SceneMount {
  * Dev-only console hook (like `vibentaAccount`): drive the live map through
  * the real session before the adaptive quiz is merged. Never shipped in production.
  */
-export function sceneDevHook(scene: SceneMount) {
+export function sceneDevHook(scene: SceneMount, map?: unknown) {
   let version = 0;
-  const id = `dev-${Date.now().toString(36)}`;
+  let outing = 0;
+  // Like the real quiz, each outing gets its own session ID: a cleared session is
+  // retired by the Scene Session, so later answers must start a new one.
+  let id = `dev-${Date.now().toString(36)}-0`;
   const submit = (intent: Record<string, unknown>): SubmitResult => {
     version++;
     return scene.session.submit(id, version, { schemaVersion: '1.0.0', presets: [], descriptors: [], overrides: [], ...intent, sessionVersion: version });
@@ -167,8 +170,15 @@ export function sceneDevHook(scene: SceneMount) {
       return submit({ descriptors });
     },
     submit,
-    clear: () => scene.session.clear(),
+    clear() {
+      scene.session.clear();
+      outing++;
+      id = `dev-${Date.now().toString(36)}-${outing}`;
+      version = 0;
+    },
     navigation: (mode: boolean | 'route' | 'focus') => scene.setNavigation(mode),
     state: () => scene.session.getState(),
+    /** The live MapLibre map, for visual QA and debugging (dev builds only). */
+    map,
   };
 }

@@ -277,3 +277,17 @@ describe('reduced motion, account taste and teardown', () => {
     h.shows(h.scene.session.getState());
   });
 });
+
+describe('sceneDevHook', () => {
+  it('starts a new outing after clear(), so later presets are not rejected as stale', async () => {
+    const { sceneDevHook } = await import('../mount');
+    const f = fakeMap();
+    const theme = startThemeController(f.map, { getState: () => ({ status: 'signed_out' }), subscribe: () => () => {} } as unknown as AccountStore, { effects: fakeEffects() });
+    const scene = mountScene({ theme, schedule: (fn) => fn(), defer: (fn) => fn() });
+    const dev = sceneDevHook(scene);
+    expect(dev.preset('amber_refuge')).toBe('applied');
+    dev.clear();
+    expect(dev.preset('neon_city')).toBe('applied');
+    expect(dev.state().presets[0].id).toBe('neon_city');
+  });
+});
