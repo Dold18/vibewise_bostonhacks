@@ -1,5 +1,5 @@
 /**
- * Gemini `generateContent` client for the vibe step: one restaurant per call, structured JSON out,
+ * Gemini `generateContent` client for the vibe step: one restaurant or place per call, structured JSON out,
  * optional inline image (Gemini vision, no CLIP). Paced to a requests-per-minute limit; 429 and
  * transient 5xx are retried with backoff even on a paid tier. Same conventions as gemini.ts.
  */
@@ -20,15 +20,19 @@ export interface VibeGeminiOptions {
   sleep?: (ms: number) => Promise<void>;
   now?: () => number;
   backoffMs?: number[];
+  /** Defaults to the restaurant prompt and schema; non-food places pass PLACE_SYSTEM_PROMPT and PLACE_RESPONSE_SCHEMA. */
+  systemPrompt?: string;
+  responseSchema?: unknown;
 }
 
+/** 2.5 models (flash, flash-lite) take a thinking budget, 3.x models (flash, flash-lite) a thinking level; others are left alone. */
 function thinkingConfigFor(model: string): Record<string, unknown> | undefined {
   if (/^gemini-2\.5-/.test(model)) return { thinkingBudget: 0 };
   if (/^gemini-3/.test(model)) return { thinkingLevel: 'low' };
   return undefined;
 }
 
-/** Returns a function that sends one restaurant and resolves to the model's raw JSON text. */
+/** Returns a function that sends one restaurant or place and resolves to the model's raw JSON text. */
 export function createVibeGenerator(o: VibeGeminiOptions): (prompt: string, image?: VibeImage) => Promise<string> {
   const fetchImpl = o.fetchImpl ?? fetch;
   const sleep = o.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
@@ -49,10 +53,10 @@ export function createVibeGenerator(o: VibeGeminiOptions): (prompt: string, imag
     const parts: unknown[] = [{ text: prompt }];
     if (image) parts.push({ inlineData: { mimeType: image.mimeType, data: image.data } });
     const body = JSON.stringify({
-      systemInstruction: { parts: [{ text: VIBE_SYSTEM_PROMPT }] },
+      systemInstruction: { parts: [{ text: o.systemPrompt ?? VIBE_SYSTEM_PROMPT }] },
       contents: [{ role: 'user', parts }],
       generationConfig: {
-        temperature: 0.3, responseMimeType: 'application/json', responseSchema: VIBE_RESPONSE_SCHEMA,
+        temperature: 0.3, responseMimeType: 'application/json', responseSchema: o.responseSchema ?? VIBE_RESPONSE_SCHEMA,
         thinkingConfig: thinkingConfigFor(o.model), maxOutputTokens: 1024,
       },
     });
