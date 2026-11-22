@@ -35,3 +35,15 @@ Do not auto-select culturally specific motifs from a person's identity. Only use
 ## Verification boundary
 
 Current GitHub manifest and tree audit: 312 model files present and metadata-consistent; 40 compositions reference imported IDs. This does **not** replace running the local scripts and visual QA. The 3D viewer has been authored, but a real browser/GPU run and a human review of all 40 installations have not yet been performed.
+
+## Activation rules
+
+Each layout's `activation` says when it may appear. `scripts/validate-scene-layouts.mjs` defines this vocabulary and rejects anything else.
+
+| Activation | When the layout may appear |
+|---|---|
+| `explicit_or_verified_context` | Cuisine or music-genre layouts: explicit user interest or independently verified venue context |
+| `vibe_selected` | Mood-only fictional decoration; the only kind the Scene Composer may choose from the outing vibe alone |
+| `user_opt_in` | Only after the user turns it on |
+| `explicit_or_verified_seasonal_context` | Seasonal decoration: explicit request or verified seasonal context, never inferred from mood |
+| `explicit_holiday_request_only` | Cultural or religious observance: only when the user explicitly asks (the validator requires this for `respectful` layouts) |
