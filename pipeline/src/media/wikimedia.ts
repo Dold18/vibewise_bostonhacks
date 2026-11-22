@@ -39,9 +39,14 @@ function isSpecificToken(t: string, extraGeneric: ReadonlySet<string>): boolean 
   return !GENERIC.has(t) && !extraGeneric.has(t) && !LOCALITY.has(t) && (t.match(/\p{L}/gu)?.length ?? 0) >= 3;
 }
 
+/** The name tokens (nameKey form) that can identify the place: not generic, locality or too short. */
+export function specificNameTokens(name: string, extraGeneric: ReadonlySet<string> = new Set()): string[] {
+  return nameKey(name).split(' ').filter(Boolean).filter((t) => isSpecificToken(t, extraGeneric));
+}
+
 export function isDistinctiveName(name: string, extraGeneric: ReadonlySet<string> = new Set()): boolean {
   const tokens = nameKey(name).split(' ').filter(Boolean);
-  const specific = tokens.filter((t) => isSpecificToken(t, extraGeneric));
+  const specific = specificNameTokens(name, extraGeneric);
   if (specific.length === 0) return false;
   return tokens.length >= 2 || specific.some((t) => t.length >= 5);
 }
