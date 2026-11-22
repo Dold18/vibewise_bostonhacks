@@ -171,6 +171,32 @@ button {
 }
 
 /*
+ * Deal chip above the pin's head. All positioning lives on this inner span
+ * (the marker's offset parent is MapLibre's wrapper), never on .pin itself.
+ * Colors are fixed so it stays legible on every vibe theme.
+ */
+.pin-deal {
+  position: absolute;
+  left: 50%;
+  bottom: calc(40px * var(--pin-scale, 1) + 3px);
+  translate: -50% 0;
+  padding: 1px 6px;
+  border-radius: 999px;
+  outline: 1px solid rgba(0, 0, 0, 0.35);
+  background: #fff;
+  color: #1f1f1f;
+  font-size: calc(11px * var(--pin-scale, 1));
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.pin-deal[hidden] {
+  display: none;
+}
+
+/*
  * Each pin's look comes from two per-pin variables (set in main.ts
  * applyPinLook), so a match score can later drive them:
  *   --pin-color  fill of the solid head
@@ -359,6 +385,46 @@ button {
   width: 20px;
   text-align: center;
   flex-shrink: 0;
+}
+
+.card-section {
+  margin: 16px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.deal-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.deal-title {
+  display: flex;
+  gap: 14px;
+  font-weight: 600;
+}
+
+.deal-when,
+.deal-meta {
+  margin-left: 34px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.deal-active {
+  color: inherit;
+  font-weight: 600;
+}
+
+.deal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
 }
 
 .card-actions {

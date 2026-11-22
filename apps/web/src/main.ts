@@ -18,6 +18,7 @@ import {
   type TilePoi,
 } from './osm';
 import { mountDiscoveryPanel, type DiscoveryPanelHandle } from './discovery';
+import { activeKinds, chipText, dealStatus, describeSchedule, type Deal } from './deals';
 import { catalogPlacesNear, isCatalogCategory, priceLabel } from './catalog';
 import { clearRoute, drawRoute, fetchRoute, renderRouteState, type LatLng, type RouteState } from './transitRoute';
 
@@ -53,6 +54,10 @@ const PIN_PATH = 'M14 0C6.3 0 0 6.2 0 13.9 0 24.3 14 40 14 40s14-15.7 14-26.1C28
 let markers: Marker[] = [];
 let shadows: Marker[] = [];
 let selectedPin: HTMLElement | null = null;
+let markerPlaces: Place[] = [];
+let dealTimer: ReturnType<typeof setInterval> | undefined;
+// The open card's place and its Deals list, so the 60 s tick can refresh statuses.
+let openDeals: { place: Place; list: HTMLElement } | null = null;
 
 /*
  * MapLibre positions every marker by rewriting its element's inline
@@ -97,6 +102,11 @@ function pinElement(): HTMLElement {
   const el = document.createElement('button');
   el.type = 'button';
   el.className = 'pin';
+  const chip = document.createElement('span');
+  chip.className = 'pin-deal';
+  chip.hidden = true;
+  chip.setAttribute('aria-hidden', 'true');
+  el.append(chip);
   const body = document.createElement('span');
   body.className = 'pin-body';
   body.innerHTML = `<svg viewBox="0 0 28 40" width="28" height="40" aria-hidden="true"><path d="${PIN_PATH}" /></svg>`;
@@ -127,6 +137,24 @@ function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: 
     });
     return new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
   });
+  markerPlaces = places;
+  updateDealChips(new Date());
+  dealTimer = setInterval(() => updateDealChips(new Date()), 60_000);
+}
+
+/** Refresh every pin's deal chip (and the open card's deal statuses) for `now`. */
+function updateDealChips(now: Date) {
+  markers.forEach((marker, i) => {
+    const place = markerPlaces[i];
+    const pin = marker.getElement();
+    const chip = pin.querySelector<HTMLElement>('.pin-deal');
+    if (!place || !chip) return;
+    const text = chipText(activeKinds(place.deals ?? [], now));
+    chip.textContent = text;
+    chip.hidden = text === '';
+    pin.setAttribute('aria-label', text ? `${place.name}, deal on now` : place.name);
+  });
+  if (openDeals && !card.hidden) renderDealRows(openDeals.place, openDeals.list, now);
 }
 
 /** Every pin the same: what search results and location types use until match scores exist. */
@@ -136,7 +164,10 @@ function clearPins() {
   [...markers, ...shadows].forEach((m) => m.remove());
   markers = [];
   shadows = [];
+  markerPlaces = [];
   selectedPin = null;
+  clearInterval(dealTimer);
+  dealTimer = undefined;
 }
 
 /** Highlight a pin and its shadow together (both scale up). */
@@ -175,8 +206,53 @@ function safeHttpUrl(raw: string | undefined): string | undefined {
   }
 }
 
+const shortDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'America/New_York' });
+
+function dealStatusText(deal: Deal, now: Date): string {
+  const status = dealStatus(deal, now);
+  switch (status.kind) {
+    case 'active':
+      return 'Active now';
+    case 'next':
+      return status.label;
+    case 'unconfirmed':
+      return 'Times not confirmed';
+    case 'stale':
+      return 'Not recently checked';
+  }
+}
+
+function renderDealRows(place: Place, list: HTMLElement, now: Date) {
+  list.replaceChildren();
+  for (const deal of place.deals ?? []) {
+    const li = el('li', 'deal-row');
+    const head = el('div', 'deal-title');
+    head.append(el('span', 'detail-icon', deal.kind === 'student' ? '🎓' : '%'), el('span', undefined, deal.title));
+    li.append(head);
+    const status = dealStatus(deal, now);
+    const when = el('div', `deal-when${status.kind === 'active' ? ' deal-active' : ''}`);
+    when.textContent = [describeSchedule(deal), dealStatusText(deal, now)].filter(Boolean).join(' · ');
+    li.append(when);
+    const meta = el('div', 'deal-meta');
+    const href = deal.source === 'osm' ? osmUrl(place) : safeHttpUrl(deal.sourceUrl ?? undefined);
+    if (href) {
+      const a = el('a', undefined, 'Source');
+      a.href = href;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      meta.append(a);
+    }
+    const checked = new Date(deal.checkedAt);
+    if (!Number.isNaN(checked.getTime())) meta.append(el('span', undefined, `checked ${shortDate.format(checked)}`));
+    if (deal.source === 'website') meta.append(el('span', undefined, 'found on venue site'));
+    li.append(meta);
+    list.append(li);
+  }
+}
+
 function openCard(place: Place, color: string, icon?: string) {
   card.replaceChildren();
+  openDeals = null;
 
   const hero = el('div', 'card-hero');
   hero.style.setProperty('--hero-color', color);
@@ -211,6 +287,12 @@ function openCard(place: Place, color: string, icon?: string) {
   actions.append(linkButton('View on OpenStreetMap', osmUrl(place)));
 
   if (details.childElementCount > 0) body.append(details);
+  if (place.deals?.length) {
+    const list = el('ul', 'deal-list');
+    renderDealRows(place, list, new Date());
+    openDeals = { place, list };
+    body.append(el('h3', 'card-section', 'Deals'), list);
+  }
   body.append(actions);
   routeBox = el('div', 'route-box');
   routeBox.setAttribute('aria-live', 'polite');
@@ -232,6 +314,7 @@ function linkButton(label: string, href: string) {
 
 function closeCard() {
   cancelRoute();
+  openDeals = null;
   card.hidden = true;
   setPinSelected(selectedPin, false);
   selectedPin = null;
