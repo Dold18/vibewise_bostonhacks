@@ -4,9 +4,9 @@
   "status": "imported_binary_integrity_verified_visual_qa_pending",
   "source": "Papyszoo/CC0-Public-Domain-Models (Modelibr CC0 GLB conversions)",
   "licenseCaveat": "Per-pack CC0 claims checked against metadata in source repository; verify author/pack terms for production. These are converted GLBs, not necessarily original publisher binary files.",
-  "modelCount": 160,
-  "totalBytes": 8234864,
-  "verification": "160/160 destination blobs matched the source Git blob SHA and byte size. Imported GLB magic and version 2 header checked; not a complete GLTF structural or rendering QA.",
+  "modelCount": 168,
+  "totalBytes": 8407240,
+  "verification": "168/168 destination blobs matched source Git blob SHA and byte size. Imported GLB magic/version 2 header checked; structural and rendering QA not yet complete.",
   "packCount": 15,
   "packs": [
     {
@@ -31,7 +31,7 @@
       "sourceWebsite": "https://kenney.nl/assets/food-kit",
       "licenseClaim": "CC0",
       "sourcePackPath": "https://github.com/Papyszoo/CC0-Public-Domain-Models/tree/main/packs/kenney-food-kit",
-      "importedCount": 32
+      "importedCount": 40
     },
     {
       "id": "kenney-furniture-kit",
@@ -683,6 +683,68 @@
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/bowl_cereal/bowl_cereal.png"
     },
     {
+      "id": "cc0.kenney-food-kit.bowl_soup",
+      "name": "bowl_soup",
+      "pack": "kenney-food-kit",
+      "uri": "/scene-assets/third-party/modelibr/kenney-food-kit/bowl_soup.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/kenney-food-kit/models/bowl_soup/bowl_soup.glb",
+      "creator": "Kenney",
+      "originalPackWebsite": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 21904,
+      "gitBlobSHA": "fc4c1daaa5aa4082b5761cec89232278c780a97d",
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/bowl_soup/bowl_soup.png",
+      "format": "glb",
+      "tags": [
+        "food",
+        "dining",
+        "comfort_food",
+        "soup"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      }
+    },
+    {
+      "id": "cc0.kenney-food-kit.chopstick",
+      "name": "chopstick",
+      "pack": "kenney-food-kit",
+      "uri": "/scene-assets/third-party/modelibr/kenney-food-kit/chopstick.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/kenney-food-kit/models/chopstick/chopstick.glb",
+      "creator": "Kenney",
+      "originalPackWebsite": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 13724,
+      "gitBlobSHA": "da68c0aa2ae79cbc4c67798be97ea904b678c1c0",
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/chopstick/chopstick.png",
+      "format": "glb",
+      "tags": [
+        "food",
+        "dining",
+        "japanese_food",
+        "asian_dining"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      }
+    },
+    {
       "id": "cc0.kenney-food-kit.croissant",
       "name": "croissant",
       "pack": "kenney-food-kit",
@@ -743,6 +805,36 @@
       },
       "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/cup_coffee/cup_coffee.png"
+    },
+    {
+      "id": "cc0.kenney-food-kit.cup_tea",
+      "name": "cup_tea",
+      "pack": "kenney-food-kit",
+      "uri": "/scene-assets/third-party/modelibr/kenney-food-kit/cup_tea.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/kenney-food-kit/models/cup_tea/cup_tea.glb",
+      "creator": "Kenney",
+      "originalPackWebsite": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 20496,
+      "gitBlobSHA": "dca0ae8283d831fe6afa9a20de129857e310769b",
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/cup_tea/cup_tea.png",
+      "format": "glb",
+      "tags": [
+        "food",
+        "dining",
+        "beverages"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      }
     },
     {
       "id": "cc0.kenney-food-kit.cupcake",
@@ -865,6 +957,36 @@
       },
       "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/ginger_bread/ginger_bread.png"
+    },
+    {
+      "id": "cc0.kenney-food-kit.glass",
+      "name": "glass",
+      "pack": "kenney-food-kit",
+      "uri": "/scene-assets/third-party/modelibr/kenney-food-kit/glass.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/kenney-food-kit/models/glass/glass.glb",
+      "creator": "Kenney",
+      "originalPackWebsite": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 14928,
+      "gitBlobSHA": "f7720e4c0b25b806db09631bd7cc567810060c61",
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/glass/glass.png",
+      "format": "glb",
+      "tags": [
+        "food",
+        "dining",
+        "beverages"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      }
     },
     {
       "id": "cc0.kenney-food-kit.glass_wine",
@@ -1075,6 +1197,37 @@
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/meat_ribs/meat_ribs.png"
     },
     {
+      "id": "cc0.kenney-food-kit.mortar_pestle",
+      "name": "mortar_pestle",
+      "pack": "kenney-food-kit",
+      "uri": "/scene-assets/third-party/modelibr/kenney-food-kit/mortar_pestle.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/kenney-food-kit/models/mortar_pestle/mortar_pestle.glb",
+      "creator": "Kenney",
+      "originalPackWebsite": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 17944,
+      "gitBlobSHA": "3c6dd39de37735038951b9fd4d43a40e3ecb1ee9",
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/mortar_pestle/mortar_pestle.png",
+      "format": "glb",
+      "tags": [
+        "food",
+        "dining",
+        "spices",
+        "food_preparation"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      }
+    },
+    {
       "id": "cc0.kenney-food-kit.mussel_open",
       "name": "mussel_open",
       "pack": "kenney-food-kit",
@@ -1255,6 +1408,37 @@
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/plate_dinner/plate_dinner.png"
     },
     {
+      "id": "cc0.kenney-food-kit.pot_stew",
+      "name": "pot_stew",
+      "pack": "kenney-food-kit",
+      "uri": "/scene-assets/third-party/modelibr/kenney-food-kit/pot_stew.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/kenney-food-kit/models/pot_stew/pot_stew.glb",
+      "creator": "Kenney",
+      "originalPackWebsite": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 40276,
+      "gitBlobSHA": "0b510bcf51a7e225c83a153a17105a28c593c722",
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/pot_stew/pot_stew.png",
+      "format": "glb",
+      "tags": [
+        "food",
+        "dining",
+        "comfort_food",
+        "soup"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      }
+    },
+    {
       "id": "cc0.kenney-food-kit.pudding",
       "name": "pudding",
       "pack": "kenney-food-kit",
@@ -1343,6 +1527,36 @@
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/salad/salad.png"
     },
     {
+      "id": "cc0.kenney-food-kit.skewer",
+      "name": "skewer",
+      "pack": "kenney-food-kit",
+      "uri": "/scene-assets/third-party/modelibr/kenney-food-kit/skewer.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/kenney-food-kit/models/skewer/skewer.glb",
+      "creator": "Kenney",
+      "originalPackWebsite": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 27244,
+      "gitBlobSHA": "c5474d4ef094700b211d6ae48130cf610eab747a",
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/skewer/skewer.png",
+      "format": "glb",
+      "tags": [
+        "food",
+        "dining",
+        "street_food"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      }
+    },
+    {
       "id": "cc0.kenney-food-kit.skewer_vegetables",
       "name": "skewer_vegetables",
       "pack": "kenney-food-kit",
@@ -1371,6 +1585,37 @@
       },
       "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/skewer_vegetables/skewer_vegetables.png"
+    },
+    {
+      "id": "cc0.kenney-food-kit.soy",
+      "name": "soy",
+      "pack": "kenney-food-kit",
+      "uri": "/scene-assets/third-party/modelibr/kenney-food-kit/soy.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/kenney-food-kit/models/soy/soy.glb",
+      "creator": "Kenney",
+      "originalPackWebsite": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 15860,
+      "gitBlobSHA": "9f0f90404cc6739af144795e977ce88f9285cb3d",
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/soy/soy.png",
+      "format": "glb",
+      "tags": [
+        "food",
+        "dining",
+        "japanese_food",
+        "asian_dining"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      }
     },
     {
       "id": "cc0.kenney-food-kit.steamer",
