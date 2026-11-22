@@ -171,18 +171,20 @@ function sameNamedPlace(a: string, b: string): boolean {
   return subset(ta, tb) || subset(tb, ta);
 }
 
-/** Only small areas contain other places: nodes (no bounds), routes and areas over the size cap never do. */
-function isContainer(o: OsmPlace): boolean {
-  return o.bounds !== null && !isOsmRoute(o.tags) && boundsAreaHa(o.bounds) <= SUB_VENUE_CONTAINER_MAX_HA;
+/** An OSM area a Foursquare place can lie inside: nodes (no bounds) and routes never are one. */
+function isArea(o: OsmPlace): boolean {
+  return o.bounds !== null && !isOsmRoute(o.tags);
 }
 
 /**
  * Non-food only: Foursquare lists rooms and wings of a place (e.g. galleries inside a museum) as places of their own,
  * and sometimes the place itself, too far from the OSM point to match. For each given Foursquare place whose point
- * lies inside the bounds of a container OSM place (see isContainer):
- * - 'merged' into the smallest containing place with a similar name, when that place has no Foursquare match in
- *   `matchedOsm` and gains no other Foursquare place here (the one closest to the OSM point wins, then fsqId);
- * - 'dropped' otherwise, reported against that similar-named place or else the smallest containing one.
+ * lies inside the bounds of OSM areas (see isArea):
+ * - 'merged' into the smallest containing area with a similar name (any size), when that place has no Foursquare
+ *   match in `matchedOsm` and gains no other Foursquare place here (the one closest to the OSM point wins, then fsqId);
+ * - otherwise 'dropped' when a containing area is at most SUB_VENUE_CONTAINER_MAX_HA, reported against the
+ *   similar-named area if it is that small, else the smallest containing one;
+ * - otherwise not returned (a big area such as a campus or district never drops what lies inside it).
  * Restaurants are never checked.
  */
 export function findFsqSubVenues(
@@ -191,24 +193,36 @@ export function findFsqSubVenues(
   const out = new Map<string, FsqSubVenue>();
   if (type === 'restaurants') return out;
   const areas = osm
-    .filter(isContainer)
+    .filter(isArea)
     .map((o) => ({ o, b: o.bounds!, ha: boundsAreaHa(o.bounds!) }))
     .sort((a, b) => a.ha - b.ha || osmIdOrder(a.o.osmId, b.o.osmId));
+  const entry = (f: FsqPlace, o: OsmPlace, outcome: FsqSubVenue['outcome']): FsqSubVenue =>
+    ({ fsqId: f.fsqId, name: f.name, insideOf: `osm:${o.osmId}`, insideName: o.name, outcome });
+  const dropInto = new Map<string, OsmPlace | null>();   // fsqId -> small container to drop into, if not merged
   const proposals: Array<{ f: FsqPlace; o: OsmPlace; meters: number }> = [];
   for (const f of fsq) {
     const hits = areas.filter(({ b }) => f.lat >= b.minlat && f.lat <= b.maxlat && f.lng >= b.minlon && f.lng <= b.maxlon);
     if (hits.length === 0) continue;
-    const similar = hits.find(({ o }) => sameNamedPlace(f.name, o.name))?.o;
-    const container = similar ?? hits[0]!.o;
-    out.set(f.fsqId, { fsqId: f.fsqId, name: f.name, insideOf: `osm:${container.osmId}`, insideName: container.name, outcome: 'dropped' });
-    if (similar && !matchedOsm.has(similar.osmId)) proposals.push({ f, o: similar, meters: metersBetween(similar, f) });
+    const similar = hits.find(({ o }) => sameNamedPlace(f.name, o.name));
+    const small = similar !== undefined && similar.ha <= SUB_VENUE_CONTAINER_MAX_HA
+      ? similar
+      : hits.find(({ ha }) => ha <= SUB_VENUE_CONTAINER_MAX_HA);
+    dropInto.set(f.fsqId, small?.o ?? null);
+    if (similar && !matchedOsm.has(similar.o.osmId)) proposals.push({ f, o: similar.o, meters: metersBetween(similar.o, f) });
   }
   proposals.sort((a, b) => a.meters - b.meters || (a.f.fsqId < b.f.fsqId ? -1 : a.f.fsqId > b.f.fsqId ? 1 : 0));
   const gained = new Set<string>();
+  const mergeInto = new Map<string, OsmPlace>();
   for (const { f, o } of proposals) {
     if (gained.has(o.osmId)) continue;
     gained.add(o.osmId);
-    out.get(f.fsqId)!.outcome = 'merged';
+    mergeInto.set(f.fsqId, o);
+  }
+  for (const f of fsq) {
+    const merged = mergeInto.get(f.fsqId);
+    const dropped = dropInto.get(f.fsqId);
+    if (merged) out.set(f.fsqId, entry(f, merged, 'merged'));
+    else if (dropped) out.set(f.fsqId, entry(f, dropped, 'dropped'));
   }
   return out;
 }

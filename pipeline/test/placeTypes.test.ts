@@ -84,6 +84,7 @@ test('normalizeKind maps every source spelling to one label set', () => {
   const cases: Array<[string, string]> = [
     ['theater', 'theatre'], ['night_club', 'nightclub'], ['movie_theater', 'cinema'], ['indie_movie_theater', 'cinema'],
     ['indie_theater', 'theatre'], ['art_gallery', 'gallery'], ['yes', 'historic_site'],
+    ['historic_and_protected_site', 'historic_site'],
   ];
   for (const [from, to] of cases) assert.equal(normalizeKind(from), to, from);
   for (const same of ['theatre', 'nightclub', 'cinema', 'gallery', 'museum', 'park', 'memorial']) assert.equal(normalizeKind(same), same);
@@ -103,6 +104,7 @@ test('non-food kinds are normalized for both OSM and Foursquare', () => {
   assert.deepEqual(classifyOsm({ tourism: 'gallery' }), { type: 'museums', kind: 'gallery' });
   assert.deepEqual(classifyOsm({ historic: 'yes', wikidata: 'Q5' }), { type: 'landmarks', kind: 'historic_site' });
   assert.equal(PLACE_TYPE_CONFIG.landmarks.osmKind({ historic: 'yes', wikidata: 'Q5' }), 'historic_site');
+  assert.deepEqual(classifyFsq('Landmarks and Outdoors > Historic and Protected Site'), { type: 'landmarks', kind: 'historic_site' });
   // Restaurant categories are untouched.
   assert.deepEqual(classifyFsq('Dining and Drinking > Bar'), { type: 'restaurants', kind: 'nightlife' });
   assert.deepEqual(classifyOsm({ amenity: 'pub' }), { type: 'restaurants', kind: 'nightlife' });

@@ -105,6 +105,7 @@ const KIND_ALIASES: Readonly<Record<string, string>> = {
   indie_movie_theater: 'cinema',
   art_gallery: 'gallery',
   yes: 'historic_site',   // OSM historic=yes
+  historic_and_protected_site: 'historic_site',
 };
 
 export function normalizeKind(kind: string): string {
