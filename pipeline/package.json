@@ -11,12 +11,14 @@
     "enrich:media": "node --env-file-if-exists=.env src/enrichMedia.ts",
     "enrich:deals": "node --env-file-if-exists=.env src/enrichDeals.ts",
     "enrich:photos": "node --env-file-if-exists=.env src/enrichPhotos.ts",
+    "enrich:vibe": "node --env-file-if-exists=.env src/enrichVibe.ts",
     "enrich:price": "node --env-file-if-exists=.env src/enrichPrice.ts",
     "test": "node --test \"test/**/*.test.ts\"",
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
     "@duckdb/node-api": "^2.0.1-r.1",
+    "@huggingface/transformers": "^4.3.2",
     "@supabase/supabase-js": "^2.119.2",
     "node-html-parser": "9.0.7",
     "proj4": "2.22.0",

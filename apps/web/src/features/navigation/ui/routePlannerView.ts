@@ -52,7 +52,7 @@ export function createRoutePlanner(c: RoutePlannerConfig) {
         if (itinerary.departure) results.append(p(itinerary.departure));
         const steps = h('ol', { class: 'vb-route-legs' });
         for (const step of itinerary.steps) {
-          const row = h('li', {});
+          const row = h('li', step.kind === 'wait' ? { class: 'vb-leg-wait' } : {});
           if (step.kind === 'ride') {
             const chip = h('strong', { class: 'vb-line-chip' }, step.line);
             chip.style.borderLeft = `6px solid ${step.color}`;

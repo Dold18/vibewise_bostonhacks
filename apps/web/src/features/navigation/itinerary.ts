@@ -2,7 +2,8 @@
  * Turns a verified route into itinerary rows. Every number keeps its label:
  * ride times and departures are schedule-derived ("scheduled", never "live"),
  * walking times are straight-line estimates unless the leg carries a routed
- * pedestrian path, and the total excludes the wait for the first train.
+ * pedestrian path, and the total includes the wait for the first train only when the
+ * route carries `firstTrainWaitSeconds` (otherwise it is excluded and says so).
  * Nothing is computed here that the route didn't contain.
  */
 import { isVerifiedWalkGeometry, lineColor, lineName, type RouteLeg, type RouteOk } from '../../transitRoute';
@@ -20,7 +21,9 @@ export type ItineraryStep =
       schedule?: string;
       detail: string;
     }
-  | { kind: 'transfer'; text: string; detail?: string };
+  | { kind: 'transfer'; text: string; detail?: string }
+  /** Scheduled wait for the first train, shown before the first ride. */
+  | { kind: 'wait'; text: string; detail: string };
 
 export interface Itinerary {
   summary: string;
@@ -51,6 +54,8 @@ export function buildItinerary(route: RouteOk, endpoints: { fromLabel: string; t
   const timings = route.timings ?? (route.timing ? [route.timing] : []);
   const steps: ItineraryStep[] = [];
   let rideIndex = 0;
+  const firstWait = route.firstTrainWaitSeconds;
+  const hasFirstWait = typeof firstWait === 'number';
 
   legs.forEach((leg, i) => {
     if (leg.mode === 'walk') {
@@ -59,6 +64,15 @@ export function buildItinerary(route: RouteOk, endpoints: { fromLabel: string; t
       steps.push(walkStep(leg, toLabel));
       return;
     }
+    // First-train wait sits right before the first ride (after the walk to the station).
+    if (rideIndex === 0 && hasFirstWait && firstWait > 0) {
+      steps.push({
+        kind: 'wait',
+        text: `Wait at ${leg.fromStopName ?? 'the station'}`,
+        detail: `~${minutes(firstWait)}, next scheduled ${lineName(leg)} train`,
+      });
+    }
+    // The transfer wait is already shown on this step (no second "Wait at" row, so nothing is duplicated).
     if (rideIndex > 0) {
       const wait = route.transferWaitSeconds;
       steps.push({
@@ -86,11 +100,15 @@ export function buildItinerary(route: RouteOk, endpoints: { fromLabel: string; t
   const first = timings[0];
   const last = route.lastTrainBack;
   return {
-    summary: `About ${minutes(route.option.durationSec)} · ${transfers === 0 ? 'no transfers' : `${transfers} transfer${transfers === 1 ? '' : 's'}`}`,
-    summaryNote:
-      'Walking estimates plus scheduled ride time' +
-      (typeof route.transferWaitSeconds === 'number' ? ' and the scheduled wait at the transfer' : '') +
-      '. Excludes waiting for the first train.',
+    // durationSec already includes the transfer wait; the first-train wait is added here.
+    summary: `About ${minutes(route.option.durationSec + (hasFirstWait ? firstWait : 0))} · ${transfers === 0 ? 'no transfers' : `${transfers} transfer${transfers === 1 ? '' : 's'}`}`,
+    summaryNote: hasFirstWait
+      ? 'Assumes you leave now. Walking estimates plus scheduled ride time, the scheduled wait for the first train' +
+        (typeof route.transferWaitSeconds === 'number' ? ' and the scheduled wait at the transfer' : '') +
+        '. Real trains may differ.'
+      : 'Walking estimates plus scheduled ride time' +
+        (typeof route.transferWaitSeconds === 'number' ? ' and the scheduled wait at the transfer' : '') +
+        '. Excludes waiting for the first train.',
     ...(first ? { departure: `First train departs ${bostonTime(first.departsAt)} (scheduled)` } : {}),
     steps,
     lastTrain: last

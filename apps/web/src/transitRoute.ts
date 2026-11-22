@@ -51,6 +51,8 @@ export interface RouteOk {
   timings?: [RideTiming, RideTiming];
   /** Tier 2: scheduled wait at the transfer station (included in durationSec). */
   transferWaitSeconds?: number;
+  /** Scheduled wait for the first train if leaving now; NOT included in option.durationSec. */
+  firstTrainWaitSeconds?: number;
   lastTrainBack: LastTrainBack | null;
   lastTrainBackNote?: string;
 }
@@ -84,6 +86,7 @@ export function isRouteResponse(body: unknown): body is RouteResponse {
         Array.isArray(o.legs) &&
         o.legs.length > 0 &&
         o.legs.every((l) => isObj(l) && typeof l.mode === 'string' && finiteNonnegative(l.durationSec) && Array.isArray(l.geometry) && l.geometry.length >= 2 && l.geometry.every(validCoordinate) && ['routeShortName', 'routeColor', 'fromStopName', 'toStopName', 'source'].every(k => l[k] === undefined || typeof l[k] === 'string')) &&
+        (body.firstTrainWaitSeconds === undefined || finiteNonnegative(body.firstTrainWaitSeconds)) &&
         (body.timing === undefined || validTiming(body.timing)) &&
         (body.timings === undefined || (Array.isArray(body.timings) && body.timings.length === 2 && body.timings.every(validTiming))) &&
         (body.lastTrainBack == null || (isObj(body.lastTrainBack) && typeof body.lastTrainBack.fromStopName === 'string' && typeof body.lastTrainBack.toStopName === 'string' && validDate(body.lastTrainBack.departsAt) && typeof body.lastTrainBack.catchable === 'boolean'))
