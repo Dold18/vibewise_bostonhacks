@@ -1,4 +1,4 @@
-import { MATCH_SAME_NAME_METERS, MATCH_SIMILAR_NAME_METERS, MATCH_SIMILARITY_THRESHOLD } from './config.ts';
+import { MATCH_SAME_NAME_METERS } from './config.ts';
 import { metersBetween, parseEwktPoint } from './geo.ts';
 import { nameKey } from './normalize.ts';
 import type { PlaceType } from './placeTypes.ts';
@@ -12,31 +12,22 @@ export interface TypeConflict { placeId: string; registeredAs: PlaceType }
 
 const CELL_DEG = 0.001; // ~111 m of latitude, >= 50 m of longitude below 63 degrees (same grid as matchSources)
 
-function tokensOf(key: string): Set<string> {
-  return new Set(key.split(' '));
-}
-
-function jaccard(a: Set<string>, b: Set<string>): number {
-  let inter = 0;
-  for (const t of a) if (b.has(t)) inter++;
-  return inter / (a.size + b.size - inter);
-}
-
 /**
  * Splits new rows into those to write and those that are the same real place as a row of another type
- * (spec §4: the existing row wins). Same rules as `matchSources`: same name key within MATCH_SAME_NAME_METERS,
- * or name Jaccard >= MATCH_SIMILARITY_THRESHOLD within MATCH_SIMILAR_NAME_METERS. The nearest match is reported.
+ * (spec §4: the existing row wins). Only an identical name key within MATCH_SAME_NAME_METERS counts: across types a
+ * merely similar name is usually a different place in the same building (e.g. "JFK Library and Museum Cafe" inside
+ * the "JFK Library and Museum"), so similar names are kept. The nearest match is reported.
  */
 export function findCrossTypeDuplicates(rows: PlaceRow[], others: OtherPlace[]): {
   kept: PlaceRow[]; duplicates: CrossTypeDuplicate[];
 } {
   const cell = (v: number) => Math.floor(v / CELL_DEG);
-  const grid = new Map<string, Array<{ o: OtherPlace; key: string; tokens: Set<string> }>>();
+  const grid = new Map<string, Array<{ o: OtherPlace; key: string }>>();
   for (const o of others) {
     const key = nameKey(o.name);
     if (key === '') continue; // an empty key never matches
     const id = `${cell(o.lat)},${cell(o.lng)}`;
-    const entry = { o, key, tokens: tokensOf(key) };
+    const entry = { o, key };
     const list = grid.get(id);
     if (list) list.push(entry); else grid.set(id, [entry]);
   }
@@ -50,17 +41,15 @@ export function findCrossTypeDuplicates(rows: PlaceRow[], others: OtherPlace[]):
       kept.push(row);
       continue;
     }
-    const tokens = tokensOf(key);
     let best: { o: OtherPlace; meters: number } | null = null;
     const cy = cell(point.lat);
     const cx = cell(point.lng);
     for (let dy = -1; dy <= 1; dy++) {
       for (let dx = -1; dx <= 1; dx++) {
         for (const c of grid.get(`${cy + dy},${cx + dx}`) ?? []) {
+          if (c.key !== key) continue;
           const meters = metersBetween(point, c.o);
           if (meters > MATCH_SAME_NAME_METERS) continue;
-          const sameName = c.key === key;
-          if (!sameName && (meters > MATCH_SIMILAR_NAME_METERS || jaccard(tokens, c.tokens) < MATCH_SIMILARITY_THRESHOLD)) continue;
           if (best === null || meters < best.meters || (meters === best.meters && c.o.placeId < best.o.placeId)) {
             best = { o: c.o, meters };
           }
