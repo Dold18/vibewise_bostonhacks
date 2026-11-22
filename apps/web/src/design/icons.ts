@@ -77,7 +77,7 @@ export const ICON_ART: Readonly<Record<IconName, string>> = {
     pop('M13 8.6a4.4 4.4 0 1 1 0 8.8 4.4 4.4 0 0 1 0-8.8z') +
     ink('M12.1 5.1c.2 4.6.1 9.2-.2 13.8M5.2 12.1c4.6-.3 9.1-.3 13.7-.1'),
   zoomOut:
-    pop('M8 10.3c3.6-.3 7.3-.3 10.9 0 .2 1.4.2 2.7 0 4.1-3.6.3-7.3.3-10.9 0-.2-1.4-.2-2.7 0-4.1z') +
+    pop('M13.4 9.6a3.6 3.6 0 1 1 0 7.2 3.6 3.6 0 0 1 0-7.2z') +
     ink('M5.2 12.1c4.6-.3 9.1-.3 13.7-.1'),
 
   // North half printed in the pop color; south half outlined.

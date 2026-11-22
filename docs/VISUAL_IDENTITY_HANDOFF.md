@@ -120,7 +120,7 @@ node scripts/visual-identity-browser.mjs [shots.json]  # screenshots (headless C
 4. ~~Route planner and Directions screenshots~~ Done (session 2): `directions-1440-before-after.jpg`. District labels on the dimmed navigation map render as hollow outlines on **both** baseline and branch (pre-existing, not changed here).
 5. ~~Recapture the final evidence~~ Done (session 2): road/building pairs re-shot after the brick change; `ui-1366-default.jpg`, `ui-360-sheet.jpg` added.
 6. **Optional polish:**
-   - The `zoomOut` icon's pop smear could be calmer.
+   - ~~`zoomOut` pop smear~~ Now an off-register dot like `zoomIn` (session 2). The map controls are static markup in `index.html`, so icon edits must be mirrored there.
    - ~~z17 brick roof tone too warm~~ Brick OKLab shift reduced from [-0.07, 0.013, 0.016] to [-0.065, 0.0095, 0.012] (session 2).
    - ~~`v1/concrete-pores` urban grain~~ Dropped (session 2, see Phase 3).
 7. ~~Update `apps/web/src/design/README.md` with an Identity section~~ Done (session 2).
