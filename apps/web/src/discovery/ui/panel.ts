@@ -156,7 +156,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     }
     if (!result.ok) {
       // Stay on the vibe screen with the draft and the reason.
-      vibeStep.setPhoto({ status: { text: result.message, kind: 'error' }, busy: false });
+      vibeStep.setPhoto({ status: { text: result.message, kind: result.reason === 'empty' ? 'info' : 'error' }, busy: false });
       return;
     }
     vibeStep.setPhoto(photo ? { description: photoClient.cached(photo) ?? null, status: null, busy: false } : { status: null });
@@ -283,6 +283,8 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     beginQuiz.hidden = next;
     liveQuiz.root.hidden = !next;
     vibeActions.hidden = next || currentStep !== 'vibe';
+    // Photo answers in the quiz may have used reads since the vibe screen last asked.
+    if (!next) vibeStep.refreshQuota();
     if (!next) beginQuiz.focus();
   }
 

@@ -53,6 +53,8 @@ export interface VibeStep {
   render(state: InitialPreferences): void;
   /** Update the photo's description, status or busy flag (the file comes from preferences). */
   setPhoto(patch: Partial<Omit<PhotoAttachmentState, 'file'>>): void;
+  /** Re-read today's remaining photo reads (quiz photo answers use them too). */
+  refreshQuota(): void;
   destroy(): void;
 }
 
@@ -188,6 +190,7 @@ export function createVibeStep(prefs: Store<InitialPreferences, PreferencesActio
       // A finished read (success or failure) changes today's remaining reads.
       if (patch.busy === false) void refreshQuota();
     },
+    refreshQuota: () => void refreshQuota(),
     destroy() {
       destroyed = true;
       unsubscribeAccess();
