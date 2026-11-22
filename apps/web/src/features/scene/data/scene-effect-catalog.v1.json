@@ -24,6 +24,7 @@
       "avoid new third-party media without usage rights"
     ],
     "aiOverrideLimit": 12,
+    "composerOverrideLimit": 48,
     "maxWeightedPresets": 3,
     "fullStateResolvedLocally": true
   },

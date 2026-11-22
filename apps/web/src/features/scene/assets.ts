@@ -3,8 +3,8 @@
  * public/scene-assets). The compiler references assets only through this
  * registry: an ID that is not in a manifest cannot reach a SceneState.
  *
- * This module only reads parsed manifest JSON; fetching/lazy-loading files is
- * the renderer's job (later phase).
+ * This module only reads parsed manifest JSON; runtime.ts and modelLoader.ts
+ * own decoding, lazy loading and rendering.
  */
 import type { SceneKey } from './catalog';
 
@@ -12,12 +12,21 @@ export interface LayoutRecord {
   readonly id: string;
   readonly activation: string;
   readonly mood: string;
+  readonly slots?: Readonly<Record<string, { center: number[]; radius: number; placements: Placement[] }>>;
   readonly heroAssetIds: readonly string[];
   readonly accentAssetIds: readonly string[];
 }
 
+export interface Placement {
+  assetId: string; position: number[]; yawDegrees: number; targetMaxDimension: number;
+}
+export interface AssetSource { readonly uri: string; readonly rect?: readonly number[] }
+
 export interface AssetRegistry {
+  readonly sources?: ReadonlyMap<string, AssetSource>;
   readonly models: ReadonlySet<string>;
+  /** Manifest `tags` per model ID (e.g. street, nightlife), for themed decoration selection. */
+  readonly modelTags?: ReadonlyMap<string, readonly string[]>;
   readonly svg: ReadonlySet<string>;
   readonly layouts: ReadonlyMap<string, LayoutRecord>;
   /** Verified SVG IDs usable for a catalog key (from manifest `usedBy` and the requirements map). */
@@ -49,6 +58,19 @@ const ids = (v: unknown, field: string) =>
 
 export function buildAssetRegistry(input: ManifestInput): { registry: AssetRegistry; problems: string[] } {
   const problems: string[] = [];
+  const sources = new Map<string, AssetSource>();
+  for (const manifest of [input.kaykit, input.modelibr]) for (const m of list(manifest, "models")) {
+    if (isObj(m) && typeof m.id === "string" && typeof m.uri === "string" && m.uri.startsWith("/scene-assets/")) sources.set(m.id, { uri: m.uri });
+  }
+  for (const [manifest, root] of [[input.svgV1, "v1"], [input.svgV2, "v2"]] as const) for (const a of list(manifest, "assets")) {
+    if (!isObj(a) || typeof a.id !== "string") continue;
+    const file = a.file ?? a.atlas;
+    if (typeof file === "string" && !file.includes("..") && !file.includes(":")) sources.set(a.id, { uri: `/scene-assets/${root}/${file}`, rect: Array.isArray(a.rect) ? a.rect as number[] : undefined });
+  }
+  const modelTags = new Map<string, readonly string[]>();
+  for (const manifest of [input.kaykit, input.modelibr]) for (const m of list(manifest, 'models')) {
+    if (isObj(m) && typeof m.id === 'string' && Array.isArray(m.tags)) modelTags.set(m.id, Object.freeze(m.tags.filter((t): t is string => typeof t === 'string')));
+  }
   const models = new Set<string>();
   for (const id of [...ids(input.kaykit, 'models'), ...ids(input.modelibr, 'models')]) {
     if (models.has(id)) problems.push(`duplicate model id ${id}`);
@@ -72,7 +94,7 @@ export function buildAssetRegistry(input: ManifestInput): { registry: AssetRegis
       problems.push(`layout ${s.id} rejected: unknown model ids ${missing.join(', ')}`);
       continue;
     }
-    layouts.set(s.id, Object.freeze({ id: s.id, activation: s.activation, mood: String(s.mood ?? ''), heroAssetIds: hero, accentAssetIds: accent }));
+    layouts.set(s.id, Object.freeze({ id: s.id, activation: s.activation, mood: String(s.mood ?? ''), heroAssetIds: hero, accentAssetIds: accent, slots: slots as unknown as LayoutRecord["slots"] }));
   }
 
   const textures = new Map<SceneKey, string[]>();
@@ -91,5 +113,5 @@ export function buildAssetRegistry(input: ManifestInput): { registry: AssetRegis
   }
   for (const v of textures.values()) v.sort();
 
-  return { registry: Object.freeze({ models, svg, layouts, texturesByKey: textures }), problems };
+  return { registry: Object.freeze({ models, modelTags, svg, layouts, texturesByKey: textures, sources }), problems };
 }

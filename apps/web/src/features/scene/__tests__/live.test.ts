@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { basePalette } from '../../../mapStyle';
 import type { AccountState, AccountStore } from '../../account/session';
 import { sceneStyleOf, startThemeController } from '../../vibeTheme/controller';
-import { fakeEffects, fakeMap } from '../../vibeTheme/__tests__/fakeMap';
+import { fakeAtmosphere, fakeEffects, fakeMap } from '../../vibeTheme/__tests__/fakeMap';
 import { MAP_RENDERER_V1 } from '../capabilities';
 import { hexToLab, lightness } from '../color';
 import { compileScene } from '../compile';
@@ -20,13 +20,14 @@ import { intent } from './fixtures';
 function harness({ loaded = true, reducedMotion = false } = {}) {
   const f = fakeMap({ loaded });
   const effects = fakeEffects();
+  const atmosphere = fakeAtmosphere();
   let state: AccountState = { status: 'signed_out' };
   const subs = new Set<(s: AccountState) => void>();
   const account = {
     getState: () => state,
     subscribe: (fn: (s: AccountState) => void) => (subs.add(fn), () => void subs.delete(fn)),
   } as unknown as AccountStore;
-  const theme = startThemeController(f.map, account, { effects });
+  const theme = startThemeController(f.map, account, { effects, atmosphere });
   const frames: Array<() => void> = [];
   const ticks: Array<() => void> = [];
   const mqListeners = new Set<(e: { matches: boolean }) => void>();
@@ -41,6 +42,7 @@ function harness({ loaded = true, reducedMotion = false } = {}) {
   return {
     f,
     effects,
+    atmosphere,
     scene,
     frames,
     /** One quiz answer → one SceneIntent → session. */
@@ -282,7 +284,7 @@ describe('sceneDevHook', () => {
   it('starts a new outing after clear(), so later presets are not rejected as stale', async () => {
     const { sceneDevHook } = await import('../mount');
     const f = fakeMap();
-    const theme = startThemeController(f.map, { getState: () => ({ status: 'signed_out' }), subscribe: () => () => {} } as unknown as AccountStore, { effects: fakeEffects() });
+    const theme = startThemeController(f.map, { getState: () => ({ status: 'signed_out' }), subscribe: () => () => {} } as unknown as AccountStore, { effects: fakeEffects(), atmosphere: fakeAtmosphere() });
     const scene = mountScene({ theme, schedule: (fn) => fn(), defer: (fn) => fn() });
     const dev = sceneDevHook(scene);
     expect(dev.preset('amber_refuge')).toBe('applied');

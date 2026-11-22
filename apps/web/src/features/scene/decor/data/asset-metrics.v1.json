@@ -1,0 +1,2505 @@
+{
+ "schemaVersion": "1.0.0",
+ "generatedBy": "scripts/measure-decor-assets.mjs",
+ "note": "w/h/d are normalized so the longest side is 1 (glTF Y-up: h is height). tris/prims are per model instance.",
+ "count": 312,
+ "failures": [],
+ "assets": {
+  "kaykit.city-builder-bits.bench": {
+   "w": 1,
+   "h": 0.25,
+   "d": 0.375,
+   "tris": 44,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.building_A": {
+   "w": 1,
+   "h": 0.825,
+   "d": 1,
+   "tris": 828,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.building_B": {
+   "w": 1,
+   "h": 0.825,
+   "d": 1,
+   "tris": 1082,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.building_C": {
+   "w": 0.672,
+   "h": 1,
+   "d": 0.672,
+   "tris": 1020,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.building_D": {
+   "w": 0.673,
+   "h": 1,
+   "d": 0.68,
+   "tris": 1118,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.building_F": {
+   "w": 0.854,
+   "h": 1,
+   "d": 0.851,
+   "tris": 1389,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.building_G": {
+   "w": 0.674,
+   "h": 1,
+   "d": 0.672,
+   "tris": 1711,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.building_H": {
+   "w": 0.658,
+   "h": 1,
+   "d": 0.656,
+   "tris": 1885,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.bush": {
+   "w": 0.498,
+   "h": 1,
+   "d": 0.523,
+   "tris": 72,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.car_hatchback": {
+   "w": 0.52,
+   "h": 0.457,
+   "d": 1,
+   "tris": 1194,
+   "prims": 5,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.car_sedan": {
+   "w": 0.447,
+   "h": 0.393,
+   "d": 1,
+   "tris": 1222,
+   "prims": 5,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.car_stationwagon": {
+   "w": 0.447,
+   "h": 0.393,
+   "d": 1,
+   "tris": 1234,
+   "prims": 5,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.car_taxi": {
+   "w": 0.447,
+   "h": 0.463,
+   "d": 1,
+   "tris": 1256,
+   "prims": 5,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.dumpster": {
+   "w": 1,
+   "h": 0.561,
+   "d": 0.623,
+   "tris": 126,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.firehydrant": {
+   "w": 0.603,
+   "h": 1,
+   "d": 0.585,
+   "tris": 180,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.streetlight": {
+   "w": 0.281,
+   "h": 1,
+   "d": 0.072,
+   "tris": 176,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.trafficlight_A": {
+   "w": 0.239,
+   "h": 1,
+   "d": 0.206,
+   "tris": 508,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.city-builder-bits.watertower": {
+   "w": 0.745,
+   "h": 1,
+   "d": 0.745,
+   "tris": 146,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.armchair_pillows": {
+   "w": 1,
+   "h": 0.68,
+   "d": 0.889,
+   "tris": 614,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.book_set": {
+   "w": 1,
+   "h": 0.641,
+   "d": 0.468,
+   "tris": 196,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.cactus_medium_A": {
+   "w": 1,
+   "h": 0.94,
+   "d": 0.951,
+   "tris": 448,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.cactus_small_A": {
+   "w": 0.906,
+   "h": 1,
+   "d": 0.906,
+   "tris": 252,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.chair_A_wood": {
+   "w": 0.596,
+   "h": 1,
+   "d": 0.672,
+   "tris": 308,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.chair_B_wood": {
+   "w": 0.596,
+   "h": 1,
+   "d": 0.672,
+   "tris": 384,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.chair_stool_wood": {
+   "w": 1,
+   "h": 0.667,
+   "d": 1,
+   "tris": 216,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.couch": {
+   "w": 1,
+   "h": 0.408,
+   "d": 0.533,
+   "tris": 636,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.couch_pillows": {
+   "w": 1,
+   "h": 0.408,
+   "d": 0.533,
+   "tris": 808,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.lamp_standing": {
+   "w": 0.397,
+   "h": 1,
+   "d": 0.397,
+   "tris": 320,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.lamp_table": {
+   "w": 0.979,
+   "h": 1,
+   "d": 0.979,
+   "tris": 392,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.pictureframe_standing_A": {
+   "w": 0.808,
+   "h": 1,
+   "d": 0.613,
+   "tris": 74,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.rug_oval_A": {
+   "w": 1,
+   "h": 0.033,
+   "d": 0.667,
+   "tris": 176,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.rug_rectangle_B": {
+   "w": 1,
+   "h": 0.033,
+   "d": 0.667,
+   "tris": 44,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.shelf_B_large_decorated": {
+   "w": 1,
+   "h": 0.409,
+   "d": 0.25,
+   "tris": 482,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.table_low": {
+   "w": 1,
+   "h": 0.208,
+   "d": 0.625,
+   "tris": 276,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.table_medium": {
+   "w": 1,
+   "h": 0.5,
+   "d": 1,
+   "tris": 168,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.furniture-bits.table_small": {
+   "w": 1,
+   "h": 1,
+   "d": 1,
+   "tris": 168,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.halloween-bits.arch_gate": {
+   "w": 0.956,
+   "h": 1,
+   "d": 0.174,
+   "tris": 868,
+   "prims": 3,
+   "mats": 1
+  },
+  "kaykit.halloween-bits.candle_triple": {
+   "w": 0.574,
+   "h": 1,
+   "d": 0.447,
+   "tris": 198,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.halloween-bits.coffin_decorated": {
+   "w": 0.667,
+   "h": 0.301,
+   "d": 1,
+   "tris": 2064,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.halloween-bits.crypt": {
+   "w": 0.75,
+   "h": 1,
+   "d": 1,
+   "tris": 952,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.halloween-bits.fence_gate": {
+   "w": 1,
+   "h": 0.75,
+   "d": 0.125,
+   "tris": 620,
+   "prims": 3,
+   "mats": 1
+  },
+  "kaykit.halloween-bits.gravestone": {
+   "w": 0.875,
+   "h": 1,
+   "d": 0.25,
+   "tris": 271,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.halloween-bits.lantern_hanging": {
+   "w": 0.454,
+   "h": 1,
+   "d": 0.454,
+   "tris": 472,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.halloween-bits.plaque_candles": {
+   "w": 1,
+   "h": 0.566,
+   "d": 1,
+   "tris": 418,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.halloween-bits.post_skull": {
+   "w": 0.245,
+   "h": 1,
+   "d": 0.475,
+   "tris": 776,
+   "prims": 2,
+   "mats": 1
+  },
+  "kaykit.halloween-bits.pumpkin_orange_jackolantern": {
+   "w": 1,
+   "h": 0.867,
+   "d": 0.933,
+   "tris": 374,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.halloween-bits.pumpkin_yellow_jackolantern": {
+   "w": 1,
+   "h": 0.867,
+   "d": 0.933,
+   "tris": 374,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.halloween-bits.shrine_candles": {
+   "w": 0.614,
+   "h": 1,
+   "d": 0.614,
+   "tris": 360,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.halloween-bits.skull": {
+   "w": 1,
+   "h": 0.979,
+   "d": 0.989,
+   "tris": 344,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.halloween-bits.tree_dead_large": {
+   "w": 0.454,
+   "h": 1,
+   "d": 0.272,
+   "tris": 256,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.halloween-bits.tree_dead_medium": {
+   "w": 0.432,
+   "h": 1,
+   "d": 0.111,
+   "tris": 216,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.halloween-bits.tree_pine_orange_large": {
+   "w": 0.637,
+   "h": 1,
+   "d": 0.556,
+   "tris": 318,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-buildings.building_stage_A": {
+   "w": 1,
+   "h": 0.273,
+   "d": 0.836,
+   "tris": 784,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-buildings.building_stage_B": {
+   "w": 0.903,
+   "h": 0.562,
+   "d": 1,
+   "tris": 902,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-buildings.building_stage_C": {
+   "w": 1,
+   "h": 0.85,
+   "d": 0.972,
+   "tris": 1218,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-buildings.fence_wood_straight_gate": {
+   "w": 0.121,
+   "h": 0.563,
+   "d": 1,
+   "tris": 308,
+   "prims": 2,
+   "mats": 1
+  },
+  "kaykit.medieval-nature.cloud_big": {
+   "w": 1,
+   "h": 0.539,
+   "d": 0.622,
+   "tris": 672,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-nature.cloud_small": {
+   "w": 1,
+   "h": 0.787,
+   "d": 0.766,
+   "tris": 366,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-nature.hill_single_A": {
+   "w": 1,
+   "h": 0.277,
+   "d": 0.729,
+   "tris": 60,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-nature.hills_A_trees": {
+   "w": 1,
+   "h": 0.759,
+   "d": 0.99,
+   "tris": 518,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-nature.mountain_A_grass": {
+   "w": 0.96,
+   "h": 0.8,
+   "d": 1,
+   "tris": 288,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-nature.mountain_B_grass": {
+   "w": 0.96,
+   "h": 0.979,
+   "d": 1,
+   "tris": 288,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-nature.rock_single_A": {
+   "w": 1,
+   "h": 0.232,
+   "d": 0.951,
+   "tris": 18,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-nature.rock_single_B": {
+   "w": 1,
+   "h": 0.47,
+   "d": 0.871,
+   "tris": 26,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-nature.rock_single_C": {
+   "w": 0.999,
+   "h": 0.566,
+   "d": 1,
+   "tris": 40,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-nature.tree_single_A": {
+   "w": 0.48,
+   "h": 1,
+   "d": 0.457,
+   "tris": 50,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-nature.tree_single_A_cut": {
+   "w": 0.514,
+   "h": 1,
+   "d": 0.49,
+   "tris": 16,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-nature.tree_single_B": {
+   "w": 0.565,
+   "h": 1,
+   "d": 0.594,
+   "tris": 220,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-props.barrel": {
+   "w": 0.952,
+   "h": 1,
+   "d": 0.952,
+   "tris": 240,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-props.bucket_empty": {
+   "w": 1,
+   "h": 0.893,
+   "d": 1,
+   "tris": 128,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-props.bucket_water": {
+   "w": 1,
+   "h": 0.75,
+   "d": 1,
+   "tris": 128,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-props.crate_A_big": {
+   "w": 1,
+   "h": 1,
+   "d": 1,
+   "tris": 132,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-props.crate_B_small": {
+   "w": 1,
+   "h": 1,
+   "d": 1,
+   "tris": 132,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-props.crate_open": {
+   "w": 1,
+   "h": 0.62,
+   "d": 0.603,
+   "tris": 260,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-props.ladder": {
+   "w": 0.329,
+   "h": 1,
+   "d": 0.066,
+   "tris": 84,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-props.pallet": {
+   "w": 1,
+   "h": 0.267,
+   "d": 1,
+   "tris": 72,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-props.resource_lumber": {
+   "w": 1,
+   "h": 0.306,
+   "d": 0.482,
+   "tris": 220,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-props.resource_stone": {
+   "w": 1,
+   "h": 0.665,
+   "d": 0.85,
+   "tris": 220,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-props.sack": {
+   "w": 0.668,
+   "h": 0.405,
+   "d": 1,
+   "tris": 92,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-props.target": {
+   "w": 0.793,
+   "h": 1,
+   "d": 0.471,
+   "tris": 156,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-props.tent": {
+   "w": 1,
+   "h": 1,
+   "d": 1,
+   "tris": 86,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.medieval-props.wheelbarrow": {
+   "w": 0.471,
+   "h": 0.373,
+   "d": 1,
+   "tris": 396,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.chair_A": {
+   "w": 0.621,
+   "h": 1,
+   "d": 0.659,
+   "tris": 428,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.crate_buns": {
+   "w": 1,
+   "h": 0.401,
+   "d": 1,
+   "tris": 2772,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.crate_carrots": {
+   "w": 1,
+   "h": 0.472,
+   "d": 1,
+   "tris": 1752,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.crate_cheese": {
+   "w": 1,
+   "h": 0.473,
+   "d": 1,
+   "tris": 1164,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.crate_lettuce": {
+   "w": 1,
+   "h": 0.499,
+   "d": 1,
+   "tris": 1980,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.crate_onions": {
+   "w": 1,
+   "h": 0.462,
+   "d": 1,
+   "tris": 1652,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.crate_potatoes": {
+   "w": 1,
+   "h": 0.483,
+   "d": 1,
+   "tris": 1068,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.crate_tomatoes": {
+   "w": 1,
+   "h": 0.462,
+   "d": 1,
+   "tris": 2072,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.food_burger": {
+   "w": 1,
+   "h": 0.902,
+   "d": 1,
+   "tris": 1622,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.food_dinner": {
+   "w": 1,
+   "h": 0.875,
+   "d": 0.916,
+   "tris": 1196,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.food_ingredient_bun": {
+   "w": 1,
+   "h": 0.725,
+   "d": 1,
+   "tris": 440,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.food_ingredient_carrot": {
+   "w": 0.441,
+   "h": 1,
+   "d": 0.435,
+   "tris": 324,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.food_ingredient_cheese": {
+   "w": 1,
+   "h": 0.512,
+   "d": 0.739,
+   "tris": 258,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.food_ingredient_ham": {
+   "w": 1,
+   "h": 0.597,
+   "d": 0.597,
+   "tris": 272,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.food_ingredient_lettuce": {
+   "w": 0.975,
+   "h": 0.724,
+   "d": 1,
+   "tris": 462,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.food_ingredient_onion": {
+   "w": 0.87,
+   "h": 1,
+   "d": 0.87,
+   "tris": 304,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.food_ingredient_potato": {
+   "w": 0.769,
+   "h": 1,
+   "d": 0.872,
+   "tris": 156,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.food_ingredient_potato_mashed": {
+   "w": 0.948,
+   "h": 0.333,
+   "d": 1,
+   "tris": 32,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.food_ingredient_steak": {
+   "w": 1,
+   "h": 0.269,
+   "d": 0.858,
+   "tris": 352,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.food_ingredient_tomato": {
+   "w": 1,
+   "h": 0.933,
+   "d": 1,
+   "tris": 388,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.food_ingredient_vegetableburger_cooked": {
+   "w": 1,
+   "h": 0.297,
+   "d": 0.985,
+   "tris": 338,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.food_stew": {
+   "w": 1,
+   "h": 0.389,
+   "d": 1,
+   "tris": 560,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.food_vegetableburger": {
+   "w": 1,
+   "h": 0.902,
+   "d": 1,
+   "tris": 1698,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.menu": {
+   "w": 0.625,
+   "h": 1,
+   "d": 0.375,
+   "tris": 108,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.oven": {
+   "w": 0.852,
+   "h": 0.86,
+   "d": 1,
+   "tris": 542,
+   "prims": 2,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.pot_A_stew": {
+   "w": 1,
+   "h": 0.369,
+   "d": 0.714,
+   "tris": 612,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.pot_B_stew": {
+   "w": 1,
+   "h": 0.369,
+   "d": 0.714,
+   "tris": 612,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.table_round_A_decorated": {
+   "w": 1,
+   "h": 0.619,
+   "d": 1,
+   "tris": 4422,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.restaurant-bits.table_round_B": {
+   "w": 1,
+   "h": 0.333,
+   "d": 1,
+   "tris": 300,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.space-base-bits.drill_structure": {
+   "w": 0.875,
+   "h": 1,
+   "d": 0.875,
+   "tris": 1198,
+   "prims": 2,
+   "mats": 1
+  },
+  "kaykit.space-base-bits.lander_A": {
+   "w": 0.965,
+   "h": 0.838,
+   "d": 1,
+   "tris": 1464,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.space-base-bits.landingpad_small": {
+   "w": 1,
+   "h": 0.263,
+   "d": 1,
+   "tris": 454,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.space-base-bits.lights": {
+   "w": 0.681,
+   "h": 1,
+   "d": 0.681,
+   "tris": 356,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.space-base-bits.roofmodule_solarpanels": {
+   "w": 1,
+   "h": 0.409,
+   "d": 1,
+   "tris": 284,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.space-base-bits.solarpanel": {
+   "w": 1,
+   "h": 0.412,
+   "d": 0.5,
+   "tris": 118,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.space-base-bits.spacetruck": {
+   "w": 0.548,
+   "h": 0.634,
+   "d": 1,
+   "tris": 1118,
+   "prims": 5,
+   "mats": 1
+  },
+  "kaykit.space-base-bits.structure_tall": {
+   "w": 0.875,
+   "h": 1,
+   "d": 0.875,
+   "tris": 670,
+   "prims": 1,
+   "mats": 1
+  },
+  "kaykit.space-base-bits.windturbine_low": {
+   "w": 0.781,
+   "h": 1,
+   "d": 0.881,
+   "tris": 826,
+   "prims": 2,
+   "mats": 1
+  },
+  "cc0.kenney-city-kit-commercial.building_a": {
+   "w": 0.683,
+   "h": 1,
+   "d": 0.727,
+   "tris": 1252,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-city-kit-commercial.building_c": {
+   "w": 0.811,
+   "h": 0.819,
+   "d": 1,
+   "tris": 1195,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-city-kit-commercial.building_skyscraper_a": {
+   "w": 0.472,
+   "h": 1,
+   "d": 0.472,
+   "tris": 1292,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-city-kit-commercial.detail_awning": {
+   "w": 1,
+   "h": 1,
+   "d": 0.37,
+   "tris": 40,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-city-kit-commercial.detail_awning_wide": {
+   "w": 1,
+   "h": 0.5,
+   "d": 0.185,
+   "tris": 40,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-city-kit-commercial.detail_parasol_a": {
+   "w": 0.77,
+   "h": 1,
+   "d": 0.889,
+   "tris": 96,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-city-kit-commercial.detail_parasol_b": {
+   "w": 0.77,
+   "h": 1,
+   "d": 0.889,
+   "tris": 120,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-city-kit-commercial.low_detail_building_wide_a": {
+   "w": 0.909,
+   "h": 1,
+   "d": 0.455,
+   "tris": 156,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-fantasy-town-kit.fountain_round": {
+   "w": 1,
+   "h": 0.14,
+   "d": 1,
+   "tris": 1002,
+   "prims": 2,
+   "mats": 2
+  },
+  "cc0.kenney-fantasy-town-kit.hedge_gate": {
+   "w": 0.25,
+   "h": 0.25,
+   "d": 1,
+   "tris": 76,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-fantasy-town-kit.lantern": {
+   "w": 0.139,
+   "h": 1,
+   "d": 0.144,
+   "tris": 158,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-fantasy-town-kit.stall": {
+   "w": 0.65,
+   "h": 0.366,
+   "d": 1,
+   "tris": 106,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-fantasy-town-kit.tree_crooked": {
+   "w": 0.424,
+   "h": 1,
+   "d": 0.424,
+   "tris": 178,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-fantasy-town-kit.wall_arch": {
+   "w": 0.1,
+   "h": 1,
+   "d": 0.3,
+   "tris": 32,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-fantasy-town-kit.watermill": {
+   "w": 0.472,
+   "h": 1,
+   "d": 1,
+   "tris": 600,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-fantasy-town-kit.windmill": {
+   "w": 0.151,
+   "h": 1,
+   "d": 1,
+   "tris": 732,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.bowl": {
+   "w": 0.866,
+   "h": 0.369,
+   "d": 1,
+   "tris": 84,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.bowl_broth": {
+   "w": 0.908,
+   "h": 0.501,
+   "d": 1,
+   "tris": 210,
+   "prims": 2,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.bowl_cereal": {
+   "w": 0.791,
+   "h": 0.661,
+   "d": 1,
+   "tris": 120,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.bowl_soup": {
+   "w": 0.866,
+   "h": 0.369,
+   "d": 1,
+   "tris": 132,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.bread": {
+   "w": 1,
+   "h": 0.09,
+   "d": 0.827,
+   "tris": 116,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.chopstick": {
+   "w": 0.044,
+   "h": 0.044,
+   "d": 1,
+   "tris": 12,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.croissant": {
+   "w": 0.725,
+   "h": 0.405,
+   "d": 1,
+   "tris": 162,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.cup_coffee": {
+   "w": 0.755,
+   "h": 0.488,
+   "d": 1,
+   "tris": 108,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.cup_tea": {
+   "w": 0.811,
+   "h": 0.685,
+   "d": 1,
+   "tris": 144,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.cupcake": {
+   "w": 0.838,
+   "h": 1,
+   "d": 0.726,
+   "tris": 204,
+   "prims": 3,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.dim_sum": {
+   "w": 0.866,
+   "h": 0.647,
+   "d": 1,
+   "tris": 56,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.egg_cooked": {
+   "w": 1,
+   "h": 0.068,
+   "d": 0.922,
+   "tris": 92,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.fish": {
+   "w": 0.319,
+   "h": 0.519,
+   "d": 1,
+   "tris": 233,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.frappe": {
+   "w": 0.509,
+   "h": 1,
+   "d": 0.509,
+   "tris": 320,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.frying_pan": {
+   "w": 0.643,
+   "h": 0.118,
+   "d": 1,
+   "tris": 200,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.ginger_bread": {
+   "w": 1,
+   "h": 0.115,
+   "d": 0.905,
+   "tris": 80,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.glass": {
+   "w": 0.56,
+   "h": 1,
+   "d": 0.646,
+   "tris": 44,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.glass_wine": {
+   "w": 0.454,
+   "h": 1,
+   "d": 0.394,
+   "tris": 232,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.grapes": {
+   "w": 0.66,
+   "h": 1,
+   "d": 0.565,
+   "tris": 592,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.lemon": {
+   "w": 0.773,
+   "h": 1,
+   "d": 0.893,
+   "tris": 104,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.loaf_baguette": {
+   "w": 1,
+   "h": 0.301,
+   "d": 0.301,
+   "tris": 122,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.maki_salmon": {
+   "w": 1,
+   "h": 0.583,
+   "d": 0.866,
+   "tris": 56,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.maki_vegetable": {
+   "w": 1,
+   "h": 0.583,
+   "d": 0.866,
+   "tris": 56,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.meat_cooked": {
+   "w": 0.832,
+   "h": 0.112,
+   "d": 1,
+   "tris": 116,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.meat_ribs": {
+   "w": 1,
+   "h": 0.112,
+   "d": 0.716,
+   "tris": 164,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.mortar_pestle": {
+   "w": 0.336,
+   "h": 1,
+   "d": 0.388,
+   "tris": 56,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.mushroom": {
+   "w": 0.866,
+   "h": 0.965,
+   "d": 1,
+   "tris": 80,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.mussel_open": {
+   "w": 0.619,
+   "h": 0.517,
+   "d": 1,
+   "tris": 90,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.pan_stew": {
+   "w": 0.863,
+   "h": 0.23,
+   "d": 1,
+   "tris": 344,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.pancakes": {
+   "w": 0.864,
+   "h": 0.241,
+   "d": 1,
+   "tris": 512,
+   "prims": 5,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.paprika": {
+   "w": 0.843,
+   "h": 1,
+   "d": 0.843,
+   "tris": 132,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.pizza": {
+   "w": 1,
+   "h": 0.052,
+   "d": 1,
+   "tris": 1208,
+   "prims": 8,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.pizza_box": {
+   "w": 0.989,
+   "h": 0.926,
+   "d": 1,
+   "tris": 84,
+   "prims": 2,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.plate_deep": {
+   "w": 1,
+   "h": 0.162,
+   "d": 1,
+   "tris": 140,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.plate_dinner": {
+   "w": 1,
+   "h": 0.248,
+   "d": 1,
+   "tris": 354,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.pot": {
+   "w": 0.8,
+   "h": 0.439,
+   "d": 1,
+   "tris": 228,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.pot_stew": {
+   "w": 0.8,
+   "h": 0.439,
+   "d": 1,
+   "tris": 370,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.pudding": {
+   "w": 0.866,
+   "h": 0.692,
+   "d": 1,
+   "tris": 56,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.rice_ball": {
+   "w": 0.62,
+   "h": 1,
+   "d": 0.88,
+   "tris": 104,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.salad": {
+   "w": 0.866,
+   "h": 0.471,
+   "d": 1,
+   "tris": 170,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.sandwich": {
+   "w": 0.996,
+   "h": 0.387,
+   "d": 1,
+   "tris": 176,
+   "prims": 4,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.skewer": {
+   "w": 1,
+   "h": 0.158,
+   "d": 0.182,
+   "tris": 116,
+   "prims": 4,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.skewer_vegetables": {
+   "w": 1,
+   "h": 0.18,
+   "d": 0.182,
+   "tris": 156,
+   "prims": 6,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.soy": {
+   "w": 0.866,
+   "h": 0.21,
+   "d": 1,
+   "tris": 68,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.steamer": {
+   "w": 1,
+   "h": 0.938,
+   "d": 1,
+   "tris": 492,
+   "prims": 4,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.sub": {
+   "w": 0.418,
+   "h": 0.329,
+   "d": 1,
+   "tris": 574,
+   "prims": 7,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.sushi_egg": {
+   "w": 0.676,
+   "h": 0.454,
+   "d": 1,
+   "tris": 78,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.sushi_salmon": {
+   "w": 0.537,
+   "h": 0.444,
+   "d": 1,
+   "tris": 96,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.taco": {
+   "w": 1,
+   "h": 0.616,
+   "d": 0.268,
+   "tris": 174,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.tajine": {
+   "w": 0.951,
+   "h": 0.16,
+   "d": 1,
+   "tris": 164,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.tomato": {
+   "w": 1,
+   "h": 0.841,
+   "d": 1,
+   "tris": 132,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-food-kit.waffle": {
+   "w": 1,
+   "h": 0.125,
+   "d": 1,
+   "tris": 588,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-furniture-kit.kitchen_blender": {
+   "w": 0.597,
+   "h": 1,
+   "d": 0.48,
+   "tris": 246,
+   "prims": 4,
+   "mats": 3
+  },
+  "cc0.kenney-furniture-kit.kitchen_coffee_machine": {
+   "w": 0.789,
+   "h": 0.739,
+   "d": 1,
+   "tris": 166,
+   "prims": 3,
+   "mats": 3
+  },
+  "cc0.kenney-furniture-kit.lounge_design_sofa": {
+   "w": 1,
+   "h": 0.357,
+   "d": 0.366,
+   "tris": 116,
+   "prims": 2,
+   "mats": 2
+  },
+  "cc0.kenney-furniture-kit.radio": {
+   "w": 1,
+   "h": 0.724,
+   "d": 0.31,
+   "tris": 432,
+   "prims": 3,
+   "mats": 3
+  },
+  "cc0.kenney-furniture-kit.speaker": {
+   "w": 0.233,
+   "h": 1,
+   "d": 0.233,
+   "tris": 228,
+   "prims": 2,
+   "mats": 2
+  },
+  "cc0.kenney-furniture-kit.speaker_small": {
+   "w": 0.497,
+   "h": 1,
+   "d": 0.447,
+   "tris": 220,
+   "prims": 2,
+   "mats": 2
+  },
+  "cc0.kenney-furniture-kit.stool_bar": {
+   "w": 0.61,
+   "h": 1,
+   "d": 0.528,
+   "tris": 176,
+   "prims": 2,
+   "mats": 2
+  },
+  "cc0.kenney-furniture-kit.table_round": {
+   "w": 0.866,
+   "h": 0.458,
+   "d": 1,
+   "tris": 80,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-graveyard-kit.altar_stone": {
+   "w": 1,
+   "h": 0.469,
+   "d": 0.628,
+   "tris": 166,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-graveyard-kit.character_ghost": {
+   "w": 1,
+   "h": 0.84,
+   "d": 0.62,
+   "tris": 413,
+   "prims": 3,
+   "mats": 1
+  },
+  "cc0.kenney-graveyard-kit.crypt_large": {
+   "w": 0.771,
+   "h": 0.417,
+   "d": 1,
+   "tris": 626,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-graveyard-kit.iron_fence_border_gate": {
+   "w": 1,
+   "h": 0.76,
+   "d": 0.222,
+   "tris": 256,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-graveyard-kit.lantern_candle": {
+   "w": 0.619,
+   "h": 1,
+   "d": 0.619,
+   "tris": 224,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-graveyard-kit.lightpost_single": {
+   "w": 0.165,
+   "h": 1,
+   "d": 0.367,
+   "tris": 352,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-graveyard-kit.pine_crooked": {
+   "w": 0.559,
+   "h": 1,
+   "d": 0.633,
+   "tris": 336,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-graveyard-kit.pumpkin_carved": {
+   "w": 1,
+   "h": 0.851,
+   "d": 1,
+   "tris": 486,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-holiday-kit.gingerbread_man": {
+   "w": 0.901,
+   "h": 1,
+   "d": 0.213,
+   "tris": 160,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-holiday-kit.hanukkah_menorah": {
+   "w": 0.865,
+   "h": 1,
+   "d": 0.29,
+   "tris": 492,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-holiday-kit.kwanzaa_kinara": {
+   "w": 1,
+   "h": 0.557,
+   "d": 0.176,
+   "tris": 838,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-holiday-kit.lantern_hanging": {
+   "w": 0.638,
+   "h": 1,
+   "d": 0.624,
+   "tris": 152,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-holiday-kit.lights_colored": {
+   "w": 1,
+   "h": 0.313,
+   "d": 0.063,
+   "tris": 760,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-holiday-kit.reindeer": {
+   "w": 0.557,
+   "h": 1,
+   "d": 0.955,
+   "tris": 870,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-holiday-kit.snowman_hat": {
+   "w": 0.79,
+   "h": 1,
+   "d": 0.504,
+   "tris": 555,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-holiday-kit.tree_decorated": {
+   "w": 0.52,
+   "h": 1,
+   "d": 0.52,
+   "tris": 670,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-mini-arcade.air_hockey": {
+   "w": 1,
+   "h": 0.5,
+   "d": 0.7,
+   "tris": 438,
+   "prims": 4,
+   "mats": 1
+  },
+  "cc0.kenney-mini-arcade.arcade_machine": {
+   "w": 0.552,
+   "h": 1,
+   "d": 0.741,
+   "tris": 392,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-mini-arcade.basketball_game": {
+   "w": 0.642,
+   "h": 0.79,
+   "d": 1,
+   "tris": 526,
+   "prims": 2,
+   "mats": 1
+  },
+  "cc0.kenney-mini-arcade.claw_machine": {
+   "w": 0.687,
+   "h": 1,
+   "d": 0.73,
+   "tris": 730,
+   "prims": 3,
+   "mats": 2
+  },
+  "cc0.kenney-mini-arcade.dance_machine": {
+   "w": 0.706,
+   "h": 0.927,
+   "d": 1,
+   "tris": 654,
+   "prims": 2,
+   "mats": 1
+  },
+  "cc0.kenney-mini-arcade.pinball": {
+   "w": 0.667,
+   "h": 0.989,
+   "d": 1,
+   "tris": 592,
+   "prims": 2,
+   "mats": 2
+  },
+  "cc0.kenney-mini-arcade.prize_wheel": {
+   "w": 0.706,
+   "h": 1,
+   "d": 0.355,
+   "tris": 224,
+   "prims": 2,
+   "mats": 1
+  },
+  "cc0.kenney-mini-arcade.vending_machine": {
+   "w": 0.667,
+   "h": 1,
+   "d": 0.633,
+   "tris": 176,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-mini-market.cash_register": {
+   "w": 1,
+   "h": 0.7,
+   "d": 1,
+   "tris": 203,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-mini-market.display_bread": {
+   "w": 1,
+   "h": 0.714,
+   "d": 0.857,
+   "tris": 362,
+   "prims": 3,
+   "mats": 1
+  },
+  "cc0.kenney-mini-market.display_fruit": {
+   "w": 1,
+   "h": 0.86,
+   "d": 1,
+   "tris": 650,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-mini-market.freezer": {
+   "w": 1,
+   "h": 0.437,
+   "d": 0.75,
+   "tris": 180,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-mini-market.shelf_bags": {
+   "w": 0.896,
+   "h": 1,
+   "d": 0.784,
+   "tris": 892,
+   "prims": 9,
+   "mats": 1
+  },
+  "cc0.kenney-mini-market.shelf_boxes": {
+   "w": 0.941,
+   "h": 1,
+   "d": 0.824,
+   "tris": 436,
+   "prims": 11,
+   "mats": 1
+  },
+  "cc0.kenney-mini-market.shopping_basket": {
+   "w": 1,
+   "h": 0.714,
+   "d": 1,
+   "tris": 288,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-mini-market.shopping_cart": {
+   "w": 0.626,
+   "h": 0.816,
+   "d": 1,
+   "tris": 384,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-nature-kit.bridge_wood": {
+   "w": 1,
+   "h": 0.385,
+   "d": 1,
+   "tris": 220,
+   "prims": 3,
+   "mats": 3
+  },
+  "cc0.kenney-nature-kit.campfire_logs": {
+   "w": 1,
+   "h": 0.214,
+   "d": 1,
+   "tris": 112,
+   "prims": 2,
+   "mats": 2
+  },
+  "cc0.kenney-nature-kit.flower_purple_a": {
+   "w": 0.656,
+   "h": 1,
+   "d": 0.747,
+   "tris": 76,
+   "prims": 2,
+   "mats": 2
+  },
+  "cc0.kenney-nature-kit.flower_red_a": {
+   "w": 0.544,
+   "h": 1,
+   "d": 0.619,
+   "tris": 76,
+   "prims": 2,
+   "mats": 2
+  },
+  "cc0.kenney-nature-kit.mushroom_red_group": {
+   "w": 1,
+   "h": 0.929,
+   "d": 0.943,
+   "tris": 144,
+   "prims": 2,
+   "mats": 2
+  },
+  "cc0.kenney-nature-kit.plant_bush_detailed": {
+   "w": 1,
+   "h": 0.598,
+   "d": 1,
+   "tris": 104,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-nature-kit.tree_oak": {
+   "w": 0.522,
+   "h": 1,
+   "d": 0.603,
+   "tris": 196,
+   "prims": 2,
+   "mats": 2
+  },
+  "cc0.kenney-nature-kit.tree_palm": {
+   "w": 0.618,
+   "h": 1,
+   "d": 0.669,
+   "tris": 186,
+   "prims": 2,
+   "mats": 2
+  },
+  "cc0.kenney-pirate-kit.boat_row_small": {
+   "w": 1,
+   "h": 0.308,
+   "d": 0.863,
+   "tris": 168,
+   "prims": 2,
+   "mats": 1
+  },
+  "cc0.kenney-pirate-kit.bottle_large": {
+   "w": 0.523,
+   "h": 1,
+   "d": 0.523,
+   "tris": 108,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-pirate-kit.chest": {
+   "w": 1,
+   "h": 0.9,
+   "d": 1,
+   "tris": 232,
+   "prims": 2,
+   "mats": 1
+  },
+  "cc0.kenney-pirate-kit.flag_pennant": {
+   "w": 0.84,
+   "h": 1,
+   "d": 0.19,
+   "tris": 118,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-pirate-kit.mast_ropes": {
+   "w": 0.556,
+   "h": 1,
+   "d": 0.298,
+   "tris": 350,
+   "prims": 3,
+   "mats": 1
+  },
+  "cc0.kenney-pirate-kit.palm_detailed_straight": {
+   "w": 0.763,
+   "h": 1,
+   "d": 0.763,
+   "tris": 482,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-pirate-kit.ship_ghost": {
+   "w": 0.453,
+   "h": 0.94,
+   "d": 1,
+   "tris": 1703,
+   "prims": 6,
+   "mats": 1
+  },
+  "cc0.kenney-pirate-kit.structure_platform_dock": {
+   "w": 0.995,
+   "h": 0.522,
+   "d": 1,
+   "tris": 324,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-retro-urban-kit.detail_awning_wide": {
+   "w": 1,
+   "h": 0.281,
+   "d": 0.3,
+   "tris": 24,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-retro-urban-kit.detail_bench": {
+   "w": 1,
+   "h": 0.677,
+   "d": 0.533,
+   "tris": 84,
+   "prims": 2,
+   "mats": 2
+  },
+  "cc0.kenney-retro-urban-kit.detail_bricks_type_a": {
+   "w": 1,
+   "h": 0.351,
+   "d": 0.936,
+   "tris": 80,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-retro-urban-kit.detail_cables_type_a": {
+   "w": 1,
+   "h": 0.143,
+   "d": 0,
+   "tris": 4,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-retro-urban-kit.detail_dumpster_open": {
+   "w": 1,
+   "h": 0.916,
+   "d": 0.808,
+   "tris": 24,
+   "prims": 4,
+   "mats": 4
+  },
+  "cc0.kenney-retro-urban-kit.detail_light_double": {
+   "w": 0.09,
+   "h": 1,
+   "d": 0.461,
+   "tris": 96,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.kenney-retro-urban-kit.tree_park_large": {
+   "w": 0.712,
+   "h": 1,
+   "d": 0.712,
+   "tris": 76,
+   "prims": 3,
+   "mats": 3
+  },
+  "cc0.kenney-retro-urban-kit.wall_a_window": {
+   "w": 1,
+   "h": 1,
+   "d": 1,
+   "tris": 36,
+   "prims": 4,
+   "mats": 4
+  },
+  "cc0.quaternius-cyberpunkgamekit.antenna_1": {
+   "w": 0.243,
+   "h": 1,
+   "d": 0.038,
+   "tris": 88,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-cyberpunkgamekit.antenna_2": {
+   "w": 0.845,
+   "h": 1,
+   "d": 0.899,
+   "tris": 412,
+   "prims": 3,
+   "mats": 3
+  },
+  "cc0.quaternius-cyberpunkgamekit.cable_long": {
+   "w": 0.115,
+   "h": 1,
+   "d": 0.053,
+   "tris": 768,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-cyberpunkgamekit.computer": {
+   "w": 0.466,
+   "h": 1,
+   "d": 0.624,
+   "tris": 1008,
+   "prims": 4,
+   "mats": 4
+  },
+  "cc0.quaternius-cyberpunkgamekit.computer_large": {
+   "w": 0.543,
+   "h": 1,
+   "d": 0.29,
+   "tris": 2356,
+   "prims": 7,
+   "mats": 7
+  },
+  "cc0.quaternius-cyberpunkgamekit.door": {
+   "w": 0.593,
+   "h": 1,
+   "d": 0.088,
+   "tris": 324,
+   "prims": 4,
+   "mats": 4
+  },
+  "cc0.quaternius-cyberpunkgamekit.lever": {
+   "w": 0.601,
+   "h": 0.673,
+   "d": 1,
+   "tris": 328,
+   "prims": 5,
+   "mats": 3
+  },
+  "cc0.quaternius-cyberpunkgamekit.light_square": {
+   "w": 0.549,
+   "h": 1,
+   "d": 0.549,
+   "tris": 148,
+   "prims": 3,
+   "mats": 3
+  },
+  "cc0.quaternius-junkfood.cake": {
+   "w": 1,
+   "h": 0.723,
+   "d": 0.99,
+   "tris": 1538,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-junkfood.cupcake": {
+   "w": 0.647,
+   "h": 1,
+   "d": 0.635,
+   "tris": 177,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-junkfood.donut": {
+   "w": 0.995,
+   "h": 0.333,
+   "d": 1,
+   "tris": 360,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-junkfood.hotdog": {
+   "w": 0.298,
+   "h": 0.246,
+   "d": 1,
+   "tris": 1064,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-junkfood.icecream": {
+   "w": 0.467,
+   "h": 1,
+   "d": 0.455,
+   "tris": 182,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-junkfood.milkshake": {
+   "w": 0.378,
+   "h": 1,
+   "d": 0.411,
+   "tris": 838,
+   "prims": 2,
+   "mats": 2
+  },
+  "cc0.quaternius-junkfood.pizza": {
+   "w": 0.707,
+   "h": 0.098,
+   "d": 1,
+   "tris": 16,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-junkfood.soda_can": {
+   "w": 0.622,
+   "h": 1,
+   "d": 0.616,
+   "tris": 434,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.decoration_bamboo": {
+   "w": 0.343,
+   "h": 1,
+   "d": 0.333,
+   "tris": 946,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.decoration_light": {
+   "w": 0.659,
+   "h": 1,
+   "d": 0.648,
+   "tris": 304,
+   "prims": 2,
+   "mats": 2
+  },
+  "cc0.quaternius-sushirestaurantkit.decoration_plant1": {
+   "w": 1,
+   "h": 0.769,
+   "d": 1,
+   "tris": 735,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.decoration_sakura_tree": {
+   "w": 1,
+   "h": 0.717,
+   "d": 0.477,
+   "tris": 6242,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.decoration_wall_light": {
+   "w": 0.425,
+   "h": 1,
+   "d": 0.636,
+   "tris": 782,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.environment_arch": {
+   "w": 0.816,
+   "h": 1,
+   "d": 0.076,
+   "tris": 148,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.environment_bowl": {
+   "w": 0.985,
+   "h": 0.458,
+   "d": 1,
+   "tris": 432,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.environment_can_fridge": {
+   "w": 0.538,
+   "h": 1,
+   "d": 0.313,
+   "tris": 3004,
+   "prims": 3,
+   "mats": 2
+  },
+  "cc0.quaternius-sushirestaurantkit.environment_chukaman_steamer": {
+   "w": 1,
+   "h": 0.555,
+   "d": 0.988,
+   "tris": 6610,
+   "prims": 2,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.environment_counter_straight": {
+   "w": 1,
+   "h": 0.481,
+   "d": 0.441,
+   "tris": 464,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.environment_cutting_table": {
+   "w": 1,
+   "h": 0.072,
+   "d": 0.807,
+   "tris": 448,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.environment_oven": {
+   "w": 0.961,
+   "h": 1,
+   "d": 0.879,
+   "tris": 2096,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.environment_pan": {
+   "w": 0.606,
+   "h": 0.118,
+   "d": 1,
+   "tris": 396,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.environment_plate": {
+   "w": 0.985,
+   "h": 0.146,
+   "d": 1,
+   "tris": 360,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.environment_pot_1_filled": {
+   "w": 1,
+   "h": 0.462,
+   "d": 0.79,
+   "tris": 644,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.environment_stool": {
+   "w": 1,
+   "h": 0.768,
+   "d": 1,
+   "tris": 308,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.environment_table": {
+   "w": 1,
+   "h": 0.712,
+   "d": 0.97,
+   "tris": 364,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_chukaman": {
+   "w": 1,
+   "h": 0.976,
+   "d": 1,
+   "tris": 864,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_dango": {
+   "w": 1,
+   "h": 0.484,
+   "d": 0.575,
+   "tris": 1956,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_ebi_nigiri": {
+   "w": 0.442,
+   "h": 0.391,
+   "d": 1,
+   "tris": 704,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_gyoza": {
+   "w": 0.539,
+   "h": 0.47,
+   "d": 1,
+   "tris": 832,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_ingredient_nori": {
+   "w": 1,
+   "h": 0.035,
+   "d": 1,
+   "tris": 60,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_ingredient_rice": {
+   "w": 1,
+   "h": 0.412,
+   "d": 1,
+   "tris": 320,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_ingredient_salmon": {
+   "w": 0.769,
+   "h": 0.325,
+   "d": 1,
+   "tris": 896,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_maguro_nigiri": {
+   "w": 0.576,
+   "h": 0.487,
+   "d": 1,
+   "tris": 256,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_onigiri": {
+   "w": 1,
+   "h": 0.815,
+   "d": 0.354,
+   "tris": 464,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_ramen": {
+   "w": 0.947,
+   "h": 0.556,
+   "d": 1,
+   "tris": 5586,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_roll": {
+   "w": 1,
+   "h": 1,
+   "d": 0.705,
+   "tris": 236,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_salmon_nigiri": {
+   "w": 0.546,
+   "h": 0.482,
+   "d": 1,
+   "tris": 612,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_salmon_roll": {
+   "w": 0.932,
+   "h": 1,
+   "d": 0.577,
+   "tris": 768,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_sea_urchin_roll": {
+   "w": 0.964,
+   "h": 1,
+   "d": 0.988,
+   "tris": 1438,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_tamago_nigiri": {
+   "w": 0.546,
+   "h": 0.406,
+   "d": 1,
+   "tris": 436,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_udon": {
+   "w": 0.974,
+   "h": 0.645,
+   "d": 1,
+   "tris": 4244,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.quaternius-sushirestaurantkit.food_wasabi": {
+   "w": 0.993,
+   "h": 1,
+   "d": 0.986,
+   "tris": 256,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.the-base-mesh.acoustic_guitar": {
+   "w": 0.383,
+   "h": 1,
+   "d": 0.115,
+   "tris": 10420,
+   "prims": 13,
+   "mats": 1
+  },
+  "cc0.the-base-mesh.computer_headphones_01": {
+   "w": 1,
+   "h": 0.832,
+   "d": 0.322,
+   "tris": 3192,
+   "prims": 1,
+   "mats": 0
+  },
+  "cc0.the-base-mesh.computer_speaker": {
+   "w": 0.39,
+   "h": 1,
+   "d": 0.366,
+   "tris": 2084,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.the-base-mesh.drum_stick": {
+   "w": 1,
+   "h": 0.039,
+   "d": 0.039,
+   "tris": 352,
+   "prims": 1,
+   "mats": 1
+  },
+  "cc0.the-base-mesh.guitar_stand": {
+   "w": 0.763,
+   "h": 1,
+   "d": 0.787,
+   "tris": 2489,
+   "prims": 4,
+   "mats": 1
+  },
+  "cc0.the-base-mesh.guitar_wall_hanger_01": {
+   "w": 0.626,
+   "h": 0.749,
+   "d": 1,
+   "tris": 1040,
+   "prims": 1,
+   "mats": 0
+  },
+  "cc0.the-base-mesh.guitar_wall_hanger_02": {
+   "w": 0.586,
+   "h": 0.818,
+   "d": 1,
+   "tris": 812,
+   "prims": 1,
+   "mats": 0
+  },
+  "cc0.the-base-mesh.pan_flute": {
+   "w": 0.855,
+   "h": 1,
+   "d": 0.121,
+   "tris": 1556,
+   "prims": 1,
+   "mats": 0
+  },
+  "cc0.the-base-mesh.piano": {
+   "w": 1,
+   "h": 0.632,
+   "d": 0.342,
+   "tris": 5734,
+   "prims": 95,
+   "mats": 1
+  },
+  "cc0.the-base-mesh.violin_bow": {
+   "w": 0.026,
+   "h": 0.06,
+   "d": 1,
+   "tris": 1424,
+   "prims": 1,
+   "mats": 1
+  }
+ }
+}

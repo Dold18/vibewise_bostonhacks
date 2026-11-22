@@ -6,6 +6,7 @@
  * Any other value is supported only if the profile lists it. Unsupported
  * requests are dropped from the scene and reported in `SceneState.disabled`.
  */
+import { ATMOSPHERE_VALUES } from '../atmosphere/fromScene';
 import type { SceneCatalog, SceneKey } from './catalog';
 import {
   CONTRAST, FOG_COLORS, HIGHLIGHT_TINT, HORIZON_BLEND, HUE_BIAS, LABEL_SYSTEMS, LIGHT_INTENSITY,
@@ -71,12 +72,32 @@ export const SCENE_ADAPTER_V1: CapabilityProfile = profile('scene-adapter-v1', {
 });
 
 /**
- * What the live map renders today (vibeTheme controller `setScene`): V1 plus
- * the always-on two-tone pin ring. Use this for the real map session.
+ * The Phase 3 baseline (vibeTheme controller `setScene`): V1 plus
+ * the always-on two-tone pin ring. The live asset profile is assetCapabilities()
+ * in runtime.ts; this baseline stays available for adapter and compiler tests.
  */
 export const MAP_RENDERER_V1: CapabilityProfile = Object.freeze({
   id: 'map-renderer-v1',
   values: SCENE_ADAPTER_V1.values,
+  features: new Set<SceneFeature>(['pin_contrast_ring']),
+});
+
+/**
+ * V1 plus the atmosphere renderer (features/atmosphere): every catalog value
+ * it realizes as world-space fog/precipitation/particles or as the screen
+ * grade below routes and labels. Values it does not draw (lens glare,
+ * chromatic aberration, distortion, ink edges, frames, starfield, clouds…)
+ * stay disabled.
+ */
+export const MAP_RENDERER_V2: CapabilityProfile = Object.freeze({
+  id: 'map-renderer-v2',
+  values: new Map<SceneKey, ReadonlySet<string>>([
+    ...MAP_RENDERER_V1.values,
+    ...Object.entries(ATMOSPHERE_VALUES).map(([key, values]): [SceneKey, ReadonlySet<string>] => [
+      key,
+      new Set([...(MAP_RENDERER_V1.values.get(key) ?? []), ...values]),
+    ]),
+  ]),
   features: new Set<SceneFeature>(['pin_contrast_ring']),
 });
 

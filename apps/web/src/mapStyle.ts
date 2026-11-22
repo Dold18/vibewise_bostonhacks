@@ -111,7 +111,7 @@ const isLine: Filter = ['match', ['geometry-type'], ['LineString', 'MultiLineStr
 const classIn = (...classes: string[]): Filter => ['match', ['get', 'class'], classes, true, false];
 
 /** Road width curve in px, given the width at zoom 10, 14 and 20. */
-const roadWidth = (w10: number, w14: number, w20: number): ExpressionSpecification => [
+export const roadWidth = (w10: number, w14: number, w20: number): ExpressionSpecification => [
   'interpolate',
   ['exponential', 1.4],
   ['zoom'],
@@ -123,12 +123,18 @@ const roadWidth = (w10: number, w14: number, w20: number): ExpressionSpecificati
   w20,
 ];
 
+/** Shared geometry for existing roads and City Changer surface overlays. */
+export const ROAD_WIDTHS = {
+  service: [0, 0.8, 8], minor: [0.3, 2.5, 18], secondary: [0.8, 4, 24],
+  primary: [1.2, 5, 28], motorway: [1.5, 6, 32],
+} as const;
+
 function road(
   id: string,
   classes: string[],
   color: string,
   casing: string,
-  widths: [number, number, number],
+  widths: readonly [number, number, number],
   minzoom = 0,
 ): LayerSpecification[] {
   const filter: Filter = ['all', isLine, notTunnel, classIn(...classes)];
@@ -295,11 +301,11 @@ const buildLayers = (palette: Palette): LayerSpecification[] => [
       'line-width': ['interpolate', ['linear'], ['zoom'], 15, 1, 20, 3],
     },
   },
-  ...road('road-service', ['service', 'track'], palette.roadMinor, palette.roadCasing, [0, 0.8, 8], 14),
-  ...road('road-minor', ['minor'], palette.roadMinor, palette.roadCasing, [0.3, 2.5, 18], 12),
-  ...road('road-secondary', ['secondary', 'tertiary'], palette.roadMajor, palette.roadMajorCasing, [0.8, 4, 24], 9),
-  ...road('road-primary', ['primary', 'trunk'], palette.roadMajor, palette.roadMajorCasing, [1.2, 5, 28], 7),
-  ...road('road-motorway', ['motorway'], palette.highway, palette.highwayCasing, [1.5, 6, 32], 5),
+  ...road('road-service', ['service', 'track'], palette.roadMinor, palette.roadCasing, ROAD_WIDTHS.service, 14),
+  ...road('road-minor', ['minor'], palette.roadMinor, palette.roadCasing, ROAD_WIDTHS.minor, 12),
+  ...road('road-secondary', ['secondary', 'tertiary'], palette.roadMajor, palette.roadMajorCasing, ROAD_WIDTHS.secondary, 9),
+  ...road('road-primary', ['primary', 'trunk'], palette.roadMajor, palette.roadMajorCasing, ROAD_WIDTHS.primary, 7),
+  ...road('road-motorway', ['motorway'], palette.highway, palette.highwayCasing, ROAD_WIDTHS.motorway, 5),
   {
     id: 'rail',
     type: 'line',

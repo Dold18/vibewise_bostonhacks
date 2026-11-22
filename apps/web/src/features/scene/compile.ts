@@ -14,11 +14,12 @@ import { basePalette, type Palette } from '../../mapStyle';
 import type { VibeKey } from '../account/vibes';
 import type { AssetRegistry } from './assets';
 import { VIBE_ACTIVATIONS } from './assets';
+import { activationAllowed } from './placement';
 import { PALETTE_ADAPTER_V0, supports, type CapabilityProfile } from './capabilities';
 import { SCENE_CATALOG, type SceneCatalog, type SceneKey } from './catalog';
 import { performanceBudget, RULES, winner, type RuleEnv, type Slot, type Work } from './constraints';
 import { guardPalette } from './guard';
-import { sanitizeIntent, SCENE_SCHEMA_VERSION, type Diagnostic, type SceneIntent, type WeightedPreset } from './intent';
+import { sanitizeIntent, SCENE_SCHEMA_VERSION, type Diagnostic, type IntentTrust, type SceneIntent, type WeightedPreset } from './intent';
 import { presetsFromDescriptors, presetsFromVibeTags } from './lexicon';
 import { choiceOf, PRESETS, PRESET_IDS } from './presets';
 import {
@@ -36,6 +37,8 @@ export const SET_PIECE_MIN_WEIGHT = 0.35;
 export interface CompileInput {
   /** Current-outing SceneIntent from the model or the local fallback (untrusted). */
   readonly outing?: unknown;
+  /** Who wrote `outing`, as asserted by the calling code. Default `model`. */
+  readonly outingTrust?: IntentTrust;
   /** Saved account taste, as vibeTheme's ThemeTarget. Used only without an outing scene. */
   readonly account?: { readonly tags: Partial<Record<VibeKey, number>>; readonly strength: number } | null;
   readonly capabilities?: CapabilityProfile;
@@ -103,7 +106,7 @@ export function compileScene(input: CompileInput = {}): SceneState {
   const diagnostics: Diagnostic[] = [];
   const note = (code: string, detail: string) => diagnostics.push({ code, detail });
 
-  const { intent, diagnostics: intentNotes } = sanitizeIntent(input.outing, catalog);
+  const { intent, diagnostics: intentNotes } = sanitizeIntent(input.outing, catalog, input.outingTrust ?? 'model');
   diagnostics.push(...intentNotes);
   const { source, presets, overrides, sessionVersion } = pickSource(intent, input.account);
 
@@ -163,6 +166,7 @@ export function compileScene(input: CompileInput = {}): SceneState {
 
   const state: Omit<SceneState, 'hash'> = {
     schemaVersion: SCENE_SCHEMA_VERSION,
+    context,
     catalogVersion: catalog.schemaVersion,
     compilerVersion: COMPILER_VERSION,
     capabilityProfile: capabilities.id,
@@ -204,8 +208,12 @@ function chooseSetPiece(
 ): SetPiece | null {
   const ordered = [...presets].sort((a, b) => b.weight - a.weight || PRESET_IDS.indexOf(a.id) - PRESET_IDS.indexOf(b.id));
   const lead = ordered.find((p) => p.weight >= SET_PIECE_MIN_WEIGHT && PRESETS[p.id].setPieces?.length);
-  if (!lead) return null;
-  for (const layoutId of PRESETS[lead.id].setPieces!) {
+  if (context.installationsEnabled === false) return null;
+  const requested = context.previewLayout;
+  if (!lead && !requested) return null;
+  // Live renderer: no installation on the first answers. Preview selection still follows progression.
+  if (capabilities.id.startsWith('map-assets') && (context.discoveryProgress ?? lead?.weight ?? 0) < 0.7) return null;
+  for (const layoutId of requested ? [requested] : PRESETS[lead!.id].setPieces!) {
     const layout = assets?.layouts.get(layoutId);
     if (!assets) {
       note('set_piece', `${layoutId}: no asset registry loaded`);
@@ -215,7 +223,7 @@ function chooseSetPiece(
       note('set_piece', `${layoutId}: not a verified layout`);
       continue;
     }
-    if (!VIBE_ACTIVATIONS.has(layout.activation)) {
+    if (requested ? !activationAllowed(layout, context.explicitSelection === true, context.observanceOptIn === true) : !VIBE_ACTIVATIONS.has(layout.activation)) {
       note('set_piece', `${layoutId}: activation ${layout.activation} needs verified context`);
       continue;
     }

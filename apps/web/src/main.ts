@@ -15,6 +15,14 @@ import { CAMERA_KEYS, cameraStep, isTypingTarget } from './keyboardCamera';
 import { cullOrder, cullOverlapping, cullsAtZoom, type PinBox } from './pinCulling';
 import { mountAccount } from './features/account';
 import { mountScene, sceneDevHook } from './features/scene';
+import { runtimeAssets } from './features/scene/registry';
+import { assetCapabilities, mountAssetRuntime } from './features/scene/runtime';
+import type { SceneState } from './features/scene/state';
+import { cityPlanner, cityRenderers, createCityEngine, residualState } from './features/city';
+import { createCityComposer } from './features/city/composer';
+import { runtimeManifests } from './features/scene/registry';
+import { detectQuality, readDevice } from './features/atmosphere/quality';
+import { mountStylizedNotice } from './features/city/disclosure';
 import {
   CATEGORIES,
   metersBetween,
@@ -913,15 +921,110 @@ const discovery = mountDiscoveryPanel(document.body, {
 });
 // Account taste and the scene composer retain ownership of map appearance.
 const account = mountAccount(document.body, { map });
+// Scene Composer: the session owns the map's look (account taste until an
+// outing scene exists). Navigation keeps the palette and drops decorations.
+// City engine: one CityPlan per scene, one section per renderer (features/city).
+// The pre-engine asset runtime keeps drawing only keys no city renderer claims.
+const preview3d = import.meta.env.DEV && new URLSearchParams(location.search).get('sceneAssets') === '1';
+const randomSeed = () => crypto.getRandomValues(new Uint32Array(1))[0]!;
+const seedParam = new URLSearchParams(location.search).get('seed');
+const variationSeed = seedParam && /^\d{1,10}$/.test(seedParam) ? Number(seedParam) >>> 0 : randomSeed();
+const assetRuntime = await mountAssetRuntime(map, preview3d);
+// Decorations keep clear of every real destination pin and the active trip's endpoints.
+const decorExclusions = () => {
+  const out: Array<{ lng: number; lat: number }> = shownPlaces.map(p => ({ lng: p.lon, lat: p.lat }));
+  const t = trip.getState();
+  for (const e of [t.from, t.to]) if (e) out.push({ lng: e.location.lng, lat: e.location.lat });
+  return out;
+};
+const renderers = cityRenderers({ preview3d, decorations: true, exclusions: decorExclusions });
+const city = createCityEngine({
+  renderers,
+  planner: cityPlanner(),
+  assets: runtimeAssets,
+  base: assetCapabilities(preview3d),
+  map,
+  overlay: map.getCanvasContainer(),
+  onError: (error, id) => console.error(`[city${id ? `:${id}` : ''}]`, error),
+  onCapabilitiesChange: (profile) => scene.session.setCapabilities(profile),
+});
+// Honest labelling: restyled facades and decorations are imagined; places, streets and routes are real.
+const stylized = mountStylizedNotice(map.getContainer());
+const buildingRenderer = renderers.find(r => r.id === 'buildings') as { stats?(): { appearance: unknown } } | undefined;
+const decorRenderer = renderers.find(r => r.id === 'decorations') as { decor?(): unknown } | undefined;
+const isStylized = (state: SceneState | null) => {
+  const plan = city.plan();
+  if (!state || !plan || plan.mode.navigation !== 'browse') return false;
+  // Decorations only appear for a scene with an aesthetic (the decoration adapter's own gate).
+  const decorated = !!decorRenderer?.decor?.() && Object.values(state.strengths).some(v => v > 0.15);
+  return !!buildingRenderer?.stats?.().appearance || decorated;
+};
 const scene = mountScene({
-  theme: account.theme,
+  assets: runtimeAssets,
+  context: { performance: window.innerWidth < 640 ? 'low' : detectQuality(readDevice()).quality, variationSeed },
+  capabilities: city.capabilities(),
+  // The existing account theme keeps its UI behavior; the city owns map rendering.
+  theme: { setScene(state, timing) {
+    account.theme.setScene(state, timing);
+    const sceneState = state as SceneState | null;
+    city.render(sceneState, timing);
+    stylized.set(isStylized(sceneState));
+    if (sceneState) assetRuntime.render(residualState(sceneState, city.claims()));
+  } },
   account: account.store,
   reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)'),
   onError: (error) => console.error('[scene]', error),
 });
-if (import.meta.env.DEV) Object.assign(window, { vibentaScene: sceneDevHook(scene, map) });
-// One publisher feeds the existing compiler/session and the existing pin system.
-scene.connectProfiles(outingProfiles);
+// The procedural Scene Composer turns the evolving vibe profile into the session's scene:
+// one world seed for composition and every city renderer.
+let worldSeed = variationSeed;
+const composer = createCityComposer({
+  session: scene.session,
+  capabilities: () => city.capabilities(),
+  assets: runtimeAssets,
+  manifests: runtimeManifests,
+  seed: () => worldSeed,
+  onError: (error) => console.error('[composer]', error),
+});
+/** A new procedural world for the same vibe (dev hook; `?seed=` for a reproducible one). */
+const reseedWorld = (seed: number) => {
+  worldSeed = seed >>> 0;
+  scene.session.setContext({ variationSeed: worldSeed });
+  composer.reseed();
+};
+if (import.meta.env.DEV) {
+  const hook = sceneDevHook(scene, map);
+  const byId = Object.fromEntries(renderers.map(r => [r.id, r]));
+  Object.assign(window, {
+    vibentaScene: { ...hook, renderers: assetRuntime.stats, destroyRenderers: assetRuntime.destroy },
+    vibentaCity: {
+      plan: () => city.plan(),
+      stats: () => city.stats(),
+      renderers: byId,
+      seed: () => worldSeed,
+      reseed: (seed?: number) => reseedWorld(seed ?? randomSeed()),
+      /** Compose a world from signals or free text, e.g. `compose('cozy rainy bookstore')` (QA). */
+      compose: (input: string | Parameters<typeof composer.compose>[0], outing?: string) =>
+        composer.compose(typeof input === 'string' ? { text: [input], progression: { answers: 6 } } : input, outing),
+      undo: () => composer.undo(),
+      composer,
+    },
+  });
+}
+// One publisher feeds the composer → existing compiler/session, and the existing pin system.
+const stopComposer = composer.connect(outingProfiles);
+// A page retained in the browser's back/forward cache resumes this same runtime.
+// Destroy only on a real departure; HMR removes the handler separately.
+const releaseCity = (event: PageTransitionEvent) => {
+  if (event.persisted) return;
+  stopComposer();
+  composer.destroy();
+  scene.destroy();
+  city.destroy();
+  assetRuntime.destroy();
+  stylized.destroy();
+};
+window.addEventListener('pagehide', releaseCity);
 const convergence = createConvergence(
   outingProfiles,
   signal => catalogSemanticCandidates(rankPlaces(shownPlaces, discovery.getPreferences()).included.map(row => row.place), signal),
@@ -1057,6 +1160,9 @@ map.on('render', pinLabels.schedule);
 
 // Release the profile consumers before Vite replaces this entry module.
 if (import.meta.hot) import.meta.hot.dispose(() => {
+  window.removeEventListener('pagehide', releaseCity);
+  stopComposer();
+  composer.destroy();
   stopConvergence();
   stopFinalSearch();
   stopFinalPrefs();
@@ -1064,5 +1170,8 @@ if (import.meta.hot) import.meta.hot.dispose(() => {
   convergence.destroy();
   discovery.destroy();
   scene.destroy();
+  city.destroy();
+  assetRuntime.destroy();
+  stylized.destroy();
   account.destroy();
 });

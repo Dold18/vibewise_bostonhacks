@@ -36,7 +36,14 @@ export interface SceneCatalog {
   /** Every setting, in catalog order (this order is part of the output's stability). */
   readonly settings: readonly SceneSetting[];
   readonly byKey: ReadonlyMap<SceneKey, SceneSetting>;
+  /** Overrides accepted from model-written (untrusted) SceneIntents. */
   readonly aiOverrideLimit: number;
+  /**
+   * Overrides accepted when local code submits a composer encoding as `source: 'composer'`
+   * (SceneSession.submit options; never asserted by the payload). Every override is still
+   * validated exactly like a model's. Defaults to `aiOverrideLimit`; never below it.
+   */
+  readonly composerOverrideLimit: number;
   readonly maxWeightedPresets: number;
 }
 
@@ -68,6 +75,8 @@ export function parseCatalog(json: unknown): SceneCatalog {
     return fallback;
   };
   const aiOverrideLimit = limit(policy.aiOverrideLimit, 'aiOverrideLimit', 12);
+  const composerOverrideLimit =
+    policy.composerOverrideLimit === undefined ? aiOverrideLimit : Math.max(aiOverrideLimit, limit(policy.composerOverrideLimit, 'composerOverrideLimit', aiOverrideLimit));
   const maxWeightedPresets = limit(policy.maxWeightedPresets, 'maxWeightedPresets', 3);
 
   const groups: SceneGroup[] = [];
@@ -129,6 +138,7 @@ export function parseCatalog(json: unknown): SceneCatalog {
     settings: Object.freeze(settings),
     byKey,
     aiOverrideLimit,
+    composerOverrideLimit,
     maxWeightedPresets,
   });
 }

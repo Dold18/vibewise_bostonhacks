@@ -50,10 +50,19 @@ const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFi
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 const round3 = (n: number) => Math.round(n * 1000) / 1000;
 
+/**
+ * Who wrote an intent, as asserted by the calling code (never by the payload).
+ * `model`: an untrusted model/fallback intent. `composer`: the local procedural composer,
+ * which may use `composerOverrideLimit`; its overrides are validated identically.
+ */
+export type IntentTrust = 'model' | 'composer';
+
 export function sanitizeIntent(
   raw: unknown,
   catalog: SceneCatalog = SCENE_CATALOG,
+  trust: IntentTrust = 'model',
 ): { intent: SceneIntent | null; diagnostics: Diagnostic[] } {
+  const overrideLimit = trust === 'composer' ? catalog.composerOverrideLimit : catalog.aiOverrideLimit;
   const diagnostics: Diagnostic[] = [];
   const note = (code: string, detail: string) => diagnostics.push({ code, detail });
 
@@ -114,8 +123,8 @@ export function sanitizeIntent(
   const seen = new Set<string>();
   const list = Array.isArray(raw.overrides) ? raw.overrides : [];
   for (const o of list) {
-    if (overrides.length >= catalog.aiOverrideLimit) {
-      note('override_dropped', `more than ${catalog.aiOverrideLimit} overrides`);
+    if (overrides.length >= overrideLimit) {
+      note('override_dropped', `more than ${overrideLimit} overrides`);
       break;
     }
     if (!isObj(o) || typeof o.key !== 'string' || typeof o.value !== 'string') {

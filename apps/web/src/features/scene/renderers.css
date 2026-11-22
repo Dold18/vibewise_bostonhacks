@@ -1,0 +1,16 @@
+.scene-atmosphere { position:absolute; inset:0; pointer-events:none; overflow:hidden; transition:opacity .3s; }
+.scene-atmosphere-cell { position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .8s; mix-blend-mode:normal;
+  mask-image:radial-gradient(ellipse at 62% 48%,#0003 12%,#000 85%); }
+.scene-atmosphere-cell[data-asset="vignette"] { mix-blend-mode:normal; mask-image:none; }
+.scene-atmosphere-cell[data-asset^="glow-"] { mix-blend-mode:normal; }
+.scene-atmosphere-cell[data-asset="fog-gradient"] { mask-image:linear-gradient(transparent 10%,#0008 65%,transparent); mix-blend-mode:normal; }
+.scene-atmosphere-cell[data-asset^="stars-"] { mask-image:linear-gradient(#000,transparent 52%); mix-blend-mode:normal; }
+.scene-atmosphere[data-motion="true"] .scene-atmosphere-cell:is([data-asset="rain-streaks"],[data-asset="snow-particles"],[data-asset="petals"]) { inset:-256px; animation:scene-drift 18s linear infinite; will-change:transform; }
+@keyframes scene-drift { to { transform:translate3d(64px,256px,0); } }
+@media(prefers-reduced-motion:reduce) { .scene-atmosphere-cell { animation:none!important; transition-duration:100ms!important; } }
+.scene-dev { position:absolute; right:12px; top:120px; z-index:5; width:225px; background:#172435ed; color:white; border:1px solid #708ba1; border-radius:10px; padding:10px; font:12px system-ui; }
+.scene-dev label { display:block; margin-top:8px; } .scene-dev select,.scene-dev input[type=range] { width:100%; } .scene-dev summary { cursor:pointer; }
+
+.scene-atmosphere[data-camera="moving"] .scene-atmosphere-cell { animation-play-state:paused!important; }
+
+.scene-dev button { color:#122234; background:#e8f2ff; border:1px solid #8fa8c4; border-radius:4px; padding:6px 8px; margin-top:8px; cursor:pointer; }

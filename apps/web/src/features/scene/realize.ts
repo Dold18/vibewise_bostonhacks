@@ -179,6 +179,6 @@ export function realizeMotion(work: Work, catalog: SceneCatalog, reducedMotion: 
   return {
     // Reduced motion keeps a near-instant fade: colors still change, nothing travels.
     transitionMs: reducedMotion ? Math.min(150, TRANSITION_MS[transition] ?? 800) : TRANSITION_MS[transition] ?? 800,
-    ambient: !reducedMotion && !navigating && pace !== null,
+    ambient: !reducedMotion && !navigating && (pace !== null || ['air_and_atmosphere.rain', 'air_and_atmosphere.snow', 'air_and_atmosphere.petals'].some(key => winner(work, key, catalog) !== null)),
   };
 }
