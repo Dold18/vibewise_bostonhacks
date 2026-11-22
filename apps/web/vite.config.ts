@@ -29,6 +29,10 @@ function maplibreWorker(): Plugin {
 
 export default defineConfig({
   plugins: [maplibreWorker()],
+  // Only the app entry belongs in Vite's dependency pre-scan. Standalone
+  // scene-asset QA galleries under public/ use browser import maps and CDN
+  // Three.js; Vite must not attempt to resolve their bare imports locally.
+  optimizeDeps: { entries: ['index.html'] },
   // The transit API runs in server/index.ts; the browser only ever talks to Vite's origin.
   server: { proxy: { '/api': `http://127.0.0.1:${process.env.TRANSIT_API_PORT ?? 8787}` } },
 });
