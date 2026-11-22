@@ -103,3 +103,13 @@ describe('lexicon', () => {
     expect(presetsFromVibeTags({ cozy: 1 }, 0)).toEqual([]);
   });
 });
+
+describe('PRESETS.md', () => {
+  it('its capability table matches the code', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { renderPresetTable } = await import('../report');
+    const doc = readFileSync(new URL('../PRESETS.md', import.meta.url), 'utf8');
+    const table = doc.split('<!-- preset-table:start -->\n')[1]?.split('\n<!-- preset-table:end -->')[0];
+    expect(table).toBe(renderPresetTable());
+  });
+});

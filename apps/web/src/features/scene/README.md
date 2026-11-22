@@ -1,6 +1,6 @@
-# Scene Composer: compiler (phase 1)
+# Scene Composer: compiler (phase 1) and session (phase 2)
 
-**Status:** pure library, tested, **not wired to the map**. Nothing here touches MapLibre, the DOM or the network. Design: [docs/SCENE_COMPOSER_DESIGN.md](../../../../../docs/SCENE_COMPOSER_DESIGN.md) (PR #32). Assets: `public/scene-assets` (PR #33).
+**Status:** pure library, tested, **not wired to the map**. Nothing here touches MapLibre, the DOM, Gemini or the network. Presets and their capabilities: [PRESETS.md](PRESETS.md). Design: [docs/SCENE_COMPOSER_DESIGN.md](../../../../../docs/SCENE_COMPOSER_DESIGN.md) (PR #32). Assets: `public/scene-assets` (PR #33).
 
 ```ts
 import { compileScene, buildAssetRegistry } from './features/scene';
@@ -14,6 +14,26 @@ const scene = compileScene({
 scene.palette;   // a full mapStyle `Palette`, contrast-guarded → vibeTheme applyPalette()
 scene.hash;      // equal hash ⇒ nothing to re-render
 ```
+
+### Session (phase 2)
+
+```ts
+import { createSceneSession, connectProfiles } from './features/scene';
+
+const session = createSceneSession({ capabilities, assets, account, context });
+const stop = connectProfiles(session, outingProfiles);   // adaptive vibe engine publisher
+session.subscribe(({ state, diff, transitionMs, reason }) => {/* renderer applies `diff` */});
+session.setContext({ navigation: 'route' });            // when a route is drawn
+```
+
+- **Stale rejection:** older versions, retired sessions, and intents produced for a different version are refused.
+- **Cache and restoration:** looks are cached by a stable content hash (intent without its version, account, context). Undoing an answer, or ending navigation, restores exactly the scene shown before.
+- **Hysteresis:** the scene on screen is fed back as `previous`. Discrete values get an enter/exit band and a challenger margin, and the guard keeps its pin edge and labels while they still pass. A neutral scene is always exactly the plain map.
+- **Updates only on change:** the render hash excludes `sessionVersion` and diagnostics. Same input sequence ⇒ same update sequence.
+- **Profile adapter:** a valid model `sceneIntent` on a profile is used; otherwise (or if it is invalid or stale) a deterministic fallback built from what the user *wants*, with presence growing per answer.
+
+### Navigation policy (ratified)
+While a route or focused destination is shown, the scene **keeps its palette** and a safe version of its lighting (`dim` light becomes `subtle`). All atmosphere and cinematic overlays are removed except a soft edge vignette (≤ 0.35), ambient motion and pin pulses stop, and decorations and 3D set pieces are hidden. Navigation never turns the theme off.
 
 ## Pipeline
 
@@ -37,12 +57,16 @@ scene.hash;      // equal hash ⇒ nothing to re-render
 | `constraints.ts` | Ordered conflict and safety rules |
 | `realize.ts`, `guard.ts`, `color.ts` | Realization, contrast guard, OKLab math |
 | `assets.ts` | Verified asset IDs from PR #33 manifests |
-| `compile.ts`, `state.ts` | `compileScene`, `SceneState`, hashing, `diffScene` |
+| `compile.ts`, `state.ts` | `compileScene`, `SceneState`, render hash, `diffScene` |
+| `session.ts` | Scene Session: staleness, cache/restore, hysteresis, updates |
+| `profiles.ts` | Adapter from the vibe engine's profile stream (structural types, no import) |
+| `report.ts`, `PRESETS.md` | Preset capability report and identities |
 
 ## Extending
 
 - **New look for a value:** add a swatch in `swatches.ts`. Tests require it to be a real catalog value and never a default.
 - **New preset:** add catalog values to `presets.ts` (and, pending ratification, to `PRESET_IDS`). Tests validate every entry.
 - **New renderer feature:** add its keys to a capability profile only once the renderer really draws them.
+- **Pin contrast ring:** `withFeatures(profile, 'pin_contrast_ring')` previews the proposed two-tone pin outline; with it, light-to-dark transitions are continuous (see `hysteresis.test.ts`).
 
 `npx vitest run src/features/scene`

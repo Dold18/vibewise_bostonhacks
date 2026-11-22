@@ -87,3 +87,20 @@ export function presetsFromVibeTags(tags: Partial<Record<VibeKey, number>>, stre
   const top = Math.max(0, ...Object.values(tags).filter((v): v is number => Number.isFinite(v)).map((v) => Math.min(1, v)));
   return topPresets(pulls, (Number.isFinite(strength) ? Math.min(1, Math.max(0, strength)) : 0) * top);
 }
+
+const NEGATORS = new Set(['not', 'no', 'without', 'avoid', 'never', 'nothing', 'less', 'non']);
+
+/**
+ * Words in free text that the lexicon understands, in order, deduplicated.
+ * A word within two words after a negator ("not too neon") is skipped.
+ */
+export function sceneWords(text: string): string[] {
+  const tokens = text.toLowerCase().replace(/[’']/g, '').split(/[^a-z_]+/).filter(Boolean);
+  const out: string[] = [];
+  tokens.forEach((word, i) => {
+    if (out.includes(word)) return;
+    if (tokens.slice(Math.max(0, i - 2), i).some((t) => NEGATORS.has(t))) return;
+    if (VIBE_KEYS.has(word) || WORDS.some(([stem]) => stem.test(word))) out.push(word);
+  });
+  return out;
+}
