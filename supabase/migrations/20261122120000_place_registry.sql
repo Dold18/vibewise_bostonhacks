@@ -261,7 +261,11 @@ create policy "landmarks are readable by everyone" on public.landmarks
 create policy "entertainment is readable by everyone" on public.entertainment
   for select to anon, authenticated using (true);
 
-grant select on public.museums, public.parks, public.landmarks, public.entertainment to anon, authenticated;
+-- Client roles get SELECT only (P-013/P-015 pattern): drop Supabase's default table grants first.
+revoke all on public.places, public.museums, public.parks, public.landmarks, public.entertainment
+  from anon, authenticated;
+grant select on public.places, public.museums, public.parks, public.landmarks, public.entertainment
+  to anon, authenticated;
 
 -- 5.5 Views. place_points replaces restaurant_points.
 drop view public.restaurant_points;
@@ -322,4 +326,4 @@ revoke all on public.place_points from anon, authenticated;
 grant select on public.place_points to service_role;
 
 revoke all on public.catalog_places from anon, authenticated;
-grant select on public.catalog_places, public.places to anon, authenticated;
+grant select on public.catalog_places to anon, authenticated;
