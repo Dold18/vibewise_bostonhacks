@@ -4,12 +4,13 @@ import { connect } from './db.ts';
 import {
   deletePhotoRow, fetchPhotosToStore, recordStored, recordStoreError, storedBytesTotal, uploadCopy, type PhotoToStore,
 } from './media/db.ts';
+import { parseTypeOption, type PlaceType } from './placeTypes.ts';
 import { createPoliteFetcher, type BytesResult } from './media/http.ts';
 import { processImage, storagePathFor } from './media/photoStore.ts';
 
 const MB = 1_000_000;
 
-export interface PhotoArgs { dryRun: boolean; limit: number | null; concurrency: number; maxMb: number }
+export interface PhotoArgs { type: PlaceType; dryRun: boolean; limit: number | null; concurrency: number; maxMb: number }
 
 export interface StoreContext {
   download: (url: string) => Promise<BytesResult>;
@@ -39,6 +40,7 @@ export function parsePhotoArgs(argv: string[]): PhotoArgs {
   const { values } = parseArgs({
     args: argv,
     options: {
+      type: { type: 'string' },
       'dry-run': { type: 'boolean', default: false },
       limit: { type: 'string' },
       concurrency: { type: 'string' },
@@ -47,6 +49,7 @@ export function parsePhotoArgs(argv: string[]): PhotoArgs {
     strict: true,
   });
   return {
+    type: parseTypeOption(values.type),
     dryRun: values['dry-run'],
     limit: positiveInt('limit', values.limit, null),
     concurrency: positiveInt('concurrency', values.concurrency, 8)!,
@@ -69,7 +72,7 @@ export async function storeOne(photo: PhotoToStore, ctx: StoreContext): Promise<
     return { kind: 'rejected', reason: img.reason };
   }
   if (ctx.dryRun) return { kind: 'stored', bytes: img.webp.byteLength };
-  const objectPath = storagePathFor(photo.restaurantId, photo.url);
+  const objectPath = storagePathFor(photo.placeRef, photo.url);
   try {
     await ctx.upload(objectPath, img.webp);
   } catch (err) {
@@ -139,7 +142,7 @@ async function main(): Promise<void> {
   const client = connect(requireEnv('SUPABASE_URL'), requireEnv('SUPABASE_SECRET_KEY'));
   const http = createPoliteFetcher({ minIntervalMs: 200 });
   const usedBytes = await storedBytesTotal(client);
-  const photos = await fetchPhotosToStore(client, { limit: args.limit });
+  const photos = await fetchPhotosToStore(client, { limit: args.limit, type: args.type });
   console.log(`${photos.length} photos to store; ${(usedBytes / MB).toFixed(1)} MB already stored; budget ${args.maxMb} MB${args.dryRun ? ' (dry run)' : ''}`);
 
   const ctx: StoreContext = {

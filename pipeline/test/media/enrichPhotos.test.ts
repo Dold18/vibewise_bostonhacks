@@ -6,7 +6,7 @@ import type { BytesResult } from '../../src/media/http.ts';
 import { storagePathFor } from '../../src/media/photoStore.ts';
 import type { PhotoToStore } from '../../src/media/db.ts';
 
-const PHOTO: PhotoToStore = { id: 5, restaurantId: 7, url: 'https://img.test/a.jpg' };
+const PHOTO: PhotoToStore = { id: 5, placeRef: 7, url: 'https://img.test/a.jpg' };
 
 async function jpeg(width: number, height: number): Promise<Uint8Array> {
   return new Uint8Array(await sharp({ create: { width, height, channels: 3, background: '#c86428' } }).jpeg().toBuffer());
@@ -28,10 +28,15 @@ function ctx(download: (url: string) => Promise<BytesResult>, over: Partial<Stor
 }
 const okBytes = async (b: Uint8Array): Promise<BytesResult> => ({ ok: true, bytes: b, contentType: 'image/jpeg' });
 
+test('parsePhotoArgs requires --type', () => {
+  assert.equal(parsePhotoArgs(['--type', 'parks']).type, 'parks');
+  assert.throws(() => parsePhotoArgs([]), /missing --type/);
+});
+
 test('parsePhotoArgs defaults and flags', () => {
-  assert.deepEqual(parsePhotoArgs([]), { dryRun: false, limit: null, concurrency: 8, maxMb: 800 });
-  assert.deepEqual(parsePhotoArgs(['--dry-run', '--limit', '30', '--concurrency', '4', '--max-mb', '100']), { dryRun: true, limit: 30, concurrency: 4, maxMb: 100 });
-  assert.throws(() => parsePhotoArgs(['--max-mb', '0']), /max-mb/);
+  assert.deepEqual(parsePhotoArgs(['--type', 'restaurants']), { type: 'restaurants', dryRun: false, limit: null, concurrency: 8, maxMb: 800 });
+  assert.deepEqual(parsePhotoArgs(['--type', 'restaurants', '--dry-run', '--limit', '30', '--concurrency', '4', '--max-mb', '100']), { type: 'restaurants', dryRun: true, limit: 30, concurrency: 4, maxMb: 100 });
+  assert.throws(() => parsePhotoArgs(['--type', 'restaurants', '--max-mb', '0']), /max-mb/);
 });
 
 test('a good image is uploaded at its storage path and then recorded', async () => {

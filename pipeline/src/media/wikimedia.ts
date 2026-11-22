@@ -35,19 +35,19 @@ const LOCALITY = new Set([
 ]);
 
 /** A token that can identify a place: 3+ letters, not a number, not a generic food word or an area word. */
-function isSpecificToken(t: string): boolean {
-  return !GENERIC.has(t) && !LOCALITY.has(t) && (t.match(/\p{L}/gu)?.length ?? 0) >= 3;
+function isSpecificToken(t: string, extraGeneric: ReadonlySet<string>): boolean {
+  return !GENERIC.has(t) && !extraGeneric.has(t) && !LOCALITY.has(t) && (t.match(/\p{L}/gu)?.length ?? 0) >= 3;
 }
 
-export function isDistinctiveName(name: string): boolean {
+export function isDistinctiveName(name: string, extraGeneric: ReadonlySet<string> = new Set()): boolean {
   const tokens = nameKey(name).split(' ').filter(Boolean);
-  const specific = tokens.filter(isSpecificToken);
+  const specific = tokens.filter((t) => isSpecificToken(t, extraGeneric));
   if (specific.length === 0) return false;
   return tokens.length >= 2 || specific.some((t) => t.length >= 5);
 }
 
-export function nameMatches(haystack: string, name: string): boolean {
-  if (!isDistinctiveName(name)) return false;
+export function nameMatches(haystack: string, name: string, extraGeneric: ReadonlySet<string> = new Set()): boolean {
+  if (!isDistinctiveName(name, extraGeneric)) return false;
   const hay = haystack.replace(/^(File|Category):/i, '').replace(/\.[a-z0-9]{2,5}$/i, '');
   const hayTokens = new Set(nameKey(hay).split(' '));
   const nameTokens = nameKey(name).split(' ').filter(Boolean);
@@ -156,8 +156,10 @@ export async function linkedPhotos(
   return { photos, wikidata };
 }
 
-export async function geosearchPhotos(place: EnrichPlace, http: PoliteFetcher): Promise<PhotoCandidate[]> {
-  if (!isDistinctiveName(place.name)) return [];
+export async function geosearchPhotos(
+  place: EnrichPlace, http: PoliteFetcher, extraGeneric: ReadonlySet<string> = new Set(),
+): Promise<PhotoCandidate[]> {
+  if (!isDistinctiveName(place.name, extraGeneric)) return [];
   const res = await http.getJson<{ query?: { geosearch?: Array<{ title: string }> } }>(apiUrl(COMMONS_API, {
     action: 'query', list: 'geosearch', gscoord: `${place.lat}|${place.lng}`, gsradius: String(GEOSEARCH_RADIUS_M),
     gsnamespace: '6', gslimit: '50',
@@ -167,7 +169,7 @@ export async function geosearchPhotos(place: EnrichPlace, http: PoliteFetcher): 
   const files = await commonsFiles(titles, http);
   const photos: PhotoCandidate[] = [];
   for (const [title, f] of files) {
-    if (nameMatches(title, place.name) || f.categories.some((c) => nameMatches(c, place.name))) {
+    if (nameMatches(title, place.name, extraGeneric) || f.categories.some((c) => nameMatches(c, place.name, extraGeneric))) {
       photos.push(toCandidate(f, 'commons', 'name_match'));
     }
   }
