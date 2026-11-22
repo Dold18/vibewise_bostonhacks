@@ -26,6 +26,7 @@ function parseWindows(raw: unknown): DealWindow[] | string {
     const start = minutes(o.start), end = minutes(o.end);
     if (start === null || end === null) return `schedule[${i}] start/end must be "HH:MM" (end may be "24:00")`;
     if (start === 24 * 60) return `schedule[${i}].start cannot be "24:00"`;
+    if (start === end) return `schedule[${i}] start and end must differ`;
     out.push({ days: days as number[], start: o.start as string, end: o.end as string });
   }
   return out;
@@ -39,18 +40,23 @@ function bostonOffset(y: number, m: number, d: number): string {
   return name.replace('GMT', '');
 }
 
-function noonBoston(checkedOn: unknown): string | null {
+function bostonToday(now: Date): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(now); // YYYY-MM-DD
+}
+
+function noonBoston(checkedOn: unknown, now: Date): string | null {
   if (typeof checkedOn !== 'string') return null;
   const m = DATE.exec(checkedOn);
   if (!m) return null;
   const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
   const check = new Date(Date.UTC(y, mo - 1, d));
   if (check.getUTCFullYear() !== y || check.getUTCMonth() !== mo - 1 || check.getUTCDate() !== d) return null;
+  if (checkedOn > bostonToday(now)) return null; // a future date would keep a row fresh indefinitely
   return `${checkedOn}T12:00:00${bostonOffset(y, mo, d)}`;
 }
 
 /** Validate deals.curated.json against the place_deals table rules; bad entries are reported and skipped. */
-export function validateCurated(raw: unknown, placeIds: Map<string, number>): { rows: CuratedRow[]; errors: string[] } {
+export function validateCurated(raw: unknown, placeIds: Map<string, number>, now: Date = new Date()): { rows: CuratedRow[]; errors: string[] } {
   const rows: CuratedRow[] = [];
   const errors: string[] = [];
   if (!Array.isArray(raw)) return { rows, errors: ['curated file must be a JSON array'] };
@@ -66,8 +72,8 @@ export function validateCurated(raw: unknown, placeIds: Map<string, number>): { 
     if (typeof e.title !== 'string' || e.title.trim() === '') { fail('title is required'); continue; }
     if (e.title.length > 120) { fail('title is longer than 120 characters'); continue; }
     if (typeof e.source_url !== 'string' || e.source_url.trim() === '') { fail('source_url is required'); continue; }
-    const checkedAt = noonBoston(e.checked_on);
-    if (checkedAt === null) { fail('checked_on must be a valid YYYY-MM-DD date'); continue; }
+    const checkedAt = noonBoston(e.checked_on, now);
+    if (checkedAt === null) { fail('checked_on must be a valid YYYY-MM-DD date, not in the future'); continue; }
     if (e.timing !== undefined && e.timing !== 'unconfirmed') { fail('timing may only be "unconfirmed" when set'); continue; }
 
     let schedule: DealWindow[] | null = null;

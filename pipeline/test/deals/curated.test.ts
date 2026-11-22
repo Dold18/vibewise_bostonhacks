@@ -80,3 +80,20 @@ test('committed deals.curated.json is empty', () => {
   const raw = JSON.parse(readFileSync(new URL('../../deals.curated.json', import.meta.url), 'utf8'));
   assert.deepEqual(raw, []);
 });
+
+test('F5: a window whose start equals its end is rejected; 00:00-24:00 is accepted', () => {
+  const bad = validateCurated([{ ...base, kind: 'special', schedule: [{ days: [1], start: '16:00', end: '16:00' }] }], ids);
+  assert.equal(bad.rows.length, 0);
+  assert.equal(bad.errors.length, 1);
+  const ok = validateCurated([{ ...base, kind: 'special', schedule: [{ days: [1], start: '00:00', end: '24:00' }] }], ids);
+  assert.deepEqual(ok.errors, []);
+});
+
+test('F11: a checked_on after today (Boston) is rejected', () => {
+  const now = new Date('2026-11-21T17:00:00Z');
+  const future = validateCurated([{ ...base, checked_on: '2099-01-01' }], ids, now);
+  assert.equal(future.rows.length, 0);
+  assert.equal(future.errors.length, 1);
+  assert.deepEqual(validateCurated([{ ...base, checked_on: '2026-11-21' }], ids, now).errors, []);
+  assert.equal(validateCurated([{ ...base, checked_on: '2026-11-22' }], ids, now).rows.length, 0);
+});

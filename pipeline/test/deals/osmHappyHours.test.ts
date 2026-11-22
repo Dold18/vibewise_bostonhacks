@@ -39,3 +39,11 @@ test('osmHappyHourDeal is scheduled when parsed, unconfirmed otherwise', () => {
   assert.equal(u.schedule, null);
   assert.equal(osmHappyHourDeal('x'.repeat(300), 'z').quote?.length, 200);
 });
+
+test('F7: a day covered by two rules is ambiguous (later rule overrides)', () => {
+  assert.equal(parseOpeningHoursSubset('Mo-Fr 16:00-19:00; Fr 16:00-18:00'), null);
+});
+test('F5: start equal to end is rejected, 00:00-24:00 is fine', () => {
+  assert.equal(parseOpeningHoursSubset('Mo 16:00-16:00'), null);
+  assert.deepEqual(parseOpeningHoursSubset('Mo 00:00-24:00'), [{ days: [1], start: '00:00', end: '24:00' }]);
+});

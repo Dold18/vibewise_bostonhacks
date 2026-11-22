@@ -25,14 +25,20 @@ function parseDays(part: string): number[] | null {
 /** Parses the simple `Days HH:MM-HH:MM[,HH:MM-HH:MM]; ...` subset of OSM opening_hours; null for anything else. */
 export function parseOpeningHoursSubset(value: string): DealWindow[] | null {
   const windows: DealWindow[] = [];
+  const seenDays = new Set<number>();
   for (const rule of value.split(';')) {
     const m = /^\s*(\S+)\s+(\S+)\s*$/.exec(rule);
     if (!m) return null;
     const days = parseDays(m[1]);
     if (!days) return null;
+    // A later rule replaces earlier ones for the same day in opening_hours; don't guess the result.
+    for (const d of days) {
+      if (seenDays.has(d)) return null;
+    }
+    days.forEach((d) => seenDays.add(d));
     for (const r of m[2].split(',')) {
       const t = RANGE.exec(r);
-      if (!t) return null;
+      if (!t || t[1] === t[2]) return null;
       windows.push({ days: [...days], start: t[1], end: t[2] });
     }
   }
