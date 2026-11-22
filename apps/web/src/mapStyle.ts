@@ -1,3 +1,4 @@
+import { mapPaletteForPreview } from './design/visualFoundation';
 import type {
   ExpressionSpecification,
   LayerSpecification,
@@ -17,7 +18,7 @@ type Filter = ExpressionSpecification;
  * Every color the map style uses. The vibe theme (src/features/vibeTheme)
  * blends these toward a user's top vibes; `basePalette` is the plain map.
  */
-export const basePalette = {
+export const basePalette = mapPaletteForPreview({
   land: '#f3f3f0',
   urban: '#eceae6',
   water: '#9fcaf5',
@@ -49,7 +50,7 @@ export const basePalette = {
   sky: '#bcd9f7',
   horizon: '#e9f2fb',
   light: '#ffffff',
-};
+});
 export type PaletteKey = keyof typeof basePalette;
 /** Colors as `#rrggbb`. */
 export type Palette = Record<PaletteKey, string>;
