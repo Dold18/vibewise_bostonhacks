@@ -3,7 +3,7 @@
  * profile can actually show. Generates the table in PRESETS.md (a test keeps
  * the document in sync with the code).
  */
-import { PALETTE_ADAPTER_V0, SCENE_ADAPTER_V1_PROPOSED, supports, type CapabilityProfile } from './capabilities';
+import { MAP_RENDERER_V1, PALETTE_ADAPTER_V0, supports, type CapabilityProfile } from './capabilities';
 import { SCENE_CATALOG } from './catalog';
 import { choiceOf, PRESET_IDS, PRESETS, type ScenePresetId } from './presets';
 
@@ -17,7 +17,7 @@ export interface PresetReport {
   readonly setPieces: readonly string[];
 }
 
-export function presetReport(id: ScenePresetId, profiles: readonly CapabilityProfile[] = [PALETTE_ADAPTER_V0, SCENE_ADAPTER_V1_PROPOSED]): PresetReport {
+export function presetReport(id: ScenePresetId, profiles: readonly CapabilityProfile[] = [PALETTE_ADAPTER_V0, MAP_RENDERER_V1]): PresetReport {
   const entries = Object.entries(PRESETS[id].settings).map(([key, c]) => ({ key, value: choiceOf(c).value, setting: SCENE_CATALOG.byKey.get(key)! }));
   const ok = (p: CapabilityProfile, e: (typeof entries)[number]) => supports(p, e.key, e.value, e.setting.default);
   const pending: Record<string, string[]> = {};
@@ -39,10 +39,10 @@ export function renderPresetTable(): string {
   const rows = PRESET_IDS.map((id) => {
     const r = presetReport(id);
     const pending = Object.entries(r.pending).map(([g, ids]) => `${g} (${ids.length})`).join(', ') || 'none';
-    return `| \`${id}\` | ${r.settings} | ${r.rendered[PALETTE_ADAPTER_V0.id]} | ${r.rendered[SCENE_ADAPTER_V1_PROPOSED.id]} | ${pending} | ${r.setPieces.map((s) => `\`${s}\``).join(', ') || 'none'} |`;
+    return `| \`${id}\` | ${r.settings} | ${r.rendered[PALETTE_ADAPTER_V0.id]} | ${r.rendered[MAP_RENDERER_V1.id]} | ${pending} | ${r.setPieces.map((s) => `\`${s}\``).join(', ') || 'none'} |`;
   });
   return [
-    '| Preset | Settings chosen | Rendered by V0 (today) | Rendered by V1 (proposed) | Not rendered yet, by system | 3D set piece |',
+    '| Preset | Settings chosen | Palette only (V0) | Live map (`map-renderer-v1`) | Not rendered yet, by system | 3D set piece |',
     '|---|---|---|---|---|---|',
     ...rows,
   ].join('\n');

@@ -58,17 +58,26 @@ const PALETTE_TABLES: Record<SceneKey, readonly string[]> = {
 export const PALETTE_ADAPTER_V0: CapabilityProfile = profile('palette-adapter-v0', PALETTE_TABLES);
 
 /**
- * V0 plus light intensity/angle, sky blends, fog color and transition timing.
- * Needs a map-owner change: `buildMapStyle` hard-codes these today (mapStyle.ts).
- * Not live until that adapter is approved and merged.
+ * V0 plus light intensity/angle, sky blends, fog color and transition timing,
+ * as rendered by vibeTheme's `setScene` through `buildMapStyle(palette, scene)`.
  */
-export const SCENE_ADAPTER_V1_PROPOSED: CapabilityProfile = profile('scene-adapter-v1-proposed', {
+export const SCENE_ADAPTER_V1: CapabilityProfile = profile('scene-adapter-v1', {
   ...PALETTE_TABLES,
   'lighting_and_shadows.light_intensity': keysOf(LIGHT_INTENSITY),
   'lighting_and_shadows.light_angle': keysOf(LIGHT_POSITION),
   'sky_and_horizon.horizon_blend': keysOf(HORIZON_BLEND),
   'sky_and_horizon.fog_horizon_color': keysOf(FOG_COLORS),
   'animation_and_morph.scene_transition': keysOf(TRANSITION_MS),
+});
+
+/**
+ * What the live map renders today (vibeTheme controller `setScene`): V1 plus
+ * the always-on two-tone pin ring. Use this for the real map session.
+ */
+export const MAP_RENDERER_V1: CapabilityProfile = Object.freeze({
+  id: 'map-renderer-v1',
+  values: SCENE_ADAPTER_V1.values,
+  features: new Set<SceneFeature>(['pin_contrast_ring']),
 });
 
 /**

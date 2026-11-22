@@ -1,0 +1,174 @@
+/**
+ * Live-map hookup: a Scene Session driving the map theme controller's
+ * `setScene` (vibeTheme). This is the only place the scene meets the map.
+ *
+ * - The session is the single scene state; its updates (state + transition
+ *   timing) are handed to `setScene` as they are, coalesced to one per frame so
+ *   a burst of answers costs one paint pass and lands on the newest scene.
+ * - Navigation flags are coalesced per tick, so switching destinations
+ *   (route off → route on in the same handler) is not seen as navigation ending.
+ * - Account taste and `prefers-reduced-motion` feed the session's inputs.
+ */
+import type { AccountState } from '../account/session';
+import { themeFor, type SceneRender } from '../vibeTheme/controller';
+import type { AssetRegistry } from './assets';
+import { MAP_RENDERER_V1, type CapabilityProfile } from './capabilities';
+import { connectProfiles, type OutingProfileLike, type ProfileSource } from './profiles';
+import { PRESET_IDS, type ScenePresetId } from './presets';
+import { createSceneSession, type SceneSession, type SceneUpdate, type SubmitResult } from './session';
+
+export interface SceneThemeTarget {
+  setScene(state: SceneRender | null, timing?: { transitionMs?: number }): void;
+}
+
+export interface AccountSource {
+  getState(): AccountState;
+  subscribe(listener: (state: AccountState) => void): () => void;
+}
+
+export interface MediaQueryLike {
+  readonly matches: boolean;
+  addEventListener(type: 'change', listener: (e: { matches: boolean }) => void): void;
+  removeEventListener(type: 'change', listener: (e: { matches: boolean }) => void): void;
+}
+
+export interface SceneMountOptions {
+  readonly theme: SceneThemeTarget;
+  readonly account?: AccountSource | null;
+  /** Defaults to MAP_RENDERER_V1: exactly what `setScene` renders today. */
+  readonly capabilities?: CapabilityProfile;
+  readonly assets?: AssetRegistry | null;
+  /** `matchMedia('(prefers-reduced-motion: reduce)')`. */
+  readonly reducedMotion?: MediaQueryLike | null;
+  /** Frame scheduler (default requestAnimationFrame); injected in tests. */
+  readonly schedule?: (fn: () => void) => void;
+  /** Tick scheduler for navigation coalescing (default queueMicrotask). */
+  readonly defer?: (fn: () => void) => void;
+  readonly onError?: (error: unknown) => void;
+}
+
+export interface SceneMount {
+  readonly session: SceneSession;
+  /** A route or focused destination is (or is no longer) on screen. */
+  setNavigation(mode: boolean | 'route' | 'focus'): void;
+  /** Follow the adaptive vibe engine's profile publisher. */
+  connectProfiles<P extends OutingProfileLike>(source: ProfileSource<P>): () => void;
+  /** Apply any pending update now (tests, teardown). */
+  flush(): void;
+  destroy(): void;
+}
+
+const frame = (fn: () => void) => (typeof requestAnimationFrame === 'function' ? requestAnimationFrame(() => fn()) : setTimeout(fn, 16));
+
+export function mountScene(options: SceneMountOptions): SceneMount {
+  const schedule = options.schedule ?? frame;
+  const defer = options.defer ?? queueMicrotask;
+  const session = createSceneSession({
+    capabilities: options.capabilities ?? MAP_RENDERER_V1,
+    assets: options.assets ?? null,
+    account: options.account ? themeFor(options.account.getState()) : null,
+    context: { reducedMotion: options.reducedMotion?.matches ?? false },
+    onError: options.onError,
+  });
+
+  let destroyed = false;
+  let pending: SceneUpdate | null = null;
+  let scheduled = false;
+  const cleanups: Array<() => void> = [];
+
+  const flush = () => {
+    scheduled = false;
+    if (destroyed || !pending) return;
+    const update = pending;
+    pending = null;
+    try {
+      options.theme.setScene(update.state, { transitionMs: update.transitionMs });
+    } catch (error) {
+      options.onError?.(error);
+    }
+  };
+
+  // Take over the look right away with the current (neutral or account) scene.
+  options.theme.setScene(session.getState());
+
+  cleanups.push(
+    session.subscribe((update) => {
+      pending = update; // newest wins; its own transition timing travels with it
+      if (!scheduled) {
+        scheduled = true;
+        schedule(flush);
+      }
+    }),
+  );
+
+  if (options.account) {
+    const account = options.account;
+    cleanups.push(account.subscribe((state) => session.setAccount(themeFor(state))));
+  }
+
+  if (options.reducedMotion) {
+    const query = options.reducedMotion;
+    const onChange = (e: { matches: boolean }) => session.setContext({ reducedMotion: e.matches });
+    query.addEventListener('change', onChange);
+    cleanups.push(() => query.removeEventListener('change', onChange));
+  }
+
+  let wantedNav: 'browse' | 'route' | 'focus' = 'browse';
+  let navQueued = false;
+
+  return {
+    session,
+    setNavigation(mode) {
+      wantedNav = mode === true ? 'route' : mode === false ? 'browse' : mode;
+      if (navQueued || destroyed) return;
+      navQueued = true;
+      defer(() => {
+        navQueued = false;
+        if (!destroyed) session.setContext({ navigation: wantedNav });
+      });
+    },
+    connectProfiles(source) {
+      const off = connectProfiles(session, source);
+      cleanups.push(off);
+      return off;
+    },
+    flush,
+    destroy() {
+      if (destroyed) return;
+      destroyed = true;
+      for (const fn of cleanups.splice(0)) fn();
+      session.destroy();
+      options.theme.setScene(null);
+    },
+  };
+}
+
+/**
+ * Dev-only console hook (like `vibentaAccount`): drive the live map through
+ * the real session before the adaptive quiz is merged. Never shipped in production.
+ */
+export function sceneDevHook(scene: SceneMount) {
+  let version = 0;
+  const id = `dev-${Date.now().toString(36)}`;
+  const submit = (intent: Record<string, unknown>): SubmitResult => {
+    version++;
+    return scene.session.submit(id, version, { schemaVersion: '1.0.0', presets: [], descriptors: [], overrides: [], ...intent, sessionVersion: version });
+  };
+  return {
+    session: scene.session,
+    presets: PRESET_IDS,
+    /** e.g. `preset('neon_city', 0.6)` or `preset([['noir_nocturne', 0.5], ['neon_city', 0.3]])` */
+    preset(idOrMix: ScenePresetId | Array<[ScenePresetId, number]>, weight = 1) {
+      const mix = typeof idOrMix === 'string' ? [[idOrMix, weight] as [ScenePresetId, number]] : idOrMix;
+      return submit({ presets: mix.map(([p, w]) => ({ id: p, weight: w })) });
+    },
+    /** Free words through the deterministic lexicon, e.g. `describe('rainy neon night')`. */
+    describe(...descriptors: string[]) {
+      return submit({ descriptors });
+    },
+    submit,
+    clear: () => scene.session.clear(),
+    navigation: (mode: boolean | 'route' | 'focus') => scene.setNavigation(mode),
+    state: () => scene.session.getState(),
+  };
+}
