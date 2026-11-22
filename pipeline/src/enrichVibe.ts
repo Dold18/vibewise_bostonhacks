@@ -51,7 +51,9 @@ export interface VibeFlavor<R> {
   responseSchema: unknown;
   buildBundle(row: R, inputs: VibeInputRow[], hasPhoto: boolean): VibeBundle;
   /** Throws on a rejected answer (the runner retries). `profile` is null for places. */
-  parse(raw: string, ctx: { hasDescriptive: boolean; hasPhoto: boolean; hasPrice: boolean }): { description: string; profile: VibeProfile | null };
+  parse(
+    raw: string, ctx: { hasDescriptive: boolean; hasPhoto: boolean; hasPrice: boolean; allowedWords?: ReadonlySet<string> },
+  ): { description: string; profile: VibeProfile | null };
 }
 
 export const RESTAURANT_FLAVOR: VibeFlavor<VibeRestaurant> = {
@@ -250,7 +252,9 @@ export async function runVibeEnrichment<R extends { id: number; name: string } =
         // A rejected answer is retried with the reason, so the model can correct it.
         const prompt = attempt > 0 && lastError && !quota ? `${bundle.prompt}\n\nYour previous answer was rejected: ${lastError}. Fix this.` : bundle.prompt;
         const raw = await d.generate(prompt, sendImage);
-        result = flavor.parse(raw, { hasDescriptive: bundle.hasDescriptive, hasPhoto: !!sendImage, hasPrice: bundle.hasPrice });
+        result = flavor.parse(raw, {
+          hasDescriptive: bundle.hasDescriptive, hasPhoto: !!sendImage, hasPrice: bundle.hasPrice, allowedWords: bundle.allowedWords,
+        });
         quota = false;
       } catch (err) {
         if (err instanceof GeminiQuotaError) { lastError = `quota/overload: ${err.message}`; quota = true; break; }

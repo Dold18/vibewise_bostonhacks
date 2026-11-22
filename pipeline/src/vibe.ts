@@ -76,6 +76,8 @@ export interface VibeBundle {
   hasDescriptive: boolean;
   /** price_band was a known value, so a price feel is evidenced. */
   hasPrice: boolean;
+  /** Places only: words of the place's own kind, which the sensory check does not count ("music" in "a music venue"). */
+  allowedWords?: ReadonlySet<string>;
 }
 
 /** Strip markup, decode entities, collapse whitespace. */
@@ -190,6 +192,19 @@ export function humanizeKind(kind: string | null): string | null {
   return kind.replace(/_/g, ' ').replace(/\s+/g, ' ').trim() || null;
 }
 
+/** Kinds whose activity is music, so saying "music" states what the place is, not an atmosphere claim. */
+const MUSIC_KINDS = new Set(['music_venue', 'concert_hall', 'rock_club', 'jazz_and_blues_venue', 'opera_house', 'nightclub']);
+
+/**
+ * Words the description may use to name the place's kind even with no atmosphere evidence: the prompt asks
+ * for "a music venue", so "music" there is a fact, not a sensory claim.
+ */
+export function kindWords(kind: string | null): Set<string> {
+  const words = new Set((humanizeKind(kind) ?? '').toLowerCase().split(/\s+/).filter(Boolean));
+  if (kind && MUSIC_KINDS.has(kind)) words.add('music');
+  return words;
+}
+
 /**
  * Whether website text names the place by at least one distinctive name token (generic, locality and
  * per-type generic words ignored). A crawled page that never names the place is probably someone
@@ -220,7 +235,7 @@ export function buildPlaceBundle(
     noEvidence: 'Atmosphere evidence: NONE beyond the kind of place. Give only a general tone inferred from the kind (for example calm and unhurried, or lively and social). Do not state lighting, noise level, decor, crowd or music. Do not describe what it looks like.',
     websiteUsable: (text) => websiteNamesPlace(text, p.name, genericWords),
   });
-  return { prompt: [`Facts: ${facts.join(', ')}`, ...lines].join('\n'), hasDescriptive, hasPrice: false };
+  return { prompt: [`Facts: ${facts.join(', ')}`, ...lines].join('\n'), hasDescriptive, hasPrice: false, allowedWords: kindWords(p.kind) };
 }
 
 export const VIBE_SYSTEM_PROMPT = `You write one searchable passage per restaurant for a Boston student food-discovery app.
@@ -309,15 +324,21 @@ function parseObject(raw: string): Record<string, unknown> {
  * Description checks shared by restaurants and places: length bounds, no photo narration, and no
  * sensory claim without atmosphere evidence (enforced in code, not only in the prompt).
  */
-function validDescription(o: Record<string, unknown>, ctx: { hasDescriptive: boolean; hasPhoto: boolean }): string {
+function validDescription(
+  o: Record<string, unknown>, ctx: { hasDescriptive: boolean; hasPhoto: boolean; allowedWords?: ReadonlySet<string> },
+): string {
   const description = typeof o['description'] === 'string' ? o['description'].replace(/\s+/g, ' ').trim() : '';
   if (description.length < MIN_DESCRIPTION) throw new Error(`description too short (${description.length} chars)`);
   if (description.length > MAX_DESCRIPTION) throw new Error(`description too long (${description.length} chars)`);
   const narr = PHOTO_NARRATION.exec(description);
   if (narr) throw new Error(`photo narration "${narr[0]}": describe the place directly, not the image`);
   if (!ctx.hasDescriptive && !ctx.hasPhoto) {
-    const hit = SENSORY_WORDS.exec(description);
-    if (hit) throw new Error(`unsupported sensory claim "${hit[0]}" with no atmosphere evidence`);
+    // The first sensory word that is not part of the place's own kind (restaurants pass none, so the first hit).
+    for (const hit of description.matchAll(new RegExp(SENSORY_WORDS.source, 'gi'))) {
+      if (!ctx.allowedWords?.has(hit[0].toLowerCase())) {
+        throw new Error(`unsupported sensory claim "${hit[0]}" with no atmosphere evidence`);
+      }
+    }
   }
   return description;
 }
@@ -332,7 +353,9 @@ export const PLACE_LIGHT_WORDS = /\b(illuminat\w*|glow\w*|lights?|lamps?|lantern
  * Parse a non-food answer: `{ description }` only, with the same description checks as restaurants,
  * plus the place-only light-word check when there is no atmosphere evidence.
  */
-export function parsePlaceResponse(raw: string, ctx: { hasDescriptive: boolean; hasPhoto: boolean }): { description: string } {
+export function parsePlaceResponse(
+  raw: string, ctx: { hasDescriptive: boolean; hasPhoto: boolean; allowedWords?: ReadonlySet<string> },
+): { description: string } {
   const description = validDescription(parseObject(raw), ctx);
   if (!ctx.hasDescriptive && !ctx.hasPhoto) {
     const hit = PLACE_LIGHT_WORDS.exec(description);
