@@ -1,9 +1,9 @@
 {
   "version": "2.0.0",
-  "assetCount": 192,
-  "atlasCount": 12,
+  "assetCount": 224,
+  "atlasCount": 14,
   "origin": "Original generated illustration; no third-party material textures",
-  "technical": "12 SVG atlases; 4x4 tile grid; 256x256 viewBox cell; browser crop via background-position or UVs",
+  "technical": "14 SVG atlases; 4x4 tile grids; 256x256 cells; crop via background-position or UVs. Two new motif atlases depict fictional food/music decoration.",
   "limitations": "Visual stylization only; not photogrammetry, normal maps, physically-based shading, or live Boston architectural facts. No renderers are enabled by these files.",
   "assets": [
     {
@@ -4036,6 +4036,678 @@
         0.25
       ],
       "type": "overlay",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "food_motifs.pizza.thematic",
+      "family": "food_motifs",
+      "style": "pizza",
+      "palette": "thematic",
+      "atlas": "food_motifs.svg",
+      "rect": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "food_motifs.noodle_bowl.thematic",
+      "family": "food_motifs",
+      "style": "noodle_bowl",
+      "palette": "thematic",
+      "atlas": "food_motifs.svg",
+      "rect": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "food_motifs.dumplings.thematic",
+      "family": "food_motifs",
+      "style": "dumplings",
+      "palette": "thematic",
+      "atlas": "food_motifs.svg",
+      "rect": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "food_motifs.taco.thematic",
+      "family": "food_motifs",
+      "style": "taco",
+      "palette": "thematic",
+      "atlas": "food_motifs.svg",
+      "rect": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "food_motifs.croissant.thematic",
+      "family": "food_motifs",
+      "style": "croissant",
+      "palette": "thematic",
+      "atlas": "food_motifs.svg",
+      "rect": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "food_motifs.espresso.thematic",
+      "family": "food_motifs",
+      "style": "espresso",
+      "palette": "thematic",
+      "atlas": "food_motifs.svg",
+      "rect": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "food_motifs.teacup.thematic",
+      "family": "food_motifs",
+      "style": "teacup",
+      "palette": "thematic",
+      "atlas": "food_motifs.svg",
+      "rect": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "food_motifs.seafood.thematic",
+      "family": "food_motifs",
+      "style": "seafood",
+      "palette": "thematic",
+      "atlas": "food_motifs.svg",
+      "rect": [
+        768,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "food_motifs.skewers.thematic",
+      "family": "food_motifs",
+      "style": "skewers",
+      "palette": "thematic",
+      "atlas": "food_motifs.svg",
+      "rect": [
+        0,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "food_motifs.burger.thematic",
+      "family": "food_motifs",
+      "style": "burger",
+      "palette": "thematic",
+      "atlas": "food_motifs.svg",
+      "rect": [
+        256,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "food_motifs.cupcake.thematic",
+      "family": "food_motifs",
+      "style": "cupcake",
+      "palette": "thematic",
+      "atlas": "food_motifs.svg",
+      "rect": [
+        512,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "food_motifs.garden_salad.thematic",
+      "family": "food_motifs",
+      "style": "garden_salad",
+      "palette": "thematic",
+      "atlas": "food_motifs.svg",
+      "rect": [
+        768,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "food_motifs.bread_loaf.thematic",
+      "family": "food_motifs",
+      "style": "bread_loaf",
+      "palette": "thematic",
+      "atlas": "food_motifs.svg",
+      "rect": [
+        0,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "food_motifs.sushi_roll.thematic",
+      "family": "food_motifs",
+      "style": "sushi_roll",
+      "palette": "thematic",
+      "atlas": "food_motifs.svg",
+      "rect": [
+        256,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "food_motifs.table_grill.thematic",
+      "family": "food_motifs",
+      "style": "table_grill",
+      "palette": "thematic",
+      "atlas": "food_motifs.svg",
+      "rect": [
+        512,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "food_motifs.stew_pot.thematic",
+      "family": "food_motifs",
+      "style": "stew_pot",
+      "palette": "thematic",
+      "atlas": "food_motifs.svg",
+      "rect": [
+        768,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "music_motifs.piano_keys.thematic",
+      "family": "music_motifs",
+      "style": "piano_keys",
+      "palette": "thematic",
+      "atlas": "music_motifs.svg",
+      "rect": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "music_motifs.acoustic_guitar.thematic",
+      "family": "music_motifs",
+      "style": "acoustic_guitar",
+      "palette": "thematic",
+      "atlas": "music_motifs.svg",
+      "rect": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "music_motifs.electric_guitar.thematic",
+      "family": "music_motifs",
+      "style": "electric_guitar",
+      "palette": "thematic",
+      "atlas": "music_motifs.svg",
+      "rect": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "music_motifs.saxophone.thematic",
+      "family": "music_motifs",
+      "style": "saxophone",
+      "palette": "thematic",
+      "atlas": "music_motifs.svg",
+      "rect": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "music_motifs.trumpet.thematic",
+      "family": "music_motifs",
+      "style": "trumpet",
+      "palette": "thematic",
+      "atlas": "music_motifs.svg",
+      "rect": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "music_motifs.drumkit.thematic",
+      "family": "music_motifs",
+      "style": "drumkit",
+      "palette": "thematic",
+      "atlas": "music_motifs.svg",
+      "rect": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "music_motifs.violin.thematic",
+      "family": "music_motifs",
+      "style": "violin",
+      "palette": "thematic",
+      "atlas": "music_motifs.svg",
+      "rect": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "music_motifs.microphone.thematic",
+      "family": "music_motifs",
+      "style": "microphone",
+      "palette": "thematic",
+      "atlas": "music_motifs.svg",
+      "rect": [
+        768,
+        256,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "music_motifs.turntable.thematic",
+      "family": "music_motifs",
+      "style": "turntable",
+      "palette": "thematic",
+      "atlas": "music_motifs.svg",
+      "rect": [
+        0,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "music_motifs.dj_mixer.thematic",
+      "family": "music_motifs",
+      "style": "dj_mixer",
+      "palette": "thematic",
+      "atlas": "music_motifs.svg",
+      "rect": [
+        256,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "music_motifs.waveform.thematic",
+      "family": "music_motifs",
+      "style": "waveform",
+      "palette": "thematic",
+      "atlas": "music_motifs.svg",
+      "rect": [
+        512,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "music_motifs.headphones.thematic",
+      "family": "music_motifs",
+      "style": "headphones",
+      "palette": "thematic",
+      "atlas": "music_motifs.svg",
+      "rect": [
+        768,
+        512,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.5,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "music_motifs.disco_ball.thematic",
+      "family": "music_motifs",
+      "style": "disco_ball",
+      "palette": "thematic",
+      "atlas": "music_motifs.svg",
+      "rect": [
+        0,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "music_motifs.vinyl_record.thematic",
+      "family": "music_motifs",
+      "style": "vinyl_record",
+      "palette": "thematic",
+      "atlas": "music_motifs.svg",
+      "rect": [
+        256,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.25,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "music_motifs.maracas.thematic",
+      "family": "music_motifs",
+      "style": "maracas",
+      "palette": "thematic",
+      "atlas": "music_motifs.svg",
+      "rect": [
+        512,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.5,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
+      "status": "asset_only_no_renderer"
+    },
+    {
+      "id": "music_motifs.stage_lights.thematic",
+      "family": "music_motifs",
+      "style": "stage_lights",
+      "palette": "thematic",
+      "atlas": "music_motifs.svg",
+      "rect": [
+        768,
+        768,
+        256,
+        256
+      ],
+      "uv": [
+        0.75,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "type": "contextual_decorative_motif",
       "status": "asset_only_no_renderer"
     }
   ]
