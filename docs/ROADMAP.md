@@ -7,7 +7,7 @@
 |---|---|---|
 | Foundation | M0–M2 | Real Boston map, cards and working MBTA route from selection |
 | Hackathon signature | M3–M5 | Vibe choices re-rank real places and transform the map |
-| Competitive extensions | M6–M9 | Multimodal input, adaptive quiz, group mode, student/events, Recreate |
+| Competitive extensions | M6–M9 | Multimodal input, generative quiz, group mode, student/events, Recreate |
 | Long-term product | M10+ | Large reliable dataset, student community, live replanning |
 
 ## Ordered tasks and acceptance criteria
@@ -53,8 +53,8 @@
 
 ### M3 — Simple vibe quiz and scoring
 **Owner:** Vibe owner.
-- [ ] Implement initial visual/text choices with deterministic preference weights.
-- [ ] Rank places by curated vibe tags and user's chosen categories/constraints.
+- [ ] Run the fixed 10-question generative quiz (VIBE_QUIZ_DESIGN.md) with static fallback questions.
+- [ ] Embed the vibe text with MiniLM and rank places by cosine similarity (EMBEDDING_PIPELINE.md), after the user's category/constraint filters.
 - [ ] Choosing an answer visibly changes card order and marker importance.
 - [ ] Expose simple match explanation.
 - [ ] Transit still works after re-ranking.
@@ -80,10 +80,10 @@
 
 **Done when:** text/image input affects the live map and a selection still yields real transit directions.
 
-### M6 — Truly adaptive questions and Vibe DNA
-- [ ] Pick the next visual question from unresolved preference dimensions.
-- [ ] Track confidence/uncertainty without inventing scientific certainty.
-- [ ] Visualize Vibe DNA and let users revise earlier answers.
+### M6 — Quiz polish and Vibe DNA
+- [ ] Add richer question content and imagery within the question-family templates.
+- [ ] Visualize the evolving `vibe_so_far` text (live map theming) as the quiz proceeds.
+- [ ] Let users revise earlier answers and regenerate the vibe text.
 
 ### M7 — Group mode
 - [ ] Two phones join one session.

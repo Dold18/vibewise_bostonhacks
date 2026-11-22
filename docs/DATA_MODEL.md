@@ -1,10 +1,10 @@
 # Data Model — Vibenta
-> **Status:** **Proposed v0.1.** Extends the schema sketch in [PROJECT_BRIEF.md §7](../PROJECT_BRIEF.md) and the types in [CONTRACTS.md](CONTRACTS.md). Rationale lives in [DECISIONS.md](DECISIONS.md) entries P-007 to P-011. Nothing here is final until the team accepts those entries.
+> **Status:** **Proposed v0.2.** Extends the schema sketch in [PROJECT_BRIEF.md §7](../PROJECT_BRIEF.md) and the types in [CONTRACTS.md](CONTRACTS.md). The embedding and vibe design is accepted: see [EMBEDDING_PIPELINE.md](EMBEDDING_PIPELINE.md) and [VIBE_QUIZ_DESIGN.md](VIBE_QUIZ_DESIGN.md). Other rationale lives in [DECISIONS.md](DECISIONS.md) entries P-007 to P-009.
 
 ## 1. Goals
 The catalog must support, from data we are allowed to **keep**:
 - **Hard filters:** price, distance / transit reach, cuisine, open now.
-- **The Vibe feature:** matching a text, image or song to how a place *feels*, not only what it serves.
+- **The Vibe feature:** matching a text, image, song or quiz result to how a place *feels*, not only what it serves. Each restaurant has one combined description (facts + vibe) and one embedding.
 
 Third-party content we may not store (Yelp, Google) appears only at display time, never in this database. See P-008.
 
@@ -17,29 +17,10 @@ Third-party content we may not store (Yelp, Google) appears only at display time
 | Price | `median_entree_price_cents`, `price_band`, `price_source` | Scraped menu prices (`'menu'`), else an LLM estimate from cuisine, category and chain name (`'estimate'`) | Mixed; estimates are labeled "(est.)" in the UI |
 | Hours | `hours`, `hours_raw` | OSM `opening_hours`, else scraped website | Partial; `null` = unknown, shown as "Hours unknown" |
 | Website, phone, address | `website`, `phone`, `address` | OSM, Foursquare OS Places | Good |
-| Menu profile | `profile`, `description`, `embedding` | Brief §5.1 offline normalizer (unchanged) | Depends on scrape |
-| Ambience / vibe | `vibe_scores`, `ambience_description`, `ambience_embedding`, `ambience_clip_embedding` | Website "about" text, offline photo analysis (descriptions only, images never stored), OSM tags, neighborhood context, student reviews | See `vibe_confidence` |
+| Combined description | `profile`, `description`, `embedding` | Facts (cuisine, dishes, price tier, neighborhood) plus a generated vibe layer, concatenated into one passage and embedded once with MiniLM. Input tiers: [EMBEDDING_PIPELINE.md §4](EMBEDDING_PIPELINE.md) | Depends on the richest tier available |
 | Reviews | `student_reviews` table; `yelp_business_id` | In-app reviews (ours); Yelp excerpts fetched live, never stored | — |
 
-## 3. Vibe vocabulary (v1)
-A fixed, versioned set of dimensions, each scored in **[0, 1]** (CONTRACTS.md score convention). Offline enrichment, the Gemini query step and the in-browser CLIP/CLAP step all output scores on **these same keys**, so ranking and the Living Map don't care which model produced them.
-
-| Key | Meaning |
-|---|---|
-| `cozy` | Warm, intimate, comfortable |
-| `lively` | Busy, loud, energetic |
-| `upscale` | Polished, dressy, special-occasion |
-| `divey` | Casual, no-frills, worn-in |
-| `aesthetic` | Visually striking, photogenic |
-| `quiet` | Calm; suits studying or conversation |
-| `date_night` | Good for two |
-| `group_friendly` | Big tables, shareable food, room for groups |
-| `late_night` | Open late; after-hours crowd |
-| `outdoor` | Patio, rooftop, waterfront, park-side |
-
-Changing the list means bumping `vibe_vocab_version` and re-running enrichment. Keep the CLIP prompt sentences for each key (section 6) in one shared module.
-
-## 4. Schema (Postgres + pgvector + PostGIS on Supabase)
+## 3. Schema (Postgres + pgvector + PostGIS on Supabase)
 
 ~~~sql
 create extension if not exists postgis with schema extensions;
@@ -72,19 +53,11 @@ create table restaurants (
                               check (price_band in ('$', '$$', '$$$', '$$$$', 'unknown')),
   price_source              text check (price_source in ('menu', 'estimate')),
 
-  -- Menu profile (PROJECT_BRIEF §5.1, unchanged).
-  profile                   jsonb,
-  description               text,
-  embedding                 extensions.vector(384),      -- the single chosen text model (brief §4)
+  -- Facts profile (PROJECT_BRIEF §5.1) and the combined embedded passage.
+  profile                   jsonb,            -- structured facts from the offline normalizer
+  description               text,             -- facts + vibe concatenated into ONE passage (EMBEDDING_PIPELINE.md §4)
+  embedding                 extensions.vector(384),      -- MiniLM (all-MiniLM-L6-v2) of `description`; the only embedding
 
-  -- Ambience / vibe layer (P-010, P-011).
-  ambience_description      text,             -- one or two sentences about the room, crowd, mood
-  ambience_embedding        extensions.vector(384),      -- SAME text model as `embedding`
-  ambience_clip_embedding   extensions.vector(512),      -- CLIP text encoder; dimension follows the pinned CLIP model
-  vibe_scores               jsonb,            -- {"cozy": 0.8, ...}; keys from section 3, values in [0,1]
-  vibe_vocab_version        smallint,
-  vibe_confidence           text check (vibe_confidence in ('high', 'medium', 'low')),
-  vibe_sources              text[] not null default '{}',  -- e.g. {website,photos,osm_tags,neighborhood}
   osm_tags                  jsonb,            -- kept vibe-relevant tags: outdoor_seating, internet_access, ...
   context_features          jsonb,            -- computed: neighborhood, bars_within_300m, near_park, near_water, ...
 
@@ -93,7 +66,7 @@ create table restaurants (
 
   fts tsvector generated always as (
     to_tsvector('english',
-      coalesce(name, '') || ' ' || coalesce(description, '') || ' ' || coalesce(ambience_description, ''))
+      coalesce(name, '') || ' ' || coalesce(description, ''))
   ) stored,
 
   last_scraped_at           timestamptz,
@@ -134,7 +107,7 @@ create table student_reviews (
   author_id      uuid,                        -- Supabase auth user; null for seeded demo reviews
   rating         smallint check (rating between 1 and 5),
   body           text not null,
-  vibe_tags      text[] not null default '{}', -- keys from section 3
+  vibe_tags      text[] not null default '{}', -- optional free-form tags the author picked
   is_seed        boolean not null default false, -- team-written demo content; must be labeled in the UI
   created_at     timestamptz not null default now()
 );
@@ -155,24 +128,24 @@ The MBTA routing tables (`pattern_stops`, `line_shapes`, `transfer_hubs`) are de
 | `location {lat, lng}` | `ST_Y(location::geometry)`, `ST_X(location::geometry)` |
 | `category` | `category` |
 | `priceBand` | `price_band` (plus `price_source` so the UI can label estimates) |
-| `vibeTags` | keys of `vibe_scores` above a threshold |
+| `vibeTags` | no column; optional display chips, curated or derived from `description` |
 | `source.provider` / `providerPlaceId` | `source` / `source_id` |
 
-`vibe_scores`, `price_source`, `hours` and `cuisines` are not in `Place` v0.1 yet. Adding them is a contract change (CONTRACTS.md §7).
+`price_source`, `hours` and `cuisines` are not in `Place` v0.1 yet. Adding them is a contract change (CONTRACTS.md §7).
 
-## 4b. Place photos and vibe inputs (proposed, P-013)
+## 3b. Place photos and vibe inputs (proposed, P-013)
 Migration `supabase/migrations/20261121200000_create_place_media.sql`. Full design: `docs/superpowers/specs/2026-11-21-place-photos-vibe-sources-design.md` §7.
 
 | Table / object | Purpose | Access |
 |---|---|---|
-| `student_reviews` | As in §4 above, plus `hidden` | Everyone reads non-hidden rows; signed-in users add and delete their own |
+| `student_reviews` | As in §3 above, plus `hidden` | Everyone reads non-hidden rows; signed-in users add and delete their own |
 | `place_photos` | Ranked card photos: uploads, licensed (OSM/Wikidata/Commons/Mapillary) and website photos, with license, credit and link-back | Everyone reads non-hidden rows; signed-in users add and delete their own uploads |
 | `place_vibe_inputs` | Collected text per place and source (`website`, `wiki`, `osm_tags`, `city_licenses`, `student_reviews`) for the vibe step | Pipeline only |
 | `restaurants.media_checked_at` | When `enrich:media` last processed the place | — |
 | `restaurant_points` view | `restaurants` with plain `lat`/`lng` for the pipeline | Service role only |
 | Storage bucket `place-photos` | Student uploads under `<user_id>/…`, JPEG/PNG/WebP, 5 MB max | Public read; users write their own folder |
 
-## 4c. Deals (proposed, P-015)
+## 3c. Deals (proposed, P-015)
 Migration `supabase/migrations/20261122090000_create_place_deals.sql`. Full design: `docs/superpowers/specs/2026-11-21-deal-markers-design.md` §1, §2.
 
 | Table / object | Purpose | Access |
@@ -183,59 +156,46 @@ Migration `supabase/migrations/20261122090000_create_place_deals.sql`. Full desi
 
 Checks: `any_time` only for `kind = 'student'`; `schedule` is non-null if and only if `timing = 'scheduled'`; `title` ≤ 120 and `quote` ≤ 200 characters. A deal is active only when `checked_at` is within 90 days **and** either `any_time` or (`scheduled` and now in a window).
 
-## 5. Offline enrichment pipeline
-Extends brief §3.1. All steps run as a batch job, never from the browser.
+## 4. Offline enrichment pipeline
+Extends brief §3.1. All steps run as a batch job, never from the browser. The principles and input tiers live in [EMBEDDING_PIPELINE.md §4](EMBEDDING_PIPELINE.md); the mechanics of each step (scraping, caching, staging) are owned by the pipeline workstream.
 
 1. **Collect places** within ~800 m of T stations in student-heavy areas: OSM via Overpass (send a descriptive `User-Agent`; public servers reject anonymous clients and are often at capacity, so retry with backoff) plus Foursquare OS Places. De-duplicate by name and distance.
-2. **Scrape** each website: menu and "about" pages, plus interior photos. Respect `robots.txt`, rate-limit, identify the crawler.
-3. **Menu profile** (brief §5.1): cuisines, dishes, `median_entree_price_cents`, `description`.
+2. **Gather inputs** by tier: name, cuisine, price and neighborhood (Tier 0); any existing descriptive text such as a website blurb or menu description (Tier 1); a photo from a legitimate open or first-party source (Tier 2). Third-party review text (Tier 3) is likely skipped. Respect `robots.txt`, rate-limit, identify the crawler.
+3. **Facts profile** (brief §5.1): cuisines, dishes, `median_entree_price_cents`, price tier, neighborhood.
 4. **Price band:** from menu price where found (`price_source = 'menu'`), else an LLM estimate (`'estimate'`).
-5. **Ambience inputs:**
-   - website text describing the room or crowd;
-   - **photo descriptions:** Gemini describes interior shots ("dim, exposed brick, candlelit"). Keep only the words; never store or display the images;
-   - OSM tags (`outdoor_seating`, `internet_access`, `opening_hours`, `takeaway`, `diet:*`, ...);
-   - `context_features` computed from OSM geometry: neighborhood, nearby bar density, parks, water, campus distance.
-6. **Vibe step (one LLM call per place):** from the inputs above, output `vibe_scores` on the section 3 vocabulary, an `ambience_description`, and `vibe_confidence`: `high` with website text or photos, `medium` with rich OSM tags, `low` from tags and neighborhood only. Record `vibe_sources`.
-7. **Embed:** `description` → `embedding`; `ambience_description` → `ambience_embedding` (same text model) and → `ambience_clip_embedding` (CLIP text encoder).
-8. **Transit proximity:** fill `restaurant_stations`.
-9. **Yelp ID (optional):** look up and store `yelp_business_id` only.
+5. **Vibe layer:** one LLM call per place generates atmosphere, mood, lighting, energy and occasion-fit language from the gathered inputs. Photos, when used, are described in words only; the images are never stored or displayed.
+6. **Combine and embed:** concatenate facts + vibe into `description`, then embed it once with MiniLM into `embedding`. Both layers are required (EMBEDDING_PIPELINE.md §4).
+7. **Transit proximity:** fill `restaurant_stations`.
+8. **Yelp ID (optional):** look up and store `yelp_business_id` only.
 
-## 6. Query side
+## 5. Query side
 
-### Text input
-Embed the query with the text model → compare against `embedding` and `ambience_embedding`, plus full-text search on `fts`.
+All query types end as text embedded with the same MiniLM model.
 
-### Image input
-- **In the browser (P-011):** a CLIP/SigLIP model via Transformers.js. It produces:
-  - `vibe_scores`, by scoring the image against one prompt sentence per vocabulary key (for example `cozy` → "a cozy, warmly lit restaurant interior");
-  - an image vector compared against `ambience_clip_embedding`. CLIP vectors are only ever compared with CLIP vectors.
-- **Gemini (server, brief §5.2):** cuisines, dishes, price feel, `signal_strength`. Extend its JSON with `vibe_scores` (same keys) and an `ambience` sentence.
-
-### Song input
-Gemini as in the brief. Optionally, a CLAP model in the browser scores the audio against the vocabulary for `vibe_scores` locally.
+- **Text:** embedded directly. No LLM call, no HyDE.
+- **Image, song or movie:** Gemini converts it to a vibe-text description in the catalog's vibe vocabulary (atmosphere and mood language), then MiniLM embeds that text. See [EMBEDDING_PIPELINE.md §5](EMBEDDING_PIPELINE.md).
+- **Quiz:** the final `vibe_so_far` text from [VIBE_QUIZ_DESIGN.md](VIBE_QUIZ_DESIGN.md) is embedded the same way.
 
 ### Ranking
 1. **Hard filters (SQL `WHERE`):** `price_band`, distance (`ST_DWithin`) or station proximity, `cuisines && $1`, open now from `hours`. Unknown values pass or fail per an explicit UI toggle; they are never treated as "cheap" or "open".
-2. **Score:** reciprocal rank fusion over the menu vector, `fts` and the ambience vector (plus the CLIP vector for image queries), then add λ × similarity between query and place `vibe_scores`. Down-weight `vibe_confidence = 'low'`.
+2. **Embedding similarity:** cosine similarity between the query vector and `embedding` over the surviving rows.
+3. **Optional small tag boost:** a tiebreaker for an explicit cuisine match. It must never outweigh the embedding similarity.
 
 Suggested RPC signature (implementation owned by the Intelligence lane):
 
 ~~~sql
 search_restaurants(
-  query_embedding           vector(384),
-  ambience_query_embedding  vector(384),
-  clip_query_embedding      vector(512),   -- null unless the input was an image
-  query_vibe                jsonb,         -- vocabulary scores from Gemini / CLIP / CLAP
-  max_price_band            text,
-  cuisines                  text[],
-  origin                    geography,
-  max_distance_m            integer,
-  open_now                  boolean,
-  result_limit              integer default 30
+  query_embedding  vector(384),
+  max_price_band   text,
+  cuisines         text[],
+  origin           geography,
+  max_distance_m   integer,
+  open_now         boolean,
+  result_limit     integer default 30
 ) returns setof ...
 ~~~
 
-## 7. Compliance rules this model encodes
+## 6. Compliance rules this model encodes
 - **Yelp:** only `yelp_business_id` is stored. Review excerpts are fetched live by a Supabase Edge Function (API key server-side), cached at most 24 hours outside the database, shown with Yelp's required attribution, and **never** stored, embedded or used for ranking or filtering. Neither is Yelp's star rating.
 - **Google:** no Google Places content anywhere in this database (brief §11).
 - **Images:** photos from a place's own website may be displayed, stored and embedded (P-013, decided 2026-11-21), credited to the site's domain with a link back. Photos from third-party platforms (Google, Yelp, Tripadvisor, social media, delivery apps) are never used. Licensed photos keep their license and credit.
@@ -243,20 +203,38 @@ search_restaurants(
 - **Foursquare OS Places (Apache 2.0):** keep its attribution notice.
 - **Honesty:** unknown hours or price are stored as `null` / `'unknown'` and shown as such. Seeded reviews are flagged `is_seed` and labeled.
 
-## 7a. User accounts (proposed, P-014)
+## 7. Map-theme vocabulary and user accounts (proposed, P-014)
+The map theme uses a small fixed vocabulary of 10 keys, each scored in **[0, 1]**. It describes the *user's* recent vibe readings for tinting the map. It is **not** a venue-side catalog: places carry no scores, and ranking uses only the embedding (EMBEDDING_PIPELINE.md). The Vibe Engine maps its output (for example the quiz `vibe_so_far` text) onto these keys when it reports a reading.
+
+| Key | Meaning |
+|---|---|
+| `cozy` | Warm, intimate, comfortable |
+| `lively` | Busy, loud, energetic |
+| `upscale` | Polished, dressy, special-occasion |
+| `divey` | Casual, no-frills, worn-in |
+| `aesthetic` | Visually striking, photogenic |
+| `quiet` | Calm; suits studying or conversation |
+| `date_night` | Good for two |
+| `group_friendly` | Big tables, shareable food, room for groups |
+| `late_night` | Open late; after-hours crowd |
+| `outdoor` | Patio, rooftop, waterfront, park-side |
+
+Changing the list means bumping `vocab_version`.
+
+### User accounts
 Migration `supabase/migrations/20261121180000_create_accounts.sql`. Users sign in with Supabase Auth (email + password).
 
 | Table | Columns | Access |
 |---|---|---|
 | `profiles` | `id` (= `auth.users.id`), `effects_enabled` (default true), `created_at`, `updated_at` | Owner reads, creates and updates their own row. Created automatically by a trigger on sign-up. |
-| `vibe_events` | `id`, `user_id` (default `auth.uid()`), `created_at`, `source` (`quiz`/`text`/`image`/`song`/`place`/`dev`), `scores` (section 3 keys, values in [0,1], checked by `is_valid_vibe_scores`), `vocab_version`, optional `place_id` | Owner reads, adds and deletes (clears) their own rows. No updates. `anon` has no access. |
+| `vibe_events` | `id`, `user_id` (default `auth.uid()`), `created_at`, `source` (`quiz`/`text`/`image`/`song`/`place`/`dev`), `scores` (theme-vocabulary keys above, values in [0,1], checked by `is_valid_vibe_scores`), `vocab_version`, optional `place_id` | Owner reads, adds and deletes (clears) their own rows. No updates. `anon` has no access. |
 
 - No location is stored: no origin, no GPS, no movement history.
 - `dev` rows are sample data from the dev-only hook and are ignored by production builds.
 - The browser derives a decayed taste from the newest 200 events (two-week half-life). That taste tints the map; it is not used for ranking.
 
 ## 8. Open questions for the team
-1. Accept the ambience layer, which amends the brief's "menus, not moods" guidance (P-010)?
-2. Pin the models: the text embedding model (MiniLM vs BGE, brief §4) and the CLIP/SigLIP model, which sets the `ambience_clip_embedding` dimension.
+1. Pin the embedding model ID (MiniLM `all-MiniLM-L6-v2`) and its quantization; queries and catalog must match.
+2. Build the ~20 to 30 query validation set (EMBEDDING_PIPELINE.md §2).
 3. Do unknown-price and unknown-hours places pass the filters by default?
 4. Is the Yelp trial worth wiring up before the deadline, or do student reviews alone cover the demo?

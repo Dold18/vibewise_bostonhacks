@@ -17,7 +17,7 @@ Students can search for a named restaurant or attraction, but it's much harder t
 1. User chooses intent: restaurants, cafés, entertainment, nightlife, events, culture, or exploring; categories can overlap.
 2. User supplies starting location, budget, time window, and individual/group mode.
 3. User can enter text, upload a photograph, or name a movie or song to express an aesthetic.
-4. An adaptive Akinator-like visual quiz asks progressively more informative comparisons.
+4. A fixed-length, generative quiz asks vivid questions drawn from cinematic, musical, sensory and visual families, and builds up a vibe description turn by turn.
 5. **The map stays on screen throughout.** As preferences evolve, destination markers reorder, fade, shrink, or grow; cards update; and the map smoothly changes aesthetic (warm/cozy, electric/energetic, etc.). Theme changes must correspond to the inferred profile and remain readable.
 6. The user selects a place or suggested multi-stop outing. Actual MBTA transit/walking options render on the **same map**, with time, transfer and feasibility details.
 7. Optional group mode merges individuals' preferences without hiding hard constraints or severely disadvantaging one participant.
@@ -31,7 +31,7 @@ A judge supplies an arbitrary image or description. Our map visibly converges to
 - Living map, animated pins/cards, coherent scene-specific visual themes, accessibility/readability controls.
 - Category selection, budget, origin, time-window and transit feasibility constraints.
 - Image, natural language, song, artist, movie and scene inputs.
-- Structured Vibe DNA profile, responsive sliders, adaptive informative questions, preference uncertainty/convergence visualization.
+- Vibe DNA: a readable summary of the user's vibe (the accumulated vibe text), built by a 10-question generative quiz.
 - Vibe Portal/Teleport transitions, authentic location previews, optional visual storyboards.
 
 **Recommendations and execution**
@@ -53,7 +53,7 @@ A judge supplies an arbitrary image or description. Our map visibly converges to
 | College students | Student pricing, campus feedback/events, group planning |
 | Food & activities | Verified restaurant, venue, experience, and event catalog |
 | Boston aesthetic | Primary vibe interpretation and map transformation |
-| Cravings/preferences | Multimodal inputs and adaptive quiz |
+| Cravings/preferences | Multimodal inputs and generative quiz |
 | Budget & location | Hard filters/constraints and ranking |
 | Public transit | MBTA-aware recommendations and actual route display |
 
@@ -73,7 +73,7 @@ Transit must influence **feasibility and/or rank**; it must not be only a decora
 - End-to-end journey from vibe → recommended place → MBTA itinerary.
 
 ### High-priority extensions, after the signature slice is reliable
-- True adaptive next-question logic and Vibe DNA; two-user group session.
+- Richer quiz content, live map theming from the evolving vibe text and Vibe DNA; two-user group session.
 - Verified student discounts/events; movie/song text input; Recreate comparisons.
 - Multi-stop optimization.
 

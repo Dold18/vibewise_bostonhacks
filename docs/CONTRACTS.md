@@ -36,7 +36,7 @@ export interface Place {
     attribution?: string;
     source: "licensed" | "first_party" | "provider";
   };
-  vibeTags: string[];            // initially curated; later from Vibe Engine
+  vibeTags?: string[];           // optional display chips (e.g. "cozy"); free-form, not a ranking vocabulary
   studentDiscount?: {          // to be replaced by `deals` once approved (see Proposed change below)
     description: string;
     verifiedAt: string;         // ISO datetime
@@ -121,7 +121,8 @@ export interface MapSelection {
 
 export interface VibeProfile {
   userId: string;
-  tags: Record<string, number>;  // e.g. cozy: 0.8, electric: 0.1
+  vibeText?: string;             // quiz `vibe_so_far`, a media-derived description, or the user's own text; embedded with MiniLM
+  tags?: Record<string, number>; // map-theme taste from the account module (DATA_MODEL.md §7), keys in [0,1]; theme only, not used for ranking
   categories: PlaceCategory[];
   budgetCents?: number;
   origin?: GeoPoint;
@@ -136,7 +137,7 @@ export interface Recommendation {
 
 // Proposed (DECISIONS.md P-014), not yet ratified.
 // One vibe reading for the signed-in user, sent by the Vibe Engine to the
-// account module's recordVibe(). Keys are the DATA_MODEL.md §3 vocabulary
+// account module's recordVibe(). Keys are the DATA_MODEL.md §7 map-theme vocabulary
 // (VibeKey), values in [0,1]; unknown keys are dropped, out-of-range values clamped.
 export interface VibeSignal {
   scores: Partial<Record<VibeKey, number>>;

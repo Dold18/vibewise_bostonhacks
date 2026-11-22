@@ -102,33 +102,8 @@
 - **Implications:** The map's current live Overpass lookups are a prototype stand-in, to be replaced by Supabase queries. `price_source`, `hours` and `cuisines` need a CONTRACTS.md change to reach `Place`.
 - **Revisit trigger:** Price estimates prove too inaccurate in testing.
 
-### P-010 · Proposed · Ambience / vibe layer (amends PROJECT_BRIEF §5)
-- **Date / owner:** 2026-11-21 · Intelligence (Vibe), with Integration
-- **Context:** The brief keeps restaurant profiles cuisine- and dish-focused ("menus, not moods") so query and document embeddings stay comparable. But the flagship Vibe feature and the Living Map need *atmosphere*: "cozy rainy-night spot" can't be answered from menus alone.
-- **Decision:** Keep the menu profile and its embedding exactly as the brief specifies. **Add a separate ambience layer** per place:
-  - `vibe_scores` on a fixed, versioned vocabulary of 10 dimensions in [0,1] (DATA_MODEL.md §3);
-  - an `ambience_description`, embedded separately (`ambience_embedding`, same text model);
-  - `vibe_confidence` and `vibe_sources`.
-  These are produced offline by one LLM step from: the restaurant's own website text, descriptions of its interior photos (words kept, images never stored), OSM tags, computed neighborhood context, and student reviews.
-  The Gemini query step also outputs `vibe_scores` and an ambience sentence. Ranking adds ambience similarity and vibe-score overlap to the brief's hybrid search.
-- **Why / alternatives:** A separate embedding keeps mood words from diluting dish matching, which is the brief's concern. A fixed vocabulary also drives map themes (M4) and explainable matches. Folding mood into the menu description was rejected for that reason.
-- **Implications:** Extra schema columns and one extra LLM call per place offline. Places without websites get low-confidence vibe data, down-weighted in ranking. `VibeProfile.tags` in CONTRACTS.md uses the same vocabulary keys.
-- **Revisit trigger:** Evaluation (brief §13) shows the ambience layer doesn't improve vibe queries.
-
-### P-011 · Proposed · In-browser image/audio vibe models (complements Gemini)
-- **Date / owner:** 2026-11-21 · Intelligence (Vibe), with Map
-- **Context:** Gemini is the decided multimodal translator (brief §4). Free image-text models (CLIP/SigLIP) and audio-text models (CLAP) run in the browser via Transformers.js.
-- **Decision:**
-  - Run a **CLIP or SigLIP** model in the browser for image input. It produces `vibe_scores` (image vs one prompt sentence per vocabulary key) and an image vector matched against `ambience_clip_embedding` (CLIP text vectors of each place's ambience description, computed offline with the same CLIP model).
-  - Optionally, run **CLAP** for song mood scores.
-  - Gemini still provides cuisine, dishes and price feel.
-  - Small generative vision-language models (SmolVLM, Florence-2, Moondream) are fallback-only, because of large downloads and weaker quality.
-- **Why / alternatives:** Instant Living Map reaction without an API round-trip; uploaded photos stay on the device; no per-request cost; image queries keep working if Gemini is slow or down. Using Gemini alone was the alternative.
-- **Implications:**
-  - A separate vector column with the CLIP model's dimension. CLIP vectors are never compared with the text-model vectors (brief §4 "never mix" rule).
-  - Pin exact model IDs.
-  - Preload the model before demos: the first download is large, and speed depends on WebGPU support.
-- **Revisit trigger:** Model download or speed hurts the demo on judging hardware.
+### P-010 / P-011 · Superseded
+- A separate ambience layer with `vibe_scores`, and CLIP/SigLIP/CLAP in-browser models, were considered and superseded by the one-embedding design in [EMBEDDING_PIPELINE.md](EMBEDDING_PIPELINE.md) and [VIBE_QUIZ_DESIGN.md](VIBE_QUIZ_DESIGN.md) (2026-11-21).
 
 ### D-008 · Accepted · Branch-agnostic stretches in Tier 1 matching
 - **Date / owner:** 2026-11-21 / transit workstream. Implemented and tested in commit 34f79f6. Refines the matching rule in D-007 (itself still proposed).
