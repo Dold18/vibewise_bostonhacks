@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none" role="img" aria-label="Recenter">
+<title>Recenter</title>
+<path d="M36.6 24 A12.6 12.6 0 1 0 11.4 24 A12.6 12.6 0 1 0 36.6 24 Z" stroke="currentColor" stroke-width="4.3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M24 4.6 V10.2 M24 37.8 V43.4 M4.6 24 H10.2 M37.8 24 H43.4" stroke="currentColor" stroke-width="4.3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M28.8 24 A4.8 4.8 0 1 0 19.2 24 A4.8 4.8 0 1 0 28.8 24 Z" style="fill:var(--ia,#FF765E)"/>
+<path d="M7.2 17.6 A18 18 0 0 1 17.6 7.2" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M4.6 12.4 A21.5 21.5 0 0 1 12.4 4.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

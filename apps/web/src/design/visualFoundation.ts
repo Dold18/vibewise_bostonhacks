@@ -1,12 +1,19 @@
 /**
- * Dev-only Visual Foundation experiments.
+ * Neutral map looks.
  *
- * A preview is opt-in through ?visual=carbon|oxide|ultramarine. Production and
- * ordinary local runs keep the existing UI and map exactly as they were.
+ * Carbon (PR #43's mineral palette) is the approved neutral city for the
+ * Vibewise V3 identity and is the production default. The other looks stay
+ * available for side-by-side critique in local development only, through
+ * ?visual=oxide|ultramarine, or ?visual=light for the original light map.
  *
- * These palettes are only starting directions for critique, not approved
- * product themes or Scene Composer presets. The scene compiler inherits the
- * selected neutral basemap through mapStyle.basePalette.
+ * Whatever look is active becomes mapStyle.basePalette before the map is
+ * created, so Scene Composer and the vibe themes compile their neutral and
+ * themed scenes from it and transition with setScene/setPaintProperty; there
+ * is never a map.setStyle() reload.
+ *
+ * The dark developer UI skin that used to accompany these previews was
+ * superseded by the V3 identity (src/design/vibewise) and removed: the
+ * interface no longer changes with the map look.
  */
 export type VisualPreview = 'carbon' | 'oxide' | 'ultramarine';
 export const VISUAL_PREVIEWS: readonly VisualPreview[] = ['carbon', 'oxide', 'ultramarine'];
@@ -15,10 +22,20 @@ export function parseVisualPreview(raw: string | null): VisualPreview | null {
   return raw === 'carbon' || raw === 'oxide' || raw === 'ultramarine' ? raw : null;
 }
 
-export const activeVisualPreview: VisualPreview | null =
-  import.meta.env.DEV && typeof window !== 'undefined'
-    ? parseVisualPreview(new URLSearchParams(window.location.search).get('visual'))
-    : null;
+/** The approved production neutral look. */
+export const DEFAULT_NEUTRAL: VisualPreview = 'carbon';
+
+const devParam =
+  import.meta.env.DEV && typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('visual') : null;
+
+/** A development-only override of the neutral look (never honored in production builds). */
+export const activeVisualPreview: VisualPreview | null = parseVisualPreview(devParam);
+
+/**
+ * The neutral look in effect: Carbon unless a development override chose
+ * another. `null` means the original light palette (dev ?visual=light).
+ */
+export const activeNeutral: VisualPreview | null = devParam === 'light' ? null : (activeVisualPreview ?? DEFAULT_NEUTRAL);
 
 /**
  * Full basemap color replacements. No changes to data sources, geometries,
@@ -128,24 +145,16 @@ export const PREVIEW_MAP_COLORS = {
   },
 } as const;
 
-/** Preserve the exact original object when no preview is selected. */
+/** Apply a neutral look to the original light palette; `null` returns it unchanged. */
 export function mapPaletteForPreview<T extends Record<string, string>>(
   base: T,
-  preview: VisualPreview | null = activeVisualPreview,
+  preview: VisualPreview | null = activeNeutral,
 ): T {
   return preview ? { ...base, ...PREVIEW_MAP_COLORS[preview] } : base;
 }
 
-/** Add styling to the document; no extra controls or DOM layout changes. */
+/** Record the active neutral look on <html> (data-neutral-map) for diagnostics and QA. */
 export function activateVisualPreview(): void {
-  if (!activeVisualPreview || typeof document === 'undefined') return;
-  document.documentElement.dataset.visualPreview = activeVisualPreview;
-
-  // Load display type only for opt-in previews. The default product still uses
-  // its original fonts; these are display and readable UI faces, not icon fonts.
-  const fonts = document.createElement('link');
-  fonts.rel = 'stylesheet';
-  fonts.href =
-    'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap';
-  document.head.append(fonts);
+  if (typeof document === 'undefined') return;
+  document.documentElement.dataset.neutralMap = activeNeutral ?? 'light';
 }

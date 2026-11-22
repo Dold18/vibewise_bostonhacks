@@ -1,6 +1,6 @@
 /** vibeTheme scene mode: buildMapStyle scene parameters, applyStyle, transitions and setScene. */
 import { describe, expect, it } from 'vitest';
-import { basePalette, BUILDING_3D_BANDS, buildingColorAt, buildMapStyle, DEFAULT_SCENE_STYLE, lightShadowAngle, mapStyle, type SceneStyle } from '../../../mapStyle';
+import { basePalette, BUILDING_3D_BANDS, neutralPalette, buildingColorAt, buildMapStyle, DEFAULT_SCENE_STYLE, lightShadowAngle, mapStyle, type SceneStyle } from '../../../mapStyle';
 import type { AccountState, AccountStore } from '../../account/session';
 import { applyStyle, COLOR_PAINT, setColorTransition } from '../apply';
 import { sceneStyleOf, startThemeController, type SceneRender } from '../controller';
@@ -45,8 +45,8 @@ function store(initial: AccountState = { status: 'signed_out' }) {
 
 describe('buildMapStyle scene parameters', () => {
   it('defaults to today’s style exactly', () => {
-    expect(buildMapStyle(basePalette)).toEqual(mapStyle);
-    expect(buildMapStyle(basePalette, DEFAULT_SCENE_STYLE)).toEqual(mapStyle);
+    expect(buildMapStyle(neutralPalette)).toEqual(mapStyle);
+    expect(buildMapStyle(neutralPalette, DEFAULT_SCENE_STYLE)).toEqual(mapStyle);
   });
 
   it('carries light, sky/fog and transition into the style', () => {
@@ -66,15 +66,15 @@ describe('buildMapStyle scene parameters', () => {
 describe('applyStyle and color transitions', () => {
   it('is a no-op between identical inputs', () => {
     const f = fakeMap();
-    applyStyle(f.map, { palette: basePalette }, { palette: basePalette, scene: { ...DEFAULT_SCENE_STYLE } });
+    applyStyle(f.map, { palette: neutralPalette }, { palette: neutralPalette, scene: { ...DEFAULT_SCENE_STYLE } });
     expect(f.counts).toMatchObject({ setPaintProperty: 0, setLight: 0, setSky: 0 });
   });
 
   it('applies light and sky changes without touching paint when only the scene parameters change', () => {
     const f = fakeMap();
-    applyStyle(f.map, { palette: basePalette }, { palette: basePalette, scene: SCENE });
+    applyStyle(f.map, { palette: neutralPalette }, { palette: neutralPalette, scene: SCENE });
     expect(f.counts).toMatchObject({ setPaintProperty: 0, setLight: 1, setSky: 1 });
-    f.expectStyle(basePalette, SCENE);
+    f.expectStyle(neutralPalette, SCENE);
   });
 
   it('sets a transition on every color paint property, and nothing else', () => {
@@ -137,12 +137,12 @@ describe('ThemeController.setScene', () => {
     const theme = startThemeController(f.map, store(), { effects });
     theme.setScene(render(), { transitionMs: 150 });
     theme.setScene(null);
-    f.expectStyle(basePalette);
+    f.expectStyle(neutralPalette);
     expect(f.paint.get('water')!['fill-color-transition']).toEqual({ duration: 800, delay: 0 });
     expect(f.cssVars['--pin-shadow-angle']).toBe('115deg');
     theme.setScene(render());
     theme.destroy();
-    f.expectStyle(basePalette);
+    f.expectStyle(neutralPalette);
     expect(effects.destroyed).toBe(true);
   });
 
@@ -152,7 +152,7 @@ describe('ThemeController.setScene', () => {
     const theme = startThemeController(f.map, s, { effects: fakeEffects() });
     theme.preview({ late_night: 1 }, 1);
     const themed = f.paint.get('background')!['background-color'];
-    expect(themed).not.toBe(basePalette.land);
+    expect(themed).not.toBe(neutralPalette.land);
     theme.setScene(render());
     theme.preview({ cozy: 1 }, 1);
     expect(f.paint.get('background')!['background-color']).toBe(night.land);

@@ -8,6 +8,8 @@ import { apiEmbeddingProvider, apiGenerationProvider } from '../providers';
 import { matchesView } from '../matchesView';
 import { outingProfiles } from '../publisher';
 import type { Answer, OutingVibeProfile, Response } from '../profile';
+import { apertureArt } from '../../../design/vibewise/brand';
+import { answerLetter, answerSpine } from './quizParts';
 import './quiz.css';
 /** Identify the focused control by role so it can be found again after a re-render. */
 function focusKeyIn(root:HTMLElement):string|null {
@@ -78,14 +80,15 @@ export function createLiveQuiz(onBack:()=>void) {
   const moodSource=[p.question,...[...p.history].reverse().map(a=>a.question)].find(q=>q&&presentationOf(q));
   const mood=moodSource?presentationOf(moodSource)!.mood:undefined;if(mood)root.dataset.mood=mood;else delete root.dataset.mood;
   const back=button('Back to vibe description',()=>{active=false;onBack();});
-  root.append(h('div',{class:'vb-quiz-top'},back,h('span',{class:'vb-quiz-count'},`${p.history.length} answered · up to 10`)));
+  root.append(h('div',{class:'vb-quiz-top'},back,h('span',{class:'vb-quiz-kicker','aria-hidden':'true'},'The feeling')));
+  root.append(h('div',{class:'vb-quiz-progress'},answerSpine(p.history.length,p.phase!=='results'),h('span',{class:'vb-quiz-count'},`${p.history.length} answered · up to 10`)));
   const selected=selectedCoffeeScene(p);
   if(selected)root.append(h('p',{class:'vb-scene-selected','data-selected-scene':selected},`Selected environment: ${selected==='bakery'?'bakery counter':'window nook'}. You can change it in answer history.`));
   if(p.notice)root.append(h('p',{class:'vb-quiz-notice',role:'status'},p.notice),button('Try AI again',()=>session.retry()));
-  if(p.phase==='generating'){root.setAttribute('aria-busy','true');root.append(h('p',{class:'vb-quiz-loading',role:'status','aria-live':'polite'},h('span',{class:'vb-quiz-spinner','aria-hidden':'true'}),p.history.length===0?'Writing your first question…':'Finding the next detail in your scene…'));}
+  if(p.phase==='generating'){root.setAttribute('aria-busy','true');root.append(h('p',{class:'vb-quiz-loading',role:'status','aria-live':'polite'},h('span',{class:'vb-quiz-spinner','aria-hidden':'true'}),p.history.length===0?'Writing your first question…':'Finding the next detail in your scene…'));if(p.history.length===0)root.append(h('div',{class:'vb-quiz-intro-art'},apertureArt(150)));}
   const question=editing===null?p.question:p.history[editing]?.question;
   if((p.phase==='question'||editing!==null)&&question) {
-   const title=h('h3',{class:'vb-quiz-prompt',tabindex:'-1'},question.prompt);root.append(title);
+   const title=h('h3',{class:'vb-quiz-prompt',tabindex:'-1'},question.prompt);if(question.prompt.length>95)title.dataset.long=question.prompt.length>160?'xl':'true';root.append(title);
    const presentation=scenePresentation(question);
    const media=presentationOf(question);
    if(media) {
@@ -107,7 +110,7 @@ export function createLiveQuiz(onBack:()=>void) {
    } else {
     const cards=h('div',{class:'vb-quiz-answers'});
     for(const option of question.options)cards.append(button('',()=>respond({kind:'choice',optionId:option.id}),'vb-quiz-answer'));
-    [...cards.children].forEach((card,i)=>card.append(h('strong',{},question.options[i].label),h('span',{},question.options[i].description)));
+    [...cards.children].forEach((card,i)=>card.append(answerLetter(i),h('span',{class:'vb-quiz-answer-copy'},h('strong',{},question.options[i].label),h('span',{},question.options[i].description))));
     root.append(cards);
    }
    const neutral=h('div',{class:'vb-quiz-neutral'},button('Skip',()=>respond({kind:'skip'})),button('Neither / something else',()=>respond({kind:'neither'})));
@@ -122,7 +125,7 @@ export function createLiveQuiz(onBack:()=>void) {
   if(showingResults) {
    // One primary action at the top, visible without scrolling: Show My Matches → Rank My Matches ⇄ Show Unranked Matches.
    root.append(...resultsAction(p));
-   root.append(h('h3',{class:'vb-quiz-prompt'},p.completion.reason==='maximum'?'Your scene, in ten answers.':'Your outing, coming into focus.'),h('p',{class:'vb-quiz-results-note','aria-live':'polite'},resultsNote(p)));
+   root.append(h('h3',{class:'vb-quiz-prompt'},p.completion.reason==='maximum'?'Your scene, in ten answers.':'Your outing, coming into focus.'),h('div',{class:'vb-quiz-complete-art'},apertureArt(118)),h('p',{class:'vb-quiz-results-note','aria-live':'polite'},resultsNote(p)));
    if(p.completion.canContinue&&p.history.length<10)root.append(button('Continue Refining',()=>session.continueRefining(),'vb-primary-btn'));
    // Entering results moves focus to that action and scrolls it into view.
    if(active&&lastResults!==p.sessionId){lastResults=p.sessionId;queueMicrotask(()=>{const target=root.querySelector<HTMLElement>('.vb-quiz-results-action');if(active&&!root.hidden&&root.offsetParent!==null&&target){target.focus({preventScroll:true});target.scrollIntoView?.({block:'nearest'});}});}
@@ -136,7 +139,9 @@ export function createLiveQuiz(onBack:()=>void) {
     root.append(h('p',{class:'vb-scene-readback'},`You chose: ${chosen?.description??''}`),button('Not quite',()=>{editing=p.history.length-1;lastQuestion='';render(session.getSnapshot());root.querySelector<HTMLTextAreaElement>('.vb-quiz-correction')?.focus();}));
    }
   }
-  root.append(h('section',{class:'vb-quiz-summary','aria-label':'Evolving vibe summary'},h('h4',{},'Your vibe so far'),h('p',{},p.vibe_so_far||'Your scene will develop as you answer.')));
+  // V3 summary artifact: supplied summary text, plus small slips of the answers already given (repeated in history, so decorative here).
+  const slips=p.history.map(a=>a.response.kind==='choice'?a.question.options.find(o=>a.response.kind==='choice'&&o.id===a.response.optionId)?.label:a.response.kind==='correction'||a.response.kind==='text'?a.response.text:undefined).filter((t):t is string=>!!t).slice(-6);
+  root.append(h('section',{class:'vb-quiz-summary','aria-label':'Evolving vibe summary'},h('h4',{},'Your vibe so far'),h('p',{},p.vibe_so_far||'Your scene will develop as you answer.'),slips.length?h('div',{class:'vb-quiz-slips','aria-hidden':'true'},...slips.map(t=>h('span',{},t.length>40?t.slice(0,39)+'…':t))):null));
   const exclusions=p.evidence.filter(e=>e.polarity!=='want');
   if(exclusions.length)root.append(h('div',{class:'vb-quiz-exclusions'},h('strong',{},'Keeping in mind'),...exclusions.map(e=>h('span',{},e.text))));
   if(p.qualifiers.length)root.append(h('p',{class:'vb-quiz-notice'},`Still open: ${p.qualifiers.join(' · ')}`));

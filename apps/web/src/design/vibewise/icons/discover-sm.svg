@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none" role="img" aria-label="Discover">
+<title>Discover</title>
+<path d="M24 7.5 C26.48 20.52 26.48 20.52 39.5 23 C26.48 25.48 26.48 25.48 24 38.5 C21.52 25.48 21.52 25.48 8.5 23 C21.52 20.52 21.52 20.52 24 7.5 Z" fill="currentColor"/>
+<path d="M8.6 31.4 C4.8 36.6 8.2 39.8 16.8 37.6 C26.4 35.2 38.8 27.6 42.4 20.8 C44.4 17 42 15.2 37.2 16" style="stroke:var(--ia,#FF765E)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M39.6 33 C40.52 36.68 40.52 36.68 44.2 37.6 C40.52 38.52 40.52 38.52 39.6 42.2 C38.68 38.52 38.68 38.52 35 37.6 C38.68 36.68 38.68 36.68 39.6 33 Z" style="fill:var(--ia,#FF765E)"/>
+</svg>

@@ -1,9 +1,11 @@
 /*
- * Map overlays: destination popup and starting-point marker.
- * Tokens (--vb-*) come from .vb-ui in discovery/discovery.css.
+ * Map overlays — Vibewise V3: destination popup and starting-point marker.
+ * Tokens come from design/vibewise/tokens.css; .vb-ui primitives from
+ * discovery/discovery.css. MapLibre still owns the popup's anchoring,
+ * offsets (placePopup.ts POPUP_OFFSETS) and edge flipping.
  */
 
-/* ---------- Destination popup (MapLibre Popup with Vibenta content) ---------- */
+/* ---------- Destination popup (MapLibre Popup with Vibewise content) ---------- */
 
 .vb-place-popup {
   z-index: 2; /* above the desktop panel (z 1) if a pin sits right beside it */
@@ -18,39 +20,41 @@
   }
 }
 
+/* A small paper sheet with the coral registration (V3 secondary surface). */
 .vb-place-popup .maplibregl-popup-content {
   padding: 0;
-  border-radius: 16px;
-  border: 1px solid rgba(60, 64, 67, 0.12);
-  box-shadow:
-    0 4px 12px rgba(60, 64, 67, 0.18),
-    0 1px 3px rgba(60, 64, 67, 0.2);
-  background: #fff;
+  border: 1px solid #82947F;
+  border-radius: var(--vw-r-frame);
+  background: var(--vw-paper);
+  box-shadow: var(--vw-register), var(--vw-shadow);
 }
 
-/* The tip points at the pin; colour it to match the surface. */
+/* The tip points at the pin; it matches the paper. */
 .vb-place-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
 .vb-place-popup.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
 .vb-place-popup.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
-  border-top-color: #fff;
+  border-top-color: var(--vw-paper);
 }
 .vb-place-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip,
 .vb-place-popup.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
 .vb-place-popup.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
-  border-bottom-color: #fff;
+  border-bottom-color: var(--vw-paper);
 }
 .vb-place-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip {
-  border-right-color: #fff;
+  border-right-color: var(--vw-paper);
 }
 .vb-place-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip {
-  border-left-color: #fff;
+  border-left-color: var(--vw-paper);
 }
 
 .vb-popup {
-  width: min(304px, calc(100vw - 32px));
-  padding: 14px 14px 12px;
+  width: min(320px, calc(100vw - 32px));
+  max-height: min(70dvh, 560px);
+  overflow-y: auto;
+  padding: 16px;
   font-size: 14px;
-  animation: vb-popup-in 0.16s ease-out;
+  scrollbar-width: thin;
+  animation: vb-popup-in var(--vw-normal) var(--vw-ease);
 }
 
 @keyframes vb-popup-in {
@@ -62,29 +66,23 @@
 
 .vb-popup-head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
 }
 
+/* Venue mark: the category hue with a paper glyph; hue is never the only cue. */
 .vb-popup-badge {
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--badge-color, #1a73e8) 16%, #fff);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--badge-color, #1a73e8) 35%, #fff);
-  font-size: 18px;
-  line-height: 1;
-}
-
-.vb-popup-badge:empty::after {
-  content: '';
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--badge-color, #1a73e8);
+  width: 44px;
+  height: 44px;
+  border-radius: 14px 6px 13px 7px;
+  background: var(--badge-color, var(--vw-ink));
+  color: #fff;
+  box-shadow: inset 0 0 0 1px #0000001f;
+  --ia: transparent;
+  --iw: transparent;
 }
 
 .vb-popup-titles {
@@ -93,66 +91,67 @@
 }
 
 .vb-popup-titles h3 {
-  margin: 1px 0 0;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 1.25;
+  margin: 0;
+  font-family: var(--vw-display);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
   overflow-wrap: anywhere;
 }
 
 .vb-popup-titles p {
-  margin: 2px 0 0;
-  font-size: 12px;
-  color: var(--vb-muted);
+  margin: 3px 0 0;
+  font-size: 13px;
+  color: var(--vw-muted);
+  text-transform: capitalize;
 }
 
 .vb-popup-close {
   flex-shrink: 0;
+  align-self: flex-start;
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
-  margin: -4px -6px 0 0;
+  width: 40px;
+  height: 40px;
+  margin: -6px -8px 0 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: 12px;
   background: transparent;
-}
-
-.vb-popup-close svg {
-  fill: var(--vb-muted);
+  color: var(--vw-ink);
 }
 
 .vb-popup-close:hover {
-  background: var(--vb-hover);
+  background: var(--vw-hover);
 }
 
 .vb-popup-details {
   list-style: none;
   display: grid;
-  gap: 6px;
-  margin: 12px 0 0;
-  padding: 10px 0 0;
-  border-top: 1px solid var(--vb-border);
-  font-size: 13px;
+  gap: 10px;
+  margin: 13px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--vw-border);
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .vb-popup-details li {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 9px;
   overflow-wrap: anywhere;
 }
 
-.vb-popup-details svg {
-  flex-shrink: 0;
+.vb-popup-details .vw-icon {
   margin-top: 1px;
-  fill: var(--vb-muted);
+  color: var(--vw-ink);
 }
 
 .vb-popup-actions {
   display: flex;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .vb-popup-navigate,
@@ -160,70 +159,89 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  height: 36px;
-  border-radius: 18px;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: var(--vw-r-button);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 700;
+  transition: background var(--vw-fast), transform var(--vw-fast);
+}
+
+.vb-popup-navigate:active,
+.vb-popup-save:active {
+  transform: translateY(1px);
 }
 
 .vb-popup-navigate {
   flex: 1;
-  border: 0;
-  background: var(--vb-accent);
-  color: #fff !important;
-}
-
-.vb-popup-navigate svg {
-  fill: #fff;
+  background: var(--vw-coral);
+  color: var(--vw-ink);
 }
 
 .vb-popup-navigate:hover {
-  background: #1765cc;
+  background: var(--vw-coral-hover);
 }
 
 .vb-popup-save {
-  padding: 0 14px;
-  border: 1px solid var(--vb-border);
-  background: var(--vb-surface);
-  color: var(--vb-accent) !important;
-}
-
-.vb-popup-save svg {
-  fill: var(--vb-accent);
+  flex: 1;
+  background: var(--vw-secondary);
+  color: var(--vw-ink);
 }
 
 .vb-popup-save:hover {
-  background: #f6fafe;
+  background: var(--vw-secondary-hover);
 }
 
+/* Saved is explicit: lime sheet, ink keyline, filled bookmark. */
 .vb-popup-save[aria-pressed='true'] {
-  background: var(--vb-accent-soft);
-  border-color: #aecbfa;
+  background: var(--vw-lime);
+  box-shadow: inset 0 0 0 1px var(--vw-lime-edge);
 }
 
 .vb-popup-links {
   display: flex;
-  gap: 14px;
-  margin-top: 10px;
-  font-size: 12px;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 12px;
+  font-size: 13px;
 }
 
 .vb-popup-links a {
-  color: var(--vb-accent);
-  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  color: var(--vw-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--vw-border);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
 }
 
 .vb-popup-links a:hover {
-  text-decoration: underline;
+  text-decoration-color: var(--vw-ink);
+}
+
+.vb-popup .vb-popup-attribution {
+  margin: 8px 0 0;
+  padding: 0;
+  font-size: 11px;
+  color: var(--vw-muted);
+}
+
+.vb-popup .deal-list {
+  padding: 0;
 }
 
 /* ---------- Starting-point marker ---------- */
 
 /* MapLibre positions these marker elements; only size/visuals here. */
 .vb-origin {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   z-index: 2;
 }
 
@@ -232,9 +250,9 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: #1a73e8;
+  background: var(--vw-focus);
   border: 3px solid #fff;
-  box-shadow: none;
+  box-shadow: 0 0 0 1px var(--vw-ink);
 }
 
 /* Accuracy halo: only created for a real browser geolocation fix. */
@@ -242,9 +260,16 @@
   width: var(--halo-size, 0px);
   height: var(--halo-size, 0px);
   border-radius: 50%;
-  background: rgba(26, 115, 232, 0.14);
-  border: 1px solid rgba(26, 115, 232, 0.35);
+  background: #245E9C24;
+  border: 1px solid #245E9C66;
   pointer-events: none;
+}
+
+@media (max-width: 360px) {
+  .vb-popup-titles h3 { font-size: 17px; }
+  .vb-popup-badge { width: 36px; height: 36px; }
+  .vb-popup-navigate,
+  .vb-popup-save { font-size: 13px; padding: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

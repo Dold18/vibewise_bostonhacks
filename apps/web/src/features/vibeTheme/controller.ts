@@ -10,7 +10,7 @@
  *   plain map. This is the original behavior and the fallback.
  */
 import type { Map as MapLibreMap } from 'maplibre-gl';
-import { basePalette, DEFAULT_SCENE_STYLE, lightShadowAngle, THEME_TRANSITION_MS, type Palette, type SceneStyle } from '../../mapStyle';
+import { DEFAULT_SCENE_STYLE, neutralPalette, lightShadowAngle, THEME_TRANSITION_MS, type Palette, type SceneStyle } from '../../mapStyle';
 import type { AccountState, AccountStore } from '../account/session';
 import { normalizeScores, VIBE_KEYS, type VibeKey, type VibeScores } from '../account/vibes';
 import { applyStyle, setColorTransition, type StyleInputs } from './apply';
@@ -88,7 +88,8 @@ export interface ThemeControllerOptions {
   atmosphere?: AtmosphereTarget | null;
 }
 
-const PLAIN: StyleInputs = { palette: basePalette };
+/** No scene and no taste: the neutral city (Carbon). */
+const PLAIN: StyleInputs = { palette: neutralPalette };
 
 export function sceneStyleOf(scene: SceneRender): SceneStyle {
   return {
@@ -143,8 +144,9 @@ export function startThemeController(map: ThemeMap, store: AccountStore, options
     setTransition(THEME_TRANSITION_MS);
     setShadow(DEFAULT_SCENE_STYLE.lightPosition[1]);
     atmosphere?.setScene(null, { transitionMs: THEME_TRANSITION_MS });
-    const blend = target ? blendPalette(basePalette, target.tags, target.strength) : null;
-    const next: StyleInputs = { palette: blend?.palette ?? basePalette };
+    // Account taste tints the neutral city the user is looking at.
+    const blend = target ? blendPalette(neutralPalette, target.tags, target.strength) : null;
+    const next: StyleInputs = { palette: blend?.palette ?? neutralPalette };
     applyStyle(map, current, next, { transitionMs: THEME_TRANSITION_MS });
     current = next;
     // Effects follow the taste itself, not the contrast-limited palette

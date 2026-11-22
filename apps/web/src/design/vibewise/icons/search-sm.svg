@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none" role="img" aria-label="Search">
+<title>Search</title>
+<path d="M35 20 A15 15 0 1 0 5 20 A15 15 0 1 0 35 20 Z M29.6 20 A9.6 9.6 0 1 0 10.4 20 A9.6 9.6 0 1 0 29.6 20 Z" fill="currentColor" fill-rule="evenodd"/>
+<path d="M29.6 20 A9.6 9.6 0 1 0 10.4 20 A9.6 9.6 0 1 0 29.6 20 Z" style="fill:var(--iw,#D7EE73)"/>
+<path d="M24.4 20 A4.4 4.4 0 1 0 15.6 20 A4.4 4.4 0 1 0 24.4 20 Z" fill="currentColor"/>
+<path d="M28.6 34.2 L34.2 28.6 L43.6 38 C45.2 39.6 45.2 42 43.6 43.6 C42 45.2 39.6 45.2 38 43.6 Z" fill="currentColor"/>
+</svg>
