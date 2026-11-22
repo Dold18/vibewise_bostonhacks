@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Deal } from './deals';
 import { CATEGORIES, type Category } from './osm';
-import { DEALS_EMBED, fetchDetailsWith, isCatalogCategory, getCachedDetails, nearestByCategory, resetDealsEmbedForTests, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
+import { DEALS_EMBED, fetchDetailsForPins, fetchDetailsWith, isCatalogCategory, getCachedDetails, nearestByCategory, resetDealsEmbedForTests, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
 
 const cat = (id: string) => CATEGORIES.find((c) => c.id === id) as Category;
 const CENTER = { lat: 42.3555, lon: -71.0636 };
@@ -143,9 +143,8 @@ describe('nearestByCategory', () => {
 });
 
 describe('isCatalogCategory', () => {
-  it('backs the food layers only in PR 1', () => {
-    expect(isCatalogCategory(cat('coffee'))).toBe(true);
-    expect(isCatalogCategory({ id: 'museums', label: 'Museums' } as unknown as Category)).toBe(false);
+  it('backs the food and non-food layers', () => {
+    for (const id of ['coffee', 'museums', 'parks', 'landmarks', 'entertainment']) expect(isCatalogCategory(cat(id)), id).toBe(true);
   });
 });
 
@@ -233,5 +232,33 @@ describe('fetchDetailsWith', () => {
     await expect(fetchDetailsWith(query, ['bad:1'])).rejects.toThrow('boom');
     expect(query.mock.calls[2][0]).toContain('place_deals');
     warn.mockRestore();
+  });
+});
+
+describe('non-food places', () => {
+  beforeEach(resetDealsEmbedForTests);
+  const museum = pin({ placeId: 'osm:node/9', placeType: 'museums', kind: 'art_museum', name: 'MFA' });
+  const details = (extra: Partial<CatalogDetails>): CatalogDetails => ({ address: null, website: null, phone: null, hours_raw: null, osm_tags: null, attribution: 'x', deals: [], ...extra });
+
+  it('labels a museum by its kind, keeps the website and sets no price tags', () => {
+    const place = pinToPlace(museum, details({ kind: 'art_museum', website: 'https://x' } as Partial<CatalogDetails>));
+    expect(place.category).toBe('Art museum');
+    expect(place.tags.website).toBe('https://x');
+    expect(place.tags['catalog:price_band']).toBeUndefined();
+    expect(place.tags['catalog:price_source']).toBeUndefined();
+  });
+
+  it('queries one table per place type for a mixed list', async () => {
+    const calls: string[] = [];
+    const queryFor = (table: string) => async (columns: string, ids: string[]) => {
+      calls.push(`${table}:${columns.split(',')[0]}:${ids.join('|')}`);
+      return { data: ids.map((id) => ({ place_id: id, attribution: 'x' })), error: null };
+    };
+    await fetchDetailsForPins(queryFor, [
+      pin({ placeId: 'r:1', placeType: 'restaurants' }),
+      pin({ placeId: 'p:1', placeType: 'parks' }),
+      pin({ placeId: 'r:2', placeType: 'restaurants' }),
+    ]);
+    expect(calls).toEqual(['restaurants:place_id:r:1|r:2', 'parks:place_id:p:1']);
   });
 });

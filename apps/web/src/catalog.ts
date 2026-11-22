@@ -3,8 +3,8 @@
  * filled offline by `pipeline/` (OpenStreetMap + Foursquare OS Places).
  *
  * The browser uses the publishable key only; Row Level Security allows reads
- * and nothing else. The catalog holds food and drink places, so it backs the
- * Restaurants / Coffee / Bars map categories. Everything else stays on tiles/Overpass.
+ * and nothing else. It backs the food layers plus museums, parks, landmarks and
+ * entertainment; a layer with no catalog rows falls back to tiles/Overpass.
  *
  * Two steps, so the page never downloads details it won't show:
  *  1. The pin index: every place's id, name, category and location, fetched
@@ -16,15 +16,21 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { toDeals, type Deal } from './deals';
 import { metersBetween, type CategorizedPlace, type Category, type Place } from './osm';
 
-/** Map layer id → which catalog rows back it. PR 1 holds only the food layers. */
+/** Map layer id → which catalog rows back it. */
 export const CATALOG_LAYERS: Record<string, { placeType: string; kind?: string }> = {
   restaurants: { placeType: 'restaurants', kind: 'restaurant' },
   coffee: { placeType: 'restaurants', kind: 'cafe' },
   bars: { placeType: 'restaurants', kind: 'nightlife' },
+  museums: { placeType: 'museums' },
+  parks: { placeType: 'parks' },
+  landmarks: { placeType: 'landmarks' },
+  entertainment: { placeType: 'entertainment' },
 };
 
 const INDEX_COLUMNS = 'place_id, place_type, source, source_id, name, kind, location';
 const DETAIL_COLUMNS = 'place_id, address, website, phone, cuisines, hours_raw, osm_tags, attribution, price_band, price_source';
+/** Non-food type tables have a kind but no price or cuisine columns. */
+const KIND_DETAIL_COLUMNS = 'place_id, address, website, phone, kind, hours_raw, osm_tags, attribution';
 /** PostgREST embed of the place's deals (restaurants.id → places.id ← place_deals.place_ref); RLS hides hidden rows. */
 export const DEALS_EMBED = 'places(place_deals(kind, title, timing, schedule, source, source_url, checked_at))';
 const PAGE_SIZE = 1000; // PostgREST max_rows
@@ -46,14 +52,17 @@ export interface CatalogDetails {
   address: string | null;
   website: string | null;
   phone: string | null;
-  cuisines: string[] | null;
+  /** Restaurants only. */
+  cuisines?: string[] | null;
+  /** Non-food types only. */
+  kind?: string;
   hours_raw: string | null;
   osm_tags: Record<string, string> | null;
   attribution: string;
-  /** '$'..'$$$$' or 'unknown'; never null. */
-  price_band: string;
+  /** Restaurants only: '$'..'$$$$' or 'unknown'. */
+  price_band?: string;
   /** 'menu' (read from a menu) or 'estimate' (LLM guess, labeled "(est.)"); null when unknown. */
-  price_source: string | null;
+  price_source?: string | null;
   /** Validated deals; empty when none or when the deals embed is unavailable. */
   deals: Deal[];
 }
@@ -108,16 +117,17 @@ export function toPin(row: IndexRow): CatalogPin | null {
  * reads them; without details the card shows name and type only.
  */
 export function pinToPlace(pin: CatalogPin, details?: CatalogDetails): Place {
+  const food = pin.placeType === 'restaurants';
   const tags: Record<string, string> = { 'catalog:place_id': pin.placeId, 'catalog:source': pin.source };
   if (details?.address) tags.display_name = details.address;
   if (details?.website) tags.website = details.website;
   if (details?.phone) tags.phone = details.phone;
   if (details?.hours_raw) tags.opening_hours = details.hours_raw;
   if (details?.attribution) tags['catalog:attribution'] = details.attribution;
-  if (details?.price_band) tags['catalog:price_band'] = details.price_band;
-  if (details?.price_source) tags['catalog:price_source'] = details.price_source;
-  const kind = details?.osm_tags?.amenity ?? pin.kind;
-  const cuisine = details?.cuisines?.[0];
+  if (food && details?.price_band) tags['catalog:price_band'] = details.price_band;
+  if (food && details?.price_source) tags['catalog:price_source'] = details.price_source;
+  const kind = food ? (details?.osm_tags?.amenity ?? pin.kind) : pin.kind;
+  const cuisine = food ? details?.cuisines?.[0] : undefined;
   const place: Place = {
     // OSM ids stay bare ("node/1") so "View on OpenStreetMap" links to the feature.
     id: pin.source === 'osm' ? pin.sourceId : pin.placeId,
@@ -214,14 +224,14 @@ export function getCachedDetails(placeId: string): CatalogDetails | undefined {
 }
 
 /** Fetch and cache details for ids not yet cached, in chunks, via `query`. Throws if a request fails even without the deals embed. */
-export async function fetchDetailsWith(query: DetailsQuery, placeIds: string[]): Promise<void> {
+export async function fetchDetailsWith(query: DetailsQuery, placeIds: string[], detailColumns = DETAIL_COLUMNS): Promise<void> {
   const missing = placeIds.filter((id) => !detailsCache.has(id));
   for (let i = 0; i < missing.length; i += DETAIL_CHUNK) {
     const ids = missing.slice(i, i + DETAIL_CHUNK);
-    let result = await query(dealsEmbedAvailable ? `${DETAIL_COLUMNS}, ${DEALS_EMBED}` : DETAIL_COLUMNS, ids);
+    let result = await query(dealsEmbedAvailable ? `${detailColumns}, ${DEALS_EMBED}` : detailColumns, ids);
     if (result.error && dealsEmbedAvailable) {
       const embedError = result.error.message;
-      result = await query(DETAIL_COLUMNS, ids);
+      result = await query(detailColumns, ids);
       // Only blame the embed when the plain request works; otherwise it's a general outage.
       if (!result.error) {
         dealsEmbedAvailable = false;
@@ -236,16 +246,23 @@ export async function fetchDetailsWith(query: DetailsQuery, placeIds: string[]):
   }
 }
 
-/** Details per place type: each type's table is queried for just its own ids (PR 1: only `restaurants`). */
-async function fetchDetails(supabase: SupabaseClient, pins: CatalogPin[]): Promise<void> {
+/** Details per place type: each type's table is queried for just its own ids. */
+export async function fetchDetailsForPins(queryFor: (table: string) => DetailsQuery, pins: CatalogPin[]): Promise<void> {
   const byType = new Map<string, string[]>();
   for (const pin of pins) byType.set(pin.placeType, [...(byType.get(pin.placeType) ?? []), pin.placeId]);
   for (const [placeType, ids] of byType) {
-    await fetchDetailsWith(async (columns, chunk) => {
-      const { data, error } = await supabase.from(placeType).select(columns).in('place_id', chunk);
-      return { data: data as unknown[] | null, error };
-    }, ids);
+    await fetchDetailsWith(queryFor(placeType), ids, placeType === 'restaurants' ? DETAIL_COLUMNS : KIND_DETAIL_COLUMNS);
   }
+}
+
+async function fetchDetails(supabase: SupabaseClient, pins: CatalogPin[]): Promise<void> {
+  await fetchDetailsForPins(
+    (table) => async (columns, chunk) => {
+      const { data, error } = await supabase.from(table).select(columns).in('place_id', chunk);
+      return { data: data as unknown[] | null, error };
+    },
+    pins,
+  );
 }
 
 /**

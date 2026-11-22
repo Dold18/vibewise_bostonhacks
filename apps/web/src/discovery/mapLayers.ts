@@ -21,6 +21,10 @@ const ACTIVITY_TYPE_LAYERS: Partial<Record<ActivityTypeId, readonly string[]>> =
   museums_galleries: ['museums'],
   outdoors_parks: ['parks'],
   nightlife: ['bars'],
+  sightseeing: ['landmarks'],
+  games_entertainment: ['entertainment'],
+  sports_recreation: ['entertainment'],
+  live_music: ['entertainment'],
 };
 
 export interface MapLayer {
