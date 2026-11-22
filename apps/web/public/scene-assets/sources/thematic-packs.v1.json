@@ -824,6 +824,51 @@
       "priority": "P1",
       "status": "sourced_not_downloaded",
       "caveat": "Primary page lists FBX, OBJ and Blend; glTF conversion is required."
+    },
+    {
+      "id": "sam-meese-instruments",
+      "publisher": "Sam Meese",
+      "name": "Sam's Simple Instruments",
+      "sourceUrl": "https://sammeese.itch.io/simple-instruments-assets",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "creator_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 8,
+      "assetClass": "3d",
+      "tags": [
+        "music",
+        "acoustic",
+        "orchestral",
+        "live_performance",
+        "romantic"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "8 named musical instrument/prop items; GLB and OBJ provided, initial set does not establish a saxophone model."
+    },
+    {
+      "id": "3dassets-orchestra",
+      "publisher": "3DAssets.dev",
+      "name": "Orchestra and Band Instruments",
+      "sourceUrl": "https://3dassets.dev/packs/orchestra-and-band-instruments",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "creator_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 47,
+      "assetClass": "3d",
+      "tags": [
+        "jazz",
+        "music",
+        "classical",
+        "live_performance",
+        "nightlife",
+        "romantic"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "47 separate low-poly GLBs, claimed 6.2 MB total, saxophone/trumpet/stands/stage; visually inspect and independently validate downloaded files."
     }
   ],
   "recipes": [
@@ -1017,14 +1062,46 @@
         "kenney-particles"
       ],
       "requiresCuration": true
+    },
+    {
+      "id": "jazz_noir",
+      "context": [
+        "jazz",
+        "noir",
+        "intimate"
+      ],
+      "hero": "compact bandstand vignette with saxophone, trumpet, chair and warm spotlights",
+      "accent": "subtle lighting beams and drifting atmosphere",
+      "sourceIds": [
+        "3dassets-orchestra",
+        "kenney-light-masks",
+        "kenney-smoke"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "acoustic_romantic",
+      "context": [
+        "live_music",
+        "romantic",
+        "cozy"
+      ],
+      "hero": "instrument stand with violin/cello and warm lanterns",
+      "accent": "petal/soft-light accent",
+      "sourceIds": [
+        "sam-meese-instruments",
+        "kenney-light-masks",
+        "kenney-foliage"
+      ],
+      "requiresCuration": true
     }
   ],
   "openGaps": [
-    "Distinct music/jazz instruments and venue-specific performance props need individually verified source packs.",
     "Specific cuisine hero objects (pasta plates, pizza oven, ramen lanterns, taco stand) require per-model inspection; source theme tags do not prove inclusion.",
     "Art/museum/science installations and sports-specific accents need dedicated sourcing.",
     "Custom set-piece compositions must be authored from licensed primitives; none of the proposed recipes are prebuilt.",
-    "Download, hash, license-file archiving, GLB conversion, compression, scale normalization and browser performance validation are still pending."
+    "Download, hash, license-file archiving, GLB conversion, compression, scale normalization and browser performance validation are still pending.",
+    "Jazz sources now identified, but no musical props have been imported or browser-QA tested."
   ],
   "acceptanceForImport": [
     "Select concrete models by verified filename/thumbnail, not inferred pack title.",
