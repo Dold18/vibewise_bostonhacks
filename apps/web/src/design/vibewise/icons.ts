@@ -85,9 +85,13 @@ export function vwIcon(name: IconName, { size = 24, cut = 'auto', className = 'v
   return svg;
 }
 
-/** Same icon as an HTML string, for modules that build markup with innerHTML. */
-export function vwIconHtml(name: IconName, options: IconOptions = {}): string {
-  return vwIcon(name, options).outerHTML;
+const escapeAttr = (v: string) => v.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
+/** Same icon as an HTML string, for modules that build markup with innerHTML. DOM-free. */
+export function vwIconHtml(name: IconName, { size = 24, cut = 'auto', className = 'vw-icon', label }: IconOptions = {}): string {
+  const markup = normalizeIconMarkup(iconSource(name, resolveCut(size, cut)));
+  const a11y = label ? `role="img" aria-label="${escapeAttr(label)}"` : 'aria-hidden="true"';
+  return markup.replace(/^<svg/, `<svg width="${size}" height="${size}" class="${escapeAttr(`${className} vw-icon-${name}`)}" focusable="false" ${a11y}`);
 }
 
 /**

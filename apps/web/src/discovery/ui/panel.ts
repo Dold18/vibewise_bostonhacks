@@ -25,6 +25,8 @@ import {
 } from '../preferences';
 import { isExpanded, type LayoutAction, type LayoutState, type Store } from '../store';
 import { h, icon, ICONS, uid } from './dom';
+import { paintSheet } from '../../design/vibewise/sheets';
+import { wordmark } from '../../design/vibewise/brand';
 import { createLocationField } from './locationField';
 import { createMultiSelectField } from './multiSelectField';
 import { createSelectField } from './selectField';
@@ -139,10 +141,11 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     notesList,
   );
 
+  // V1 3C Button Cradle: this key sits in the sheet's top-right scoop (discovery.css .vw-cradle-key).
   const minimizeBtn = h(
     'button',
-    { type: 'button', class: 'vb-icon-btn vb-minimize', 'aria-label': 'Minimize preferences', 'aria-expanded': 'true', 'aria-controls': bodyId },
-    icon(ICONS.chevronDown, 22),
+    { type: 'button', class: 'vb-icon-btn vb-minimize vw-cradle-key', 'aria-label': 'Minimize preferences', 'aria-expanded': 'true', 'aria-controls': bodyId },
+    icon(ICONS.minus, 20),
   );
   const resetBtn = h('button', { type: 'button', class: 'vb-text-btn' }, 'Clear all');
   resetBtn.addEventListener('click', () => {
@@ -157,9 +160,10 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     'button',
     { type: 'button', class: 'vb-summary-btn', 'aria-expanded': 'false', 'aria-controls': bodyId },
     h('span', { class: 'vb-handle', 'aria-hidden': 'true' }),
-    icon(ICONS.tune, 20, 'vb-icon vb-summary-icon'),
+    icon(ICONS.tune, 28, 'vb-icon vb-summary-icon'),
     h('span', { class: 'vb-summary-stack' }, h('span', { class: 'vb-summary-title' }, 'Your preferences'), summaryText),
-    icon(ICONS.chevronDown, 20, 'vb-icon vb-summary-chevron'),
+    // The whole summary expands; its key occupies the same cradle scoop as the collapse key.
+    h('span', { class: 'vw-cradle-key vb-summary-key', 'aria-hidden': 'true' }, icon(ICONS.chevronDown, 20, 'vb-icon vb-summary-chevron')),
   );
 
   // --- Quick Tools and secondary views ---------------------------------------
@@ -209,6 +213,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
       'header',
       { class: 'vb-header' },
       h('span', { class: 'vb-handle', 'aria-hidden': 'true' }),
+      wordmark('stacked', { height: 62 }),
       h(
         'div',
         { class: 'vb-header-text' },
@@ -228,6 +233,8 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   expansion.inert = true;
   const toolsWidget = h('section', { class: 'vb-widget vb-tools-widget', 'aria-label': 'Quick Tools' }, quickTools.root, expansion);
   const preferencesWidget = h('section', { class: 'vb-widget vb-preferences-widget', 'aria-label': 'Discovery Preferences' }, summaryBtn, body);
+  // The signature layered sheet: paper front and coral backing share the exact V1 3C outline.
+  const unpaintSheet = paintSheet(preferencesWidget, 'cradle');
   const directionsSlot = h('section', { class: 'vb-widget vb-directions-slot', 'aria-label': 'Directions', hidden: true }, directions?.panel ?? null);
   const root = h('aside', { class: 'vb-discovery', 'aria-label': 'Plan your outing', 'data-panel-view': 'preferences', 'data-step': currentStep }, hasTools ? toolsWidget : null, preferencesWidget, directionsSlot, directions?.control ?? null);
   function setDirectionsExpanded(expanded: boolean) {
@@ -385,6 +392,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     },
     destroy() {
       window.clearTimeout(collapseTimer);
+      unpaintSheet();
       unsubPrefs();
       unsubLayout();
       fields.forEach((f) => f.destroy());

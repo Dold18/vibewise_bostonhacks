@@ -481,8 +481,19 @@ button {
 /* ---------- Small screens ---------- */
 
 @media (max-width: 640px) {
+  /* V3 phone layout: the control column sits under the account key, clear of the docked sheet. */
   .map-controls {
-    bottom: 40px;
+    top: 72px;
+    bottom: auto;
+    flex-direction: row;
+    gap: 8px;
+  }
+  .control-stack {
+    flex-direction: row;
+  }
+  .control-stack .control + .control {
+    border-top: 0;
+    border-left: 1px solid var(--vw-border);
   }
   .toast {
     left: 8px;

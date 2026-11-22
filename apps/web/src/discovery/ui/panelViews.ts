@@ -7,6 +7,7 @@ import type { Place } from '../../osm';
 import { createSearchController, type PlaceSearchProvider, type SearchState } from '../placeSearch';
 import type { SavedPlace, SavedStore } from '../saved';
 import { h, icon, ICONS, uid } from './dom';
+import type { IconName } from '../../design/vibewise/icons';
 
 // ---------------------------------------------------------------------------
 // Quick Tools
@@ -24,8 +25,8 @@ export function createQuickTools(actions: {
   saved?: () => void;
   recenter?: () => void;
 }): QuickTools {
-  const tool = (label: string, path: string, onClick?: () => void, extra?: Node) => {
-    const btn = h('button', { type: 'button', class: 'vb-tool', hidden: !onClick }, icon(path, 18), h('span', {}, label), extra ?? null);
+  const tool = (label: string, name: IconName, onClick?: () => void, extra?: Node) => {
+    const btn = h('button', { type: 'button', class: 'vb-tool', hidden: !onClick }, icon(name, 24), h('span', { class: 'vb-tool-label' }, label), extra ?? null);
     if (onClick) btn.addEventListener('click', onClick);
     return btn;
   };

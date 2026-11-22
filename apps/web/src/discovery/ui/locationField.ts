@@ -17,6 +17,7 @@ import {
 } from '../locations';
 import type { Origin } from '../preferences';
 import { h, icon, ICONS, onOutsideInteraction, uid } from './dom';
+import type { IconName } from '../../design/vibewise/icons';
 
 export interface LocationFieldConfig {
   provider: LocationSuggestionProvider;
@@ -43,7 +44,7 @@ export interface LocationField {
   destroy(): void;
 }
 
-const KIND_ICON: Record<string, string> = {
+const KIND_ICON: Record<string, IconName> = {
   station: ICONS.train,
   university: ICONS.school,
   landmark: ICONS.landmark,
