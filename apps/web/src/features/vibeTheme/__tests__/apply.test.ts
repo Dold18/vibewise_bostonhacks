@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { basePalette, buildMapStyle } from '../../../mapStyle';
+import { basePalette, BUILDING_MATERIALS, buildingLayerId, buildMapStyle } from '../../../mapStyle';
 import { applyPalette, diffPaint, type PaintTarget } from '../apply';
 
 function fakeMap(missing: string[] = []) {
@@ -31,13 +31,13 @@ describe('diffPaint', () => {
   });
 
   it('reports every 3D building band a changed palette entry feeds', () => {
-    // building3dHigh shapes the gradient from 60 m up: bands b4 (60–110 m) to b6 (200 m+).
+    // building3dHigh shapes the gradient from 60 m up: bands b4 (60–110 m) to b6 (200 m+),
+    // each drawn as one layer per OSM material tone (mapStyle BUILDING_MATERIALS).
     const changes = diffPaint(buildMapStyle(basePalette), buildMapStyle({ ...basePalette, building3dHigh: '#000000' }));
-    expect(changes.map((c) => `${c.layerId}/${c.property}`)).toEqual([
-      'building-3d-b4/fill-extrusion-color',
-      'building-3d-b5/fill-extrusion-color',
-      'building-3d-b6/fill-extrusion-color',
-    ]);
+    const expected = ['building-3d-b4', 'building-3d-b5', 'building-3d-b6'].flatMap((band) =>
+      BUILDING_MATERIALS.map((m) => `${buildingLayerId(band, m)}/fill-extrusion-color`),
+    );
+    expect(changes.map((c) => `${c.layerId}/${c.property}`).sort()).toEqual(expected.sort());
   });
 });
 
