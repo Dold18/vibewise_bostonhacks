@@ -7,7 +7,7 @@
  * and refreshed on a TTL so the index grows as pipeline enrichment completes.
  */
 import { createClient } from '@supabase/supabase-js';
-import { MODEL } from '../src/features/vibe/profile.ts';
+import { MODEL, preferenceScore } from '../src/features/vibe/profile.ts';
 import {
   PRICE_BANDS, normalizeCuisine, type GeoPoint, type PriceBand, type SearchFilters, type SearchResult,
 } from '../src/features/vibe/searchContract.ts';
@@ -158,14 +158,16 @@ export function straightLineMeters(a: GeoPoint, b: GeoPoint): number {
   return 2 * EARTH_RADIUS_M * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
-export interface Ranked { candidates: number; filtersApplied: Array<'price' | 'distance' | 'cuisine'>; results: SearchResult[] }
+export interface Ranked { candidates: number; filtersApplied: Array<'price' | 'distance' | 'cuisine'>; exclusionApplied: boolean; results: SearchResult[] }
 
 /**
- * Hard filters first (never touch the embedding), then cosine similarity over the survivors.
- * `query` must already be L2-normalized (`validateVector` does that).
+ * Hard filters first (never touch the embedding), then cosine similarity over the survivors, minus the
+ * exclusion penalty when `negative` is given (profile.ts preferenceScore, the same policy as the live map).
+ * `query` and `negative` must already be L2-normalized (`validateVector` does that).
  */
 export function rankRestaurants(
   rows: readonly CatalogRestaurant[], query: readonly number[], filters: SearchFilters, limit: number,
+  negative?: readonly number[],
 ): Ranked {
   const ceiling = filters.maxPriceBand ? PRICE_BANDS.indexOf(filters.maxPriceBand) : null; // every indexed row has a known band
   const applied: Ranked['filtersApplied'] = [];
@@ -183,15 +185,17 @@ export function rankRestaurants(
       distance = straightLineMeters(filters.origin, { lat: r.lat, lng: r.lng });
       if (filters.maxDistanceMeters !== undefined && distance > filters.maxDistanceMeters) continue;
     }
-    let dot = 0;
+    let dot = 0, avoid = 0;
     for (let i = 0; i < query.length; i++) dot += query[i]! * r.embedding[i]!;
-    scored.push({ r, score: dot, ...(distance === undefined ? {} : { distance }) });
+    if (negative) for (let i = 0; i < negative.length; i++) avoid += negative[i]! * r.embedding[i]!;
+    scored.push({ r, score: preferenceScore(dot, negative ? avoid : undefined), ...(distance === undefined ? {} : { distance }) });
   }
   scored.sort((a, b) => b.score - a.score || a.r.placeId.localeCompare(b.r.placeId));
 
   return {
     candidates: scored.length,
     filtersApplied: applied,
+    exclusionApplied: !!negative,
     results: scored.slice(0, limit).map(({ r, score, distance }) => ({
       placeId: r.placeId, name: r.name, score: Math.round(score * 10_000) / 10_000,
       category: r.category, cuisines: r.cuisines, priceBand: r.priceBand, priceSource: r.priceSource,

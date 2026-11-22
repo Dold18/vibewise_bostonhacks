@@ -1,7 +1,8 @@
 /**
  * The quiz's final, authoritative result set. When the quiz reaches its results phase and its query vector
  * is ready, this sends that vector (never re-embedded) to POST /api/vibe/search together with the
- * discovery panel's origin, budget and cuisine choices, and reports one of four states: idle, loading,
+ * discovery panel's origin, budget and cuisine choices (plus the exclusion vector, when the quiz has one),
+ * and reports one of four states: idle, loading,
  * error or ready. The live per-answer ranking (convergence.ts) stays separate and provisional.
  *
  * It never substitutes the live ranking for a failed call: the caller shows `error` as an error.
@@ -39,9 +40,10 @@ export function filtersFor(prefs: Pick<InitialPreferences, 'origin' | 'budget' |
   return filters;
 }
 
+/** The quiz's exclusions travel with the query, so "no bars or pubs" scores the same here as on the live map. */
 export function searchBodyFor(profile: OutingVibeProfile, filters: SearchFilters) {
-  const { vector, modelKey } = profile.embedding;
-  return { vector, modelKey, filters, limit: FINAL_SEARCH_LIMIT };
+  const { vector, negativeVector, modelKey } = profile.embedding;
+  return { vector, ...(negativeVector ? { negativeVector } : {}), modelKey, filters, limit: FINAL_SEARCH_LIMIT };
 }
 
 /** A search result as a map `Place`, built by the same `pinToPlace` the live pins use, so ids and tags match. */

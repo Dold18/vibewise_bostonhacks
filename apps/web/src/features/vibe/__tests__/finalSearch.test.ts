@@ -278,3 +278,42 @@ describe('end to end: quiz completion -> /api/vibe/search -> routable places', (
     expect((states.at(-1) as Extract<FinalSearchState, { status: 'ready' }>).places).toHaveLength(5);
   });
 });
+
+describe('final search carries the quiz exclusions', () => {
+  it('sends the exclusion vector with the query vector, and re-searches when a newer profile changes it', async () => {
+    const f = vi.fn(async () => json(searchBody()));
+    const states: FinalSearchState[] = [];
+    const fs = createFinalSearch({ getPrefs: () => prefs(), onState: (s) => states.push(s), fetchImpl: f as unknown as typeof fetch });
+    fs.evaluate(profile({ version: 1, embedding: ready(unit(3)) }));
+    await vi.waitFor(() => expect(states.at(-1)!.status).toBe('ready'));
+    fs.evaluate(profile({ version: 2, embedding: { ...ready(unit(3)), version: 2, negativeVector: unit(5) } }));
+    await vi.waitFor(() => expect(f).toHaveBeenCalledTimes(2));
+    const bodies = f.mock.calls.map((c) => JSON.parse((c as unknown as [string, RequestInit])[1].body as string));
+    expect('negativeVector' in bodies[0]).toBe(false);
+    expect(bodies[1]).toMatchObject({ vector: unit(3), negativeVector: unit(5), modelKey: MODEL_KEY });
+  });
+});
+
+describe('final search ordering', () => {
+  it('a slower, older response can never overwrite the newer answer', async () => {
+    const result = (placeId: string): SearchResult => ({
+      placeId, name: placeId, score: 0.5, category: 'restaurant', cuisines: [], priceBand: '$$', priceSource: 'estimate',
+      description: 'd', address: null, website: null, hoursRaw: null, location: { lat: 42.35, lng: -71.06 },
+    });
+    let releaseOld!: () => void;
+    const old = new Promise<void>((r) => { releaseOld = r; });
+    const f = vi.fn()
+      .mockImplementationOnce(async () => { await old; return json(searchBody([result('osm:node/1')])); }) // version 1, answers last
+      .mockImplementationOnce(async () => json(searchBody([result('osm:node/2')])));                       // version 2, answers first
+    const states: FinalSearchState[] = [];
+    const fs = createFinalSearch({ getPrefs: () => prefs(), onState: (s) => states.push(s), fetchImpl: f as unknown as typeof fetch });
+    fs.evaluate(profile({ version: 1, embedding: ready(unit(3)) }));
+    fs.evaluate(profile({ version: 2, embedding: { ...ready(unit(4)), version: 2 } }));
+    await vi.waitFor(() => expect(states.at(-1)!.status).toBe('ready'));
+    releaseOld();
+    await new Promise((r) => setTimeout(r, 20));
+    const last = states.at(-1)!;
+    expect(last.status === 'ready' && last.places.map((p) => p.tags['catalog:place_id'])).toEqual(['osm:node/2']);
+    expect(states.filter((s) => s.status === 'ready')).toHaveLength(1);
+  });
+});

@@ -46,14 +46,14 @@ export function createVibeRouter(deps:{generator?:GenerationProvider;embedder?:E
   if(!parsed.ok){res.status(400).json({error:parsed.error});return;}
   const catalog=catalogFor();
   if(!catalog){res.status(503).json({error:'Catalog search is not configured.'});return;}
-  const {query,filters,limit}=parsed.value;
+  const {query,filters,limit,negativeVector}=parsed.value;
   const abort=new AbortController();res.on('close',()=>abort.abort());
   try {
    // A text query is embedded here with the pinned MiniLM; a vector was already validated against MODEL_KEY on parse.
    const vector=query.kind==='vector'?query.vector:validateVector((await embedder.embed(query.text,abort.signal)).vector,MODEL_KEY);
    const rows=await catalog.restaurants(abort.signal);
-   const ranked=rankRestaurants(rows,vector,filters,limit);
-   const body:SearchResponse={modelKey:MODEL_KEY,candidates:ranked.candidates,indexed:rows.length,filtersApplied:ranked.filtersApplied,results:ranked.results};
+   const ranked=rankRestaurants(rows,vector,filters,limit,negativeVector);
+   const body:SearchResponse={modelKey:MODEL_KEY,candidates:ranked.candidates,indexed:rows.length,filtersApplied:ranked.filtersApplied,exclusionApplied:ranked.exclusionApplied,results:ranked.results};
    res.json(body);
   }catch{if(!res.headersSent&&!res.destroyed)res.status(503).json({error:'Search unavailable. Please retry.'});}
  });

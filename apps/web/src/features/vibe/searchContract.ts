@@ -47,14 +47,22 @@ export type SearchQuery =
   /** A vector the caller already embedded with this server's model (L2-normalized on parse). */
   | { kind: 'vector'; vector: number[] };
 
-export interface SearchRequest { query: SearchQuery; filters: SearchFilters; limit: number }
+export interface SearchRequest {
+  query: SearchQuery; filters: SearchFilters; limit: number;
+  /**
+   * The quiz's explicit exclusions ("no bars or pubs"), embedded separately with the same model and
+   * L2-normalized on parse. Ranking subtracts a penalty for similarity to it (profile.ts preferenceScore),
+   * the same policy as the live map ranking. Soft, not a hard filter.
+   */
+  negativeVector?: number[];
+}
 
 export type ParsedSearch = { ok: true; value: SearchRequest } | { ok: false; error: string };
 
 export interface SearchResult {
   placeId: string;
   name: string;
-  /** Cosine similarity to the query, 4 decimals. */
+  /** Cosine similarity to the query, minus the exclusion penalty when one was sent; 4 decimals. */
   score: number;
   category: string | null;
   cuisines: string[];
@@ -79,6 +87,8 @@ export interface SearchResponse {
   /** Embedded restaurants searched in total. Grows as catalog enrichment completes. */
   indexed: number;
   filtersApplied: Array<'price' | 'distance' | 'cuisine'>;
+  /** True when the request's exclusion vector lowered the scores below. */
+  exclusionApplied: boolean;
   results: SearchResult[];
 }
 
@@ -160,7 +170,15 @@ export function parseSearchRequest(body: unknown): ParsedSearch {
     limit = rawLimit;
   }
 
-  return { ok: true, value: { query, filters, limit } };
+  const rawNegative = body['negativeVector'];
+  if (rawNegative === undefined) return { ok: true, value: { query, filters, limit } };
+  let negativeVector: number[];
+  try {
+    negativeVector = validateVector(rawNegative, body['modelKey']);
+  } catch {
+    return { ok: false, error: '"negativeVector" must be a finite 384-number array sent with the server\'s exact "modelKey".' };
+  }
+  return { ok: true, value: { query, filters, limit, negativeVector } };
 }
 
 /**

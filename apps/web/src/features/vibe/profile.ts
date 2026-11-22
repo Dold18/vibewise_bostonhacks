@@ -42,3 +42,10 @@ export function validateVector(value: unknown, modelKey: unknown): number[] {
   return value.map(v=>v/norm);
 }
 export function cosine(a: readonly number[], b: readonly number[]) { return a.reduce((sum,v,i)=>sum+v*b[i],0); }
+/** Penalty for similarity to explicit exclusions; calibrated on real MiniLM fixtures (scripts/ranking-real-minilm.mjs). */
+export const AVOID_WEIGHT=0.6;
+/**
+ * One scoring policy for the live map ranking and the final catalog search: similarity to what the user
+ * wants, minus a penalty for similarity to what they excluded (MiniLM cannot read negation inside one query).
+ */
+export function preferenceScore(similarity: number, avoidSimilarity?: number) { return similarity-(avoidSimilarity===undefined?0:AVOID_WEIGHT*Math.max(0,avoidSimilarity)); }
