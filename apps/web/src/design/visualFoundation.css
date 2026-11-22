@@ -249,11 +249,11 @@
 
 
 /* ========================================================================== *
- * CARBON STUDIO / interface study
+ * CARBON STUDIO / youth culture interface study
  *
  * Opt-in via ?visual=carbon&studio=1. Identical basemap, DOM, event handlers,
  * map camera, overlays and question engine to the existing Carbon preview.
- * Every change below is presentational. No global marker geometry changes.
+ * Visual inspiration: independent music flyers, art-book typography, eclectic\n * gig posters and contemporary youth culture. Avoid faux-industrial dashboards.\n * Every change below is presentational. No global marker geometry changes.
  * ========================================================================== */
 
 :root[data-carbon-studio] {
@@ -304,14 +304,14 @@
   pointer-events: none;
 }
 
-/* A thin control deck with framed glyphs. */
+/* A compact culture-index strip: sticker-framed glyphs, not dashboard controls. */
 :root[data-carbon-studio] .vb-tools-widget {
   flex: 0 0 auto;
   padding: 10px 12px 12px;
   background-color: var(--studio-recess);
 }
 :root[data-carbon-studio] .vb-tools-widget::before {
-  content: 'VIBENTA  /  FIELD TOOLS';
+  content: 'VIBENTA   /   FIND YOUR FREQUENCY';
   display: block;
   margin: 0 0 9px 1px;
   color: var(--studio-muted);
@@ -356,7 +356,7 @@
   font-weight: 700;
 }
 
-/* Preference sheet: dense type, distinctive headings and subtle inset rules. */
+/* An editorial sheet: headline-scale type and bright graphic rules. */
 :root[data-carbon-studio] .vb-preferences-widget {
   --vb-radius: 10px 4px 10px 4px;
   background-color: var(--studio-surface);
@@ -425,7 +425,7 @@
   fill: var(--studio-lime);
 }
 
-/* Inputs become inset machined surfaces. Preserve the native controls. */
+/* Matte, tactile input tiles. Preserve all native controls and behaviors. */
 :root[data-carbon-studio] .vb-trigger,
 :root[data-carbon-studio] .vb-input,
 :root[data-carbon-studio] .vb-textarea,
@@ -469,7 +469,7 @@
   color: var(--studio-lime);
 }
 
-/* Control language: flat acid-lime keys, square-framed icon buttons. */
+/* Control language: gig-poster ink, electric chartreuse accents, graphic glyphs. */
 :root[data-carbon-studio] .vb-primary-btn,
 :root[data-carbon-studio] .vb-footer-actions .vb-primary-btn,
 :root[data-carbon-studio] .vb-popup-navigate,
@@ -737,5 +737,90 @@
   :root[data-carbon-studio] *::before,
   :root[data-carbon-studio] *::after {
     scroll-behavior: auto !important;
+  }
+}
+
+
+/* Young, expressive and location-led: restrained editorial stickers and rules.
+   These are presentation-only accents—no fabricated venue/cultural content. */
+:root[data-carbon-studio] {
+  --studio-rose: #E4A6A0;
+  --studio-blue: #9BBFD1;
+  --studio-paper: #E6E2D4;
+}
+:root[data-carbon-studio] .vb-preferences-widget {
+  background-image:
+    radial-gradient(circle at 96% 2%, rgba(228,166,160,.10) 0 22px, transparent 23px),
+    linear-gradient(146deg, rgba(216,234,130,.03), transparent 42%),
+    repeating-linear-gradient(90deg, transparent 0 29px, rgba(255,255,255,.008) 30px);
+}
+:root[data-carbon-studio] .vb-preferences-widget::before {
+  content: '01   /   CURATE YOUR CITY';
+  display: block;
+  align-self: stretch;
+  flex: 0 0 auto;
+  padding: 8px 18px 0;
+  color: var(--studio-lime);
+  font: 700 10px/1.5 'Space Grotesk', Arial, sans-serif;
+  letter-spacing: .13em;
+  pointer-events: none;
+}
+:root[data-carbon-studio] .vb-header {
+  padding-top: 9px;
+}
+:root[data-carbon-studio] .vb-title {
+  font-size: 34px;
+  letter-spacing: -.018em;
+}
+:root[data-carbon-studio] .vb-handle {
+  background: var(--studio-lime);
+}
+:root[data-carbon-studio] .vb-tool:nth-child(2) svg {
+  background: #393338;
+  border-color: rgba(228,166,160,.48);
+  fill: var(--studio-rose);
+}
+:root[data-carbon-studio] .vb-tool:nth-child(3) svg {
+  background: #27383B;
+  border-color: rgba(155,191,209,.48);
+  fill: var(--studio-blue);
+}
+:root[data-carbon-studio] .vb-vibe-example:nth-child(3n + 2) {
+  border-color: rgba(228,166,160,.46);
+}
+:root[data-carbon-studio] .vb-vibe-example:nth-child(3n) {
+  border-color: rgba(155,191,209,.45);
+}
+:root[data-carbon-studio] .vb-vibe-example:hover {
+  transform: translateY(-2px) rotate(-.25deg);
+}
+:root[data-carbon-studio] .vb-quiz-top {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--studio-hairline);
+}
+:root[data-carbon-studio] .vb-quiz-count {
+  color: var(--studio-lime);
+  font: 700 10px/1.5 'Space Grotesk', sans-serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+:root[data-carbon-studio] .vb-scene-option:nth-child(odd) {
+  border-top: 3px solid var(--studio-rose);
+}
+:root[data-carbon-studio] .vb-scene-option:nth-child(even) {
+  border-top: 3px solid var(--studio-blue);
+}
+:root[data-carbon-studio] .vb-popup-badge {
+  transform: rotate(-3deg);
+}
+:root[data-carbon-studio] .vb-planner-notice {
+  border-left: 3px solid var(--studio-rose);
+}
+:root[data-carbon-studio] .vb-route-option {
+  border-left: 2px solid var(--studio-blue);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-carbon-studio] .vb-vibe-example:hover {
+    transform: none;
   }
 }
