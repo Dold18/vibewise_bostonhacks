@@ -113,7 +113,7 @@ test('parseFsqRows filters by place type', () => {
     { ...base, fsq_place_id: 'f2', fsq_category_labels: ['Dining and Drinking > Cafe'] },
     { ...base, fsq_place_id: 'f3', fsq_category_labels: ['Landmarks and Outdoors > Park'] },
   ];
-  assert.deepEqual(parseFsqRows(rows, PLACE_TYPE_CONFIG.parks), []);
+  assert.deepEqual(parseFsqRows(rows, PLACE_TYPE_CONFIG.parks).map((p) => p.fsqId), ['f3']);
   assert.deepEqual(parseFsqRows(rows, PLACE_TYPE_CONFIG.museums).map((p) => p.fsqId), ['f1']);
   assert.deepEqual(parseFsqRows(rows, FOOD).map((p) => p.fsqId), ['f2']);
 });
@@ -143,4 +143,14 @@ test('fsqRow for a museum carries the Foursquare kind', () => {
   assert.equal(row.hours_raw, null);
   assert.throws(() => fsqRow({ fsqId: 'z', name: 'Cafe', lat: 1, lng: 2, address: null, locality: null, postcode: null,
     tel: null, website: null, dateRefreshed: null, categoryLabels: ['Dining and Drinking > Cafe'] }, runStart, PLACE_TYPE_CONFIG.museums));
+});
+
+test('parseOverpass drops a landmark route relation (Freedom Trail) but keeps a real landmark', () => {
+  const places = parseOverpass([
+    { type: 'relation', id: 976514, bounds: { minlat: 42.35, maxlat: 42.38, minlon: -71.07, maxlon: -71.05 },
+      tags: { name: 'Freedom Trail', type: 'route', route: 'foot', tourism: 'attraction', wikidata: 'Q1' } },
+    { type: 'way', id: 2, bounds: { minlat: 42.358, maxlat: 42.3582, minlon: -71.058, maxlon: -71.0578 },
+      tags: { name: 'Old State House', historic: 'building', wikidata: 'Q2' } },
+  ], PLACE_TYPE_CONFIG.landmarks);
+  assert.deepEqual(places.map((p) => p.osmId), ['way/2']);
 });

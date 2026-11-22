@@ -180,3 +180,16 @@ test('summarize prints Foursquare sub-venues dropped only for non-food types', (
   const food = summarize({ ...baseInput, subVenuesDropped: 0 }).split('\n');
   assert.equal(food.some((l) => l.startsWith('Foursquare sub-venues')), false);
 });
+
+test('summarize prints sub-venues merged and unmatched Foursquare dropped for non-food types only', () => {
+  const parks = summarize({ ...baseInput, type: 'parks', subVenuesMerged: 4, subVenuesDropped: 1, unmatchedFsqDropped: 7 }).split('\n');
+  const i = parks.indexOf('Foursquare sub-venues merged: 4');
+  assert.ok(i >= 0);
+  assert.equal(parks[i + 1], 'Foursquare sub-venues dropped: 1');
+  assert.equal(parks[i + 2], 'Unmatched Foursquare dropped: 7');
+  const museums = summarize({ ...baseInput, type: 'museums' }).split('\n');
+  assert.ok(museums.includes('Foursquare sub-venues merged: 0'));
+  assert.ok(museums.includes('Unmatched Foursquare dropped: 0'));
+  const food = summarize({ ...baseInput, subVenuesMerged: 0, unmatchedFsqDropped: 0 }).split('\n');
+  assert.equal(food.some((l) => l.startsWith('Foursquare sub-venues') || l.startsWith('Unmatched Foursquare')), false);
+});

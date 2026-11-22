@@ -62,7 +62,6 @@ export function parseOverpass(elements: OverpassElement[], cfg: PlaceTypeConfig)
 }
 
 export function parseFsqRows(rows: Record<string, unknown>[], cfg: PlaceTypeConfig): FsqPlace[] {
-  if (!cfg.keepFsq) return [];
   const out: FsqPlace[] = [];
   for (const r of rows) {
     const fsqId = clean(r.fsq_place_id);
