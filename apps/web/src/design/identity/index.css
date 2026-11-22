@@ -1,0 +1,8 @@
+/*
+ * Vibenta identity. Imported last by main.ts so it styles every module's
+ * existing markup. See design/README.md (Identity section) for the system.
+ */
+@import './tokens.css';
+@import './base.css';
+@import './surfaces.css';
+@import './quiz.css';

@@ -10,10 +10,10 @@ import {
 } from '../preferences';
 import { appendVibeImages, MAX_VIBE_IMAGES, MAX_VIBE_IMAGE_BYTES } from '../vibeImages';
 import type { Store } from '../store';
-import { h, icon, uid } from './dom';
+import { h, icon, ICONS, uid } from './dom';
 
-const PHOTO_ICON = 'M21 19V5H3v14h18zm0-16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h18zM8.5 7a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zm-4 10 5-4 3 2.5 3-4.5 4.5 6H4.5z';
-const REMOVE_ICON = 'M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z';
+const PHOTO_ICON = ICONS.photo;
+const REMOVE_ICON = ICONS.close;
 
 const EXAMPLES = [
   {

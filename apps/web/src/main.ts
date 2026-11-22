@@ -54,6 +54,9 @@ import { paddingAround } from './features/map/routeFrame';
 import { drawRoute, clearRoute, routeBounds, routeStations } from './transitRoute';
 import { catalogPlacesNear, catalogSemanticCandidates, isCatalogCategory } from './catalog';
 import { activeKinds, chipText } from './deals';
+// The Vibenta identity loads last so it styles every module's existing markup.
+import './design/identity/index.css';
+import { connectSceneAccent } from './design/sceneAccent';
 
 const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
 const TILTED = { pitch: 60, bearing: -20 };
@@ -903,6 +906,8 @@ const scene = mountScene({
   onError: (error) => console.error('[scene]', error),
 });
 if (import.meta.env.DEV) Object.assign(window, { vibentaScene: sceneDevHook(scene, map) });
+// Selected interface accents (not the identity itself) follow the active scene.
+const stopSceneAccent = connectSceneAccent(scene.session);
 // One publisher feeds the existing compiler/session and the existing pin system.
 scene.connectProfiles(outingProfiles);
 const convergence = createConvergence(
@@ -995,6 +1000,7 @@ if (import.meta.hot) import.meta.hot.dispose(() => {
   stopConvergence();
   convergence.destroy();
   discovery.destroy();
+  stopSceneAccent();
   scene.destroy();
   account.destroy();
 });
