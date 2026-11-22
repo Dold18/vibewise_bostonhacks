@@ -108,7 +108,17 @@ node scripts/visual-identity-browser.mjs [shots.json]  # screenshots (headless C
   - **Navigation:** the old blue-header check now asserts the identity (header in `--vx-text` with Londrina, coral `::after` marker, `--vx-text-faint` labels), resolved through a token probe. The baseline fails it, as it should. `mobile Directions … onScreen` was flaky, and the cause wasn't the CSS: under swiftshader the page runs at a few fps, so the sheet was measured on the first frame of `vb-sheet` + `vb-enter` (24 + 8 = 32 px below the fold). The suite now waits for finite animations to finish (`settled()`) before measuring. `Exit … releases pitch` failed once, only while two swiftshader suites ran in parallel. Run the suites one at a time.
   - **Vibe:** the `listeners===1` failure is fixed by `withSceneAccent`. Confirmed 30/30.
   - **Session B:** the same 4 failures exist on the untouched baseline (390 px "preview leaves map unchanged", the two "Gemini failure authored B1/B2" checks, and harness `Invalid InterceptionId` errors), so they're pre-existing.
-  - **Software-GL frame rate:** a 1 s rAF count after opening mobile Directions gives **3 fps on the branch vs 6 fps on the baseline** (swiftshader). On a GPU both run at about 55 fps (above). The extra cost comes from 30 building layers, contact shadows and material overlays. Machines that fall back to software WebGL will feel it. A cheaper path would be collapsing materials to one layer per band when the GL renderer string (`WEBGL_debug_renderer_info`) reports SwiftShader or another software renderer. Not done.
+  - **Software-GL frame rate (corrected).** An earlier single sample (3 vs 6 fps while mobile Directions was open, machine load ≈12) suggested a 2× regression. A controlled bench does **not** reproduce it. The bench uses SwiftShader at 1440×900, a static camera with every tile loaded, continuous repaint, 6 s windows, and alternates branch and baseline in rounds. Median p50 frame time:
+
+    | View | Baseline `a680902` | Branch | Branch, textures off | Branch, all new map effects off |
+    |---|---|---|---|---|
+    | 3D downtown, z15.5, pitch 60 | ~157 ms | ~159 ms | ~151 ms | ~149 ms |
+    | 2D river, z13.2 | ~149 ms | ~138 ms | ~106 ms | ~101 ms |
+
+    - The ground textures are the largest new cost: about 20–25% of frame time when water and parks fill a 2D view, about 5% in 3D. The contact shadow costs about 10% in 3D downtown and is inconsistent in 2D.
+    - Collapsing the 30 material layers to 6 gave **no** gain. The identity CSS (no backdrop-filter or blend modes) has no measurable cost.
+    - Run-to-run noise on a loaded machine is ±30%, so only effects that win in every round are reported.
+    - Recommendation, not implemented: on a software renderer (`WEBGL_debug_renderer_info` reports SwiftShader/llvmpipe), call `vibentaMaterials.setEnabled(false)` and hide `building-contact-shadow`. GPU users keep full quality. Measure that combined config before shipping it.
 - **Screenshots** captured: 1440×900, 1366×768, 390×844, 360×640. States: default, dropdown, vibe step, quiz, quiz launch, search, saved, venue popup, mobile sheet, mobile dropdown, keyboard focus. Road zooms: z12/z13 2D, z14/z15/z16/z17.5 tilt, z16 2D. Committed evidence is in `docs/qa/visual-identity/`.
 - **Keyboard:** Tab and Enter work. Focus rings are cobalt-light (`#a3b5ff`); field triggers show focus with a cobalt border and ring. Tab order still starts at the map pins (their DOM order), which is existing behavior.
 - **Reduced motion:** the harness emulates `prefers-reduced-motion: reduce` by default, and the identity's transforms and transitions are disabled under it.
