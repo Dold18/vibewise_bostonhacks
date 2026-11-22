@@ -6,7 +6,7 @@
 |---|---|---|---|
 | A — Living Map & Cards | **Map teammate (assign name)** | Basemap, markers, place cards, selection UX, route overlay renderer, theme slots | Calling MBTA/provider APIs, inventing route logic |
 | B — Transit | **MBTA teammate (assign name)** | Transit provider/adapter, request validation, route legs, times/transfers, routing tests | Second map, place catalog UI, changing cards |
-| C — Product / Vibe (after M2) | **Project lead / assigned developer** | Preference scoring, quiz, Vibe DNA, theme state and rank output | Owning the map renderer or transit provider |
+| C — Product / Vibe (after M2) | **Project lead / assigned developer** | Quiz, embedding-based ranking, Vibe DNA, theme state and rank output | Owning the map renderer or transit provider |
 | D — Integration / QA | **Project lead / integration owner** | Shared contracts, selection coordinator, catalog fixture, integration smoke tests, PR coordination | Silent breaking changes in teammates' branches |
 
 Names are deliberately unassigned; do not infer assignments from repository access.

@@ -24,31 +24,32 @@ This document briefs an agent joining the project. It covers the goal, the decid
 
 ## 3. Architecture overview
 
-The system has two phases that share one embedding model.
+The system has two phases that share one embedding model and one embedding space (see [docs/EMBEDDING_PIPELINE.md](docs/EMBEDDING_PIPELINE.md)).
 
 ### 3.1 Phase 1: offline indexing (batch job)
 
 1. **Restaurant list.** Pull restaurants with coordinates, cuisine tags, and website URLs from open map data (OpenStreetMap via Overpass, and/or Foursquare Open Source Places, which is Apache 2.0 licensed). **Do not** source restaurant data or website URLs from the Google Places API (see constraints).
 2. **Scrape** each restaurant's website: menu pages, about pages. Handle PDFs and image menus where feasible (text extraction or OCR). Respect `robots.txt`, rate-limit, use an honest user agent. Skip menus hosted on third-party ordering or delivery platforms.
-3. **Normalize** each scraped site with an LLM into a standardized profile (see section 5.1). This runs offline, so cost and latency don't matter much.
-4. **Embed** each profile's description text with the embedding model.
+3. **Normalize** each scraped site with an LLM into a standardized profile (see section 5.1), and generate a vibe layer (atmosphere, mood, lighting, energy, occasion-fit). This runs offline, so cost and latency don't matter much.
+4. **Embed** each restaurant's combined description (facts + vibe, one passage) once with the embedding model.
 5. **Store** vectors plus metadata in Supabase.
 6. **Precompute transit proximity:** for each restaurant, the nearest MBTA stations within roughly 800 m and the walking distance to each.
 
 ### 3.2 Phase 2: online query (per request)
 
-1. **Text input** goes straight to the embedding model.
-2. **Image or song input** goes to Gemini first, which returns structured JSON (section 5.2). Only the `description` field is embedded; the other fields are used for filtering and boosting.
-3. **Filter** candidates in SQL: geographic radius or transit reachability, open now, budget.
-4. **Rank** with hybrid search: pgvector cosine similarity combined with Postgres full-text search via reciprocal rank fusion (section 6).
-5. **Return** the top results with transit info and cost estimates, rendered on the map.
+1. **Text input** goes straight to the embedding model. No LLM call and no HyDE.
+2. **Image, song or movie input** goes to Gemini first, which returns structured JSON (section 5.2). Its `description` field, a vibe-text description in the catalog's vibe vocabulary, is embedded; the other fields are used for filtering and boosting.
+3. **Quiz input:** the final `vibe_so_far` text from the generative quiz ([docs/VIBE_QUIZ_DESIGN.md](docs/VIBE_QUIZ_DESIGN.md)) is embedded like any text.
+4. **Filter** candidates in SQL: geographic radius or transit reachability, open now, budget.
+5. **Rank** by pgvector cosine similarity, with an optional small tag boost (section 6).
+6. **Return** the top results with transit info and cost estimates, rendered on the map.
 
 ## 4. Tech stack
 
 | Component | Choice | Status |
 |---|---|---|
 | Language | TypeScript | **Decided** |
-| Embedding model | `Xenova/all-MiniLM-L6-v2` or `Xenova/bge-small-en-v1.5` via Transformers.js (`@huggingface/transformers`), 384 dimensions | **Decided** (pick one and never mix) |
+| Embedding model | `Xenova/all-MiniLM-L6-v2` via Transformers.js (`@huggingface/transformers`), 384 dimensions | **Decided** |
 | Embedding location | Server-side (Node or a Supabase Edge Function) | Recommended |
 | Database | Supabase (Postgres + pgvector + PostGIS + full-text search) | **Decided** |
 | Multimodal translation | Gemini (image and audio input, JSON output) | **Decided** |
@@ -58,8 +59,6 @@ The system has two phases that share one embedding model.
 | Transit data | MBTA V3 API (free, needs API key) and MBTA GTFS static feed | **Decided** |
 
 Critical rule: the embedding model used for queries must be **identical** to the one used for indexing, including quantization if possible. Changing the model means re-embedding the whole index and altering the vector column dimension.
-
-If using BGE, queries (not documents) need the prefix `"Represent this sentence for searching relevant passages: "`.
 
 ## 5. Data contracts
 
@@ -76,9 +75,9 @@ If using BGE, queries (not documents) need the prefix `"Represent this sentence 
 }
 ```
 
-The `description` is what gets embedded. It should be cuisine- and dish-focused, written in a consistent style across all restaurants, and free of boilerplate (hours, catering forms, gift cards). The normalizer should extract `median_entree_price` from menu prices when available and return `null` otherwise.
+The facts `description` is the first layer of the embedded passage; a generated vibe layer (atmosphere, mood, lighting, energy, occasion-fit) is concatenated after it, and the combined text is embedded once. Both layers are required. The facts layer should be cuisine- and dish-focused, written in a consistent style across all restaurants, and free of boilerplate (hours, catering forms, gift cards). The normalizer should extract `median_entree_price` from menu prices when available and return `null` otherwise.
 
-### 5.2 Gemini output for image and song queries
+### 5.2 Gemini output for image, song and movie queries
 
 Gemini must be instructed to return only JSON in this shape, at low temperature:
 
@@ -94,8 +93,8 @@ Gemini must be instructed to return only JSON in this shape, at low temperature:
 
 Requirements:
 
-- The `description` must mimic the style and vocabulary of the restaurant profile descriptions (this is the HyDE technique; it makes query and document embeddings comparable).
-- The prompt should push toward cuisine and dishes rather than abstract mood words, since restaurant documents contain menus, not moods.
+- The `description` must be written in the same descriptive vocabulary as the catalog's vibe layer: atmosphere and mood language, not plot summary or genre classification. This is mandatory modality conversion, since the embedder only accepts text; it is not HyDE.
+- Cuisine and dish fields may still be returned for filtering and the small boost, but the `description` carries the vibe.
 - `signal_strength` can be `"strong"`, `"weak"`, or `"none"`. Many songs and images carry no real cuisine signal. When weak or none, the app should fall back to other ranking signals (price, distance, popularity) rather than trust an arbitrary guess, and may tell the user the vibe was ambiguous.
 - Strip code fences and parse defensively; handle malformed JSON with a retry or a graceful error.
 
@@ -107,21 +106,17 @@ Vectors are normalized, so cosine similarity equals the dot product. pgvector's 
 
 $$\text{sim}(\mathbf{q}, \mathbf{d}) = \frac{\mathbf{q} \cdot \mathbf{d}}{\|\mathbf{q}\| \, \|\mathbf{d}\|}$$
 
-### 6.2 Hybrid search
+### 6.2 Embedding similarity
 
-Embeddings are weak at exact rare terms like specific dish names ("birria", "xiao long bao"). Combine vector ranking with Postgres full-text ranking (`tsvector` with a GIN index) using reciprocal rank fusion. Supabase documents this pattern in its hybrid search guide; adapt it rather than writing from scratch.
+Cosine similarity between the query vector and each restaurant's single `embedding`, over rows that survive the hard filters. Because facts and vibe live in one combined passage, this one mechanism handles both literal queries ("hotpot near me") and mood queries. Full-text search and reciprocal rank fusion are not part of ranking. If testing shows exact rare terms (specific dish names) rank poorly, revisit that in response to the observed problem.
 
-$$\text{RRF}(r) = \frac{w_v}{k + \text{rank}_{\text{vec}}(r)} + \frac{w_t}{k + \text{rank}_{\text{fts}}(r)}$$
+### 6.3 Optional tag boost
 
-with $k \approx 50$ to $60$ and weights tuned on the test set.
+If structured tags are extracted separately (for example an explicit cuisine category), add a small bonus for a match, as a tiebreaker only:
 
-### 6.3 Cuisine boost for Vibe queries
+$$\text{score}(r) = \text{sim}(\mathbf{q}, \mathbf{d}_r) + \lambda \cdot c_r$$
 
-For image and song queries, add a small boost when a restaurant's cuisine tags match Gemini's guesses:
-
-$$\text{score}(r) = \text{RRF}(r) + \lambda \cdot c_r$$
-
-where $c_r$ is Gemini's confidence for a matching cuisine (zero if none) and $\lambda$ is small. Skip the boost when `signal_strength` is not `"strong"`.
+where $c_r$ is 1 for a tag match (zero if none) and $\lambda$ is small enough never to override the embedding similarity. Skip the boost when Gemini's `signal_strength` is not `"strong"`.
 
 ### 6.4 Filters before ranking
 
@@ -266,7 +261,7 @@ $$\text{total cost} = \text{meal estimate} + 2 \times \text{fare}$$
 
 ## 13. Evaluation
 
-Build a small test set early: about 30 queries (text, plus some images and songs) with restaurants the team considers good answers. Use it to compare the two embedding models, description formats, Gemini prompts, RRF weights, and the cuisine boost. Don't tune by eyeballing.
+Build a small test set early: about 30 queries (text, plus some images and songs) with restaurants the team considers good answers. Use it to check retrieval quality, compare description formats and Gemini prompts, and size the tag boost. Don't swap the embedding model without evidence of a real problem.
 
 ## 14. Known risks
 
