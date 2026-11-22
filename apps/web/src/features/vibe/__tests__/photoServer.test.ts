@@ -4,7 +4,8 @@ import type {Server} from 'node:http';
 import {createGeminiPhotoDescriber,PHOTO_SCHEMA,PHOTO_SYSTEM,type PhotoInput} from '../../../../server/photoDescriber';
 import {createPhotoRoutes,type PhotoDeps} from '../../../../server/photoApi';
 import {createVibeRouter} from '../../../../server/vibeApi';
-import type {PhotoAuth,PhotoQuota} from '../../../../server/photoAuth';
+import {createSupabasePhotoAuth,normalizeSupabaseUrl,type PhotoAuth,type PhotoQuota} from '../../../../server/photoAuth';
+import type {createClient} from '@supabase/supabase-js';
 const img={mimeType:'image/jpeg' as const,data:'QUJD'};
 const reply=(text:string)=>vi.fn(async()=>new Response(JSON.stringify({candidates:[{content:{parts:[{text}]}}]}),{status:200}));
 const make=(f:ReturnType<typeof vi.fn>)=>createGeminiPhotoDescriber({apiKey:'TEST-FIXTURE-NOT-A-KEY',fetchImpl:f as unknown as typeof fetch});
@@ -79,4 +80,19 @@ describe('photo routes',()=>{
   const s=app.listen(0,'127.0.0.1');running.push(s);await new Promise<void>(r=>s.once('listening',r));const a=s.address();if(!a||typeof a==='string')throw Error('no server');
   const r=await fetch(`http://127.0.0.1:${a.port}/api/vibe/describe-image`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer good'},body:JSON.stringify({mimeType:'image/jpeg',data:'A'.repeat(500000)})});
   expect(r.status).not.toBe(413);});
+});
+describe('supabase photo auth',()=>{
+ it('normalises the Supabase URL',()=>{for(const u of ['https://abc.supabase.co/rest/v1/','https://abc.supabase.co/rest/v1','https://abc.supabase.co/','  https://abc.supabase.co  ','https://abc.supabase.co'])expect(normalizeSupabaseUrl(u)).toBe('https://abc.supabase.co');});
+ const stub=(getUser:()=>Promise<unknown>,urls:string[]=[])=>createSupabasePhotoAuth({url:'https://abc.supabase.co/rest/v1/',key:'TEST-FIXTURE',create:((u:string)=>{urls.push(u);return {auth:{getUser},rpc:async()=>({data:3,error:null})};}) as unknown as typeof createClient})!;
+ it('passes a normalised URL and returns a quota for a valid user',async()=>{const urls:string[]=[];const q=await stub(async()=>({data:{user:{id:'u'}},error:null}),urls).verify('t');expect(urls).toEqual(['https://abc.supabase.co']);expect(await q!.remaining(5)).toBe(3);});
+ it('returns null for 401/403 or no user, throws for other errors',async()=>{
+  expect(await stub(async()=>({data:{user:null},error:{status:401}})).verify('t')).toBeNull();
+  expect(await stub(async()=>({data:{user:null},error:{status:403}})).verify('t')).toBeNull();
+  expect(await stub(async()=>({data:{user:null},error:null})).verify('t')).toBeNull();
+  await expect(stub(async()=>({data:{user:null},error:{status:500}})).verify('t')).rejects.toThrow();
+  await expect(stub(async()=>({data:{user:null},error:{status:0}})).verify('t')).rejects.toThrow();});
+ it('route answers 503 when verify rejects',async()=>{
+  const app=express();app.use(express.json());app.use('/api/vibe',createPhotoRoutes({auth:()=>({verify:async()=>{throw Error('SECRET');}}),describer:()=>({describe:async()=>'x'}),unlimited:()=>false}));
+  const s=app.listen(0,'127.0.0.1');running.push(s);await new Promise<void>(r=>s.once('listening',r));const a=s.address();if(!a||typeof a==='string')throw Error('no server');
+  const r=await fetch(`http://127.0.0.1:${a.port}/api/vibe/photo-quota`,{headers:{Authorization:'Bearer t'}});expect(r.status).toBe(503);});
 });
