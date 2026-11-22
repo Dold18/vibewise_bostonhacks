@@ -4,9 +4,9 @@
   "status": "imported_binary_integrity_verified_visual_qa_pending",
   "source": "Papyszoo/CC0-Public-Domain-Models (Modelibr CC0 GLB conversions)",
   "licenseCaveat": "Per-pack CC0 claims checked against metadata in source repository; verify author/pack terms for production. These are converted GLBs, not necessarily original publisher binary files.",
-  "modelCount": 180,
-  "totalBytes": 8703988,
-  "verification": "180/180 source/destination Git blob SHA and GLB v2 header verified at import; render QA pending.",
+  "modelCount": 184,
+  "totalBytes": 8797804,
+  "verification": "184/184 source/destination Git blob SHA and GLB v2 header verified at import; render QA pending.",
   "packCount": 15,
   "packs": [
     {
@@ -119,7 +119,7 @@
       "sourceWebsite": "https://quaternius.com/packs/sushirestaurantkit.html",
       "licenseClaim": "CC0",
       "sourcePackPath": "https://github.com/Papyszoo/CC0-Public-Domain-Models/tree/main/packs/quaternius-sushirestaurantkit",
-      "importedCount": 24
+      "importedCount": 28
     },
     {
       "id": "the-base-mesh",
@@ -4888,6 +4888,126 @@
       },
       "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/quaternius-sushirestaurantkit/models/environment_counter_straight/environment_counter_straight.png"
+    },
+    {
+      "id": "cc0.quaternius-sushirestaurantkit.environment_cutting_table",
+      "name": "environment_cutting_table",
+      "pack": "quaternius-sushirestaurantkit",
+      "uri": "/scene-assets/third-party/modelibr/quaternius-sushirestaurantkit/environment_cutting_table.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/quaternius-sushirestaurantkit/models/environment_cutting_table/environment_cutting_table.glb",
+      "creator": "Quaternius",
+      "originalPackWebsite": "https://quaternius.com/packs/sushirestaurantkit.html",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 26600,
+      "gitBlobSHA": "89a519b4a3df0b3b05e6b3168b5ed2de7ff4f4a8",
+      "format": "glb",
+      "tags": [
+        "restaurant",
+        "food_prep",
+        "kitchen"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      },
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/quaternius-sushirestaurantkit/models/environment_cutting_table/environment_cutting_table.png"
+    },
+    {
+      "id": "cc0.quaternius-sushirestaurantkit.environment_pan",
+      "name": "environment_pan",
+      "pack": "quaternius-sushirestaurantkit",
+      "uri": "/scene-assets/third-party/modelibr/quaternius-sushirestaurantkit/environment_pan.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/quaternius-sushirestaurantkit/models/environment_pan/environment_pan.glb",
+      "creator": "Quaternius",
+      "originalPackWebsite": "https://quaternius.com/packs/sushirestaurantkit.html",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 20232,
+      "gitBlobSHA": "8e67df315b79944872f3c81a6ccde80f60c60d7a",
+      "format": "glb",
+      "tags": [
+        "restaurant",
+        "food_prep",
+        "kitchen"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      },
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/quaternius-sushirestaurantkit/models/environment_pan/environment_pan.png"
+    },
+    {
+      "id": "cc0.quaternius-sushirestaurantkit.environment_plate",
+      "name": "environment_plate",
+      "pack": "quaternius-sushirestaurantkit",
+      "uri": "/scene-assets/third-party/modelibr/quaternius-sushirestaurantkit/environment_plate.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/quaternius-sushirestaurantkit/models/environment_plate/environment_plate.glb",
+      "creator": "Quaternius",
+      "originalPackWebsite": "https://quaternius.com/packs/sushirestaurantkit.html",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 14536,
+      "gitBlobSHA": "0cc85ccd95bda3dd8ad2a831af28f0962e01c2f6",
+      "format": "glb",
+      "tags": [
+        "restaurant",
+        "food_prep",
+        "kitchen"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      },
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/quaternius-sushirestaurantkit/models/environment_plate/environment_plate.png"
+    },
+    {
+      "id": "cc0.quaternius-sushirestaurantkit.environment_pot_1_filled",
+      "name": "environment_pot_1_filled",
+      "pack": "quaternius-sushirestaurantkit",
+      "uri": "/scene-assets/third-party/modelibr/quaternius-sushirestaurantkit/environment_pot_1_filled.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/quaternius-sushirestaurantkit/models/environment_pot_1_filled/environment_pot_1_filled.glb",
+      "creator": "Quaternius",
+      "originalPackWebsite": "https://quaternius.com/packs/sushirestaurantkit.html",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 32448,
+      "gitBlobSHA": "d664bf27f044f54f866e793348511cc75f9dd550",
+      "format": "glb",
+      "tags": [
+        "restaurant",
+        "food_prep",
+        "kitchen"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      },
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/quaternius-sushirestaurantkit/models/environment_pot_1_filled/environment_pot_1_filled.png"
     },
     {
       "id": "cc0.quaternius-sushirestaurantkit.environment_table",
