@@ -117,13 +117,16 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   const vibeStep = createVibeStep(prefs);
   let quizMode = false;
   const liveQuiz = createLiveQuiz(() => toggleQuiz(false));
-  const beginQuiz = h('button', { type: 'button', class: 'vb-primary-btn vb-begin-quiz' }, 'Refine this vibe');
+  const beginQuiz = h('button', { type: 'button', class: 'vb-primary-btn vb-begin-quiz' }, 'Start vibe quiz');
   beginQuiz.addEventListener('click', () => {
     toggleQuiz(true);
     const p = prefs.getState();
     const previous = liveQuiz.session.getSnapshot();
     if (previous && previous.originalInput.text === p.vibeText.trim() && previous.originalInput.imageCount === p.vibeImages.length) liveQuiz.resume();
     else liveQuiz.start(p.vibeText, p.vibeImages.length);
+    // The quiz replaces a tall vibe form inside a scrolling panel. Move into
+    // the new content so the user sees the first question or loading state.
+    liveQuiz.focus();
   });
   let currentStep: 'plan' | 'vibe' = 'plan';
 
@@ -194,7 +197,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
 
   const continueBtn = h('button', { type: 'button', class: 'vb-primary-btn vb-continue-btn' }, 'Continue to your vibe');
   const backBtn = h('button', { type: 'button', class: 'vb-text-btn vb-back-btn' }, 'Back to details');
-  const doneBtn = h('button', { type: 'button', class: 'vb-primary-btn vb-continue-btn' }, 'Save my vibe');
+  const doneBtn = h('button', { type: 'button', class: 'vb-primary-btn vb-continue-btn vb-launch-quiz' }, 'Save & start quiz');
   const planActions = h('div', { class: 'vb-footer-actions' }, resetBtn, continueBtn);
   const vibeActions = h('div', { class: 'vb-footer-actions', hidden: true }, backBtn, doneBtn);
   const footerNote = h('p', { class: 'vb-step-footnote' }, 'Next: describe the atmosphere you have in mind. All these details stay saved.');
@@ -257,7 +260,9 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   }
   continueBtn.addEventListener('click', () => showStep('vibe'));
   backBtn.addEventListener('click', () => showStep('plan'));
-  doneBtn.addEventListener('click', () => { layout.dispatch({ type: 'collapse' }); summaryBtn.focus(); });
+  // The footer is the prominent action on the vibe step; it must launch the
+  // quiz, not silently collapse the entire panel.
+  doneBtn.addEventListener('click', () => beginQuiz.click());
   let view: PanelView = 'preferences';
   let collapseTimer: number | undefined;
   quickTools.setExpanded('preferences', expansionId);

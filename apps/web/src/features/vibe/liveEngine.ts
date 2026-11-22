@@ -49,9 +49,12 @@ export function createLiveVibeSession(generator:GenerationProvider,embedder:Embe
  async function generateCurrent() {
   if(!state)return;generation?.abort();const abort=new AbortController();generation=abort;
   const p=state,id=p.sessionId,v=p.version,c=contextFor(p);
+  const authored=sessionBQuestion(c);
+  // Authored scenes are usable without Gemini. Show them immediately while
+  // the optional contextual summary is generated in the background.
+  if(authored&&!userResults)publish({...state,question:authored,phase:'question'});
   try {
    const generated=await generator.generate(c,abort.signal);
-   const authored=sessionBQuestion(c);
    const result=validateGeneration(authored?{...generated,nextQuestion:authored}:generated,c);
    if(!own(id,v)||abort.signal.aborted)return;
    const constraints=constraintsText(state!.evidence);
