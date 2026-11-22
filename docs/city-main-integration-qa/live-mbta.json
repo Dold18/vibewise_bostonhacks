@@ -1,0 +1,1091 @@
+{
+  "status": "ok",
+  "tier": 1,
+  "option": {
+    "id": "tier1:Red:dir0:place-harsq>place-knncl",
+    "transfers": 0,
+    "legs": [
+      {
+        "mode": "walk",
+        "start": {
+          "lat": 42.3736,
+          "lng": -71.119
+        },
+        "end": {
+          "stop_id": "place-harsq",
+          "name": "Harvard",
+          "lat": 42.373362,
+          "lng": -71.118956
+        },
+        "durationSec": 20,
+        "distanceMeters": 27,
+        "geometry": [
+          [
+            -71.119,
+            42.3736
+          ],
+          [
+            -71.118956,
+            42.373362
+          ]
+        ],
+        "instructions": "Walk to Harvard",
+        "source": "approx: straight-line walk, ~80 m/min"
+      },
+      {
+        "mode": "subway",
+        "start": {
+          "lat": 42.373362,
+          "lng": -71.118956
+        },
+        "end": {
+          "lat": 42.362491,
+          "lng": -71.086176
+        },
+        "durationSec": 360,
+        "geometry": [
+          [
+            -71.118821,
+            42.373459
+          ],
+          [
+            -71.118759,
+            42.373389
+          ],
+          [
+            -71.118641,
+            42.373332
+          ],
+          [
+            -71.118479,
+            42.373269
+          ],
+          [
+            -71.115943,
+            42.372506
+          ],
+          [
+            -71.1159,
+            42.37248
+          ],
+          [
+            -71.115814,
+            42.372412
+          ],
+          [
+            -71.114216,
+            42.37101
+          ],
+          [
+            -71.113365,
+            42.37034
+          ],
+          [
+            -71.113179,
+            42.370172
+          ],
+          [
+            -71.113001,
+            42.37004
+          ],
+          [
+            -71.112597,
+            42.369856
+          ],
+          [
+            -71.109857,
+            42.368842
+          ],
+          [
+            -71.108551,
+            42.368259
+          ],
+          [
+            -71.107808,
+            42.367895
+          ],
+          [
+            -71.104035,
+            42.365542
+          ],
+          [
+            -71.103625,
+            42.365307
+          ],
+          [
+            -71.103625,
+            42.365307
+          ],
+          [
+            -71.102691,
+            42.364769
+          ],
+          [
+            -71.101333,
+            42.363956
+          ],
+          [
+            -71.100988,
+            42.363774
+          ],
+          [
+            -71.100488,
+            42.363553
+          ],
+          [
+            -71.100109,
+            42.363487
+          ],
+          [
+            -71.09954,
+            42.363438
+          ],
+          [
+            -71.09821,
+            42.36336
+          ],
+          [
+            -71.096742,
+            42.363232
+          ],
+          [
+            -71.094912,
+            42.363109
+          ],
+          [
+            -71.091812,
+            42.362849
+          ],
+          [
+            -71.086756,
+            42.36253
+          ],
+          [
+            -71.086178,
+            42.362477
+          ]
+        ],
+        "routeShortName": "Red",
+        "routeColor": "#DA291C",
+        "fromStopName": "Harvard",
+        "toStopName": "Kendall/MIT",
+        "source": "MBTA GTFS static shape, Red direction 0 (branch-agnostic stretch; patterns Red-1-0, Red-3-0, Red-R-0); duration: schedule-derived (MBTA /schedules trip 81027169, departs 2026-11-22T11:06:00.000Z)"
+      },
+      {
+        "mode": "walk",
+        "start": {
+          "stop_id": "place-knncl",
+          "name": "Kendall/MIT",
+          "lat": 42.362491,
+          "lng": -71.086176
+        },
+        "end": {
+          "lat": 42.3625,
+          "lng": -71.0862
+        },
+        "durationSec": 2,
+        "distanceMeters": 2,
+        "geometry": [
+          [
+            -71.086176,
+            42.362491
+          ],
+          [
+            -71.0862,
+            42.3625
+          ]
+        ],
+        "instructions": "Walk from Kendall/MIT",
+        "source": "approx: straight-line walk, ~80 m/min"
+      }
+    ],
+    "durationSec": 382
+  },
+  "plan": {
+    "option": {
+      "id": "tier1:Red:dir0:place-harsq>place-knncl",
+      "durationSec": null,
+      "transfers": 0,
+      "legs": [
+        {
+          "mode": "walk",
+          "start": {
+            "lat": 42.3736,
+            "lng": -71.119
+          },
+          "end": {
+            "stop_id": "place-harsq",
+            "name": "Harvard",
+            "lat": 42.373362,
+            "lng": -71.118956
+          },
+          "durationSec": 20,
+          "distanceMeters": 27,
+          "geometry": [
+            [
+              -71.119,
+              42.3736
+            ],
+            [
+              -71.118956,
+              42.373362
+            ]
+          ],
+          "instructions": "Walk to Harvard",
+          "source": "approx: straight-line walk, ~80 m/min"
+        },
+        {
+          "mode": "subway",
+          "start": {
+            "lat": 42.373362,
+            "lng": -71.118956
+          },
+          "end": {
+            "lat": 42.362491,
+            "lng": -71.086176
+          },
+          "durationSec": null,
+          "geometry": [
+            [
+              -71.118821,
+              42.373459
+            ],
+            [
+              -71.118759,
+              42.373389
+            ],
+            [
+              -71.118641,
+              42.373332
+            ],
+            [
+              -71.118479,
+              42.373269
+            ],
+            [
+              -71.115943,
+              42.372506
+            ],
+            [
+              -71.1159,
+              42.37248
+            ],
+            [
+              -71.115814,
+              42.372412
+            ],
+            [
+              -71.114216,
+              42.37101
+            ],
+            [
+              -71.113365,
+              42.37034
+            ],
+            [
+              -71.113179,
+              42.370172
+            ],
+            [
+              -71.113001,
+              42.37004
+            ],
+            [
+              -71.112597,
+              42.369856
+            ],
+            [
+              -71.109857,
+              42.368842
+            ],
+            [
+              -71.108551,
+              42.368259
+            ],
+            [
+              -71.107808,
+              42.367895
+            ],
+            [
+              -71.104035,
+              42.365542
+            ],
+            [
+              -71.103625,
+              42.365307
+            ],
+            [
+              -71.103625,
+              42.365307
+            ],
+            [
+              -71.102691,
+              42.364769
+            ],
+            [
+              -71.101333,
+              42.363956
+            ],
+            [
+              -71.100988,
+              42.363774
+            ],
+            [
+              -71.100488,
+              42.363553
+            ],
+            [
+              -71.100109,
+              42.363487
+            ],
+            [
+              -71.09954,
+              42.363438
+            ],
+            [
+              -71.09821,
+              42.36336
+            ],
+            [
+              -71.096742,
+              42.363232
+            ],
+            [
+              -71.094912,
+              42.363109
+            ],
+            [
+              -71.091812,
+              42.362849
+            ],
+            [
+              -71.086756,
+              42.36253
+            ],
+            [
+              -71.086178,
+              42.362477
+            ]
+          ],
+          "routeShortName": "Red",
+          "routeColor": "#DA291C",
+          "fromStopName": "Harvard",
+          "toStopName": "Kendall/MIT",
+          "source": "MBTA GTFS static shape, Red direction 0 (branch-agnostic stretch; patterns Red-1-0, Red-3-0, Red-R-0)"
+        },
+        {
+          "mode": "walk",
+          "start": {
+            "stop_id": "place-knncl",
+            "name": "Kendall/MIT",
+            "lat": 42.362491,
+            "lng": -71.086176
+          },
+          "end": {
+            "lat": 42.3625,
+            "lng": -71.0862
+          },
+          "durationSec": 2,
+          "distanceMeters": 2,
+          "geometry": [
+            [
+              -71.086176,
+              42.362491
+            ],
+            [
+              -71.0862,
+              42.3625
+            ]
+          ],
+          "instructions": "Walk from Kendall/MIT",
+          "source": "approx: straight-line walk, ~80 m/min"
+        }
+      ]
+    },
+    "pattern": {
+      "route_pattern_id": "Red-1-0",
+      "route_id": "Red",
+      "direction_id": 0,
+      "typicality": 1,
+      "shape_id": "canonical-931_0009",
+      "name": "Alewife - Ashmont",
+      "stops": [
+        {
+          "stop_id": "place-alfcl",
+          "seq": 0
+        },
+        {
+          "stop_id": "place-davis",
+          "seq": 1
+        },
+        {
+          "stop_id": "place-portr",
+          "seq": 2
+        },
+        {
+          "stop_id": "place-harsq",
+          "seq": 3
+        },
+        {
+          "stop_id": "place-cntsq",
+          "seq": 4
+        },
+        {
+          "stop_id": "place-knncl",
+          "seq": 5
+        },
+        {
+          "stop_id": "place-chmnl",
+          "seq": 6
+        },
+        {
+          "stop_id": "place-pktrm",
+          "seq": 7
+        },
+        {
+          "stop_id": "place-dwnxg",
+          "seq": 8
+        },
+        {
+          "stop_id": "place-sstat",
+          "seq": 9
+        },
+        {
+          "stop_id": "place-brdwy",
+          "seq": 10
+        },
+        {
+          "stop_id": "place-andrw",
+          "seq": 11
+        },
+        {
+          "stop_id": "place-jfk",
+          "seq": 12
+        },
+        {
+          "stop_id": "place-shmnl",
+          "seq": 13
+        },
+        {
+          "stop_id": "place-fldcr",
+          "seq": 14
+        },
+        {
+          "stop_id": "place-smmnl",
+          "seq": 15
+        },
+        {
+          "stop_id": "place-asmnl",
+          "seq": 16
+        }
+      ]
+    },
+    "direction": "forward",
+    "originStop": {
+      "stop": {
+        "stop_id": "place-harsq",
+        "name": "Harvard",
+        "lat": 42.373362,
+        "lng": -71.118956
+      },
+      "walkMeters": 27,
+      "walkSeconds": 20,
+      "source": "estimate"
+    },
+    "destinationStop": {
+      "stop": {
+        "stop_id": "place-knncl",
+        "name": "Kendall/MIT",
+        "lat": 42.362491,
+        "lng": -71.086176
+      },
+      "walkMeters": 2,
+      "walkSeconds": 2,
+      "source": "estimate"
+    },
+    "equivalentPatterns": [
+      {
+        "route_pattern_id": "Red-1-0",
+        "route_id": "Red",
+        "direction_id": 0,
+        "typicality": 1,
+        "shape_id": "canonical-931_0009",
+        "name": "Alewife - Ashmont",
+        "stops": [
+          {
+            "stop_id": "place-alfcl",
+            "seq": 0
+          },
+          {
+            "stop_id": "place-davis",
+            "seq": 1
+          },
+          {
+            "stop_id": "place-portr",
+            "seq": 2
+          },
+          {
+            "stop_id": "place-harsq",
+            "seq": 3
+          },
+          {
+            "stop_id": "place-cntsq",
+            "seq": 4
+          },
+          {
+            "stop_id": "place-knncl",
+            "seq": 5
+          },
+          {
+            "stop_id": "place-chmnl",
+            "seq": 6
+          },
+          {
+            "stop_id": "place-pktrm",
+            "seq": 7
+          },
+          {
+            "stop_id": "place-dwnxg",
+            "seq": 8
+          },
+          {
+            "stop_id": "place-sstat",
+            "seq": 9
+          },
+          {
+            "stop_id": "place-brdwy",
+            "seq": 10
+          },
+          {
+            "stop_id": "place-andrw",
+            "seq": 11
+          },
+          {
+            "stop_id": "place-jfk",
+            "seq": 12
+          },
+          {
+            "stop_id": "place-shmnl",
+            "seq": 13
+          },
+          {
+            "stop_id": "place-fldcr",
+            "seq": 14
+          },
+          {
+            "stop_id": "place-smmnl",
+            "seq": 15
+          },
+          {
+            "stop_id": "place-asmnl",
+            "seq": 16
+          }
+        ]
+      },
+      {
+        "route_pattern_id": "Red-3-0",
+        "route_id": "Red",
+        "direction_id": 0,
+        "typicality": 1,
+        "shape_id": "canonical-933_0009",
+        "name": "Alewife - Braintree",
+        "stops": [
+          {
+            "stop_id": "place-alfcl",
+            "seq": 0
+          },
+          {
+            "stop_id": "place-davis",
+            "seq": 1
+          },
+          {
+            "stop_id": "place-portr",
+            "seq": 2
+          },
+          {
+            "stop_id": "place-harsq",
+            "seq": 3
+          },
+          {
+            "stop_id": "place-cntsq",
+            "seq": 4
+          },
+          {
+            "stop_id": "place-knncl",
+            "seq": 5
+          },
+          {
+            "stop_id": "place-chmnl",
+            "seq": 6
+          },
+          {
+            "stop_id": "place-pktrm",
+            "seq": 7
+          },
+          {
+            "stop_id": "place-dwnxg",
+            "seq": 8
+          },
+          {
+            "stop_id": "place-sstat",
+            "seq": 9
+          },
+          {
+            "stop_id": "place-brdwy",
+            "seq": 10
+          },
+          {
+            "stop_id": "place-andrw",
+            "seq": 11
+          },
+          {
+            "stop_id": "place-jfk",
+            "seq": 12
+          },
+          {
+            "stop_id": "place-nqncy",
+            "seq": 13
+          },
+          {
+            "stop_id": "place-wlsta",
+            "seq": 14
+          },
+          {
+            "stop_id": "place-qnctr",
+            "seq": 15
+          },
+          {
+            "stop_id": "place-qamnl",
+            "seq": 16
+          },
+          {
+            "stop_id": "place-brntn",
+            "seq": 17
+          }
+        ]
+      },
+      {
+        "route_pattern_id": "Red-R-0",
+        "route_id": "Red",
+        "direction_id": 0,
+        "typicality": 3,
+        "shape_id": "10200005",
+        "name": "Alewife - Broadway",
+        "stops": [
+          {
+            "stop_id": "place-alfcl",
+            "seq": 0
+          },
+          {
+            "stop_id": "place-davis",
+            "seq": 1
+          },
+          {
+            "stop_id": "place-portr",
+            "seq": 2
+          },
+          {
+            "stop_id": "place-harsq",
+            "seq": 3
+          },
+          {
+            "stop_id": "place-cntsq",
+            "seq": 4
+          },
+          {
+            "stop_id": "place-knncl",
+            "seq": 5
+          },
+          {
+            "stop_id": "place-chmnl",
+            "seq": 6
+          },
+          {
+            "stop_id": "place-pktrm",
+            "seq": 7
+          },
+          {
+            "stop_id": "place-dwnxg",
+            "seq": 8
+          },
+          {
+            "stop_id": "place-sstat",
+            "seq": 9
+          },
+          {
+            "stop_id": "place-brdwy",
+            "seq": 10
+          }
+        ]
+      }
+    ],
+    "branchAgnostic": true,
+    "leg": {
+      "from": {
+        "stop_id": "place-harsq",
+        "name": "Harvard",
+        "lat": 42.373362,
+        "lng": -71.118956
+      },
+      "to": {
+        "stop_id": "place-knncl",
+        "name": "Kendall/MIT",
+        "lat": 42.362491,
+        "lng": -71.086176
+      },
+      "pattern": {
+        "route_pattern_id": "Red-1-0",
+        "route_id": "Red",
+        "direction_id": 0,
+        "typicality": 1,
+        "shape_id": "canonical-931_0009",
+        "name": "Alewife - Ashmont",
+        "stops": [
+          {
+            "stop_id": "place-alfcl",
+            "seq": 0
+          },
+          {
+            "stop_id": "place-davis",
+            "seq": 1
+          },
+          {
+            "stop_id": "place-portr",
+            "seq": 2
+          },
+          {
+            "stop_id": "place-harsq",
+            "seq": 3
+          },
+          {
+            "stop_id": "place-cntsq",
+            "seq": 4
+          },
+          {
+            "stop_id": "place-knncl",
+            "seq": 5
+          },
+          {
+            "stop_id": "place-chmnl",
+            "seq": 6
+          },
+          {
+            "stop_id": "place-pktrm",
+            "seq": 7
+          },
+          {
+            "stop_id": "place-dwnxg",
+            "seq": 8
+          },
+          {
+            "stop_id": "place-sstat",
+            "seq": 9
+          },
+          {
+            "stop_id": "place-brdwy",
+            "seq": 10
+          },
+          {
+            "stop_id": "place-andrw",
+            "seq": 11
+          },
+          {
+            "stop_id": "place-jfk",
+            "seq": 12
+          },
+          {
+            "stop_id": "place-shmnl",
+            "seq": 13
+          },
+          {
+            "stop_id": "place-fldcr",
+            "seq": 14
+          },
+          {
+            "stop_id": "place-smmnl",
+            "seq": 15
+          },
+          {
+            "stop_id": "place-asmnl",
+            "seq": 16
+          }
+        ]
+      },
+      "equivalentPatterns": [
+        {
+          "route_pattern_id": "Red-1-0",
+          "route_id": "Red",
+          "direction_id": 0,
+          "typicality": 1,
+          "shape_id": "canonical-931_0009",
+          "name": "Alewife - Ashmont",
+          "stops": [
+            {
+              "stop_id": "place-alfcl",
+              "seq": 0
+            },
+            {
+              "stop_id": "place-davis",
+              "seq": 1
+            },
+            {
+              "stop_id": "place-portr",
+              "seq": 2
+            },
+            {
+              "stop_id": "place-harsq",
+              "seq": 3
+            },
+            {
+              "stop_id": "place-cntsq",
+              "seq": 4
+            },
+            {
+              "stop_id": "place-knncl",
+              "seq": 5
+            },
+            {
+              "stop_id": "place-chmnl",
+              "seq": 6
+            },
+            {
+              "stop_id": "place-pktrm",
+              "seq": 7
+            },
+            {
+              "stop_id": "place-dwnxg",
+              "seq": 8
+            },
+            {
+              "stop_id": "place-sstat",
+              "seq": 9
+            },
+            {
+              "stop_id": "place-brdwy",
+              "seq": 10
+            },
+            {
+              "stop_id": "place-andrw",
+              "seq": 11
+            },
+            {
+              "stop_id": "place-jfk",
+              "seq": 12
+            },
+            {
+              "stop_id": "place-shmnl",
+              "seq": 13
+            },
+            {
+              "stop_id": "place-fldcr",
+              "seq": 14
+            },
+            {
+              "stop_id": "place-smmnl",
+              "seq": 15
+            },
+            {
+              "stop_id": "place-asmnl",
+              "seq": 16
+            }
+          ]
+        },
+        {
+          "route_pattern_id": "Red-3-0",
+          "route_id": "Red",
+          "direction_id": 0,
+          "typicality": 1,
+          "shape_id": "canonical-933_0009",
+          "name": "Alewife - Braintree",
+          "stops": [
+            {
+              "stop_id": "place-alfcl",
+              "seq": 0
+            },
+            {
+              "stop_id": "place-davis",
+              "seq": 1
+            },
+            {
+              "stop_id": "place-portr",
+              "seq": 2
+            },
+            {
+              "stop_id": "place-harsq",
+              "seq": 3
+            },
+            {
+              "stop_id": "place-cntsq",
+              "seq": 4
+            },
+            {
+              "stop_id": "place-knncl",
+              "seq": 5
+            },
+            {
+              "stop_id": "place-chmnl",
+              "seq": 6
+            },
+            {
+              "stop_id": "place-pktrm",
+              "seq": 7
+            },
+            {
+              "stop_id": "place-dwnxg",
+              "seq": 8
+            },
+            {
+              "stop_id": "place-sstat",
+              "seq": 9
+            },
+            {
+              "stop_id": "place-brdwy",
+              "seq": 10
+            },
+            {
+              "stop_id": "place-andrw",
+              "seq": 11
+            },
+            {
+              "stop_id": "place-jfk",
+              "seq": 12
+            },
+            {
+              "stop_id": "place-nqncy",
+              "seq": 13
+            },
+            {
+              "stop_id": "place-wlsta",
+              "seq": 14
+            },
+            {
+              "stop_id": "place-qnctr",
+              "seq": 15
+            },
+            {
+              "stop_id": "place-qamnl",
+              "seq": 16
+            },
+            {
+              "stop_id": "place-brntn",
+              "seq": 17
+            }
+          ]
+        },
+        {
+          "route_pattern_id": "Red-R-0",
+          "route_id": "Red",
+          "direction_id": 0,
+          "typicality": 3,
+          "shape_id": "10200005",
+          "name": "Alewife - Broadway",
+          "stops": [
+            {
+              "stop_id": "place-alfcl",
+              "seq": 0
+            },
+            {
+              "stop_id": "place-davis",
+              "seq": 1
+            },
+            {
+              "stop_id": "place-portr",
+              "seq": 2
+            },
+            {
+              "stop_id": "place-harsq",
+              "seq": 3
+            },
+            {
+              "stop_id": "place-cntsq",
+              "seq": 4
+            },
+            {
+              "stop_id": "place-knncl",
+              "seq": 5
+            },
+            {
+              "stop_id": "place-chmnl",
+              "seq": 6
+            },
+            {
+              "stop_id": "place-pktrm",
+              "seq": 7
+            },
+            {
+              "stop_id": "place-dwnxg",
+              "seq": 8
+            },
+            {
+              "stop_id": "place-sstat",
+              "seq": 9
+            },
+            {
+              "stop_id": "place-brdwy",
+              "seq": 10
+            }
+          ]
+        }
+      ],
+      "branchAgnostic": true
+    }
+  },
+  "timing": {
+    "kind": "scheduled",
+    "method": "route+direction",
+    "routeId": "Red",
+    "directionId": 0,
+    "tripId": "81027169",
+    "patternId": "Red-R-0",
+    "departsAt": "2026-11-22T11:06:00.000Z",
+    "arrivesAt": "2026-11-22T11:12:00.000Z",
+    "rideSeconds": 360,
+    "runningPatternIds": [
+      "Red-R-0"
+    ],
+    "idlePatternIds": [
+      "Red-1-0",
+      "Red-3-0"
+    ]
+  },
+  "service": {
+    "running": true,
+    "next": {
+      "kind": "scheduled",
+      "method": "route+direction",
+      "routeId": "Red",
+      "directionId": 0,
+      "tripId": "81027169",
+      "patternId": "Red-R-0",
+      "departsAt": "2026-11-22T11:06:00.000Z",
+      "arrivesAt": "2026-11-22T11:12:00.000Z",
+      "rideSeconds": 360,
+      "runningPatternIds": [
+        "Red-R-0"
+      ],
+      "idlePatternIds": [
+        "Red-1-0",
+        "Red-3-0"
+      ]
+    },
+    "runningPatternIds": [
+      "Red-R-0"
+    ],
+    "idlePatternIds": [
+      "Red-1-0",
+      "Red-3-0"
+    ]
+  },
+  "firstTrainWaitSeconds": 94,
+  "lastTrainBack": {
+    "kind": "scheduled",
+    "routeId": "Red",
+    "directionId": 1,
+    "patternId": "Red-R-1",
+    "tripId": "81027781",
+    "fromStopName": "Kendall/MIT",
+    "toStopName": "Harvard",
+    "departsAt": "2026-11-23T06:08:00.000Z",
+    "catchable": true
+  }
+}

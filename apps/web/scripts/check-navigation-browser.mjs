@@ -2,7 +2,7 @@
 // Transit, Overpass and Nominatim are intercepted TEST FIXTURES, not live verification.
 import { spawn } from 'node:child_process';
 import { writeFileSync, mkdirSync } from 'node:fs';
-const OUT='/private/tmp/vibenta-refinement-qa';mkdirSync(OUT,{recursive:true});
+const OUT=process.env.VIBENTA_QA_OUTPUT??'/private/tmp/vibenta-refinement-qa';mkdirSync(OUT,{recursive:true});
 const chrome=spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',['--headless=new','--remote-debugging-port=9384',`--user-data-dir=${OUT}/chrome-${Date.now()}`,'--no-first-run','--no-default-browser-check','--use-angle=swiftshader','--enable-unsafe-swiftshader','about:blank'],{stdio:'ignore'});
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let targets;for(let i=0;i<60;i++){try{targets=await(await fetch('http://127.0.0.1:9384/json')).json();if(targets.some(t=>t.type==='page'))break;}catch{}await sleep(200);}

@@ -12,6 +12,8 @@
 import type { AccountState } from '../account/session';
 import { themeFor, type SceneRender } from '../vibeTheme/controller';
 import type { AssetRegistry } from './assets';
+import type { SceneContext } from './state';
+import { detectQuality, readDevice } from '../atmosphere/quality';
 import { MAP_RENDERER_V1, type CapabilityProfile } from './capabilities';
 import { connectProfiles, type OutingProfileLike, type ProfileSource } from './profiles';
 import { PRESET_IDS, type ScenePresetId } from './presets';
@@ -19,6 +21,8 @@ import { createSceneSession, type SceneSession, type SceneUpdate, type SubmitRes
 
 export interface SceneThemeTarget {
   setScene(state: SceneRender | null, timing?: { transitionMs?: number }): void;
+  /** Optional: the same navigation context the session compiles with, for renderers that need it directly. */
+  setNavigation?(mode: 'browse' | 'route' | 'focus'): void;
 }
 
 export interface AccountSource {
@@ -35,9 +39,16 @@ export interface MediaQueryLike {
 export interface SceneMountOptions {
   readonly theme: SceneThemeTarget;
   readonly account?: AccountSource | null;
-  /** Defaults to MAP_RENDERER_V1: exactly what `setScene` renders today. */
+  /**
+   * Defaults to MAP_RENDERER_V1 (what the theme controller's `setScene` draws by itself).
+   * The live app passes the city engine's composed profile (`city.capabilities()`), which adds
+   * exactly the values its mounted renderers draw; `MAP_RENDERER_V2` is the static V1 + atmosphere profile.
+   */
   readonly capabilities?: CapabilityProfile;
+  /** Compiler effect budget; overrides `context.performance`. Defaults to the device tier the atmosphere module detects. */
+  readonly performance?: 'low' | 'medium' | 'high';
   readonly assets?: AssetRegistry | null;
+  readonly context?: Partial<SceneContext>;
   /** `matchMedia('(prefers-reduced-motion: reduce)')`. */
   readonly reducedMotion?: MediaQueryLike | null;
   /** Frame scheduler (default requestAnimationFrame); injected in tests. */
@@ -67,7 +78,12 @@ export function mountScene(options: SceneMountOptions): SceneMount {
     capabilities: options.capabilities ?? MAP_RENDERER_V1,
     assets: options.assets ?? null,
     account: options.account ? themeFor(options.account.getState()) : null,
-    context: { reducedMotion: options.reducedMotion?.matches ?? false },
+    context: {
+      performance: detectQuality(readDevice()).quality,
+      ...options.context,
+      ...(options.performance ? { performance: options.performance } : {}),
+      reducedMotion: options.reducedMotion?.matches ?? false,
+    },
     onError: options.onError,
   });
 
@@ -124,7 +140,9 @@ export function mountScene(options: SceneMountOptions): SceneMount {
       navQueued = true;
       defer(() => {
         navQueued = false;
-        if (!destroyed) session.setContext({ navigation: wantedNav });
+        if (destroyed) return;
+        session.setContext({ navigation: wantedNav });
+        options.theme.setNavigation?.(wantedNav);
       });
     },
     connectProfiles(source) {
@@ -159,6 +177,12 @@ export function sceneDevHook(scene: SceneMount, map?: unknown) {
   };
   return {
     session: scene.session,
+    layout(layoutId: string | null, explicit = false) { scene.session.setContext({ previewLayout: layoutId, explicitSelection: explicit }); },
+    progress(value: number) { scene.session.setContext({ discoveryProgress: Math.max(0, Math.min(1, value)) }); },
+    atmosphere(enabled: boolean) { scene.session.setContext({ atmosphereEnabled: enabled }); },
+    installations(enabled: boolean) { scene.session.setContext({ installationsEnabled: enabled }); },
+    materials(enabled: boolean) { scene.session.setContext({ materialsEnabled: enabled }); },
+    observance(enabled: boolean) { scene.session.setContext({ observanceOptIn: enabled }); },
     presets: PRESET_IDS,
     /** e.g. `preset('neon_city', 0.6)` or `preset([['noir_nocturne', 0.5], ['neon_city', 0.3]])` */
     preset(idOrMix: ScenePresetId | Array<[ScenePresetId, number]>, weight = 1) {

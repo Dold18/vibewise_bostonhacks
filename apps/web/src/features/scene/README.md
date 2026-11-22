@@ -50,7 +50,7 @@ While a route or focused destination is shown, the scene **keeps its palette** a
 
 ## Known limitations (browser QA, 2026-11-21)
 
-- **Account atmosphere effects are paused.** Before Phase 3, signed-in users with vibe history saw one or two CSS effects above the map (`vibeTheme/effects.css`): cozy lamplight vignette, lively drifting sparkles, upscale gold frame, divey grain, aesthetic pastel wash, quiet edge fog, date-night rose glow, group-friendly top warmth, late-night navy edges with stars, outdoor daylight bloom. While the Scene Composer owns the look, the controller renders no such effects: those overlays sit above the canvas and tint routes, and the scene has its own atmosphere vocabulary. Account taste still drives the **colors** through the scene (`source: 'account'`). The effects return as catalog overlays (vignette, sparkle, grain, fog, starfield) with the Phase 4 atmosphere renderer, under the ratified navigation policy. `setScene(null)` restores the old account mode, effects included.
+- **Asset renderers are live.** `mountScene()` receives `runtimeAssets` and `assetCapabilities()`. SVG atmosphere and map-bound pattern materials render for account and outing scenes. Imported-model installations run only in development with `?sceneAssets=1`, using the actual map and a labeled fictional stage. All compositions remain production-blocked for visual QA. See [implementation and browser QA](../../../../../docs/SCENE_ASSET_RENDERING_QA.md).
 - **Highways keep their yellow.** No road swatch moves `highway`/`highwayCasing`, so the Mass Pike and expressways stay a bright cream-yellow band in dark scenes (noir, neon). Legible, but the brightest element in those scenes; a candidate for a road-swatch extension.
 - **3D building colors are banded.** Six constant-color height bands sample the old height gradient (pixel diff vs. the single-layer gradient: mean ΔE 0.2–0.35, p99 ≤ 2.6), so scene changes animate natively instead of snapping and re-laying-out tiles.
 
@@ -60,7 +60,7 @@ While a route or focused destination is shown, the scene **keeps its palette** a
 
 - **Continuous palette, discrete labels.** Every weighted choice contributes to the palette in OKLab, so preset blends are real blends and small quiz changes are small visual changes. `resolved` holds the dominant value per key for discrete renderers (overlays, markers).
 - **Weights may sum to < 1.** The remainder is the plain map, so early, low-confidence answers give a faint scene.
-- **Honest capabilities.** A value is implemented only if a realizer exists (`swatches.ts`). Anything else is dropped and listed in `disabled`, never reported as active. `PALETTE_ADAPTER_V0` (128 of 828 variations) is what the existing `applyPalette()` can render with no map-owner change.
+- **Honest capabilities.** A value is implemented only if its palette realizer or asset renderer exists (`swatches.ts`, `atmosphere.ts`, `materials.ts`). Anything else is dropped and listed in `disabled`, never reported as active. `PALETTE_ADAPTER_V0` (128 of 828 variations) is what the existing `applyPalette()` can render with no map-owner change.
 - **Legibility is enforced, not hoped for.** `guard.ts` keeps labels, pins and water labels at least as readable as WCAG targets or the plain map, by the smallest correction (label set swap or push toward black/white, then pin edges, and only as a last resort the ground lightness).
 
 ## Files
@@ -75,7 +75,10 @@ While a route or focused destination is shown, the scene **keeps its palette** a
 | `capabilities.ts` | Renderer capability profiles |
 | `constraints.ts` | Ordered conflict and safety rules |
 | `realize.ts`, `guard.ts`, `color.ts` | Realization, contrast guard, OKLab math |
-| `assets.ts` | Verified asset IDs from PR #33 manifests |
+| `assets.ts`, `registry.ts`, `svg.ts` | Verified IDs, local sources, atlas cropping and layout transforms |
+| `runtime.ts`, `atmosphere.ts`, `materials.ts` | Unified asset capabilities, raster-cached original SVG overlays and geometry-bound pattern decals |
+| `modelLoader.ts`, `models.ts`, `placement.ts` | Lazy glTF/GLB cache, shared-context MapLibre custom layer, bounded fictional stage |
+| `tools.ts` | Development-only controls dispatching through Scene Session |
 | `compile.ts`, `state.ts` | `compileScene`, `SceneState`, render hash, `diffScene` |
 | `session.ts` | Scene Session: staleness, cache/restore, hysteresis, updates |
 | `profiles.ts` | Adapter from the vibe engine's profile stream (structural types, no import) |

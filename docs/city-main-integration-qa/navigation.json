@@ -1,0 +1,279 @@
+{
+  "checks": [
+    {
+      "name": "Discovery cards 1440",
+      "ok": true,
+      "detail": {
+        "independent": true,
+        "above": true,
+        "aligned": true,
+        "onScreen": true
+      }
+    },
+    {
+      "name": "Discovery cards 1366",
+      "ok": true,
+      "detail": {
+        "independent": true,
+        "above": true,
+        "aligned": true,
+        "onScreen": true
+      }
+    },
+    {
+      "name": "Discovery cards 1280",
+      "ok": true,
+      "detail": {
+        "independent": true,
+        "above": true,
+        "aligned": true,
+        "onScreen": true
+      }
+    },
+    {
+      "name": "preferences keep blue header and field accents",
+      "ok": true
+    },
+    {
+      "name": "Discovery pins have no glow",
+      "ok": true
+    },
+    {
+      "name": "Step 1 is practical only",
+      "ok": true
+    },
+    {
+      "name": "ordinary popup never routes or collapses",
+      "ok": true
+    },
+    {
+      "name": "Search darker and preserves pitch",
+      "ok": true
+    },
+    {
+      "name": "unrelated Search pins hidden and inert",
+      "ok": true
+    },
+    {
+      "name": "Search enables a slight pin glow",
+      "ok": true
+    },
+    {
+      "name": "Search does not route",
+      "ok": true
+    },
+    {
+      "name": "hidden pins do not intercept pointer hit tests",
+      "ok": true
+    },
+    {
+      "name": "pins loaded during Search obey focus visibility",
+      "ok": true
+    },
+    {
+      "name": "missing origin expands Directions and replaces preferences",
+      "ok": true
+    },
+    {
+      "name": "missing origin focused with explicit GPS action",
+      "ok": true
+    },
+    {
+      "name": "Navigation dark and locked",
+      "ok": true
+    },
+    {
+      "name": "all ordinary pins hidden in Navigation",
+      "ok": true
+    },
+    {
+      "name": "initial, transfer and final estimated walking connections are visible and labeled",
+      "ok": true
+    },
+    {
+      "name": "board, exit and both walking-transfer stations",
+      "ok": true
+    },
+    {
+      "name": "main contrast casing and two-tone pins survive the refined navigation UI",
+      "ok": true
+    },
+    {
+      "name": "neon rail glow preserves MBTA color",
+      "ok": true
+    },
+    {
+      "name": "route layer above focus",
+      "ok": true
+    },
+    {
+      "name": "collapsed Directions retains the walking-estimates disclosure",
+      "ok": true
+    },
+    {
+      "name": "collapse retains navigation, route, hubs and request",
+      "ok": true
+    },
+    {
+      "name": "Directions replaces card 1440",
+      "ok": true,
+      "detail": {
+        "independent": true,
+        "above": true,
+        "aligned": true,
+        "onScreen": true
+      }
+    },
+    {
+      "name": "Directions replaces card 1366",
+      "ok": true,
+      "detail": {
+        "independent": true,
+        "above": true,
+        "aligned": true,
+        "onScreen": true
+      }
+    },
+    {
+      "name": "Directions replaces card 1280",
+      "ok": true,
+      "detail": {
+        "independent": true,
+        "above": true,
+        "aligned": true,
+        "onScreen": true
+      }
+    },
+    {
+      "name": "Exit removes all navigation overlays and releases pitch",
+      "ok": true
+    },
+    {
+      "name": "discovery pins restore",
+      "ok": true,
+      "detail": {
+        "count": 99,
+        "focus": "discovery"
+      }
+    },
+    {
+      "name": "one vibe heading and no redundant subtitle",
+      "ok": true
+    },
+    {
+      "name": "seven upstream vibe examples",
+      "ok": true
+    },
+    {
+      "name": "multiple local image previews decode",
+      "ok": true
+    },
+    {
+      "name": "step changes retain all preference data and images",
+      "ok": true
+    },
+    {
+      "name": "valid navigation initially opens Directions with vibe preserved",
+      "ok": true
+    },
+    {
+      "name": "Directions preserves original File objects",
+      "ok": true
+    },
+    {
+      "name": "collapse restores exact Vibe step",
+      "ok": true
+    },
+    {
+      "name": "Exit restores exact Vibe step",
+      "ok": true
+    },
+    {
+      "name": "individual image removal works",
+      "ok": true
+    },
+    {
+      "name": "three verified walking legs and correct rail colors",
+      "ok": true
+    },
+    {
+      "name": "walking has a subtle neon glow",
+      "ok": true
+    },
+    {
+      "name": "walking dark dashes with light casing",
+      "ok": true
+    },
+    {
+      "name": "mobile Directions uses the same bottom sheet",
+      "ok": true,
+      "detail": {
+        "independent": true,
+        "above": true,
+        "aligned": true,
+        "onScreen": true
+      }
+    },
+    {
+      "name": "mobile collapse restores Vibe and keeps route",
+      "ok": true
+    },
+    {
+      "name": "navigation pitch gestures and programmatic tilt stay locked",
+      "ok": true
+    },
+    {
+      "name": "Search during Navigation keeps Navigation priority",
+      "ok": true
+    },
+    {
+      "name": "ordinary Search has no route hubs",
+      "ok": true
+    },
+    {
+      "name": "typing remains offline",
+      "ok": true
+    },
+    {
+      "name": "submit-only search shows relevant result markers",
+      "ok": true
+    },
+    {
+      "name": "Discovery removes route-only markers and restores normal pins",
+      "ok": true
+    },
+    {
+      "name": "repeated navigation removes every hub and destination marker",
+      "ok": true
+    },
+    {
+      "name": "Directions no-route state",
+      "ok": true
+    },
+    {
+      "name": "Directions no-service state",
+      "ok": true
+    },
+    {
+      "name": "Directions invalid-response state",
+      "ok": true
+    },
+    {
+      "name": "Discovery removes glow again",
+      "ok": true
+    },
+    {
+      "name": "no automatic geolocation",
+      "ok": true
+    },
+    {
+      "name": "no browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "networkFailures": [],
+  "routes": 9,
+  "queries": 1
+}

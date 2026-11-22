@@ -4,7 +4,7 @@ import { createLiveVibeSession } from '../../vibe/liveEngine';
 import { MODEL_KEY } from '../../vibe/profile';
 import { createProfilePublisher } from '../../vibe/publisher';
 import { sceneStyleOf, startThemeController } from '../../vibeTheme/controller';
-import { fakeEffects, fakeMap } from '../../vibeTheme/__tests__/fakeMap';
+import { fakeAtmosphere, fakeEffects, fakeMap } from '../../vibeTheme/__tests__/fakeMap';
 import { mountScene } from '../mount';
 import { intentFromProfile } from '../profiles';
 
@@ -12,7 +12,7 @@ function setup() {
   const publisher = createProfilePublisher();
   const map = fakeMap();
   const account = { getState: () => ({ status: 'signed_out' }), subscribe: () => () => {} } as unknown as AccountStore;
-  const theme = startThemeController(map.map, account, { effects: fakeEffects() });
+  const theme = startThemeController(map.map, account, { effects: fakeEffects(), atmosphere: fakeAtmosphere() });
   const scene = mountScene({ theme, account, schedule: () => {} });
   scene.connectProfiles(publisher);
   const quiz = createLiveVibeSession(
@@ -69,7 +69,9 @@ describe('real adaptive publisher through the existing Scene Composer', () => {
       await Promise.resolve();
       h.quiz.answer({ kind: 'correction', text: 'A gritty cinematic underground music scene' });
       const state = await h.settle();
-      expect(state.overlays).toEqual([]);
+      // Ratified navigation policy: every overlay is removed except a soft edge vignette (≤ 0.35).
+      for (const o of state.overlays) expect(o).toMatchObject({ key: 'air_and_atmosphere.vignette', value: 'soft' });
+      expect(Math.max(0, ...state.overlays.map((o) => o.opacity))).toBeLessThanOrEqual(0.35);
       expect(state.setPiece).toBeNull();
       expect(state.motion.ambient).toBe(false);
       const before = h.scene.session.getState();

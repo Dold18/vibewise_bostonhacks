@@ -16,6 +16,7 @@ import { normalizeScores, VIBE_KEYS, type VibeKey, type VibeScores } from '../ac
 import { applyStyle, setColorTransition, type StyleInputs } from './apply';
 import { blendPalette } from './blend';
 import { effectLayers, mountEffects, type EffectsHandle } from './effects';
+import type { AtmosphereSceneInput } from '../atmosphere/fromScene';
 
 export interface ThemeTarget {
   tags: Record<VibeKey, number>;
@@ -40,6 +41,16 @@ export interface SceneRender {
     readonly fogGroundBlend: number;
   };
   readonly motion: { readonly transitionMs: number };
+  /** Dominant catalog value and effective strength per key: what the atmosphere renderer reads. */
+  readonly resolved?: Readonly<Record<string, string>>;
+  readonly strengths?: Readonly<Record<string, number>>;
+}
+
+/** The slice of the atmosphere renderer the controller drives. */
+export interface AtmosphereTarget {
+  setScene(scene: AtmosphereSceneInput | null, timing?: { transitionMs?: number }): void;
+  setNavigation?(mode: 'browse' | 'route' | 'focus'): void;
+  destroy(): void;
 }
 
 /** What the map should look like for this account state; null = the plain map. */
@@ -57,6 +68,8 @@ export interface ThemeController {
    * `transitionMs` (from the session update) overrides the state's own timing.
    */
   setScene(state: SceneRender | null, timing?: { transitionMs?: number }): void;
+  /** Navigation context for the atmosphere (a second guard beside the compiler's navigation rule). */
+  setNavigation(mode: 'browse' | 'route' | 'focus'): void;
   destroy(): void;
 }
 
@@ -67,6 +80,12 @@ export type ThemeMap = Pick<MapLibreMap, 'isStyleLoaded' | 'once' | 'off' | 'get
 export interface ThemeControllerOptions {
   /** Injected for tests; defaults to the CSS effects layer in the canvas container. */
   effects?: EffectsHandle;
+  /**
+   * Scene atmosphere (fog, weather, particles, grade, bloom) as MapLibre custom
+   * layers below routes and labels. Optional: in the live app the city engine owns
+   * the atmosphere renderer, so this defaults to none (never drawn twice).
+   */
+  atmosphere?: AtmosphereTarget | null;
 }
 
 const PLAIN: StyleInputs = { palette: basePalette };
@@ -85,6 +104,9 @@ export function sceneStyleOf(scene: SceneRender): SceneStyle {
 
 export function startThemeController(map: ThemeMap, store: AccountStore, options: ThemeControllerOptions = {}): ThemeController {
   const effects = options.effects ?? mountEffects(map.getCanvasContainer());
+  // Integrated runtime: the city engine mounts the atmosphere renderer (features/city/atmosphere),
+  // so the controller drives one only when a caller injects it (standalone mounts, tests).
+  const atmosphere = options.atmosphere ?? null;
   let current: StyleInputs = PLAIN;
   let target: ThemeTarget | null = themeFor(store.getState());
   let scene: SceneRender | null = null;
@@ -114,11 +136,13 @@ export function startThemeController(map: ThemeMap, store: AccountStore, options
       applyStyle(map, current, next, { transitionMs: ms });
       current = next;
       setShadow(scene.lighting.position[1]);
-      effects.render([], scene.darkMode); // scene overlays have their own (later) renderer
+      effects.render([], scene.darkMode); // scene overlays are drawn by the city engine's atmosphere renderer
+      atmosphere?.setScene(scene, { transitionMs: ms });
       return;
     }
     setTransition(THEME_TRANSITION_MS);
     setShadow(DEFAULT_SCENE_STYLE.lightPosition[1]);
+    atmosphere?.setScene(null, { transitionMs: THEME_TRANSITION_MS });
     const blend = target ? blendPalette(basePalette, target.tags, target.strength) : null;
     const next: StyleInputs = { palette: blend?.palette ?? basePalette };
     applyStyle(map, current, next, { transitionMs: THEME_TRANSITION_MS });
@@ -149,6 +173,9 @@ export function startThemeController(map: ThemeMap, store: AccountStore, options
           : null;
       if (!scene) render();
     },
+    setNavigation(mode) {
+      atmosphere?.setNavigation?.(mode);
+    },
     setScene(state, timing) {
       if (state && scene && state.hash === scene.hash && timing?.transitionMs === sceneTransition) return;
       scene = state;
@@ -164,6 +191,7 @@ export function startThemeController(map: ThemeMap, store: AccountStore, options
         setShadow(DEFAULT_SCENE_STYLE.lightPosition[1]);
       }
       effects.destroy();
+      atmosphere?.destroy();
     },
   };
 }

@@ -17,11 +17,20 @@ import type { AssetRegistry } from './assets';
 import { PALETTE_ADAPTER_V0, type CapabilityProfile } from './capabilities';
 import type { SceneCatalog } from './catalog';
 import { compileScene, type CompileInput } from './compile';
-import { sanitizeIntent, type SceneIntent } from './intent';
+import { sanitizeIntent, type IntentTrust, type SceneIntent } from './intent';
 import { DEFAULT_CONTEXT, diffScene, hashString, stableStringify, type SceneContext, type SceneDiff, type SceneState } from './state';
 import type { Palette } from '../../mapStyle';
 
 export type SubmitResult = 'applied' | 'unchanged' | 'stale' | 'rejected';
+
+export interface SubmitOptions {
+  /**
+   * Who wrote the intent, asserted by the calling code and never read from the payload.
+   * Only the local procedural composer passes `composer` (larger override budget,
+   * identical validation). Default `model`.
+   */
+  readonly source?: IntentTrust;
+}
 export type UpdateReason = 'intent' | 'restore' | 'clear' | 'account' | 'context';
 
 export interface SceneUpdate {
@@ -60,11 +69,17 @@ export interface SceneSession {
   /** Future updates only; read getState() for the current scene. */
   subscribe(listener: (update: SceneUpdate) => void): () => void;
   /** A SceneIntent (untrusted, or null for "no scene yet") for quiz `version` of `sessionId`. */
-  submit(sessionId: string, version: number, intent: unknown): SubmitResult;
+  submit(sessionId: string, version: number, intent: unknown, options?: SubmitOptions): SubmitResult;
   /** The outing ended or was cleared; its session ID is retired. */
   clear(): void;
   setAccount(account: CompileInput['account']): void;
   setContext(context: Partial<SceneContext>): void;
+  /**
+   * Replace the renderer capability profile (a city renderer registered, failed
+   * or was retired). Clears the look cache and recompiles, so a value is never
+   * reported active after the renderer that draws it is gone.
+   */
+  setCapabilities(capabilities: CapabilityProfile): void;
   stats(): SceneSessionStats;
   destroy(): void;
 }
@@ -73,13 +88,14 @@ interface Outing {
   readonly sessionId: string;
   readonly version: number;
   readonly intent: SceneIntent | null;
+  readonly trust: IntentTrust;
 }
 
 export function createSceneSession(options: SceneSessionOptions = {}): SceneSession {
   const compile = options.compile ?? compileScene;
   const capabilities = options.capabilities ?? PALETTE_ADAPTER_V0;
   const cacheSize = Math.max(1, options.cacheSize ?? 48);
-  const fixed = { capabilities, assets: options.assets ?? null, catalog: options.catalog, base: options.base };
+  const fixed: { -readonly [K in 'capabilities' | 'assets' | 'catalog' | 'base']: CompileInput[K] } = { capabilities, assets: options.assets ?? null, catalog: options.catalog, base: options.base };
 
   let context: SceneContext = { ...DEFAULT_CONTEXT, ...options.context };
   let account: CompileInput['account'] = options.account ?? null;
@@ -104,6 +120,7 @@ export function createSceneSession(options: SceneSessionOptions = {}): SceneSess
     hashString(
       stableStringify({
         intent: outing?.intent ? { ...outing.intent, sessionVersion: 0 } : null,
+        trust: outing?.trust ?? 'model',
         account: account ?? null,
         context,
       }),
@@ -123,7 +140,7 @@ export function createSceneSession(options: SceneSessionOptions = {}): SceneSess
       return { state: stamp(hit, version), cached: true };
     }
     compiles++;
-    const state = compile({ ...fixed, outing: outing?.intent ?? null, account, context, previous });
+    const state = compile({ ...fixed, outing: outing?.intent ?? null, outingTrust: outing?.trust ?? 'model', account, context, previous });
     cache.set(key, state);
     while (cache.size > cacheSize) cache.delete(cache.keys().next().value!);
     return { state: stamp(state, version), cached: false };
@@ -168,17 +185,18 @@ export function createSceneSession(options: SceneSessionOptions = {}): SceneSess
       return () => void listeners.delete(listener);
     },
 
-    submit(sessionId, version, raw) {
+    submit(sessionId, version, raw, submitOptions) {
       if (destroyed || typeof sessionId !== 'string' || !sessionId || !Number.isInteger(version) || version < 0) return 'rejected';
       if (retired.has(sessionId)) return 'stale';
       if (outing?.sessionId === sessionId && version < outing.version) return 'stale';
 
-      const { intent } = sanitizeIntent(raw, options.catalog);
+      const trust: IntentTrust = submitOptions?.source === 'composer' ? 'composer' : 'model';
+      const { intent } = sanitizeIntent(raw, options.catalog, trust);
       if (raw !== null && raw !== undefined && !intent) return 'rejected';
       if (intent && intent.sessionVersion !== version) return intent.sessionVersion < version ? 'stale' : 'rejected';
 
       if (outing && outing.sessionId !== sessionId) retired.add(outing.sessionId);
-      outing = { sessionId, version, intent };
+      outing = { sessionId, version, intent, trust };
       return render('intent');
     },
 
@@ -186,6 +204,8 @@ export function createSceneSession(options: SceneSessionOptions = {}): SceneSess
       if (destroyed) return;
       if (outing) retired.add(outing.sessionId);
       outing = null;
+      // The outing's explicit themes end with it (decor/evidence.ts).
+      if (context.themeEvidence?.length) context = { ...context, themeEvidence: [] };
       render('clear');
     },
 
@@ -198,6 +218,13 @@ export function createSceneSession(options: SceneSessionOptions = {}): SceneSess
     setContext(next) {
       if (destroyed) return;
       context = { ...context, ...next };
+      render('context');
+    },
+
+    setCapabilities(next) {
+      if (destroyed || next === fixed.capabilities) return;
+      fixed.capabilities = next;
+      cache.clear(); // cached looks were clipped against the old profile
       render('context');
     },
 

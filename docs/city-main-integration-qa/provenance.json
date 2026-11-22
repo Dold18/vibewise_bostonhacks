@@ -1,0 +1,31 @@
+{
+  "fixture": "Adversarial model qualifiers and explicit-answer publisher fixture on a real quiz profile",
+  "checks": [
+    {
+      "name": "model-only haunted and Christmas qualifiers authorize no props",
+      "ok": true,
+      "detail": {
+        "themes": [],
+        "provenance": []
+      }
+    },
+    {
+      "name": "explicit answer authorizes only its theme",
+      "ok": true
+    },
+    {
+      "name": "undo cannot promote model qualifiers to explicit evidence",
+      "ok": true
+    },
+    {
+      "name": "reseed cannot promote model qualifiers to explicit evidence",
+      "ok": true
+    },
+    {
+      "name": "no browser errors",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

@@ -213,10 +213,10 @@ const reducedMotion: ConstraintRule = {
   },
 };
 
-/** Rough relative GPU/compositing cost of a visible effect. */
+/** Rough relative GPU/compositing cost; fog is now a cached static SVG illustration. */
 export const COST: Readonly<Record<SceneKey, number>> = {
   'air_and_atmosphere.rain': 3, 'air_and_atmosphere.snow': 3, 'air_and_atmosphere.petals': 2, 'air_and_atmosphere.fireflies': 2,
-  'air_and_atmosphere.sparkle': 2, 'air_and_atmosphere.dust_motes': 1.5, 'air_and_atmosphere.fog_volume': 2,
+  'air_and_atmosphere.sparkle': 2, 'air_and_atmosphere.dust_motes': 1.5, 'air_and_atmosphere.fog_volume': 1,
   'air_and_atmosphere.volumetric_weather': 4, 'air_and_atmosphere.light_shafts': 3, 'air_and_atmosphere.distortion': 4,
   'air_and_atmosphere.grain': 1, 'air_and_atmosphere.vignette': 0.5, 'air_and_atmosphere.scanlines': 1,
   'air_and_atmosphere.chromatic_aberration': 2, 'air_and_atmosphere.lens_glare': 1, 'air_and_atmosphere.haze_profile': 1,

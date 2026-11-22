@@ -1,0 +1,1642 @@
+{
+  "liveApi": true,
+  "geminiConfigured": false,
+  "checks": [
+    {
+      "name": "neutral app has all four renderers",
+      "ok": true,
+      "detail": {
+        "source": "neutral",
+        "renderers": [
+          {
+            "id": "buildings",
+            "section": "buildings",
+            "status": "ready",
+            "deliveries": 2,
+            "failures": 0,
+            "claims": [
+              "building_surfaces.facade_look",
+              "building_surfaces.window_pattern",
+              "building_surfaces.window_glow",
+              "building_surfaces.building_material_finish",
+              "building_surfaces.roof_details"
+            ],
+            "usage": {
+              "customLayers": 0,
+              "textureMB": 0
+            },
+            "overBudget": []
+          },
+          {
+            "id": "streets",
+            "section": "streets",
+            "status": "ready",
+            "deliveries": 1,
+            "failures": 0,
+            "claims": [
+              "roads_and_ground.street_material",
+              "roads_and_ground.wet_sheen",
+              "roads_and_ground.lane_detail",
+              "roads_and_ground.pedestrian_paths",
+              "roads_and_ground.street_lights",
+              "roads_and_ground.road_reflections",
+              "natural_land.grass_texture",
+              "natural_land.floral_accents",
+              "natural_land.park_glow",
+              "natural_land.foliage_density_illusion",
+              "natural_land.seasonal_visual"
+            ],
+            "usage": {
+              "styleLayers": 20,
+              "textureMB": 6
+            },
+            "overBudget": []
+          },
+          {
+            "id": "decorations",
+            "section": "decorations",
+            "status": "ready",
+            "deliveries": 2,
+            "failures": 0,
+            "claims": [],
+            "usage": {
+              "customLayers": 0
+            },
+            "overBudget": []
+          },
+          {
+            "id": "atmosphere",
+            "section": "atmosphere",
+            "status": "ready",
+            "deliveries": 1,
+            "failures": 0,
+            "claims": [
+              "air_and_atmosphere.fog_volume",
+              "air_and_atmosphere.haze_profile",
+              "air_and_atmosphere.vignette",
+              "air_and_atmosphere.grain",
+              "air_and_atmosphere.dust_motes",
+              "air_and_atmosphere.rain",
+              "air_and_atmosphere.snow",
+              "air_and_atmosphere.sparkle",
+              "air_and_atmosphere.fireflies",
+              "air_and_atmosphere.petals",
+              "air_and_atmosphere.light_shafts",
+              "air_and_atmosphere.scanlines",
+              "air_and_atmosphere.volumetric_weather",
+              "cinematic_and_artistic.render_aesthetic",
+              "cinematic_and_artistic.paper_texture",
+              "cinematic_and_artistic.halftone",
+              "cinematic_and_artistic.analog_aging",
+              "cinematic_and_artistic.grid_overlay",
+              "lighting_and_shadows.bloom",
+              "animation_and_morph.ambient_pace",
+              "animation_and_morph.particle_motion",
+              "air_and_atmosphere.fog_hue"
+            ],
+            "usage": {
+              "customLayers": 0,
+              "textureMB": 0
+            },
+            "overBudget": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "Need a fun night. reaches composer and all renderers",
+      "ok": true,
+      "detail": {
+        "themes": [],
+        "fidelity": 0.957,
+        "generation": "fallback"
+      }
+    },
+    {
+      "name": "Need a fun night. has no thematic props permission",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "Need a fun night. accepted answer continues same pipeline",
+      "ok": true
+    },
+    {
+      "name": "correction reaches shared profile",
+      "ok": true
+    },
+    {
+      "name": "clear resets explicit theme 0",
+      "ok": true
+    },
+    {
+      "name": "Jazz and candlelight. reaches composer and all renderers",
+      "ok": true,
+      "detail": {
+        "themes": [],
+        "fidelity": 1,
+        "generation": "fallback"
+      }
+    },
+    {
+      "name": "Jazz and candlelight. has no thematic props permission",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "Jazz and candlelight. accepted answer continues same pipeline",
+      "ok": true
+    },
+    {
+      "name": "clear resets explicit theme 1",
+      "ok": true
+    },
+    {
+      "name": "Haunted but romantic. reaches composer and all renderers",
+      "ok": true,
+      "detail": {
+        "themes": [
+          "spooky|haunted|vibe"
+        ],
+        "fidelity": 1,
+        "generation": "fallback"
+      }
+    },
+    {
+      "name": "Haunted but romantic. accepted answer continues same pipeline",
+      "ok": true
+    },
+    {
+      "name": "clear resets explicit theme 2",
+      "ok": true
+    },
+    {
+      "name": "Cozy rainy bookstore. reaches composer and all renderers",
+      "ok": true,
+      "detail": {
+        "themes": [],
+        "fidelity": 1,
+        "generation": "fallback"
+      }
+    },
+    {
+      "name": "Cozy rainy bookstore. has no thematic props permission",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "Cozy rainy bookstore. accepted answer continues same pipeline",
+      "ok": true
+    },
+    {
+      "name": "clear resets explicit theme 3",
+      "ok": true
+    },
+    {
+      "name": "Cyberpunk nightlife. reaches composer and all renderers",
+      "ok": true,
+      "detail": {
+        "themes": [
+          "cyberpunk|cyberpunk|vibe"
+        ],
+        "fidelity": 0.959,
+        "generation": "fallback"
+      }
+    },
+    {
+      "name": "Cyberpunk nightlife. accepted answer continues same pipeline",
+      "ok": true
+    },
+    {
+      "name": "clear resets explicit theme 4",
+      "ok": true
+    },
+    {
+      "name": "Peaceful afternoon in Boston. reaches composer and all renderers",
+      "ok": true,
+      "detail": {
+        "themes": [],
+        "fidelity": 1,
+        "generation": "fallback"
+      }
+    },
+    {
+      "name": "Peaceful afternoon in Boston. has no thematic props permission",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "Peaceful afternoon in Boston. accepted answer continues same pipeline",
+      "ok": true
+    },
+    {
+      "name": "clear resets explicit theme 5",
+      "ok": true
+    },
+    {
+      "name": "Christmas in Boston. reaches composer and all renderers",
+      "ok": true,
+      "detail": {
+        "themes": [
+          "winter_holiday|christmas|vibe"
+        ],
+        "fidelity": 1,
+        "generation": "fallback"
+      }
+    },
+    {
+      "name": "Christmas in Boston. accepted answer continues same pipeline",
+      "ok": true
+    },
+    {
+      "name": "clear resets explicit theme 6",
+      "ok": true
+    },
+    {
+      "name": "Somewhere energetic but intimate. reaches composer and all renderers",
+      "ok": true,
+      "detail": {
+        "themes": [],
+        "fidelity": 1,
+        "generation": "fallback"
+      }
+    },
+    {
+      "name": "Somewhere energetic but intimate. has no thematic props permission",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "Somewhere energetic but intimate. accepted answer continues same pipeline",
+      "ok": true
+    },
+    {
+      "name": "clear resets explicit theme 7",
+      "ok": true
+    },
+    {
+      "name": "Surprise me. reaches composer and all renderers",
+      "ok": true,
+      "detail": {
+        "themes": [],
+        "fidelity": 1,
+        "generation": "fallback"
+      }
+    },
+    {
+      "name": "Surprise me. has no thematic props permission",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "Surprise me. accepted answer continues same pipeline",
+      "ok": true
+    },
+    {
+      "name": "clear resets explicit theme 8",
+      "ok": true
+    },
+    {
+      "name": "different inputs produce varied cities",
+      "ok": true
+    },
+    {
+      "name": "no uncaught exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "observations": [
+    {
+      "input": "Need a fun night.",
+      "phase": "question",
+      "generation": "fallback",
+      "embedding": "ready",
+      "sceneHash": "ea3153d133cb4f3e",
+      "themes": [],
+      "composition": "c3dbeaf2c6b346e2",
+      "fidelity": 0.957,
+      "signals": {
+        "style": {
+          "warmth": 0,
+          "luminance": -0.497,
+          "energy": 0.575,
+          "chroma": 0.575,
+          "ornament": 0,
+          "era": 0,
+          "nature": 0,
+          "softness": 0.215,
+          "grit": 0,
+          "moisture": 0,
+          "intimacy": 0
+        },
+        "hints": {
+          "night": 1.5
+        },
+        "avoidTags": {},
+        "timeOfDay": null,
+        "confidence": 0,
+        "presence": 0.3,
+        "boldness": 0.55,
+        "explicit": [],
+        "venue": null,
+        "recognized": [
+          {
+            "channel": "text",
+            "term": "fun",
+            "entry": "joyful",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "night",
+            "entry": "night",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "fun",
+            "entry": "joyful",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "night",
+            "entry": "night",
+            "polarity": "want"
+          }
+        ],
+        "culturalTerms": [],
+        "ignored": []
+      },
+      "buildings": [
+        "metal panel low-rise",
+        "glass curtain",
+        "glass tower"
+      ],
+      "streets": {
+        "minor": "wet_asphalt",
+        "major": "wet_asphalt",
+        "motorway": "wet_asphalt",
+        "intensity": 0.582
+      },
+      "decor": {
+        "secondary": [
+          "kaykit.city-builder-bits.streetlight",
+          "cc0.kenney-retro-urban-kit.tree_park_large",
+          "cc0.kenney-nature-kit.tree_oak",
+          "cc0.kenney-retro-urban-kit.detail_light_double"
+        ],
+        "micro": [
+          "kaykit.city-builder-bits.bush",
+          "cc0.kenney-city-kit-commercial.detail_parasol_b",
+          "cc0.kenney-city-kit-commercial.detail_parasol_a",
+          "kaykit.city-builder-bits.bench",
+          "cc0.kenney-retro-urban-kit.detail_bench"
+        ]
+      },
+      "atmosphere": {
+        "quality": "high",
+        "deviceReasons": [
+          "8 cores",
+          "8 GB"
+        ],
+        "governor": [],
+        "layers": true,
+        "animating": true,
+        "repaintRequests": 81,
+        "plan": {
+          "load": 0.446,
+          "fps": 30,
+          "empty": false,
+          "notes": []
+        },
+        "worldFrames": 128,
+        "gradeFrames": 128,
+        "avgWorldCpuMs": 0.21328125009313226,
+        "avgGradeCpuMs": 0.1148437513038516,
+        "drawCalls": 384,
+        "gpuBytes": {
+          "buffers": 416056,
+          "textures": 0,
+          "framebuffers": 0
+        },
+        "allocations": 3,
+        "texturesLoaded": [],
+        "bloomPasses": 0,
+        "fogSigma": 0
+      },
+      "renderers": [
+        {
+          "id": "buildings",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "streets",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "decorations",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "atmosphere",
+          "failures": 0,
+          "status": "ready"
+        }
+      ],
+      "listeners": 1,
+      "ui": {
+        "identity": false,
+        "debug": false,
+        "background": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "pins": 30
+    },
+    {
+      "input": "Jazz and candlelight.",
+      "phase": "question",
+      "generation": "fallback",
+      "embedding": "ready",
+      "sceneHash": "5ba27c63927ff0cd",
+      "themes": [],
+      "composition": "1099b0bf01fc6748",
+      "fidelity": 1,
+      "signals": {
+        "style": {
+          "warmth": 0.797,
+          "luminance": -0.754,
+          "energy": 0,
+          "chroma": 0,
+          "ornament": 0,
+          "era": 0.497,
+          "nature": 0,
+          "softness": 0,
+          "grit": -0.215,
+          "moisture": 0,
+          "intimacy": 0.834
+        },
+        "hints": {
+          "cinematic": 0.8,
+          "warm-glow": 1.5,
+          "lantern": 1
+        },
+        "avoidTags": {},
+        "timeOfDay": null,
+        "confidence": 0,
+        "presence": 0.3,
+        "boldness": 0.55,
+        "explicit": [],
+        "venue": null,
+        "recognized": [
+          {
+            "channel": "text",
+            "term": "jazz",
+            "entry": "jazz",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "candlelight",
+            "entry": "glow",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "jazz",
+            "entry": "jazz",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "candlelight",
+            "entry": "glow",
+            "polarity": "want"
+          }
+        ],
+        "culturalTerms": [],
+        "ignored": []
+      },
+      "buildings": [
+        "red running bond",
+        "buff stacked bond",
+        "dark slim brick tower"
+      ],
+      "streets": {
+        "minor": "cobbles",
+        "major": "granite_setts",
+        "motorway": "asphalt",
+        "intensity": 0.582
+      },
+      "decor": {
+        "secondary": [
+          "kaykit.city-builder-bits.streetlight",
+          "cc0.kenney-nature-kit.tree_oak",
+          "cc0.kenney-fantasy-town-kit.lantern"
+        ],
+        "micro": [
+          "cc0.kenney-nature-kit.flower_red_a",
+          "cc0.kenney-city-kit-commercial.detail_parasol_b",
+          "cc0.kenney-city-kit-commercial.detail_parasol_a",
+          "kaykit.city-builder-bits.bench",
+          "cc0.kenney-nature-kit.flower_purple_a"
+        ]
+      },
+      "atmosphere": {
+        "quality": "high",
+        "deviceReasons": [
+          "8 cores",
+          "8 GB"
+        ],
+        "governor": [],
+        "layers": true,
+        "animating": true,
+        "repaintRequests": 249,
+        "plan": {
+          "load": 0.358,
+          "fps": 30,
+          "empty": false,
+          "notes": [
+            "dust 0.30→0.20: dust motes need light"
+          ]
+        },
+        "worldFrames": 265,
+        "gradeFrames": 363,
+        "avgWorldCpuMs": 0.1445283017068539,
+        "avgGradeCpuMs": 0.2732782367175604,
+        "drawCalls": 1345,
+        "gpuBytes": {
+          "buffers": 416056,
+          "textures": 348652,
+          "framebuffers": 648000
+        },
+        "allocations": 5,
+        "texturesLoaded": [
+          "film-grain"
+        ],
+        "bloomPasses": 4,
+        "fogSigma": 0
+      },
+      "renderers": [
+        {
+          "id": "buildings",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "streets",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "decorations",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "atmosphere",
+          "failures": 0,
+          "status": "ready"
+        }
+      ],
+      "listeners": 1,
+      "ui": {
+        "identity": false,
+        "debug": false,
+        "background": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "input": "Haunted but romantic.",
+      "phase": "question",
+      "generation": "fallback",
+      "embedding": "ready",
+      "sceneHash": "eb7624fbabfb5649",
+      "themes": [
+        "spooky|haunted|vibe"
+      ],
+      "composition": "9afd0afc18547c4d",
+      "fidelity": 1,
+      "signals": {
+        "style": {
+          "warmth": 0.497,
+          "luminance": -0.703,
+          "energy": 0,
+          "chroma": -0.316,
+          "ornament": 0,
+          "era": 0.497,
+          "nature": 0,
+          "softness": 0.497,
+          "grit": 0,
+          "moisture": 0.411,
+          "intimacy": 0.754
+        },
+        "hints": {
+          "spooky": 1.5,
+          "nocturnal": 0.8
+        },
+        "avoidTags": {},
+        "timeOfDay": null,
+        "confidence": 0,
+        "presence": 0.3,
+        "boldness": 0.55,
+        "explicit": [],
+        "venue": null,
+        "recognized": [
+          {
+            "channel": "text",
+            "term": "haunted",
+            "entry": "spooky",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "romantic",
+            "entry": "romantic",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "haunted",
+            "entry": "spooky",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "romantic",
+            "entry": "romantic",
+            "polarity": "want"
+          }
+        ],
+        "culturalTerms": [],
+        "ignored": []
+      },
+      "buildings": [
+        "limestone ashlar",
+        "granite blocks",
+        "board-formed concrete",
+        "limestone tower"
+      ],
+      "streets": {
+        "minor": "granite_setts",
+        "major": "granite_setts",
+        "motorway": "asphalt",
+        "intensity": 0.582
+      },
+      "decor": {
+        "secondary": [
+          "kaykit.halloween-bits.tree_dead_large",
+          "kaykit.halloween-bits.crypt",
+          "cc0.kenney-graveyard-kit.lightpost_single",
+          "cc0.kenney-graveyard-kit.pine_crooked",
+          "kaykit.halloween-bits.arch_gate",
+          "cc0.kenney-graveyard-kit.character_ghost",
+          "cc0.kenney-graveyard-kit.crypt_large"
+        ],
+        "micro": [
+          "kaykit.halloween-bits.fence_gate",
+          "kaykit.halloween-bits.candle_triple",
+          "cc0.kenney-graveyard-kit.lantern_candle",
+          "cc0.kenney-graveyard-kit.iron_fence_border_gate"
+        ]
+      },
+      "atmosphere": {
+        "quality": "high",
+        "deviceReasons": [
+          "8 cores",
+          "8 GB"
+        ],
+        "governor": [],
+        "layers": true,
+        "animating": true,
+        "repaintRequests": 366,
+        "plan": {
+          "load": 0.542,
+          "fps": 10,
+          "empty": false,
+          "notes": []
+        },
+        "worldFrames": 471,
+        "gradeFrames": 569,
+        "avgWorldCpuMs": 0.12165604996833072,
+        "avgGradeCpuMs": 0.4801405985661257,
+        "drawCalls": 2222,
+        "gpuBytes": {
+          "buffers": 416056,
+          "textures": 348652,
+          "framebuffers": 648000
+        },
+        "allocations": 5,
+        "texturesLoaded": [
+          "film-grain"
+        ],
+        "bloomPasses": 4,
+        "fogSigma": 0.00308
+      },
+      "renderers": [
+        {
+          "id": "buildings",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "streets",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "decorations",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "atmosphere",
+          "failures": 0,
+          "status": "ready"
+        }
+      ],
+      "listeners": 1,
+      "ui": {
+        "identity": false,
+        "debug": false,
+        "background": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "input": "Cozy rainy bookstore.",
+      "phase": "question",
+      "generation": "fallback",
+      "embedding": "ready",
+      "sceneHash": "d183ff5899e8c132",
+      "themes": [],
+      "composition": "26dbacb0332f1af9",
+      "fidelity": 1,
+      "signals": {
+        "style": {
+          "warmth": 0.864,
+          "luminance": -0.316,
+          "energy": -0.703,
+          "chroma": 0,
+          "ornament": 0,
+          "era": 0.497,
+          "nature": 0,
+          "softness": 0.411,
+          "grit": 0,
+          "moisture": 0.754,
+          "intimacy": 0.889
+        },
+        "hints": {
+          "warm-glow": 1.2,
+          "rain": 1.5,
+          "paper": 0.6
+        },
+        "avoidTags": {},
+        "timeOfDay": null,
+        "confidence": 0,
+        "presence": 0.3,
+        "boldness": 0.55,
+        "explicit": [],
+        "venue": null,
+        "recognized": [
+          {
+            "channel": "text",
+            "term": "cozy",
+            "entry": "cozy",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "rainy",
+            "entry": "rain",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "bookstore",
+            "entry": "bookish",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "cozy",
+            "entry": "cozy",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "rainy",
+            "entry": "rain",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "bookstore",
+            "entry": "bookish",
+            "polarity": "want"
+          }
+        ],
+        "culturalTerms": [],
+        "ignored": []
+      },
+      "buildings": [
+        "red running bond",
+        "buff stacked bond",
+        "dark slim brick tower"
+      ],
+      "streets": {
+        "minor": "paper_sketch",
+        "major": "paper_sketch",
+        "motorway": "wet_asphalt",
+        "intensity": 0.582
+      },
+      "decor": {
+        "secondary": [
+          "kaykit.city-builder-bits.streetlight",
+          "cc0.kenney-nature-kit.tree_oak",
+          "cc0.kenney-fantasy-town-kit.lantern"
+        ],
+        "micro": [
+          "cc0.kenney-nature-kit.flower_red_a",
+          "cc0.kenney-city-kit-commercial.detail_parasol_b",
+          "cc0.kenney-city-kit-commercial.detail_parasol_a",
+          "cc0.kenney-nature-kit.flower_purple_a",
+          "kaykit.city-builder-bits.bench"
+        ]
+      },
+      "atmosphere": {
+        "quality": "medium",
+        "deviceReasons": [
+          "8 cores",
+          "8 GB"
+        ],
+        "governor": [
+          "high→medium: p80 frame 100.0 ms > 53.3 ms"
+        ],
+        "layers": true,
+        "animating": true,
+        "repaintRequests": 542,
+        "plan": {
+          "load": 0.7,
+          "fps": 30,
+          "empty": false,
+          "notes": []
+        },
+        "worldFrames": 701,
+        "gradeFrames": 799,
+        "avgWorldCpuMs": 0.15977175302070148,
+        "avgGradeCpuMs": 0.591864831158157,
+        "drawCalls": 3160,
+        "gpuBytes": {
+          "buffers": 227256,
+          "textures": 348652,
+          "framebuffers": 648000
+        },
+        "allocations": 6,
+        "texturesLoaded": [
+          "film-grain"
+        ],
+        "bloomPasses": 4,
+        "fogSigma": 0.0011199999999999995
+      },
+      "renderers": [
+        {
+          "id": "buildings",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "streets",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "decorations",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "atmosphere",
+          "failures": 0,
+          "status": "ready"
+        }
+      ],
+      "listeners": 1,
+      "ui": {
+        "identity": false,
+        "debug": false,
+        "background": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "input": "Cyberpunk nightlife.",
+      "phase": "question",
+      "generation": "fallback",
+      "embedding": "ready",
+      "sceneHash": "1ecd7efa33eafbc0",
+      "themes": [
+        "cyberpunk|cyberpunk|vibe"
+      ],
+      "composition": "491cd87a900e4c92",
+      "fidelity": 0.959,
+      "signals": {
+        "style": {
+          "warmth": 0,
+          "luminance": -0.969,
+          "energy": 0.754,
+          "chroma": 0.834,
+          "ornament": 0,
+          "era": -0.754,
+          "nature": 0,
+          "softness": 0,
+          "grit": 0,
+          "moisture": 0,
+          "intimacy": -0.215
+        },
+        "hints": {
+          "futurist": 1.4,
+          "night": 1.5,
+          "neon": 0.6
+        },
+        "avoidTags": {},
+        "timeOfDay": null,
+        "confidence": 0,
+        "presence": 0.3,
+        "boldness": 0.55,
+        "explicit": [],
+        "venue": null,
+        "recognized": [
+          {
+            "channel": "text",
+            "term": "cyberpunk",
+            "entry": "futurist",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "nightlife",
+            "entry": "night",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "nightlife",
+            "entry": "nightlife",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "cyberpunk",
+            "entry": "futurist",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "nightlife",
+            "entry": "night",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "nightlife",
+            "entry": "nightlife",
+            "polarity": "want"
+          }
+        ],
+        "culturalTerms": [],
+        "ignored": []
+      },
+      "buildings": [
+        "metal panel low-rise",
+        "glass curtain",
+        "glass tower"
+      ],
+      "streets": {
+        "minor": "wet_asphalt",
+        "major": "wet_asphalt",
+        "motorway": "wet_asphalt",
+        "intensity": 0.582
+      },
+      "decor": {
+        "secondary": [
+          "kaykit.city-builder-bits.streetlight",
+          "cc0.quaternius-cyberpunkgamekit.computer",
+          "cc0.kenney-nature-kit.tree_oak",
+          "cc0.quaternius-cyberpunkgamekit.antenna_1",
+          "cc0.quaternius-cyberpunkgamekit.light_square",
+          "cc0.kenney-retro-urban-kit.tree_park_large",
+          "cc0.quaternius-cyberpunkgamekit.antenna_2"
+        ],
+        "micro": [
+          "cc0.kenney-nature-kit.flower_red_a",
+          "cc0.kenney-city-kit-commercial.detail_parasol_b",
+          "cc0.kenney-city-kit-commercial.detail_parasol_a",
+          "kaykit.city-builder-bits.bench"
+        ]
+      },
+      "atmosphere": {
+        "quality": "medium",
+        "deviceReasons": [
+          "8 cores",
+          "8 GB"
+        ],
+        "governor": [
+          "high→medium: p80 frame 100.0 ms > 53.3 ms"
+        ],
+        "layers": true,
+        "animating": true,
+        "repaintRequests": 732,
+        "plan": {
+          "load": 0.584,
+          "fps": 30,
+          "empty": false,
+          "notes": []
+        },
+        "worldFrames": 932,
+        "gradeFrames": 1030,
+        "avgWorldCpuMs": 0.13733905496259616,
+        "avgGradeCpuMs": 0.5859223306179047,
+        "drawCalls": 4366,
+        "gpuBytes": {
+          "buffers": 227256,
+          "textures": 348652,
+          "framebuffers": 648000
+        },
+        "allocations": 6,
+        "texturesLoaded": [
+          "film-grain"
+        ],
+        "bloomPasses": 141,
+        "fogSigma": 0.00006351905602414451
+      },
+      "renderers": [
+        {
+          "id": "buildings",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "streets",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "decorations",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "atmosphere",
+          "failures": 0,
+          "status": "ready"
+        }
+      ],
+      "listeners": 1,
+      "ui": {
+        "identity": false,
+        "debug": false,
+        "background": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "input": "Peaceful afternoon in Boston.",
+      "phase": "question",
+      "generation": "fallback",
+      "embedding": "ready",
+      "sceneHash": "7cd8d814a00acb2d",
+      "themes": [],
+      "composition": "c8c5a1e4d4329004",
+      "fidelity": 1,
+      "signals": {
+        "style": {
+          "warmth": 0,
+          "luminance": 0.575,
+          "energy": -0.703,
+          "chroma": -0.215,
+          "ornament": 0,
+          "era": 0,
+          "nature": 0,
+          "softness": 0.411,
+          "grit": 0,
+          "moisture": 0,
+          "intimacy": 0
+        },
+        "hints": {
+          "day": 1.5,
+          "noon": 0.6
+        },
+        "avoidTags": {},
+        "timeOfDay": null,
+        "confidence": 0,
+        "presence": 0.3,
+        "boldness": 0.55,
+        "explicit": [],
+        "venue": null,
+        "recognized": [
+          {
+            "channel": "text",
+            "term": "peaceful",
+            "entry": "calm",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "afternoon",
+            "entry": "afternoon",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "peaceful",
+            "entry": "calm",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "afternoon",
+            "entry": "afternoon",
+            "polarity": "want"
+          }
+        ],
+        "culturalTerms": [],
+        "ignored": []
+      },
+      "buildings": [
+        "lime render",
+        "painted clapboard",
+        "board-formed concrete",
+        "mustard painted render",
+        "coral painted render",
+        "sea-glass painted boards",
+        "rendered tower"
+      ],
+      "streets": {
+        "minor": "limestone",
+        "major": "limestone",
+        "motorway": "asphalt",
+        "intensity": 0.582
+      },
+      "decor": {
+        "secondary": [
+          "cc0.kenney-retro-urban-kit.tree_park_large"
+        ],
+        "micro": [
+          "kaykit.medieval-nature.rock_single_B",
+          "cc0.kenney-city-kit-commercial.detail_parasol_b",
+          "cc0.kenney-city-kit-commercial.detail_parasol_a",
+          "kaykit.medieval-nature.rock_single_C",
+          "cc0.kenney-nature-kit.flower_red_a"
+        ]
+      },
+      "atmosphere": {
+        "quality": "medium",
+        "deviceReasons": [
+          "8 cores",
+          "8 GB"
+        ],
+        "governor": [
+          "high→medium: p80 frame 100.0 ms > 53.3 ms"
+        ],
+        "layers": true,
+        "animating": true,
+        "repaintRequests": 833,
+        "plan": {
+          "load": 0.49,
+          "fps": 10,
+          "empty": false,
+          "notes": []
+        },
+        "worldFrames": 1029,
+        "gradeFrames": 1202,
+        "avgWorldCpuMs": 0.1299319723141321,
+        "avgGradeCpuMs": 0.6258735444006229,
+        "drawCalls": 5148,
+        "gpuBytes": {
+          "buffers": 227256,
+          "textures": 348652,
+          "framebuffers": 648000
+        },
+        "allocations": 6,
+        "texturesLoaded": [
+          "film-grain"
+        ],
+        "bloomPasses": 238,
+        "fogSigma": 0.00006351905602414451
+      },
+      "renderers": [
+        {
+          "id": "buildings",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "streets",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "decorations",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "atmosphere",
+          "failures": 0,
+          "status": "ready"
+        }
+      ],
+      "listeners": 1,
+      "ui": {
+        "identity": false,
+        "debug": false,
+        "background": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "input": "Christmas in Boston.",
+      "phase": "question",
+      "generation": "fallback",
+      "embedding": "ready",
+      "sceneHash": "27810d1b8730db92",
+      "themes": [
+        "winter_holiday|christmas|vibe"
+      ],
+      "composition": "5f95bb08262da390",
+      "fidelity": 1,
+      "signals": {
+        "style": {
+          "warmth": 0,
+          "luminance": 0,
+          "energy": 0,
+          "chroma": 0,
+          "ornament": 0,
+          "era": 0,
+          "nature": 0,
+          "softness": 0,
+          "grit": 0,
+          "moisture": 0,
+          "intimacy": 0
+        },
+        "hints": {},
+        "avoidTags": {},
+        "timeOfDay": null,
+        "confidence": 0,
+        "presence": 0,
+        "boldness": 0,
+        "explicit": [],
+        "venue": null,
+        "recognized": [],
+        "culturalTerms": [
+          "christmas"
+        ],
+        "ignored": []
+      },
+      "streets": {
+        "minor": "asphalt",
+        "major": "asphalt",
+        "motorway": "asphalt",
+        "intensity": 0
+      },
+      "decor": {
+        "secondary": [
+          "cc0.kenney-fantasy-town-kit.lantern",
+          "cc0.kenney-holiday-kit.reindeer",
+          "cc0.kenney-holiday-kit.tree_decorated",
+          "cc0.kenney-holiday-kit.lights_colored",
+          "cc0.kenney-holiday-kit.gingerbread_man"
+        ],
+        "micro": [
+          "cc0.kenney-nature-kit.flower_red_a",
+          "cc0.kenney-holiday-kit.lantern_hanging",
+          "cc0.kenney-city-kit-commercial.detail_parasol_b",
+          "cc0.kenney-city-kit-commercial.detail_parasol_a",
+          "cc0.kenney-nature-kit.flower_purple_a"
+        ]
+      },
+      "atmosphere": {
+        "quality": "medium",
+        "deviceReasons": [
+          "8 cores",
+          "8 GB"
+        ],
+        "governor": [
+          "high→medium: p80 frame 100.0 ms > 53.3 ms"
+        ],
+        "layers": false,
+        "animating": false,
+        "repaintRequests": 926,
+        "plan": {
+          "load": 0,
+          "fps": 0,
+          "empty": true,
+          "notes": []
+        },
+        "worldFrames": 1029,
+        "gradeFrames": 1320,
+        "avgWorldCpuMs": 0.1299319723141321,
+        "avgGradeCpuMs": 0.6918939396287456,
+        "drawCalls": 5500,
+        "gpuBytes": {
+          "buffers": 0,
+          "textures": 0,
+          "framebuffers": 0
+        },
+        "allocations": 6,
+        "texturesLoaded": [],
+        "bloomPasses": 238,
+        "fogSigma": 0.00006351905602414451
+      },
+      "renderers": [
+        {
+          "id": "buildings",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "streets",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "decorations",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "atmosphere",
+          "failures": 0,
+          "status": "ready"
+        }
+      ],
+      "listeners": 1,
+      "ui": {
+        "identity": false,
+        "debug": false,
+        "background": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "input": "Somewhere energetic but intimate.",
+      "phase": "question",
+      "generation": "fallback",
+      "embedding": "ready",
+      "sceneHash": "5e79c74aaaaffcb1",
+      "themes": [],
+      "composition": "7b5d74ccf350659b",
+      "fidelity": 1,
+      "signals": {
+        "style": {
+          "warmth": 0.497,
+          "luminance": -0.215,
+          "energy": 0.797,
+          "chroma": 0.316,
+          "ornament": 0,
+          "era": 0,
+          "nature": 0,
+          "softness": 0.497,
+          "grit": 0,
+          "moisture": 0,
+          "intimacy": 0.754
+        },
+        "hints": {},
+        "avoidTags": {},
+        "timeOfDay": null,
+        "confidence": 0,
+        "presence": 0.3,
+        "boldness": 0.55,
+        "explicit": [],
+        "venue": null,
+        "recognized": [
+          {
+            "channel": "text",
+            "term": "energetic",
+            "entry": "energetic",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "intimate",
+            "entry": "romantic",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "energetic",
+            "entry": "energetic",
+            "polarity": "want"
+          },
+          {
+            "channel": "text",
+            "term": "intimate",
+            "entry": "romantic",
+            "polarity": "want"
+          }
+        ],
+        "culturalTerms": [],
+        "ignored": []
+      },
+      "buildings": [
+        "red running bond",
+        "buff stacked bond",
+        "dark slim brick tower"
+      ],
+      "streets": {
+        "minor": "cobbles",
+        "major": "granite_setts",
+        "motorway": "asphalt",
+        "intensity": 0.582
+      },
+      "decor": {
+        "secondary": [
+          "kaykit.city-builder-bits.streetlight",
+          "cc0.kenney-nature-kit.tree_oak",
+          "cc0.kenney-fantasy-town-kit.lantern"
+        ],
+        "micro": [
+          "cc0.kenney-nature-kit.flower_red_a",
+          "cc0.kenney-city-kit-commercial.detail_parasol_b",
+          "cc0.kenney-city-kit-commercial.detail_parasol_a",
+          "cc0.kenney-nature-kit.flower_purple_a",
+          "kaykit.city-builder-bits.bench"
+        ]
+      },
+      "atmosphere": {
+        "quality": "medium",
+        "deviceReasons": [
+          "8 cores",
+          "8 GB"
+        ],
+        "governor": [
+          "high→medium: p80 frame 100.0 ms > 53.3 ms"
+        ],
+        "layers": true,
+        "animating": true,
+        "repaintRequests": 954,
+        "plan": {
+          "load": 0.457,
+          "fps": 10,
+          "empty": false,
+          "notes": []
+        },
+        "worldFrames": 1061,
+        "gradeFrames": 1352,
+        "avgWorldCpuMs": 0.14816211092370957,
+        "avgGradeCpuMs": 0.7524408286757017,
+        "drawCalls": 5660,
+        "gpuBytes": {
+          "buffers": 227256,
+          "textures": 0,
+          "framebuffers": 648000
+        },
+        "allocations": 10,
+        "texturesLoaded": [],
+        "bloomPasses": 270,
+        "fogSigma": 0.0016221333333333334
+      },
+      "renderers": [
+        {
+          "id": "buildings",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "streets",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "decorations",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "atmosphere",
+          "failures": 0,
+          "status": "ready"
+        }
+      ],
+      "listeners": 1,
+      "ui": {
+        "identity": false,
+        "debug": false,
+        "background": "rgba(0, 0, 0, 0)"
+      }
+    },
+    {
+      "input": "Surprise me.",
+      "phase": "question",
+      "generation": "fallback",
+      "embedding": "ready",
+      "sceneHash": "1bff5331b8d7bf3b",
+      "themes": [],
+      "composition": "5f95bb08262da390",
+      "fidelity": 1,
+      "signals": {
+        "style": {
+          "warmth": 0,
+          "luminance": 0,
+          "energy": 0,
+          "chroma": 0,
+          "ornament": 0,
+          "era": 0,
+          "nature": 0,
+          "softness": 0,
+          "grit": 0,
+          "moisture": 0,
+          "intimacy": 0
+        },
+        "hints": {},
+        "avoidTags": {},
+        "timeOfDay": null,
+        "confidence": 0,
+        "presence": 0,
+        "boldness": 0,
+        "explicit": [],
+        "venue": null,
+        "recognized": [],
+        "culturalTerms": [],
+        "ignored": [
+          "Surprise me.",
+          "Surprise me"
+        ]
+      },
+      "streets": {
+        "minor": "asphalt",
+        "major": "asphalt",
+        "motorway": "asphalt",
+        "intensity": 0
+      },
+      "decor": {
+        "secondary": [],
+        "micro": []
+      },
+      "atmosphere": {
+        "quality": "medium",
+        "deviceReasons": [
+          "8 cores",
+          "8 GB"
+        ],
+        "governor": [
+          "high→medium: p80 frame 100.0 ms > 53.3 ms"
+        ],
+        "layers": false,
+        "animating": false,
+        "repaintRequests": 1004,
+        "plan": {
+          "load": 0,
+          "fps": 0,
+          "empty": true,
+          "notes": []
+        },
+        "worldFrames": 1128,
+        "gradeFrames": 1419,
+        "avgWorldCpuMs": 0.14343971611126094,
+        "avgGradeCpuMs": 0.8859760396240294,
+        "drawCalls": 5989,
+        "gpuBytes": {
+          "buffers": 0,
+          "textures": 0,
+          "framebuffers": 0
+        },
+        "allocations": 11,
+        "texturesLoaded": [],
+        "bloomPasses": 308,
+        "fogSigma": 0.00005636987664701631
+      },
+      "renderers": [
+        {
+          "id": "buildings",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "streets",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "decorations",
+          "failures": 0,
+          "status": "ready"
+        },
+        {
+          "id": "atmosphere",
+          "failures": 0,
+          "status": "ready"
+        }
+      ],
+      "listeners": 1,
+      "ui": {
+        "identity": false,
+        "debug": false,
+        "background": "rgba(0, 0, 0, 0)"
+      }
+    }
+  ],
+  "errors": [],
+  "networkFailures": []
+}

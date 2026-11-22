@@ -17,6 +17,26 @@ export interface Choice {
 export interface SceneContext {
   /** `route`/`focus`: a route or focused destination is on screen; legibility wins. */
   readonly navigation: 'browse' | 'route' | 'focus';
+  /** Dev preview only; never inferred as real venue context. */
+  readonly previewLayout?: string | null;
+  readonly explicitSelection?: boolean;
+  readonly observanceOptIn?: boolean;
+  /**
+   * Themes the user explicitly asked for, as `theme|term|source` (decor/evidence.ts), computed
+   * by the host from the user's own words and accepted answers. Only these authorize themed
+   * decorations; derived visual values never do. Hashed and cached like the rest of the context.
+   */
+  readonly themeEvidence?: readonly string[];
+  readonly discoveryProgress?: number;
+  readonly materialsEnabled?: boolean;
+  readonly atmosphereEnabled?: boolean;
+  readonly installationsEnabled?: boolean;
+  /**
+   * World seed for procedural variation (uint32). Part of the context, so it is
+   * hashed and cached like any other input: same answers + same seed = same city.
+   * Set once per app session by the host; city renderers read it via the CityPlan.
+   */
+  readonly variationSeed?: number;
   readonly reducedMotion: boolean;
   readonly performance: 'low' | 'medium' | 'high';
 }
@@ -46,6 +66,7 @@ export interface SetPiece {
 
 export interface SceneState {
   readonly schemaVersion: '1.0.0';
+  readonly context?: SceneContext;
   readonly catalogVersion: string;
   readonly compilerVersion: string;
   readonly capabilityProfile: string;

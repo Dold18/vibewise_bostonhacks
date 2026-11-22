@@ -1,0 +1,128 @@
+{
+  "fixtures": true,
+  "checks": [
+    {
+      "name": "loading and Show My Matches immediately available",
+      "ok": true
+    },
+    {
+      "name": "single question with descriptive cards and unfamiliar action",
+      "ok": true
+    },
+    {
+      "name": "early completion at three with durable crowd exclusion",
+      "ok": true
+    },
+    {
+      "name": "Show All toggles back to ranked places",
+      "ok": true
+    },
+    {
+      "name": "ranked display can reveal weaker places again",
+      "ok": true
+    },
+    {
+      "name": "no catalog does not fabricate rankings",
+      "ok": true
+    },
+    {
+      "name": "continue refinement returns one question",
+      "ok": true
+    },
+    {
+      "name": "fallback answer reaches MiniLM with explicit exclusion",
+      "ok": false
+    },
+    {
+      "name": "failure preserves summary and keeps new answer",
+      "ok": true
+    },
+    {
+      "name": "AI recovery includes pending history; unavailable embedding honest",
+      "ok": true
+    },
+    {
+      "name": "embedding retry revision matches",
+      "ok": true
+    },
+    {
+      "name": "editing first answer removes obsolete future",
+      "ok": true
+    },
+    {
+      "name": "back preserves all practical fields, text and photo",
+      "ok": true
+    },
+    {
+      "name": "resume retains revised history",
+      "ok": true
+    },
+    {
+      "name": "Directions preserves the mounted quiz and local File objects",
+      "ok": true
+    },
+    {
+      "name": "one scene session consumes the adaptive version with navigation safety",
+      "ok": true
+    },
+    {
+      "name": "collapsed Directions restores the current quiz",
+      "ok": true
+    },
+    {
+      "name": "navigation exit restores camera and preserves quiz history",
+      "ok": true
+    },
+    {
+      "name": "user-requested result reason",
+      "ok": true
+    },
+    {
+      "name": "Start over resets Show All",
+      "ok": true
+    },
+    {
+      "name": "Clear all removes provisional profile",
+      "ok": true
+    },
+    {
+      "name": "new outing after Clear all defaults to ranked places",
+      "ok": true
+    },
+    {
+      "name": "mobile cards fit panel width",
+      "ok": true
+    },
+    {
+      "name": "unfamiliarity neutral with non-cultural follow-up",
+      "ok": true
+    },
+    {
+      "name": "neutral answers do not force early completion",
+      "ok": true
+    },
+    {
+      "name": "correction preserves immutable original and overrides crowd evidence",
+      "ok": true
+    },
+    {
+      "name": "Clear all remains enabled for a quiz with otherwise empty preferences",
+      "ok": true
+    },
+    {
+      "name": "Clear all resets that empty-input quiz",
+      "ok": true
+    },
+    {
+      "name": "panel teardown clears its outing and removes the quiz",
+      "ok": true
+    },
+    {
+      "name": "no uncaught browser exceptions",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "networkFailures": []
+}

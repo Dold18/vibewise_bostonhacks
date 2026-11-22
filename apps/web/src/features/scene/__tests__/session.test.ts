@@ -1,9 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 import { previewAllCapabilities } from '../capabilities';
-import { SCENE_CATALOG } from '../catalog';
+import { parseCatalog, SCENE_CATALOG } from '../catalog';
 import { compileScene, type CompileInput } from '../compile';
 import { createSceneSession, type SceneUpdate } from '../session';
 import { intent } from './fixtures';
+import { sanitizeIntent } from '../intent';
+import rawCatalog from '../data/scene-effect-catalog.v1.json';
 import type { ScenePresetId } from '../presets';
 
 const ALL = previewAllCapabilities(SCENE_CATALOG);
@@ -215,5 +217,58 @@ describe('context, account and lifecycle', () => {
     expect(session.stats()).toMatchObject({ listeners: 0, cached: 0 });
     expect(session.submit('s1', 1, v(1, [['noir_nocturne', 0.5]]))).toBe('rejected');
     expect(a).not.toHaveBeenCalled();
+  });
+});
+
+describe('override budget by caller-asserted source', () => {
+  const selectable = SCENE_CATALOG.settings.filter((s) => s.group.aiSelectable);
+  // One non-default value for each of the first 20 model-editable keys.
+  const many = selectable.slice(0, 20).map((s) => ({ key: s.key, value: s.values.find((v) => v !== s.default)! }));
+  const locked = SCENE_CATALOG.settings.find((s) => !s.group.aiSelectable)!;
+  const raw = (overrides: unknown[], extra: Record<string, unknown> = {}) => ({ ...intent([], { overrides: overrides as never }), sessionVersion: 1, ...extra });
+  const realized = (resolved: Readonly<Record<string, string>>) => many.filter((o) => resolved[o.key] === o.value).length;
+
+  it('caps model intents at aiOverrideLimit, even when the payload claims to be the composer', () => {
+    for (const payload of [raw(many), raw(many, { source: 'composer', trust: 'composer' })]) {
+      const s = createSceneSession({ capabilities: ALL });
+      expect(s.submit('m', 1, payload)).toBe('applied');
+      expect(realized(s.getState().resolved)).toBeLessThanOrEqual(SCENE_CATALOG.aiOverrideLimit);
+      expect(sanitizeIntent(payload).diagnostics.filter((d) => d.code === 'override_dropped')).toHaveLength(1);
+    }
+  });
+
+  it('grants the composer budget only to callers that assert it, with identical validation', () => {
+    expect(SCENE_CATALOG.composerOverrideLimit).toBeGreaterThan(SCENE_CATALOG.aiOverrideLimit);
+    const invalid = [{ key: locked.key, value: locked.values.find((v) => v !== locked.default) ?? locked.default }, { key: 'not.a_key', value: 'x' }, { key: many[0]!.key, value: 'not_a_value' }];
+    const payload = raw([...invalid, ...many]);
+    const { intent: clean, diagnostics } = sanitizeIntent(payload, SCENE_CATALOG, 'composer');
+    expect(diagnostics.map((d) => d.code).sort()).toEqual(['override_dropped', 'override_dropped', 'override_locked']);
+    expect(clean!.overrides).toHaveLength(many.length);
+
+    const composer = createSceneSession({ capabilities: ALL });
+    const model = createSceneSession({ capabilities: ALL });
+    composer.submit('c', 1, payload, { source: 'composer' });
+    model.submit('c', 1, payload);
+    expect(realized(composer.getState().resolved)).toBeGreaterThan(realized(model.getState().resolved));
+    expect(composer.getState().hash).not.toBe(model.getState().hash);
+  });
+
+  it('defaults the composer budget to the model limit and never lets it fall below', () => {
+    const policy = (extra: Record<string, unknown>) => parseCatalog({ ...rawCatalog, runtimePolicy: { ...rawCatalog.runtimePolicy, composerOverrideLimit: undefined, ...extra } });
+    expect(policy({}).composerOverrideLimit).toBe(12);
+    expect(policy({ composerOverrideLimit: 4 }).composerOverrideLimit).toBe(12);
+    expect(policy({ composerOverrideLimit: 48 }).composerOverrideLimit).toBe(48);
+  });
+});
+
+describe('outing-scoped context', () => {
+  it('drops the outing\'s explicit themes when the outing is cleared', () => {
+    const s = createSceneSession({ capabilities: ALL });
+    s.setContext({ themeEvidence: ['spooky|haunted|vibe'], discoveryProgress: 0.8 });
+    s.submit('o', 1, { ...intent([['noir_nocturne', 1]]), sessionVersion: 1 });
+    expect(s.getState().context?.themeEvidence).toEqual(['spooky|haunted|vibe']);
+    s.clear();
+    expect(s.getState().context?.themeEvidence).toEqual([]);
+    expect(s.getState().context?.discoveryProgress).toBe(0.8); // other context stays
   });
 });

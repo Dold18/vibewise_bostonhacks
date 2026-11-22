@@ -110,3 +110,23 @@ export function fakeEffects() {
     },
   };
 }
+
+/** Records what the theme controller hands the atmosphere renderer (features/atmosphere). */
+export function fakeAtmosphere() {
+  const scenes: Array<{ scene: unknown; transitionMs?: number }> = [];
+  const navigation: string[] = [];
+  return {
+    scenes,
+    navigation,
+    destroyed: false,
+    setNavigation(mode: string) {
+      navigation.push(mode);
+    },
+    setScene(scene: unknown, timing?: { transitionMs?: number }) {
+      scenes.push({ scene, transitionMs: timing?.transitionMs });
+    },
+    destroy() {
+      this.destroyed = true;
+    },
+  };
+}
