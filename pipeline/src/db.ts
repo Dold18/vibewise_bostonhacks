@@ -81,13 +81,6 @@ export async function fetchRegistry(client: SupabaseClient, placeIds: string[]):
   return out;
 }
 
-/** The registered type of each given place_id that is in the registry. */
-export async function fetchRegisteredTypes(client: SupabaseClient, placeIds: string[]): Promise<Map<string, PlaceType>> {
-  const out = new Map<string, PlaceType>();
-  for (const [placeId, e] of await fetchRegistry(client, placeIds)) out.set(placeId, e.placeType);
-  return out;
-}
-
 /**
  * Deletes registry rows of `type` by id. Only for orphans (registry rows with no type row, left by a run that
  * stopped between registering and upserting): with no type row, nothing in the catalog points at them.

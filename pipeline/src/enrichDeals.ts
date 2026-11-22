@@ -79,7 +79,6 @@ async function main(): Promise<void> {
   const now = new Date();
   const checkedAt = now.toISOString();
   const places = await fetchDealPlaces(client, args.type);
-  const byId = new Map(places.map((p) => [p.id, p]));
   const hidden = await fetchHiddenDealKeys(client);
   const hiddenFor = (id: number, source: DealSource) => hidden.get(`${id}:${source}`) ?? new Set<string>();
   const dry: DryRow[] = [];

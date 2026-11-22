@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
-  applyRekey, deleteRegistryRows, fetchExisting, fetchOtherTypePlaces, fetchRegisteredTypes, fetchRegistry, listNotSeen,
+  applyRekey, deleteRegistryRows, fetchExisting, fetchOtherTypePlaces, fetchRegistry, listNotSeen,
   registerPlaces, upsertRows,
 } from '../src/db.ts';
 import type { KindRow, PlaceRow } from '../src/types.ts';
@@ -113,16 +113,16 @@ test('fetchOtherTypePlaces reads catalog_places of other types and decodes the l
   assert.deepEqual(out, [{ placeId: 'osm:way/9', placeType: 'landmarks', name: 'Old State House', lat: 42.35, lng: -71.06 }]);
 });
 
-test('fetchRegisteredTypes looks up place_ids in chunks of 200', async () => {
+test('fetchRegistry looks up place_ids in chunks of 200', async () => {
   const ids = Array.from({ length: 250 }, (_, i) => `osm:node/${i}`);
   const { client, calls } = fakeClient((_t, _c, ops) => (ops.includes('in')
-    ? { data: [{ place_id: 'osm:node/1', place_type: 'landmarks' }], error: null }
+    ? { data: [{ id: 2, place_id: 'osm:node/1', place_type: 'landmarks' }], error: null }
     : { data: [], error: null }));
-  const out = await fetchRegisteredTypes(client, ids);
+  const out = await fetchRegistry(client, ids);
   const ins = calls.filter((c) => c.op === 'in');
   assert.deepEqual(ins.map((c) => (c.args[1] as string[]).length), [200, 50]);
   assert.ok(calls.every((c) => c.table === 'places'));
-  assert.equal(out.get('osm:node/1'), 'landmarks');
+  assert.deepEqual(out.get('osm:node/1'), { id: 2, placeType: 'landmarks' });
 });
 
 test('fetchRegistry returns the registry id and type of each found place_id', async () => {

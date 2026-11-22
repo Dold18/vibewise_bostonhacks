@@ -1,17 +1,20 @@
 import { MODEL_KEY, validateVector } from './features/vibe/profile';
 /**
- * Read-only access to our own place catalog: the Supabase `restaurants` table
- * filled offline by `pipeline/` (OpenStreetMap + Foursquare OS Places).
+ * Read-only access to our own place catalog, filled offline by `pipeline/`
+ * (OpenStreetMap + Foursquare OS Places): one table per place type
+ * (`restaurants`, `museums`, `parks`, `landmarks`, `entertainment`) sharing ids
+ * from the `places` registry, plus the `catalog_places` view that unions them.
  *
  * The browser uses the publishable key only; Row Level Security allows reads
- * and nothing else. The catalog holds food and drink places, so it backs the
- * Restaurants / Coffee / Bars map categories. Everything else stays on tiles/Overpass.
+ * and nothing else. CATALOG_LAYERS lists the map layers the catalog backs;
+ * every other layer stays on tiles/Overpass.
  *
  * Two steps, so the page never downloads details it won't show:
- *  1. The pin index: every place's id, name, category and location, fetched
- *     once per page load (a few thousand small rows).
- *  2. Details (address, website, phone, hours, cuisines) for just the pins in
- *     range, fetched by place id and cached, so panning back costs nothing.
+ *  1. The pin index: every place's id, type, name, kind and location from
+ *     `catalog_places`, fetched once per page load (a few thousand small rows).
+ *  2. Details (address, website, phone, hours, and per type cuisines, price and
+ *     deals) for just the pins in range, read from each pin's own type table by
+ *     place id and cached, so panning back costs nothing.
  */
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { toDeals, type Deal } from './deals';
