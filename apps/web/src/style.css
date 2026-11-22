@@ -73,8 +73,9 @@ button {
   padding: 0;
   border: 0;
   background: transparent;
-  /* Tilted view: main.ts stacks pins by screen depth so near pins cover far ones. */
-  z-index: var(--pin-z, auto);
+  /* Tilted view: main.ts stacks pins by screen depth so near pins cover far ones.
+     Flat view: final recommendations stack by match (--pin-rank), others in DOM order. */
+  z-index: var(--pin-z, var(--pin-rank, auto));
 }
 
 /*

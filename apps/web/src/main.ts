@@ -1,4 +1,4 @@
-import { AttributionControl, LngLatBounds, Map as MapLibreMap, Marker, setWorkerUrl } from 'maplibre-gl';
+import { AttributionControl, Map as MapLibreMap, Marker, setWorkerUrl } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
 import './design/visualFoundation.css';
@@ -65,6 +65,8 @@ import { createFinalSearch, filtersFor, type FinalSearchState } from './features
 import { matchesBrowsingFilters } from './discovery/browsingFilters';
 import type { SearchFilters } from './features/vibe/searchContract';
 import { createResultsGate } from './features/map/resultsGate';
+import { finalPinRanks, finalPinScales } from './features/map/finalPinScale';
+import { focusZoom, previouslyAuthorizedLocation, recommendationFocus } from './features/map/recommendationFocus';
 import { activeKinds, chipText } from './deals';
 
 const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
@@ -104,6 +106,8 @@ let markers: Marker[] = [];
 let shadows: Marker[] = [];
 let selectedPin: HTMLElement | null = null;
 let semanticRanking: Ranking | null = null;
+/** Score-based pin size for the quiz's final recommendations (place id → scale), used while they own the map. */
+const finalPinScale = new Map<string, number>();
 let refreshConvergence = () => {};
 // True while the quiz's final search results (or its error) own the pins: category reloads must not replace them.
 const resultsGate = createResultsGate();
@@ -135,20 +139,22 @@ function shadowElement(): HTMLElement {
 }
 
 /**
- * How one pin looks. Today every pin in a result set shares a look; the plan
- * is for each place's match score to drive both (better match = stronger
- * color, bigger pin). `scale` 1 is the default 28×40px pin; its shadow
- * scales with it.
+ * How one pin looks. `scale` 1 is the default 28×40px pin; its shadow scales
+ * with it. The quiz's final recommendations size each pin by its match score
+ * (finalPinScale.ts) and set `rank` so stronger matches paint over weaker
+ * ones on a flat map (a tilted map keeps its depth order, see --pin-z).
  */
 interface PinLook {
   color: string;
   scale: number;
+  rank?: number;
 }
 
 function applyPinLook(pin: HTMLElement, shadow: HTMLElement, look: PinLook) {
   pin.style.setProperty('--pin-color', look.color);
   pin.style.setProperty('--pin-scale', String(look.scale));
   shadow.style.setProperty('--pin-scale', String(look.scale));
+  if (look.rank !== undefined) pin.style.setProperty('--pin-rank', String(look.rank));
 }
 
 /** A solid teardrop pin, colored and sized entirely by --pin-color / --pin-scale. */
@@ -448,12 +454,14 @@ function syncMarkerVisibility() {
   for (const [id, pin] of pinById) {
     const appearance = semanticMarkerState(semanticRanking, id, mode, relevant, mapDisplay.showAll);
     const visible = appearance.visible && !(mode === 'search' && searchMarkers.has(id));
+    // Final recommendations keep their score-based size; the live ranking only sizes provisional pins.
+    const scale = (resultsGate.active ? finalPinScale.get(id) : undefined) ?? appearance.scale;
     setMarkerVisible(pin, visible);
-    pin.style.setProperty('--pin-scale', String(appearance.scale));
+    pin.style.setProperty('--pin-scale', String(scale));
     const shadow = shadows[Number(pin.dataset.index)]?.getElement();
     if (shadow) {
       setMarkerVisible(shadow, visible);
-      shadow.style.setProperty('--pin-scale', String(appearance.scale));
+      shadow.style.setProperty('--pin-scale', String(scale));
     }
   }
   for (const [id, { marker }] of searchMarkers) setMarkerVisible(marker.getElement(), markerVisible(mode, 'search', id, mode === 'discovery' ? [placePopup.current()?.id ?? ''] : relevant));
@@ -1050,6 +1058,8 @@ function applyFinalSearch(state: FinalSearchState) {
   }
   if (state.status === 'loading') { showToast('Finding your matches…', true); return; }
   resultsGate.set(true);
+  semanticRanking = null; // the provisional ranking must not resize or hide final pins
+  finalPinScale.clear();
   closePopup();
   if (state.status === 'error') {
     // Honest failure: the provisional pins are removed rather than left up looking final.
@@ -1061,17 +1071,39 @@ function applyFinalSearch(state: FinalSearchState) {
   pinCategory.clear();
   for (const place of state.places) if (foodCategory) pinCategory.set(place.id, foodCategory.id);
   const color = CATEGORY_COLORS[foodCategory?.id ?? ''] ?? CATEGORY_COLORS.search;
-  showPlaces(state.places, () => ({ color, scale: 1 }), foodCategory?.icon);
+  // Places arrive in result order, so index i is the server's score for place i.
+  const scores = state.response.results.map(r => r.score);
+  const scales = finalPinScales(scores), ranks = finalPinRanks(scores);
+  state.places.forEach((place, i) => finalPinScale.set(place.id, scales[i] ?? 1));
+  const lookById = new Map(state.places.map((place, i) => [place.id, { color, scale: scales[i] ?? 1, rank: ranks[i] }]));
+  showPlaces(state.places, place => lookById.get(place.id) ?? { color, scale: 1 }, foodCategory?.icon);
   if (state.places.length === 0) {
     showToast('No places match your vibe and filters. Try a wider budget or fewer cuisines.', true);
     return;
   }
   hideToast();
-  const bounds = new LngLatBounds();
-  for (const place of state.places) bounds.extend([place.lon, place.lat]);
-  const origin = discovery.getPreferences().origin;
-  if (origin) bounds.extend([origin.location.lng, origin.location.lat]);
-  map.fitBounds(bounds, { padding: 80, maxZoom: 15, duration: 800 });
+  void focusRecommendations(state.response);
+}
+
+/** The last device location the user granted this session (via "Use my location"); never requested here. */
+let lastDeviceFix: { lat: number; lng: number } | null = null;
+discovery.subscribe(prefs => {
+  if (prefs.origin?.source === 'device_geolocation') lastDeviceFix = { ...prefs.origin.location };
+});
+
+/** Center the final recommendations around the user (recommendationFocus.ts), not around the results. */
+async function focusRecommendations(response: Extract<FinalSearchState, { status: 'ready' }>['response']) {
+  const origin = discovery.getPreferences().origin?.location ?? null;
+  const deviceFix = origin ? null : lastDeviceFix ?? await previouslyAuthorizedLocation({
+    permissions: navigator.permissions,
+    geolocation: navigator.geolocation,
+  });
+  // A newer search or leaving results while waiting for a fix must not move the camera.
+  const current = finalSearch.getState();
+  if (!resultsGate.active || current.status !== 'ready' || current.response !== response) return;
+  const here = map.getCenter();
+  const focusAt = recommendationFocus({ origin, deviceFix, current: { lat: here.lat, lng: here.lng } });
+  map.easeTo({ center: [focusAt.center.lng, focusAt.center.lat], zoom: focusZoom(focusAt.source, map.getZoom()), duration: 800 });
 }
 const finalSearch = createFinalSearch({ getPrefs: () => discovery.getPreferences(), getDetails: getCachedDetails, onState: applyFinalSearch });
 const stopFinalSearch = outingProfiles.subscribe(profile => finalSearch.evaluate(profile));
