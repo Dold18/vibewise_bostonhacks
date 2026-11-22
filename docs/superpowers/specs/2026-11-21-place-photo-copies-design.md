@@ -59,3 +59,14 @@ Cards hotlink restaurant websites today, so a photo disappears when a site chang
 - `sharp` version (pinned, at least two weeks old).
 - The exact retry and backoff behavior within one run.
 - The summary wording.
+
+## Run record (2026-11-21, hosted project)
+
+Ran after `enrich:media` finished, with 8 workers and the 800 MB budget.
+
+- 6,871 photos processed.
+- 5,863 stored: 277.1 MB in total, about 47 KB per copy on average.
+- 872 rejected and their rows deleted: 850 too small (short side under 400 px once decoded), 22 not an image.
+- 136 failed with `store_error` set, to be retried next run: http 122, network 13, too large 1.
+- The budget wasn't reached. `place_photos` now has 5,999 rows, of which 5,863 have a stored copy. Spot-checked copies serve as `image/webp`.
+- Rows rejected for size come back on the next `enrich:media --refresh` and are dropped again by the next `enrich:photos`.
