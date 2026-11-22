@@ -85,6 +85,9 @@ export function createCityComposer(options: CityComposerOptions): CityComposer {
   let outingId = '';
   let generation = 0;
   let signals: CompositionSignals | null = null;
+  // Profile qualifiers are model-derived style hints, not accepted user answers.
+  // Keep provenance across history/undo/reseed without retaining discarded signals.
+  const profileSignals = new WeakSet<CompositionSignals>();
   /** Mirrors the driver's undo stack, so undo restores the evidence of the world it restores. */
   let history: Array<CompositionSignals | null> = [];
   let last: ComposerUpdate | null = null;
@@ -118,7 +121,11 @@ export function createCityComposer(options: CityComposerOptions): CityComposer {
       // Quiz confidence gates late-stage installations (decor heroes, the compiler's set piece); the
       // user's explicit themes are the only thing that may authorize themed decorations.
       const progress = Math.round(Math.min(1, Math.max(0, u.plan.confidence)) * 20) / 20;
-      session.setContext({ discoveryProgress: progress, themeEvidence: evidenceFor(shown()) });
+      const visible = shown();
+      const permissionSignals = visible && profileSignals.has(visible)
+        ? { text: visible.text, avoid: visible.avoid }
+        : visible;
+      session.setContext({ discoveryProgress: progress, themeEvidence: evidenceFor(permissionSignals) });
       options.onUpdate?.(u);
       return u;
     } catch (error) {
@@ -143,6 +150,7 @@ export function createCityComposer(options: CityComposerOptions): CityComposer {
           return;
         }
         const next = signalsFromProfile(profile, options.extras?.() ?? {});
+        profileSignals.add(next);
         const d = driver && outingId === profile.sessionId ? driver : fresh(profile.sessionId);
         signals = next;
         history.push(next);
