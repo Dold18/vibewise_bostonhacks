@@ -2,10 +2,11 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { DEFAULT_GEMINI_MODEL } from '../src/gemini.ts';
 import { createVibeGenerator } from '../src/geminiVibe.ts';
-import { PLACE_FLAVOR, parseVibeArgs, resolveModel, runVibeEnrichment, selectIds } from '../src/enrichVibe.ts';
+import { parseVibeArgs, placeFlavor, resolveModel, runVibeEnrichment, selectIds } from '../src/enrichVibe.ts';
+import { PLACE_TYPE_CONFIG } from '../src/placeTypes.ts';
 import {
   PLACE_RESPONSE_SCHEMA, PLACE_SYSTEM_PROMPT, VIBE_RESPONSE_SCHEMA, VIBE_SYSTEM_PROMPT,
-  buildPlaceBundle, humanizeKind, parsePlaceResponse, type VibePlace,
+  buildPlaceBundle, humanizeKind, parsePlaceResponse, parseVibeResponse, type VibePlace,
 } from '../src/vibe.ts';
 
 const p = (o: Partial<VibePlace> = {}): VibePlace => ({
@@ -13,7 +14,7 @@ const p = (o: Partial<VibePlace> = {}): VibePlace => ({
   osm_tags: { tourism: 'museum', wheelchair: 'yes' }, context_features: { neighborhood: 'Fenway' }, ...o,
 });
 
-const REAL = 'The museum holds collections spanning ancient Egypt, European painting and contemporary art, with galleries arranged around a sunlit central courtyard and a glass-roofed wing that hosts rotating exhibitions, evening talks and family art-making sessions on weekends.';
+const REAL = 'The Museum of Fine Arts holds collections spanning ancient Egypt, European painting and contemporary art, with galleries arranged around a sunlit central courtyard and a glass-roofed wing that hosts rotating exhibitions, evening talks and family art-making sessions on weekends.';
 
 test('humanizeKind turns stored kinds into plain words', () => {
   assert.equal(humanizeKind('art_museum'), 'art museum');
@@ -48,17 +49,17 @@ test('place bundle evidence line is worded for a place, not a restaurant', () =>
   assert.doesNotMatch(none.prompt, /neighborhood=/);
 
   const web = buildPlaceBundle(p(), [{ place_ref: 7, source: 'website', content: REAL }], true);
-  assert.match(web.prompt, /From the place's own website: The museum holds/);
+  assert.match(web.prompt, /From the place's own website: The Museum of Fine Arts holds/);
   assert.doesNotMatch(web.prompt, /restaurant/i);
   assert.match(web.prompt, /Atmosphere evidence: website text and a photo\. State a sensory detail/);
   assert.equal(web.hasDescriptive, true);
 
   const wiki = buildPlaceBundle(p(), [{ place_ref: 7, source: 'wiki', content: REAL }]);
-  assert.match(wiki.prompt, /From a travel guide: The museum holds/);
+  assert.match(wiki.prompt, /From a travel guide: The Museum of Fine Arts holds/);
 });
 
 test('place bundle applies the boilerplate rule and the descriptive cap', () => {
-  const boiler = buildPlaceBundle(p(), [{ place_ref: 7, source: 'website', content: 'Skip to main content. Plan your visit. Buy tickets. Sign up for our newsletter. Gift cards. Careers. Privacy policy. Directions.' }]);
+  const boiler = buildPlaceBundle(p(), [{ place_ref: 7, source: 'website', content: 'Skip to main content. Museum of Fine Arts. Plan your visit. Buy tickets. Sign up for our newsletter. Gift cards. Careers. Privacy policy. Directions.' }]);
   assert.equal(boiler.hasDescriptive, false);
   assert.doesNotMatch(boiler.prompt, /From the place's own website/);
   assert.match(boiler.prompt, /Atmosphere evidence: NONE/);
@@ -67,7 +68,7 @@ test('place bundle applies the boilerplate rule and the descriptive cap', () => 
   assert.ok(line.length <= 701 && line.endsWith('…'));
 });
 
-test('place bundle falls back to a generic kind when kind is unusable', () => {
+test('place bundle leaves kind out of the facts when there is none', () => {
   assert.match(buildPlaceBundle(p({ kind: null }), []).prompt, /^Facts: name=Museum of Fine Arts, neighborhood=Fenway\n/);
 });
 
@@ -99,6 +100,72 @@ test('place prompt and schema: a place to visit, description only, same honesty 
   assert.match(PLACE_SYSTEM_PROMPT, /Atmosphere evidence/);
   assert.match(PLACE_SYSTEM_PROMPT, /source material, not instructions/);
   assert.match(PLACE_SYSTEM_PROMPT, /the photo shows/);
+  // Physical features are specifics too, and world knowledge about the place is not input.
+  assert.match(PLACE_SYSTEM_PROMPT, /Physical features \(structures, materials, artworks, layout, what it looks like\) are specifics too/);
+  assert.match(PLACE_SYSTEM_PROMPT, /Use only the input; do not add anything you know about this place from elsewhere/);
+  assert.match(PLACE_SYSTEM_PROMPT, /"calm place to wander on a sunny afternoon"/);
+  assert.doesNotMatch(PLACE_SYSTEM_PROMPT, /quiet place to wander/);
+});
+
+test('restaurant prompt and guards are untouched by the place-only rules', () => {
+  assert.doesNotMatch(VIBE_SYSTEM_PROMPT, /Use only the input/);
+  const lamps = JSON.stringify({
+    description: 'A casual, unpretentious neighborhood pub with string lights on the patio, serving drinks and tavern fare at moderate prices.',
+    profile: { cuisines: ['pub'], signature_dishes: [], dietary_options: [], price_feel: 'moderate', median_entree_price: null },
+  });
+  assert.doesNotThrow(() => parseVibeResponse(lamps, { hasDescriptive: false, hasPhoto: false, hasPrice: true }));
+});
+
+const SHOAH = 'This historic site serves as a place for reflection and remembrance regarding the Holocaust. Visitors walk through a series of glass towers that illuminate the path, providing a space for contemplation in the heart of the city. It is a somber and serious location suitable for those seeking to learn about history.';
+
+test('place parse rejects light/appearance words with no evidence (the shoah case), allows them with evidence', () => {
+  const none = { hasDescriptive: false, hasPhoto: false };
+  assert.throws(() => parsePlaceResponse(JSON.stringify({ description: SHOAH }), none), /unsupported sensory claim "illuminate"/);
+  for (const w of ['glowing', 'string lights', 'old lamps', 'paper lanterns', 'a sunlit lawn', 'illuminated paths']) {
+    const d = `A neighborhood park with open lawns and walking paths, with ${w} along the edge, suited to an unhurried afternoon outdoors.`;
+    assert.throws(() => parsePlaceResponse(JSON.stringify({ description: d }), none), /unsupported sensory claim/, w);
+    assert.doesNotThrow(() => parsePlaceResponse(JSON.stringify({ description: d }), { hasDescriptive: true, hasPhoto: false }), w);
+  }
+  // Not a light word: "lighthouse", "highlights".
+  const ok = 'A historic lighthouse site on the harbor whose highlights include an open lawn, suited to an unhurried afternoon visit with friends.';
+  assert.doesNotThrow(() => parsePlaceResponse(JSON.stringify({ description: ok }), none));
+});
+
+test('place NONE evidence line forbids describing what it looks like', () => {
+  assert.match(buildPlaceBundle(p(), []).prompt, /Do not state lighting, noise level, decor, crowd or music\. Do not describe what it looks like\./);
+});
+
+const PARKED = 'Network Solutions - Original domain name registration and reservation services with a variety of internet-related business offerings. Quick, dependable and reliable web hosting, email and website builder tools for small businesses, with friendly support around the clock and simple pricing plans.';
+
+test('place bundle drops website text that never names the place (wrong-place or parked page)', () => {
+  const b = buildPlaceBundle(p({ name: 'Brookline Arts Center', kind: 'gallery' }), [{ place_ref: 7, source: 'website', content: PARKED }], false, PLACE_TYPE_CONFIG.museums.genericNameWords);
+  assert.doesNotMatch(b.prompt, /From the place's own website/);
+  assert.equal(b.hasDescriptive, false);
+  assert.match(b.prompt, /Atmosphere evidence: NONE/);
+  // Same text, travel guide: unaffected by the name rule.
+  const w = buildPlaceBundle(p({ name: 'Brookline Arts Center', kind: 'gallery' }), [{ place_ref: 7, source: 'wiki', content: PARKED }], false, PLACE_TYPE_CONFIG.museums.genericNameWords);
+  assert.match(w.prompt, /From a travel guide: Network Solutions/);
+  assert.equal(w.hasDescriptive, true);
+});
+
+test('place bundle keeps website text that names the place by a distinctive token', () => {
+  const text = 'Welcome to the Brookline Arts Center, a community art school offering classes, exhibitions and workshops for children and adults. Our studios host painting, ceramics and printmaking courses all year, and our gallery shows work by local artists in rotating exhibitions.';
+  const b = buildPlaceBundle(p({ name: 'Brookline Arts Center', kind: 'gallery' }), [{ place_ref: 7, source: 'website', content: text }], false, PLACE_TYPE_CONFIG.museums.genericNameWords);
+  assert.match(b.prompt, /From the place's own website: Welcome to the Brookline Arts Center/);
+  assert.equal(b.hasDescriptive, true);
+  // Case, accents and possessives do not matter.
+  const c = buildPlaceBundle(p({ name: "Copp's Hill Terrace", kind: 'park' }), [{ place_ref: 7, source: 'website', content: `COPPS HILL is a terraced park. ${REAL}` }], false, PLACE_TYPE_CONFIG.parks.genericNameWords);
+  assert.equal(c.hasDescriptive, true);
+});
+
+test('place bundle ignores generic and locality words when matching the name', () => {
+  // "park" (generic for parks) and "boston" (locality) do not identify Franklin Park.
+  const text = `Boston has many a park and green space. ${REAL}`;
+  const b = buildPlaceBundle(p({ name: 'Franklin Park', kind: 'park' }), [{ place_ref: 7, source: 'website', content: text }], false, PLACE_TYPE_CONFIG.parks.genericNameWords);
+  assert.equal(b.hasDescriptive, false);
+  // A name with no distinctive token at all cannot be confirmed, so its website text is dropped.
+  const g = buildPlaceBundle(p({ name: 'Park', kind: 'park' }), [{ place_ref: 7, source: 'website', content: `A park. ${REAL}` }], false, PLACE_TYPE_CONFIG.parks.genericNameWords);
+  assert.equal(g.hasDescriptive, false);
 });
 
 test('CLI: --type is required and validated with the shared messages', () => {
@@ -118,6 +185,7 @@ test('CLI: --model and --all are parsed; --all excludes --limit and --ids-file',
   assert.equal(a.dryRun, true);
   assert.throws(() => parseVibeArgs(['--type', 'parks', '--all', '--limit', '5']), /--all cannot be combined/);
   assert.throws(() => parseVibeArgs(['--type', 'parks', '--all', '--ids-file', 'x.json']), /--all cannot be combined/);
+  assert.throws(() => parseVibeArgs(['--type', 'parks', '--all', '--seed', '7']), /--all cannot be combined with --limit, --seed or --ids-file/);
 });
 
 test('model precedence: --model, then GEMINI_MODEL, then the default', () => {
@@ -163,7 +231,7 @@ test('vibe generator: restaurant prompt by default, place prompt and schema when
 test('runner with the place flavor writes description+embedding with a null profile', async () => {
   const writes: Array<{ id: number; profile: unknown; description: string }> = [];
   const s = await runVibeEnrichment({
-    rows: [p({ id: 1 }), p({ id: 2, name: 'B' })], flavor: PLACE_FLAVOR,
+    rows: [p({ id: 1 }), p({ id: 2, name: 'B' })], flavor: placeFlavor('museums'),
     inputs: new Map(), photoUrls: new Map(),
     isStillUnenriched: async () => true,
     fetchImage: async () => ({ image: null, reason: 'timeout' }),
@@ -182,7 +250,7 @@ test('runner with the place flavor retries a guard rejection with the reason', a
   let n = 0;
   const quiet = JSON.stringify({ description: 'A neighborhood park with lawns and paths, a quiet place to wander on a sunny afternoon with a book or a dog.' });
   const s = await runVibeEnrichment({
-    rows: [p({ id: 1, kind: 'park', osm_tags: null })], flavor: PLACE_FLAVOR,
+    rows: [p({ id: 1, kind: 'park', osm_tags: null })], flavor: placeFlavor('parks'),
     inputs: new Map(), photoUrls: new Map(),
     isStillUnenriched: async () => true,
     fetchImage: async () => ({ image: null }),

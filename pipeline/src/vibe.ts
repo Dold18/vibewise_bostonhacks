@@ -4,6 +4,8 @@
  * Gemini prompt and response schema, and validate the response. No network or database access here.
  */
 import { parse } from 'node-html-parser';
+import { specificNameTokens } from './media/wikimedia.ts';
+import { nameKey } from './normalize.ts';
 
 /** Max characters of each descriptive source, taken from the start of the text. */
 export const DESCRIPTIVE_CAP = 700;
@@ -99,7 +101,12 @@ function osmFacts(tags: Record<string, unknown> | null): string | null {
 }
 
 /** How the shared part of a bundle is worded for this kind of row. */
-interface BundleWording { website: string; noEvidence: string }
+interface BundleWording {
+  website: string;
+  noEvidence: string;
+  /** Extra test the (capped) website text must pass to be used at all; restaurants have none. */
+  websiteUsable?: (cappedText: string) => boolean;
+}
 
 /**
  * Lines shared by restaurants and places: OSM tags, city licenses, website/travel-guide text
@@ -118,6 +125,7 @@ function evidenceLines(
   if (lic.length) lines.push(`City license records: ${capText(lic.join(' '), LICENSE_CAP)}`);
 
   let website: string | undefined = bySource('website')[0];
+  if (website && w.websiteUsable && !w.websiteUsable(capText(website, DESCRIPTIVE_CAP))) website = undefined;
   let wiki: string | undefined = bySource('wiki')[0];
   // Text only counts as atmosphere evidence if enough of it is real content. Chain boilerplate
   // ("find a location near you") and one-liners are treated as no descriptive input: facts-only.
@@ -182,8 +190,26 @@ export function humanizeKind(kind: string | null): string | null {
   return kind.replace(/_/g, ' ').replace(/\s+/g, ' ').trim() || null;
 }
 
-/** Bundle for a non-food place: name, kind and neighborhood in place of cuisine, price and category. */
-export function buildPlaceBundle(p: VibePlace, inputs: VibeInputRow[], hasPhoto = false): VibeBundle {
+/**
+ * Whether website text names the place by at least one distinctive name token (generic, locality and
+ * per-type generic words ignored). A crawled page that never names the place is probably someone
+ * else's (a parked domain, a parent company, a different venue), so it is not evidence about this one.
+ * A name with no distinctive token cannot be confirmed, so its website text is not used either.
+ */
+export function websiteNamesPlace(text: string, name: string, genericWords: ReadonlySet<string> = new Set()): boolean {
+  const tokens = specificNameTokens(name, genericWords);
+  if (tokens.length === 0) return false;
+  const hay = new Set(nameKey(text).split(' '));
+  return tokens.some((t) => hay.has(t));
+}
+
+/**
+ * Bundle for a non-food place: name, kind and neighborhood in place of cuisine, price and category.
+ * `genericWords` is the type's PLACE_TYPE_CONFIG genericNameWords, ignored when matching the name in website text.
+ */
+export function buildPlaceBundle(
+  p: VibePlace, inputs: VibeInputRow[], hasPhoto = false, genericWords: ReadonlySet<string> = new Set(),
+): VibeBundle {
   const facts: string[] = [`name=${p.name}`];
   const kind = humanizeKind(p.kind);
   if (kind) facts.push(`kind=${kind}`);
@@ -191,7 +217,8 @@ export function buildPlaceBundle(p: VibePlace, inputs: VibeInputRow[], hasPhoto 
   if (hood) facts.push(`neighborhood=${hood}`);
   const { lines, hasDescriptive } = evidenceLines(p.osm_tags, inputs, hasPhoto, {
     website: "From the place's own website",
-    noEvidence: 'Atmosphere evidence: NONE beyond the kind of place. Give only a general tone inferred from the kind (for example calm and unhurried, or lively and social). Do not state lighting, noise level, decor, crowd or music.',
+    noEvidence: 'Atmosphere evidence: NONE beyond the kind of place. Give only a general tone inferred from the kind (for example calm and unhurried, or lively and social). Do not state lighting, noise level, decor, crowd or music. Do not describe what it looks like.',
+    websiteUsable: (text) => websiteNamesPlace(text, p.name, genericWords),
   });
   return { prompt: [`Facts: ${facts.join(', ')}`, ...lines].join('\n'), hasDescriptive, hasPrice: false };
 }
@@ -233,10 +260,10 @@ export const VIBE_RESPONSE_SCHEMA = {
 export const PLACE_SYSTEM_PROMPT = `You write one searchable passage per place to visit (a museum, gallery, entertainment venue, park, beach or landmark, not a restaurant) for a Boston student discovery app.
 
 Output JSON with exactly one field:
-- "description": 2 to 4 sentences, plain third-person present tense. Combine FACTS (what kind of place it is, what you do there, its setting) with an inferred ATMOSPHERE (energy, mood, who it suits, what occasion or time of day). It is embedded and matched against mood queries like "quiet place to wander on a sunny afternoon" or "lively night out with live music" as well as literal ones like "science museum" or "dog park", so include both kinds of language. Name the kind of place in plain words (for example "an art museum", "a music venue", "a park", "a historic site"). Do not include the place's name or address. No marketing superlatives ("best", "amazing", "world-class"), no emojis.
+- "description": 2 to 4 sentences, plain third-person present tense. Combine FACTS (what kind of place it is, what you do there, its setting) with an inferred ATMOSPHERE (energy, mood, who it suits, what occasion or time of day). It is embedded and matched against mood queries like "calm place to wander on a sunny afternoon" or "lively night out with live music" as well as literal ones like "science museum" or "dog park", so include both kinds of language. Name the kind of place in plain words (for example "an art museum", "a music venue", "a park", "a historic site"). Do not include the place's name or address. No marketing superlatives ("best", "amazing", "world-class"), no emojis.
 
 Rules:
-1. The description must always be produced, even from facts alone. Never invent specifics (named exhibits, collections, shows, events, performers, history, dates, hours, prices, awards) that the input does not support.
+1. The description must always be produced, even from facts alone. Never invent specifics (named exhibits, collections, shows, events, performers, history, dates, hours, prices, awards) that the input does not support. Physical features (structures, materials, artworks, layout, what it looks like) are specifics too: state them only when the website text, travel-guide text or photo shows them. Use only the input; do not add anything you know about this place from elsewhere.
 1a. Sensory and atmosphere details (lighting, noise level, music, decor, crowd, and mood words such as dim, moody, bright, buzzing, quiet, intimate) may be stated ONLY when the website text, travel-guide text or photo supports them. The input says which evidence exists on its "Atmosphere evidence" line. When it says NONE, be honestly vague: describe only a general tone inferred from the kind of place, such as "a calm, unhurried place for an afternoon outdoors" or "a lively, social spot for a night out", plus what you do there and who it suits. Do not mention lighting, noise, decor, crowd or music at all. Amenity tags support only the facts they state (for example wheelchair access, dogs allowed, or an entry fee).
 2. A photo may be attached. Use it only if it shows this place (its building, interior, grounds, water or view); ignore it if it is a logo, a map, a poster, a portrait of a person, or unrelated. Describe setting, lighting and crowd only from what you can see.
 2a. Never narrate the photo as an object. Do not write phrases like "the photo shows", "the image displays", "pictured", "in the picture" or "as seen in the photo". State what the photo reveals as a plain fact about the place (for example "a wide lawn ringed by old shade trees", not "the photo shows a wide lawn"). This rule changes only the phrasing: keep using every relevant detail the photo supports.
@@ -295,9 +322,23 @@ function validDescription(o: Record<string, unknown>, ctx: { hasDescriptive: boo
   return description;
 }
 
-/** Parse a non-food answer: `{ description }` only, with the same description checks as restaurants. */
+/**
+ * Light and appearance words that, for a place with no text or photo, usually come from world knowledge
+ * (a memorial's "glass towers that illuminate the path"). Places only; SENSORY_WORDS stays shared and unchanged.
+ */
+export const PLACE_LIGHT_WORDS = /\b(illuminat\w*|glow\w*|lights?|lamps?|lanterns?|sunlit)\b/i;
+
+/**
+ * Parse a non-food answer: `{ description }` only, with the same description checks as restaurants,
+ * plus the place-only light-word check when there is no atmosphere evidence.
+ */
 export function parsePlaceResponse(raw: string, ctx: { hasDescriptive: boolean; hasPhoto: boolean }): { description: string } {
-  return { description: validDescription(parseObject(raw), ctx) };
+  const description = validDescription(parseObject(raw), ctx);
+  if (!ctx.hasDescriptive && !ctx.hasPhoto) {
+    const hit = PLACE_LIGHT_WORDS.exec(description);
+    if (hit) throw new Error(`unsupported sensory claim "${hit[0]}" with no atmosphere evidence`);
+  }
+  return { description };
 }
 
 /**
@@ -308,7 +349,7 @@ export function parsePlaceResponse(raw: string, ctx: { hasDescriptive: boolean; 
 export function parseVibeResponse(raw: string, ctx: { hasDescriptive: boolean; hasPhoto: boolean; hasPrice: boolean }): VibeResult {
   const o = parseObject(raw);
   const description = validDescription(o, ctx);
-  const p =(o['profile'] && typeof o['profile'] === 'object' ? o['profile'] : {}) as Record<string, unknown>;
+  const p = (o['profile'] && typeof o['profile'] === 'object' ? o['profile'] : {}) as Record<string, unknown>;
 
   const evidence = ctx.hasDescriptive || ctx.hasPhoto;
   const price = typeof p['median_entree_price'] === 'number' && p['median_entree_price'] > 0 && p['median_entree_price'] < 500

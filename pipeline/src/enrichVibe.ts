@@ -19,7 +19,7 @@ import { USER_AGENT } from './config.ts';
 import { createEmbedder, type Embedder } from './embed.ts';
 import { DEFAULT_GEMINI_MODEL, GeminiQuotaError, GeminiRequestError } from './gemini.ts';
 import { createVibeGenerator, type VibeImage } from './geminiVibe.ts';
-import { parseTypeOption, type PlaceType } from './placeTypes.ts';
+import { PLACE_TYPE_CONFIG, parseTypeOption, type PlaceType } from './placeTypes.ts';
 import {
   PLACE_RESPONSE_SCHEMA, PLACE_SYSTEM_PROMPT, VIBE_RESPONSE_SCHEMA, VIBE_SYSTEM_PROMPT,
   buildBundle, buildPlaceBundle, parsePlaceResponse, parseVibeResponse, sample, seededRandom,
@@ -60,13 +60,17 @@ export const RESTAURANT_FLAVOR: VibeFlavor<VibeRestaurant> = {
   parse: parseVibeResponse,
 };
 
-export const PLACE_FLAVOR: VibeFlavor<VibePlace> = {
-  noun: 'places',
-  systemPrompt: PLACE_SYSTEM_PROMPT,
-  responseSchema: PLACE_RESPONSE_SCHEMA,
-  buildBundle: buildPlaceBundle,
-  parse: (raw, ctx) => ({ ...parsePlaceResponse(raw, ctx), profile: null }),
-};
+/** Non-food flavor for one type: its generic name words are ignored when checking that website text names the place. */
+export function placeFlavor(type: Exclude<PlaceType, 'restaurants'>): VibeFlavor<VibePlace> {
+  const genericWords = PLACE_TYPE_CONFIG[type].genericNameWords;
+  return {
+    noun: 'places',
+    systemPrompt: PLACE_SYSTEM_PROMPT,
+    responseSchema: PLACE_RESPONSE_SCHEMA,
+    buildBundle: (row, inputs, hasPhoto) => buildPlaceBundle(row, inputs, hasPhoto, genericWords),
+    parse: (raw, ctx) => ({ ...parsePlaceResponse(raw, ctx), profile: null }),
+  };
+}
 
 /** --model wins, then the GEMINI_MODEL environment variable, then the default. */
 export function resolveModel(flag: string | null, env: string | undefined): string {
@@ -101,8 +105,8 @@ export function parseVibeArgs(argv: string[]): VibeArgs {
     strict: true,
   });
   const type = parseTypeOption(values.type);
-  if (values.all && (values.limit !== undefined || values['ids-file'] !== undefined)) {
-    throw new Error('--all cannot be combined with --limit or --ids-file');
+  if (values.all && (values.limit !== undefined || values.seed !== undefined || values['ids-file'] !== undefined)) {
+    throw new Error('--all cannot be combined with --limit, --seed or --ids-file');
   }
   if (values.model !== undefined && !values.model.trim()) throw new Error('invalid --model (expected a model name)');
   return {
@@ -301,7 +305,7 @@ async function main(): Promise<void> {
   const args = parseVibeArgs(process.argv.slice(2));
   const table = args.type;
   const isRestaurants = table === 'restaurants';
-  const flavor = isRestaurants ? RESTAURANT_FLAVOR : PLACE_FLAVOR;
+  const flavor = isRestaurants ? RESTAURANT_FLAVOR : placeFlavor(table);
   const client = connect(requireEnv('SUPABASE_URL'), requireEnv('SUPABASE_SECRET_KEY'));
   const model = resolveModel(args.model, process.env.GEMINI_MODEL);
   const generate = createVibeGenerator({
@@ -345,7 +349,7 @@ async function main(): Promise<void> {
   };
   const summary = isRestaurants
     ? await runVibeEnrichment({ ...common, rows: rows as VibeRestaurant[], flavor: RESTAURANT_FLAVOR })
-    : await runVibeEnrichment({ ...common, rows: rows as VibePlace[], flavor: PLACE_FLAVOR });
+    : await runVibeEnrichment({ ...common, rows: rows as VibePlace[], flavor: flavor as VibeFlavor<VibePlace> });
   console.log(formatVibeSummary(summary, args.dryRun, flavor.noun));
 
   const after = await enrichmentCounts(client, table);

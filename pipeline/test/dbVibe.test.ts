@@ -9,16 +9,17 @@ type Call = { table: string; op: string; args: unknown[] };
 type Result = { data?: unknown; error: null | { message: string }; count?: number };
 
 /** Chainable fake of the supabase-js query builder that records every call (same pattern as test/media/db.test.ts). */
-function fakeClient(resultFor: (table: string, ops: string[]) => Result = () => ({ data: [], error: null })) {
+function fakeClient(resultFor: (table: string, ops: string[], query: Call[]) => Result = () => ({ data: [], error: null })) {
   const calls: Call[] = [];
   const client = {
     from(table: string) {
       const ops: string[] = [];
+      const query: Call[] = [];
       const builder: Record<string, unknown> = {};
       for (const op of ['select', 'update', 'eq', 'is', 'order', 'range', 'in', 'not', 'maybeSingle']) {
-        builder[op] = (...args: unknown[]) => { calls.push({ table, op, args }); ops.push(op); return builder; };
+        builder[op] = (...args: unknown[]) => { calls.push({ table, op, args }); query.push({ table, op, args }); ops.push(op); return builder; };
       }
-      builder.then = (resolve: (v: unknown) => unknown) => resolve(resultFor(table, ops));
+      builder.then = (resolve: (v: unknown) => unknown) => resolve(resultFor(table, ops, query));
       return builder;
     },
   };
@@ -55,6 +56,32 @@ test('fetchPhotoUrls filters by place_ref and keeps the first visible photo per 
   assert.equal(map.get(7), 'https://a/1.jpg');
   assert.equal(map.get(9), 'https://b/1.jpg');
   assert.ok(!calls.some((c) => JSON.stringify(c.args).includes('restaurant_id')));
+});
+
+/** Serves `total` rows for one place in pages, honouring the query's .range(from, to). */
+function pagedRows(total: number, row: (i: number) => Record<string, unknown>) {
+  return (_t: string, _ops: string[], query: Call[]): Result => {
+    const range = query.find((c) => c.op === 'range');
+    const [from, to] = (range?.args ?? [0, total - 1]) as [number, number];
+    const rows = Array.from({ length: Math.max(0, Math.min(to, total - 1) - from + 1) }, (_, k) => row(from + k));
+    return { data: rows, error: null };
+  };
+}
+
+test('fetchInputs pages past the 1000-row cap within one id chunk', async () => {
+  const { client, calls } = fakeClient(pagedRows(1003, (i) => ({ place_ref: 7, source: `s${i}`, content: 'x' })));
+  const map = await fetchInputs(client, [7]);
+  assert.equal(map.get(7)!.length, 1003);
+  assert.deepEqual(calls.filter((c) => c.op === 'range').map((c) => c.args), [[0, 999], [1000, 1999]]);
+  assert.deepEqual(calls.filter((c) => c.op === 'order').map((c) => c.args[0]).slice(0, 2), ['place_ref', 'source']);
+});
+
+test('fetchPhotoUrls pages past the 1000-row cap and keeps the first photo per place', async () => {
+  const { client, calls } = fakeClient(pagedRows(1001, (i) => ({ place_ref: i < 1000 ? 7 : 9, url: `https://a/${i}.jpg` })));
+  const map = await fetchPhotoUrls(client, [7, 9]);
+  assert.equal(map.get(7), 'https://a/0.jpg');
+  assert.equal(map.get(9), 'https://a/1000.jpg');
+  assert.deepEqual(calls.filter((c) => c.op === 'range').map((c) => c.args), [[0, 999], [1000, 1999]]);
 });
 
 test('fetchUnenrichedIds reads the chosen table, null description and embedding, in id order', async () => {

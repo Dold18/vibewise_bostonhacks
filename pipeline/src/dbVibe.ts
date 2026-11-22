@@ -73,10 +73,16 @@ export async function fetchPlaces(client: SupabaseClient, table: Exclude<PlaceTy
 export async function fetchInputs(client: SupabaseClient, ids: number[]): Promise<Map<number, VibeInputRow[]>> {
   const map = new Map<number, VibeInputRow[]>();
   for (const chunk of chunks(ids, ID_CHUNK)) {
-    const { data, error } = await client
-      .from('place_vibe_inputs').select('place_ref, source, content').in('place_ref', chunk);
-    if (error) throw new Error(`fetchInputs failed: ${error.message}`);
-    for (const row of data as VibeInputRow[]) map.set(row.place_ref, [...(map.get(row.place_ref) ?? []), row]);
+    // Paged in a total order (place_ref, source is unique), so a chunk with more rows than the PostgREST cap is not cut short.
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data, error } = await client
+        .from('place_vibe_inputs').select('place_ref, source, content').in('place_ref', chunk)
+        .order('place_ref', { ascending: true }).order('source', { ascending: true })
+        .range(from, from + PAGE_SIZE - 1);
+      if (error) throw new Error(`fetchInputs failed: ${error.message}`);
+      for (const row of data as VibeInputRow[]) map.set(row.place_ref, [...(map.get(row.place_ref) ?? []), row]);
+      if (data.length < PAGE_SIZE) break;
+    }
   }
   return map;
 }
@@ -85,13 +91,18 @@ export async function fetchInputs(client: SupabaseClient, ids: number[]): Promis
 export async function fetchPhotoUrls(client: SupabaseClient, ids: number[]): Promise<Map<number, string>> {
   const map = new Map<number, string>();
   for (const chunk of chunks(ids, ID_CHUNK)) {
-    const { data, error } = await client
-      .from('place_photos').select('place_ref, url')
-      .in('place_ref', chunk).eq('hidden', false).not('url', 'is', null)
-      .order('rank', { ascending: true }).order('id', { ascending: true });
-    if (error) throw new Error(`fetchPhotoUrls failed: ${error.message}`);
-    for (const row of data as Array<{ place_ref: number; url: string }>) {
-      if (!map.has(row.place_ref)) map.set(row.place_ref, row.url);
+    // Paged in a total order (rank, then the unique id); the first row seen per place is its first photo.
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data, error } = await client
+        .from('place_photos').select('place_ref, url')
+        .in('place_ref', chunk).eq('hidden', false).not('url', 'is', null)
+        .order('rank', { ascending: true }).order('id', { ascending: true })
+        .range(from, from + PAGE_SIZE - 1);
+      if (error) throw new Error(`fetchPhotoUrls failed: ${error.message}`);
+      for (const row of data as Array<{ place_ref: number; url: string }>) {
+        if (!map.has(row.place_ref)) map.set(row.place_ref, row.url);
+      }
+      if (data.length < PAGE_SIZE) break;
     }
   }
   return map;
