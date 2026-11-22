@@ -10,12 +10,12 @@ Adding a photo requires signing in; a line shows how many of today's 5 photo
 reads are left.
 
 The photo is held as a browser-local `File` object (one JPG/PNG/WebP file, up to
-8 MB) until the user refines. Moving back to Step 1 and forward again preserves
+8 MB) until the quiz starts. Moving back to Step 1 and forward again preserves
 both text and photo during the session.
-Clear all removes them; refresh does not retain the photo. `Save my vibe` collapses
-the panel with a clear summary.
+Clear all removes them; refresh does not retain the photo. `Save & start quiz` in
+the footer starts the quiz too.
 
-**Refine this vibe** starts the adaptive questionnaire within Step 2. Text and
+**Start vibe quiz** starts the adaptive questionnaire within Step 2. Text and
 answers go to the server's Gemini integration. If a photo is attached and the
 user is signed in, the photo client first sends it to `/api/vibe/describe-image`,
 which asks Google Gemini for a short text description. Vibenta doesn't store the
@@ -196,7 +196,7 @@ map connectors, never as verified pedestrian paths.
 Step 1 contains practical fields and Continue to your vibe. Step 2 has one
 “What’s your vibe?” heading, the descriptive text field, seven examples and an
 optional one-photo attachment. The file stays in memory (one JPG/PNG/WebP image,
-up to 8 MB) and is sent for a text description only on Refine; `vibeImages.ts`
+up to 8 MB) and is sent for a text description only when the quiz starts; `vibeImages.ts`
 only validates and never uploads. Thumbnails use object URLs revoked once no
 attachment shows the file. Back, Continue, and Directions preserve the original File objects.
 The preference normalizer intentionally does not restore File objects from JSON.

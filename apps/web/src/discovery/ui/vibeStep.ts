@@ -2,7 +2,7 @@
  * Dedicated "what should it feel like?" screen.
  * Text and the browser-local photo live in the same observable preferences
  * store as the practical filters. Nothing is uploaded from this screen: when the
- * user presses "Refine this vibe", panel.ts has the photo client send the photo
+ * user presses "Start vibe quiz", panel.ts has the photo client send the photo
  * to the server for a short text description.
  */
 import {

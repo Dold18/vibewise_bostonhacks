@@ -1,6 +1,6 @@
 /**
  * Validation for the one browser-local vibe photo. This module only validates and
- * NEVER uploads; the photo client sends the photo when the user refines (panel.ts).
+ * NEVER uploads; the photo client sends the photo when the quiz starts (panel.ts).
  */
 export const MAX_VIBE_IMAGES = 1;
 export const MAX_VIBE_IMAGE_BYTES = 8 * 1024 * 1024;
