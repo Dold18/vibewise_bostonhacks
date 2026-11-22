@@ -31,13 +31,19 @@ test('a new row 30 m from another type with the same name is a cross-type duplic
   assert.ok(Math.abs(duplicates[0]!.meters - 30) < 0.5);
 });
 
-test('a similar name (Jaccard 0.67) at 20 m is a duplicate, at 40 m it is kept', () => {
+test('only an exact name key counts across types: a similar name nearby is kept', () => {
   const near = findCrossTypeDuplicates([museum('Old North Church', 20)], [landmark('Old North')]);
-  assert.equal(near.duplicates.length, 1);
-  assert.deepEqual(near.kept, []);
-  const far = findCrossTypeDuplicates([museum('Old North Church', 40)], [landmark('Old North')]);
-  assert.equal(far.duplicates.length, 0);
-  assert.equal(far.kept.length, 1);
+  assert.equal(near.duplicates.length, 0);
+  assert.equal(near.kept.length, 1);
+});
+
+test('a café named after the venue it sits in does not hide the venue', () => {
+  const cafe: OtherPlace = {
+    placeId: 'fsq:cafe', placeType: 'restaurants', name: 'John F. Kennedy Presidential Library And Museum Cafe', lat: LAT, lng: LNG,
+  };
+  const { kept, duplicates } = findCrossTypeDuplicates([museum('John F. Kennedy Presidential Library and Museum', 10)], [cafe]);
+  assert.equal(duplicates.length, 0);
+  assert.equal(kept.length, 1);
 });
 
 test('a row with an empty name key is kept', () => {
