@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.0.0",
   "status": "asset_files_imported_but_no_scene_renderer_or_preview",
-  "assetCount": 90,
-  "modelCount": 90,
+  "assetCount": 120,
+  "modelCount": 120,
   "origin": "KayKit / Kay Lousberg",
   "license": "CC0-1.0",
   "licenseFilesStored": true,
@@ -46,9 +46,33 @@
       "selectedModels": 9,
       "licenseFile": "space-base-bits/LICENSE.txt",
       "texture": "spacebits_texture.png"
+    },
+    {
+      "id": "medieval-props",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "originRoot": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props",
+      "selectedModels": 14,
+      "licenseFile": "medieval-props/LICENSE.txt",
+      "texture": "hexagons_medieval.png"
+    },
+    {
+      "id": "medieval-nature",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "originRoot": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature",
+      "selectedModels": 12,
+      "licenseFile": "medieval-nature/LICENSE.txt",
+      "texture": "hexagons_medieval.png"
+    },
+    {
+      "id": "medieval-buildings",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "originRoot": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/neutral",
+      "selectedModels": 4,
+      "licenseFile": "medieval-buildings/LICENSE.txt",
+      "texture": "hexagons_medieval.png"
     }
   ],
-  "note": "90 individually imported KayKit CC0 glTF models with companion .bin, five shared textures, five license files. All 190 source/destination blob SHA values match. No renderer, visual inspection, model compression or device testing.",
+  "note": "120 distinct CC0 3D glTF models in eight folders sourced from six official KayKit pack repositories. All 256 original files are Git-blob identical, no visual/runtime QA or conversion to optimized GLB performed. External sourced leads not included.",
   "futureRules": {
     "aiMaySelectAssetIdOnly": true,
     "contextAndVibeBothRequired": true,
@@ -1584,6 +1608,887 @@
       }
     },
     {
+      "id": "kaykit.medieval-buildings.building_stage_A",
+      "name": "building_stage_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-buildings/building_stage_A.gltf",
+      "externalBuffer": "building_stage_A.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/neutral/building_stage_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-buildings/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "stage",
+        "market",
+        "festival",
+        "storybook",
+        "fictional_diorama_only",
+        "performance"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-buildings.building_stage_B",
+      "name": "building_stage_B",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-buildings/building_stage_B.gltf",
+      "externalBuffer": "building_stage_B.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/neutral/building_stage_B.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-buildings/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "stage",
+        "market",
+        "festival",
+        "storybook",
+        "fictional_diorama_only",
+        "performance"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-buildings.building_stage_C",
+      "name": "building_stage_C",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-buildings/building_stage_C.gltf",
+      "externalBuffer": "building_stage_C.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/neutral/building_stage_C.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-buildings/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "stage",
+        "market",
+        "festival",
+        "storybook",
+        "fictional_diorama_only",
+        "performance"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-buildings.fence_wood_straight_gate",
+      "name": "fence_wood_straight_gate",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-buildings/fence_wood_straight_gate.gltf",
+      "externalBuffer": "fence_wood_straight_gate.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/neutral/fence_wood_straight_gate.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-buildings/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "stage",
+        "market",
+        "festival",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.cloud_big",
+      "name": "cloud_big",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/cloud_big.gltf",
+      "externalBuffer": "cloud_big.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/cloud_big.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.cloud_small",
+      "name": "cloud_small",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/cloud_small.gltf",
+      "externalBuffer": "cloud_small.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/cloud_small.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.hill_single_A",
+      "name": "hill_single_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/hill_single_A.gltf",
+      "externalBuffer": "hill_single_A.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/hill_single_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.hills_A_trees",
+      "name": "hills_A_trees",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/hills_A_trees.gltf",
+      "externalBuffer": "hills_A_trees.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/hills_A_trees.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.mountain_A_grass",
+      "name": "mountain_A_grass",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/mountain_A_grass.gltf",
+      "externalBuffer": "mountain_A_grass.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/mountain_A_grass.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors",
+        "landscape"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.mountain_B_grass",
+      "name": "mountain_B_grass",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/mountain_B_grass.gltf",
+      "externalBuffer": "mountain_B_grass.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/mountain_B_grass.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors",
+        "landscape"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.rock_single_A",
+      "name": "rock_single_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/rock_single_A.gltf",
+      "externalBuffer": "rock_single_A.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/rock_single_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.rock_single_B",
+      "name": "rock_single_B",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/rock_single_B.gltf",
+      "externalBuffer": "rock_single_B.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/rock_single_B.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.rock_single_C",
+      "name": "rock_single_C",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/rock_single_C.gltf",
+      "externalBuffer": "rock_single_C.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/rock_single_C.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.tree_single_A",
+      "name": "tree_single_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/tree_single_A.gltf",
+      "externalBuffer": "tree_single_A.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/tree_single_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors",
+        "landscape"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.tree_single_A_cut",
+      "name": "tree_single_A_cut",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/tree_single_A_cut.gltf",
+      "externalBuffer": "tree_single_A_cut.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/tree_single_A_cut.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors",
+        "landscape"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.tree_single_B",
+      "name": "tree_single_B",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/tree_single_B.gltf",
+      "externalBuffer": "tree_single_B.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/tree_single_B.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors",
+        "landscape"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.barrel",
+      "name": "barrel",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/barrel.gltf",
+      "externalBuffer": "barrel.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/barrel.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.bucket_empty",
+      "name": "bucket_empty",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/bucket_empty.gltf",
+      "externalBuffer": "bucket_empty.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/bucket_empty.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.bucket_water",
+      "name": "bucket_water",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/bucket_water.gltf",
+      "externalBuffer": "bucket_water.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/bucket_water.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.crate_A_big",
+      "name": "crate_A_big",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/crate_A_big.gltf",
+      "externalBuffer": "crate_A_big.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/crate_A_big.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.crate_B_small",
+      "name": "crate_B_small",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/crate_B_small.gltf",
+      "externalBuffer": "crate_B_small.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/crate_B_small.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.crate_open",
+      "name": "crate_open",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/crate_open.gltf",
+      "externalBuffer": "crate_open.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/crate_open.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.ladder",
+      "name": "ladder",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/ladder.gltf",
+      "externalBuffer": "ladder.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/ladder.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.pallet",
+      "name": "pallet",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/pallet.gltf",
+      "externalBuffer": "pallet.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/pallet.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.resource_lumber",
+      "name": "resource_lumber",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/resource_lumber.gltf",
+      "externalBuffer": "resource_lumber.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/resource_lumber.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.resource_stone",
+      "name": "resource_stone",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/resource_stone.gltf",
+      "externalBuffer": "resource_stone.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/resource_stone.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.sack",
+      "name": "sack",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/sack.gltf",
+      "externalBuffer": "sack.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/sack.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.target",
+      "name": "target",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/target.gltf",
+      "externalBuffer": "target.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/target.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.tent",
+      "name": "tent",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/tent.gltf",
+      "externalBuffer": "tent.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/tent.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.wheelbarrow",
+      "name": "wheelbarrow",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/wheelbarrow.gltf",
+      "externalBuffer": "wheelbarrow.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/wheelbarrow.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
       "id": "kaykit.restaurant-bits.chair_A",
       "name": "chair_A",
       "assetClass": "mesh",
@@ -2708,10 +3613,10 @@
   ],
   "verificationSummary": {
     "runDate": "2026-11-21",
-    "verifiedSourceVsImportGitBlobShas": 190,
+    "verifiedSourceVsImportGitBlobShas": 256,
     "mismatches": 0,
     "verifiedModelDependencyEntries": 40,
-    "notYetIndividuallyDependencyChecked": 50,
-    "method": "Complete byte identity against official GitHub source via Git blob SHA for 90 glTF, 90 BIN, 5 textures and 5 license files; external glTF reference checks not rerun for the latest 50 models"
+    "notYetIndividuallyDependencyChecked": 80,
+    "method": "SHA identity of all 120 glTF, 120 matching BIN, 8 shared texture PNGs and 8 original license files against official publisher GitHub repos. Individual dependency validation was performed during import for 40 initial models; 80 newer models require separate automated JSON validation."
   }
 }
