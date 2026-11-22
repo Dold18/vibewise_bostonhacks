@@ -109,7 +109,9 @@ function pinElement(): HTMLElement {
   el.append(chip);
   const body = document.createElement('span');
   body.className = 'pin-body';
-  body.innerHTML = `<svg viewBox="0 0 28 40" width="28" height="40" aria-hidden="true"><path d="${PIN_PATH}" /></svg>`;
+  // Two-tone contrast ring (issue #40): a dark ring under the head's light edge,
+  // so every pin stays visible on light, mid-tone and dark map themes.
+  body.innerHTML = `<svg viewBox="0 0 28 40" width="28" height="40" aria-hidden="true"><path class="pin-ring" d="${PIN_PATH}" /><path class="pin-head" d="${PIN_PATH}" /></svg>`;
   el.append(body);
   return el;
 }
