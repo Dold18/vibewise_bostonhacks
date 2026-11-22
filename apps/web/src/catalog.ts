@@ -354,6 +354,7 @@ export async function catalogPlacesNear(
   center: { lat: number; lon: number },
   radiusMeters: number,
   limit: number,
+  matches?: (place: Place) => boolean,
 ): Promise<CategorizedPlace[] | null> {
   const supabase = getClient();
   if (!supabase) return null;
@@ -378,13 +379,20 @@ export async function catalogPlacesNear(
   const deals = await dealIndexPromise;
   const now = new Date();
   const dealOn = (pin: CatalogPin) => activeKinds(deals.get(pin.placeId) ?? [], now).size > 0;
-  const near = nearestByCategory(pins, categories, center, radiusMeters, limit, dealOn);
+  const near = nearestByCategory(pins, categories, center, radiusMeters, matches ? Infinity : limit, dealOn);
   try {
     await fetchDetails(supabase, near.map((n) => n.pin));
   } catch (err) {
     console.warn('[catalog] details unavailable:', (err as Error).message);
   }
-  return near.map(({ categoryId, pin }) => ({ categoryId, place: pinToPlace(pin, getCachedDetails(pin.placeId)) }));
+  const toPlace = (pin: CatalogPin) => pinToPlace(pin, getCachedDetails(pin.placeId));
+  if (!matches) return near.map(({ categoryId, pin }) => ({ categoryId, place: toPlace(pin) }));
+
+  const eligible = near.map(({ pin }) => pin).filter(pin => matches(toPlace(pin)));
+  // A pin can belong to multiple requested layers.
+  const unique = [...new Set(eligible)];
+  return nearestByCategory(unique, categories, center, radiusMeters, limit, dealOn)
+    .map(({ categoryId, pin }) => ({ categoryId, place: toPlace(pin) }));
 }
 
 function humanize(s: string): string {

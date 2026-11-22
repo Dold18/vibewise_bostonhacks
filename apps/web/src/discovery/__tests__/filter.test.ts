@@ -193,7 +193,7 @@ describe('qualifications', () => {
       { type: 'setVibeText', text: 'cozy' },
     );
     const text = qualificationsFor(s).join(' ');
-    expect(text).toMatch(/prices and transit fares aren't available/);
+    expect(text).toMatch(/unknown prices are excluded/);
     expect(text).toMatch(/Opening hours aren't checked/);
     expect(text).toMatch(/Vibe matching is not active/);
   });

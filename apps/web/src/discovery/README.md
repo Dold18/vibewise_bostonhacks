@@ -154,16 +154,16 @@ travel time.
 | Preference | Applied today? | Why |
 |---|---|---|
 | Activity | Yes | OSM `amenity`/`tourism`/`leisure`/`shop`/`historic` tags. Tile places use their subclass label. |
-| Cuisines | Partly | OSM `cuisine` tag with synonyms. Untagged places count as unknown. |
+| Cuisines | Yes | Browsing pins use catalog cuisine tags or the OSM `cuisine` tag. Untagged venues are excluded when a specific cuisine filter is active. Other keeps cuisine unrestricted. |
 | Activity types | Mostly | Student events have no data source, so that choice is saved but not applied. |
-| Budget | No | Catalog price bands are displayed with source/estimate labels, but budgets and fares do not filter pins yet. Missing prices remain unknown. |
+| Budget | Yes | Browsing pins use the selected catalog price-band ceiling. A ceiling excludes places with unknown price bands. Transit fares are outside this filter. |
 | Timing | No | `opening_hours` isn't parsed yet; that needs a parser such as opening_hours.js. |
-| Vibe text | No | Reserved for the Vibe Engine. |
+| Vibe text | Through the adaptive quiz | Refine this vibe starts semantic ranking. Show My Matches requests final restaurant matches using the same budget and cuisine choices. |
 
-`rankPlaces` is **not yet wired to the map pins**. Pins are chosen by
-category only, via `mapLayers.ts`. Connecting `rankPlaces` to pin visibility
-and size (`PinLook` in `main.ts`) is the next step and needs the map owner.
-The panel tells users that their other choices don't filter pins yet.
+Activity determines the map layers. Budget and cuisine narrow pins within those
+layers before the adaptive quiz. The quiz uses `rankPlaces` to prepare candidates
+for provisional semantic ranking. The origin provides location context and does
+not set a search radius.
 
 ## Tests
 

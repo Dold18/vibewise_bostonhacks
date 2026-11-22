@@ -251,7 +251,7 @@ export function qualificationsFor(prefs: InitialPreferences): string[] {
     notes.push("Starting point saved. It doesn't rank places yet; travel times need the transit service.");
   }
   if (prefs.budget && prefs.budget.maxCentsPerPerson !== null) {
-    notes.push("Budget saved. Venue prices and transit fares aren't available yet, so nothing is filtered by cost.");
+    notes.push("Budget uses venue price bands. Places with unknown prices are excluded when a budget is set.");
   }
   if (prefs.timing) {
     notes.push("Timing saved. Opening hours aren't checked yet.");

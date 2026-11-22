@@ -8,8 +8,8 @@
  * unsupported. They are never swapped for an unrelated category just to put
  * pins on the map.
  *
- * Cuisine, budget, timing, origin and vibe deliberately don't affect this:
- * they aren't reliable enough in the map data to filter pins (see filter.ts).
+ * Cuisine and budget narrow individual pins in the map coordinator.
+ * Timing, origin and vibe do not determine which layers load.
  */
 import { activeSubtypes, type ActivityTypeId, type InitialPreferences } from './preferences';
 
@@ -57,7 +57,7 @@ export function mapLayersFor(prefs: InitialPreferences, available: readonly MapL
     case 'anything':
       return { layerIds: order, detail: 'full', unsupportedActivityTypes: [] };
     case 'food_drinks':
-      // Cuisine choices don't narrow layers: most venues have no trustworthy cuisine tag.
+      // Cuisine choices narrow pins within these layers.
       return { layerIds: keep(FOOD_LAYERS), detail: 'full', unsupportedActivityTypes: [] };
     case 'activities': {
       const types = activeSubtypes(prefs) as ActivityTypeId[];
