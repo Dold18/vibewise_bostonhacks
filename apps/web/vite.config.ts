@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
 
 /**
  * Serve MapLibre's self-contained web worker byte-for-byte.
@@ -27,8 +28,22 @@ function maplibreWorker(): Plugin {
   };
 }
 
-export default defineConfig({
-  plugins: [maplibreWorker()],
-  // The transit API runs in server/index.ts; the browser only ever talks to Vite's origin.
-  server: { proxy: { '/api': `http://127.0.0.1:${process.env.TRANSIT_API_PORT ?? 8787}` } },
+// Explicit files may have any name. Values remain in Node's environment;
+// Vite only forwards its default VITE_ prefix to browser code.
+if (process.env.VIBENTA_ENV_FILE) process.loadEnvFile(process.env.VIBENTA_ENV_FILE);
+const rootEnvDir = fileURLToPath(new URL('../../', import.meta.url));
+export default defineConfig(({ mode }) => {
+  const envDir = process.env.VIBENTA_ENV_FILE ? dirname(process.env.VIBENTA_ENV_FILE) : rootEnvDir;
+  const env = loadEnv(mode, envDir, '');
+  return {
+    plugins: [maplibreWorker()],
+    // Standalone scene galleries use import maps/CDN Three.js, outside the app scan.
+    optimizeDeps: { entries: ['index.html'] },
+    envDir,
+    // Browser calls share Vite's origin; provider keys stay in the API process.
+    server: {
+      port: Number(process.env.VITE_PORT ?? env.VITE_PORT ?? 5173),
+      proxy: { '/api': `http://127.0.0.1:${process.env.TRANSIT_API_PORT ?? env.TRANSIT_API_PORT ?? 8787}` },
+    },
+  };
 });

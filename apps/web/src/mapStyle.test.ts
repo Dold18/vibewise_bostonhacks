@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { basePalette, buildMapStyle, mapStyle, THEME_TRANSITION_MS } from './mapStyle';
+import { basePalette, BUILDING_3D_BANDS, buildingColorAt, buildMapStyle, mapStyle, THEME_TRANSITION_MS } from './mapStyle';
 
 describe('buildMapStyle', () => {
   it('takes every color in the built style from the palette', () => {
     const json = JSON.stringify(buildMapStyle(basePalette));
     const hexes = json.match(/#[0-9a-fA-F]{6}\b/g) ?? [];
-    const allowed = new Set(Object.values(basePalette).map((c) => c.toLowerCase()));
+    // Palette entries, plus 3D building band colors interpolated between palette entries.
+    const allowed = new Set([...Object.values(basePalette), ...BUILDING_3D_BANDS.map((b) => buildingColorAt(basePalette, b.sampleHeight))].map((c) => c.toLowerCase()));
     expect(hexes.length).toBeGreaterThan(0);
     for (const hex of hexes) expect(allowed, hex).toContain(hex.toLowerCase());
   });

@@ -34,7 +34,7 @@ export interface LocationSuggestion {
   id: string;
   label: string;
   secondary?: string;
-  kind: LocalLocationKind | 'address' | 'business' | 'other';
+  kind: LocalLocationKind | 'place' | 'saved' | 'address' | 'business' | 'other';
   location: GeoPoint;
   source: Origin['source'];
   sourceRef?: string;
@@ -105,6 +105,68 @@ export function createLocalSuggestionProvider(locations: readonly LocalLocation[
         source: 'local_suggestion',
         sourceRef: loc.id,
       }));
+    },
+  };
+}
+
+/** A place with real coordinates, e.g. a map pin or a saved destination (osm.ts `Place` fits). */
+export interface PlaceLike {
+  id: string;
+  name: string;
+  lat: number;
+  lon: number;
+  category?: string;
+}
+
+/**
+ * Suggestions from a live list of places (the pins on the map, saved places).
+ * `getPlaces` is read on every search so the list stays current.
+ */
+export function createPlaceListProvider(
+  getPlaces: () => readonly PlaceLike[],
+  options: { description: string; source: 'map_place' | 'saved_place'; kind: 'place' | 'saved'; secondary?: string },
+): LocationSuggestionProvider {
+  return {
+    description: options.description,
+    live: false,
+    async search(query, { limit = 8, signal } = {}) {
+      signal?.throwIfAborted();
+      if (!normalizeForSearch(query)) return [];
+      return getPlaces()
+        .map((p) => ({ p, score: matchScore(query, p.name) }))
+        .filter(({ p, score }) => score > 0 && isValidGeoPoint({ lat: p.lat, lng: p.lon }))
+        .sort((a, b) => b.score - a.score || a.p.name.localeCompare(b.p.name))
+        .slice(0, limit)
+        .map(({ p }) => ({
+          id: `${options.source}:${p.id}`,
+          label: p.name,
+          secondary: [options.secondary, p.category].filter(Boolean).join(' · ') || undefined,
+          kind: options.kind,
+          location: { lat: p.lat, lng: p.lon },
+          source: options.source,
+          sourceRef: p.id,
+        }));
+    },
+  };
+}
+
+/** Search several providers at once; results keep provider order, deduped by label + position. */
+export function combineProviders(providers: readonly LocationSuggestionProvider[], description: string): LocationSuggestionProvider {
+  return {
+    description,
+    live: providers.some((p) => p.live),
+    async search(query, { limit = 8, signal } = {}) {
+      const lists = await Promise.all(providers.map((p) => p.search(query, { limit, signal }).catch(() => [])));
+      signal?.throwIfAborted();
+      const seen = new Set<string>();
+      const merged: LocationSuggestion[] = [];
+      for (const s of lists.flat()) {
+        const key = `${normalizeForSearch(s.label)}|${s.location.lat.toFixed(4)}|${s.location.lng.toFixed(4)}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        merged.push(s);
+      }
+      return merged.slice(0, limit);
     },
   };
 }

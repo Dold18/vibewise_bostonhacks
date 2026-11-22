@@ -214,3 +214,11 @@
 ~~~
 
 If a decision is reversed, mark the original **Superseded** and link the new ID. Never erase architectural history.
+
+
+### D-015 · Accepted · Adaptive session refinement of PR #35
+- **Date / owner:** 2026-11-21 · User-approved Adaptive Vibe Engine request; vibe/integration implementation.
+- **Decision:** Preserve venue-independent Gemini questions and one catalog/query MiniLM space. Supersede fixed-ten and completion-only embedding with variable length up to ten, per-summary embeddings, durable explicit evidence, replayable immutable history and one versioned outing publisher. Creative family/topic variety is an acceptance requirement.
+- **Boundaries:** Outing state is separate from account taste and practical constraints. No alternate venue catalog, migrations or Composer renderer. PR #32 SceneIntent is accommodated by an adapter with no invented presets/assets. Navigation takes precedence over temporary outing preview.
+- **Compatibility:** Interactive MiniLM fingerprint and catalog activation gate are documented in EMBEDDING_PIPELINE.md. Missing provenance disables semantic ranking, never fabricates it.
+- **Revisit:** Validate live question quality and ranking quality with real permitted venue descriptions; coordinate Composer and map feature branches before integration.

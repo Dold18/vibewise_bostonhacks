@@ -205,8 +205,6 @@ export function createVibeStep(prefs: Store<InitialPreferences, PreferencesActio
     'div',
     { class: 'vb-vibe-screen' },
     h('div', { class: 'vb-vibe-intro' },
-      h('p', { class: 'vb-overline' }, 'Your inspiration'),
-      h('h3', { class: 'vb-vibe-heading' }, 'What’s your vibe?'),
       h('p', { class: 'vb-vibe-lead' },
         'Use a feeling, a song, a movie scene, or anything that captures the atmosphere.'),
     ),

@@ -5,14 +5,14 @@
  * The Vibe Engine records readings with `store.recordVibe(signal)`.
  */
 import type { Map as MapLibreMap } from 'maplibre-gl';
-import { startThemeController } from '../vibeTheme/controller';
+import { startThemeController, type ThemeController } from '../vibeTheme/controller';
 import { createAccountClient, createSupabaseBackend } from './backend';
 import { createAccountStore, type AccountStore } from './session';
 import { mountAccountUi } from './ui';
 
 export type { AccountState, AccountStore, RecordResult } from './session';
 
-export function mountAccount(container: HTMLElement, opts: { map: MapLibreMap }): { store: AccountStore; destroy(): void } {
+export function mountAccount(container: HTMLElement, opts: { map: MapLibreMap }): { store: AccountStore; theme: ThemeController; destroy(): void } {
   const client = createAccountClient();
   const store = createAccountStore(client ? createSupabaseBackend(client) : null, { includeDev: import.meta.env.DEV });
   const unmountUi = mountAccountUi(container, store);
@@ -33,6 +33,7 @@ export function mountAccount(container: HTMLElement, opts: { map: MapLibreMap })
 
   return {
     store,
+    theme,
     destroy() {
       theme.destroy();
       unmountUi();
