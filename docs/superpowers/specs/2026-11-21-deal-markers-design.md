@@ -179,7 +179,10 @@ New entry point `pipeline/src/enrichDeals.ts`, with logic in `pipeline/src/deals
   - A time but no days → `daily` if the line says "daily", else no schedule.
   - "Close", "late" or "till close" as the end → no schedule.
 - When parsing isn't confident, `timing = 'unconfirmed'`. Never guess.
-- **Student lines with no schedule:** `any_time` only when the line and the next contain **no** timing words (day names, `weekday(s)`, `weekend(s)`, `daily`, `night(s)`, `lunch`, `dinner`, `brunch`, `hour(s)`, `week`, `finals`, `semester`, `until`, `till`, `pm`, `am`, or any time). Otherwise `unconfirmed`.
+- **One-off dates:** text containing a month name or abbreviation, a numeric date, a year or a holiday word (Thanksgiving, Christmas, Black Friday and similar) never yields a schedule.
+- **Student lines with no schedule:** `any_time` only when both of these hold, otherwise `unconfirmed` (still listed on the card, no chip):
+  - the line and the next contain **no** "not safe to treat as standing or weekly" words: day names; `weekday(s)`, `weekend(s)`, `week*`, `daily`, `every day`; `*night(s)`; `lunch*`, `dinner*`, `brunch*`, `breakfast`, `evening`, `morning`, `afternoon`, `late`, `tonight`, `today`, `after`, `before`; `hour*`, `semester(s)`, `final(s)`; `until`, `till`, `through`, `thru`, `end(s)`, `expire(s)`, `valid` (except in "valid student ID"), `limited`, `season`, `holiday`, `only`; month names, numeric dates and years; `am`, `pm` or any time;
+  - the line has a **concrete offer** (ruling R7, a deliberate tightening of the broad discount terms above): `N% off`, `$N off`, `half-price`, "free <something> with (a) (valid) student/college/school ID", or "student discount/price/pricing/rate(s)". "Free Wi-Fi for students" or "Great deals for students!" are still read as `student` deals, but never get an any_time chip.
 
 **Limits:** at most 5 deals per place from the website, de-duplicated by lower-cased title.
 
