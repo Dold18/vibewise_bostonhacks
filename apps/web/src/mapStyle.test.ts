@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { basePalette, BUILDING_3D_BANDS, buildingColorAt, buildMapStyle, mapStyle, THEME_TRANSITION_MS } from './mapStyle';
+import { basePalette, BUILDING_3D_BANDS, buildingColorAt, buildMapStyle, mapStyle, neutralPalette, THEME_TRANSITION_MS } from './mapStyle';
+import { PREVIEW_MAP_COLORS } from './design/visualFoundation';
 
 describe('buildMapStyle', () => {
   it('takes every color in the built style from the palette', () => {
@@ -28,7 +29,13 @@ describe('buildMapStyle', () => {
     expect(layer?.paint).toMatchObject({ 'fill-extrusion-opacity-transition': { duration: 300, delay: 0 } });
   });
 
-  it('keeps the default map export built from the base palette', () => {
-    expect(mapStyle).toEqual(buildMapStyle(basePalette));
+  it('builds the default map from the neutral palette: Carbon (Vibewise V3)', () => {
+    expect(mapStyle).toEqual(buildMapStyle(neutralPalette));
+    expect(neutralPalette).toEqual({ ...basePalette, ...PREVIEW_MAP_COLORS.carbon });
+  });
+
+  it('keeps the light reference palette the scene engines are tuned against', () => {
+    expect(basePalette.land).toBe('#f3f3f0');
+    expect(Object.keys(neutralPalette).sort()).toEqual(Object.keys(basePalette).sort());
   });
 });

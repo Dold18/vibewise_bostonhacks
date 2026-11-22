@@ -4,7 +4,7 @@
  * that fails on any non-paint call (camera, setStyle, layers, handlers).
  */
 import { describe, expect, it } from 'vitest';
-import { basePalette } from '../../../mapStyle';
+import { neutralPalette } from '../../../mapStyle';
 import type { AccountState, AccountStore } from '../../account/session';
 import { sceneStyleOf, startThemeController } from '../../vibeTheme/controller';
 import { fakeAtmosphere, fakeEffects, fakeMap } from '../../vibeTheme/__tests__/fakeMap';
@@ -36,7 +36,8 @@ function harness({ loaded = true, reducedMotion = false } = {}) {
     addEventListener: (_, fn) => void mqListeners.add(fn),
     removeEventListener: (_, fn) => void mqListeners.delete(fn),
   };
-  const scene = mountScene({ theme, account, reducedMotion: query, schedule: (fn) => frames.push(fn), defer: (fn) => ticks.push(fn) });
+  // As in main.ts: scenes compile from the neutral city the map displays.
+  const scene = mountScene({ theme, account, base: neutralPalette, reducedMotion: query, schedule: (fn) => frames.push(fn), defer: (fn) => ticks.push(fn) });
   let version = 0;
   const run = (q: Array<() => void>) => q.splice(0).forEach((fn) => fn());
   return {
@@ -69,13 +70,13 @@ function harness({ loaded = true, reducedMotion = false } = {}) {
 }
 
 const compiled = (presets: Array<[ScenePresetId, number]>, context = {}) =>
-  compileScene({ outing: intent(presets), capabilities: MAP_RENDERER_V1, context });
+  compileScene({ outing: intent(presets), capabilities: MAP_RENDERER_V1, context, base: neutralPalette });
 
 describe('neutral baseline with the always-on pin ring', () => {
   it('mounting on a fresh map changes nothing: the neutral scene is exactly the plain map', () => {
     const h = harness();
     const s = h.scene.session.getState();
-    expect(s.palette).toEqual(basePalette);
+    expect(s.palette).toEqual(neutralPalette);
     expect(s.pinEdge).toBe('two_tone');
     expect(s.darkMode).toBe(false);
     expect(h.f.counts).toMatchObject({ setPaintProperty: 0, setLight: 0, setSky: 0 });
@@ -112,7 +113,7 @@ describe('quiz flow', () => {
       h.answer([['amber_refuge', w]]);
       h.frame();
       h.shows(h.scene.session.getState());
-      const [a, b] = [hexToLab(h.scene.session.getState().palette.building3d), hexToLab(basePalette.building3d)];
+      const [a, b] = [hexToLab(h.scene.session.getState().palette.building3d), hexToLab(neutralPalette.building3d)];
       distances.push(Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]));
     }
     for (let i = 1; i < distances.length; i++) expect(distances[i]).toBeGreaterThan(distances[i - 1]);
@@ -199,7 +200,7 @@ describe('navigation', () => {
     h.settle();
     h.scene.session.clear();
     h.frame();
-    h.f.expectStyle(basePalette); // includes route-layer equality
+    h.f.expectStyle(neutralPalette); // includes route-layer equality
     expect(h.f.unexpected).toEqual([]); // no jumpTo/easeTo/flyTo/setZoom/setStyle/removeLayer/on/...
     expect(h.f.counts.off).toEqual([]);
   });
@@ -223,7 +224,8 @@ describe('pins on light, medium and dark grounds', () => {
   });
 
   it('covers genuinely different ground lightness', () => {
-    const L = (p: Array<[ScenePresetId, number]>) => lightness(compiled(p).palette.land);
+    // The guard's coverage is a property of the compiler on its reference (light) palette.
+    const L = (p: Array<[ScenePresetId, number]>) => lightness(compileScene({ outing: intent(p), capabilities: MAP_RENDERER_V1 }).palette.land);
     expect(L([['sunlit_coast', 1]])).toBeGreaterThan(0.9);
     expect(L([['neon_city', 0.45]])).toBeGreaterThan(0.45);
     expect(L([['neon_city', 0.45]])).toBeLessThan(0.85);
@@ -262,11 +264,11 @@ describe('reduced motion, account taste and teardown', () => {
     h.frame();
     h.scene.session.clear();
     h.frame();
-    h.f.expectStyle(basePalette);
+    h.f.expectStyle(neutralPalette);
     h.answer([['amber_refuge', 1]]);
     h.frame();
     h.scene.destroy();
-    h.f.expectStyle(basePalette);
+    h.f.expectStyle(neutralPalette);
     expect(h.answer([['noir_nocturne', 1]])).toBe('rejected');
   });
 

@@ -7,7 +7,7 @@
  */
 import { expect } from 'vitest';
 import type { LightSpecification, SkySpecification } from '@maplibre/maplibre-gl-style-spec';
-import { basePalette, buildMapStyle, DEFAULT_SCENE_STYLE, type Palette, type SceneStyle } from '../../../mapStyle';
+import { buildMapStyle, neutralPalette, DEFAULT_SCENE_STYLE, type Palette, type SceneStyle } from '../../../mapStyle';
 import type { EffectLayer } from '../effects';
 import type { ThemeMap } from '../controller';
 
@@ -21,7 +21,8 @@ export const ROUTE_LAYERS: Record<string, Record<string, unknown>> = {
 const ALLOWED = new Set(['isStyleLoaded', 'once', 'off', 'getCanvasContainer', 'getContainer', 'getLayer', 'setPaintProperty', 'setLight', 'setSky']);
 
 export function fakeMap({ loaded = true } = {}) {
-  const style = buildMapStyle(basePalette);
+  // The live map's default style: the neutral city (Carbon).
+  const style = buildMapStyle(neutralPalette);
   const paint = new Map<string, Record<string, unknown>>();
   for (const l of style.layers) paint.set(l.id, JSON.parse(JSON.stringify(('paint' in l && l.paint) || {})));
   for (const [id, p] of Object.entries(ROUTE_LAYERS)) paint.set(id, JSON.parse(JSON.stringify(p)));

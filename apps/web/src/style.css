@@ -1,14 +1,5 @@
+/* Tokens (--vw-* and the legacy --surface/--text/... names) live in design/vibewise/tokens.css. */
 :root {
-  --surface: #ffffff;
-  --surface-hover: #f1f3f4;
-  --text: #202124;
-  --text-muted: #5f6368;
-  --accent: #1a73e8;
-  --border: #dadce0;
-  --shadow: 0 2px 4px rgba(60, 64, 67, 0.3), 0 2px 8px 2px rgba(60, 64, 67, 0.12);
-  --radius: 24px;
-  font-family: Roboto, 'Segoe UI', Arial, sans-serif;
-  color: var(--text);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -25,7 +16,6 @@ body {
   margin: 0;
   height: 100%;
   overflow: hidden;
-  background: #f3f3f0;
 }
 
 #map {
@@ -89,13 +79,14 @@ button {
   bottom: calc(40px * var(--pin-scale, 1) * var(--pin-distance, 1) + 3px);
   translate: -50% 0;
   padding: 1px 6px;
-  border-radius: 999px;
-  outline: 1px solid rgba(0, 0, 0, 0.35);
-  background: #fff;
-  color: #1f1f1f;
+  border-radius: var(--vw-r-chip);
+  outline: 1px solid var(--vw-ink);
+  background: var(--vw-lime);
+  color: var(--vw-ink);
+  font-family: var(--vw-font);
   /* Shrinks with distance, but not past legibility. */
   font-size: calc(11px * var(--pin-scale, 1) * max(0.75, var(--pin-distance, 1)));
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.3;
   white-space: nowrap;
   pointer-events: none;
@@ -125,6 +116,7 @@ button {
  * Hover/selection enlarge on top of that via `transform`.
  */
 .pin-body {
+  position: relative;
   display: block;
   width: 100%;
   height: 100%;
@@ -176,12 +168,50 @@ button {
   stroke-opacity: 0.85;
 }
 
+/* V3: the category hue keeps its meaning; a paper keyline separates it from any ground. */
 .pin .pin-head {
   fill: var(--pin-color);
-  stroke: #fff;
-  stroke-width: 1.5;
+  stroke: var(--vw-paper);
+  stroke-width: 1.6;
   stroke-linejoin: round;
   transition: fill 0.3s ease;
+}
+
+/*
+ * V3 category glyph in the pin head: a non-color cue for the category
+ * (main.ts sets data-glyph from the category). Painted with a mask so one
+ * cached image serves every pin; it inherits the body's scale.
+ */
+.pin-glyph {
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  width: 14px;
+  height: 14px;
+  translate: -50% 0;
+  background: #fff;
+  mask: var(--pin-glyph) center / contain no-repeat;
+  -webkit-mask: var(--pin-glyph) center / contain no-repeat;
+  pointer-events: none;
+}
+.pin:not([data-glyph]) .pin-glyph { display: none; }
+.pin[data-glyph='food'] { --pin-glyph: url('./design/vibewise/icons/food-sm.svg'); }
+.pin[data-glyph='coffee'] { --pin-glyph: url('./design/vibewise/icons/coffee-sm.svg'); }
+.pin[data-glyph='music'] { --pin-glyph: url('./design/vibewise/icons/music-sm.svg'); }
+.pin[data-glyph='leaf'] { --pin-glyph: url('./design/vibewise/icons/leaf-sm.svg'); }
+.pin[data-glyph='culture'] { --pin-glyph: url('./design/vibewise/icons/culture-sm.svg'); }
+.pin[data-glyph='pin'] { --pin-glyph: url('./design/vibewise/icons/pin-sm.svg'); }
+.pin[data-glyph='discover'] { --pin-glyph: url('./design/vibewise/icons/discover-sm.svg'); }
+.pin[data-glyph='search'] { --pin-glyph: url('./design/vibewise/icons/search-sm.svg'); }
+
+/* Selection adds an outline, never a replacement hue (V3 marker rules). */
+.pin.selected .pin-ring {
+  stroke: var(--vw-lime);
+  stroke-width: 5;
+  stroke-opacity: 1;
+}
+.pin.selected .pin-head {
+  stroke: var(--vw-ink);
 }
 
 .pin:hover,
@@ -256,7 +286,7 @@ button {
   scale: calc(var(--pin-scale, 1) * var(--pin-distance, 1) * 1.3);
 }
 
-/* ---------- Map controls ---------- */
+/* ---------- Map controls (V3: 44px paper keys, grouped zoom) ---------- */
 
 .map-controls {
   position: absolute;
@@ -272,70 +302,180 @@ button {
 .control {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  border: 0;
-  border-radius: 8px;
-  background: var(--surface);
-  box-shadow: var(--shadow);
-  fill: var(--text-muted);
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--vw-keyline);
+  border-radius: var(--vw-r-control);
+  background: var(--vw-paper);
+  box-shadow: var(--vw-shadow-control);
+  color: var(--vw-ink);
+  transition: background var(--vw-fast), transform var(--vw-fast);
 }
 
-.control:hover {
-  background: var(--surface-hover);
+.control:hover:not(:disabled) {
+  background: var(--vw-hover);
+}
+
+.control:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.control:focus-visible {
+  outline: 3px solid var(--vw-focus);
+  outline-offset: 3px;
 }
 
 .control.tilt {
+  font-family: var(--vw-font);
   font-weight: 700;
-  font-size: 13px;
-  color: var(--text-muted);
+  font-size: 14px;
+  color: var(--vw-ink);
+}
+
+#tilt-toggle:disabled {
+  cursor: not-allowed;
+  background: var(--vw-disabled);
+  color: var(--vw-disabled-ink);
+  box-shadow: none;
 }
 
 #compass-needle {
+  position: relative;
+  display: grid;
+  place-items: center;
   transition: transform 0.1s linear;
+}
+
+/* North cue: the coral registration dot turns with the needle (main.ts rotates it by -bearing). */
+#compass-needle::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  translate: -50% 0;
+  border: 1.5px solid var(--vw-ink);
+  border-radius: 50%;
+  background: var(--vw-coral);
 }
 
 .control-stack {
   display: flex;
   flex-direction: column;
-  border-radius: 8px;
-  box-shadow: var(--shadow);
+  border: 1px solid var(--vw-keyline);
+  border-radius: var(--vw-r-control);
+  background: var(--vw-paper);
+  box-shadow: var(--vw-shadow-control);
   overflow: hidden;
 }
 
 .control-stack .control {
+  border: 0;
   border-radius: 0;
   box-shadow: none;
 }
 
 .control-stack .control + .control {
-  border-top: 1px solid #e8eaed;
+  border-top: 1px solid var(--vw-border);
 }
 
-/* ---------- Toast ---------- */
+.control-stack .control:focus-visible {
+  outline-offset: -3px;
+}
+
+/* ---------- Toast (status live region; paper, coral register, icon + message + dismiss) ---------- */
 
 .toast {
   position: absolute;
-  bottom: 28px;
+  bottom: 35px;
   left: 50%;
   translate: -50% 0;
-  padding: 12px 20px;
-  border-radius: 8px;
-  background: #323232;
-  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: max-content;
+  max-width: min(520px, calc(100% - 24px));
+  padding: 8px 8px 8px 12px;
+  border: 1px solid #7D917C;
+  border-radius: var(--vw-r-toast);
+  background: var(--vw-paper);
+  box-shadow: var(--vw-register-sm);
+  color: var(--vw-ink);
+  font-family: var(--vw-font);
   font-size: 14px;
-  box-shadow: var(--shadow);
+  line-height: 1.4;
   z-index: 3;
+  animation: vw-enter var(--vw-normal) var(--vw-ease);
 }
 
 .toast[hidden] {
   display: none;
 }
 
-/* ---------- Attribution ---------- */
+.toast-text {
+  flex: 1;
+  min-width: 0;
+  max-width: 420px;
+}
 
-.maplibregl-ctrl-attrib {
-  font-size: 11px;
+.toast-close {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--vw-ink);
+}
+
+.toast-close:hover {
+  background: var(--vw-hover);
+}
+
+.toast-close:focus-visible {
+  outline: 3px solid var(--vw-focus);
+  outline-offset: 1px;
+}
+
+/* ---------- Attribution (real map credits; always reachable) ---------- */
+
+.maplibregl-ctrl.maplibregl-ctrl-attrib {
+  margin: 0 0 8px 8px;
+  border-radius: 8px;
+  background: #FCFDF9E8;
+  color: var(--vw-ink);
+  font: 10px/1.3 var(--vw-font);
+}
+
+.maplibregl-ctrl-attrib a {
+  color: var(--vw-ink);
+}
+
+.maplibregl-ctrl-attrib-button:focus-visible,
+.maplibregl-ctrl-attrib a:focus-visible {
+  outline: 3px solid var(--vw-focus);
+  outline-offset: 1px;
+}
+
+/* ---------- Stylized-city disclosure (features/city/disclosure.ts) ---------- */
+
+.vb-stylized-note {
+  position: absolute;
+  right: 66px;
+  bottom: 40px;
+  z-index: 2;
+  margin: 0;
+  max-width: min(420px, calc(100% - 80px));
+  padding: 5px 8px;
+  border-radius: 5px 8px 6px 8px;
+  background: var(--vw-paper);
+  color: var(--vw-muted);
+  font: 500 11px/1.35 var(--vw-font);
+  pointer-events: none;
 }
 
 /* ---------- Small screens ---------- */
@@ -344,61 +484,160 @@ button {
   .map-controls {
     bottom: 40px;
   }
+  .toast {
+    left: 8px;
+    right: 8px;
+    bottom: 32px;
+    translate: none;
+    width: auto;
+    max-width: none;
+    font-size: 13px;
+  }
+  .toast-text {
+    max-width: none;
+  }
+  .maplibregl-ctrl.maplibregl-ctrl-attrib {
+    margin: 0 0 3px 4px;
+    font-size: 9px;
+  }
+  .vb-stylized-note {
+    right: 62px;
+    bottom: 30px;
+    max-width: 250px;
+    font-size: 10px;
+  }
 }
 
-/* Navigation focus, route stations, and business labels */
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .control,
+  #compass-needle {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ---------- Navigation focus, route stations, and business labels ---------- */
 
 /* CSS visibility and inert together remove hidden pins from hit testing and keyboard focus. */
 .vb-marker-hidden { visibility: hidden !important; pointer-events: none !important; }
 body[data-focus="navigation"] .pin, body[data-focus="navigation"] .pin-shadow { visibility: hidden; pointer-events: none; }
-.vb-route-hub { display: grid; place-items: center; width: 30px; height: 30px; border: 3px solid var(--hub-color); border-radius: 50%; background: #fff; color: #17212e; box-shadow: 0 0 10px color-mix(in srgb, var(--hub-color) 65%, transparent); }
-.vb-route-hub svg { fill: currentColor; width: 18px; height: 18px; }
-.vb-route-hub.is-transfer { width: 36px; height: 36px; border-width: 4px; }
-.vb-route-hub:focus-visible { outline: 3px solid #60a5fa; outline-offset: 3px; }
-body:not([data-focus="navigation"]) .vb-route-hub { visibility: hidden; pointer-events: none; }
-.vb-trip-destination { width: 22px; height: 22px; background: #e94235; border: 4px solid white; border-radius: 50%; box-shadow: 0 0 12px rgba(239, 68, 68, .6); }
-.vb-popup-attribution { padding: 0 16px 8px; font-size: 11px; color: #5f6368; }
-#tilt-toggle:disabled { cursor: not-allowed; opacity: .6; }
 
-.vb-hub-label { position: absolute; top: calc(100% + 6px); left: 50%; translate: -50% 0; width: max-content; max-width: 150px; padding: 3px 6px; border-radius: 6px; background: rgba(247, 251, 255, .96); color: #19385a; font-size: 12px; font-weight: 600; line-height: 1.3; text-align: center; pointer-events: none; }
+/* Transit stations: paper chip, ink train glyph, the real MBTA line color as the ring. */
+.vb-route-hub {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--hub-color);
+  border-radius: 10px 6px 11px 6px;
+  background: var(--vw-paper);
+  color: var(--vw-ink);
+  box-shadow: 0 0 0 1px var(--vw-ink), var(--vw-shadow-control);
+}
+.vb-route-hub svg { width: 18px; height: 18px; }
+.vb-route-hub.is-transfer { width: 38px; height: 38px; border-width: 4px; box-shadow: 0 0 0 2px var(--vw-ink), var(--vw-shadow-control); }
+.vb-route-hub:focus-visible { outline: 3px solid var(--vw-focus); outline-offset: 3px; }
+body:not([data-focus="navigation"]) .vb-route-hub { visibility: hidden; pointer-events: none; }
+
+/* Destination: coral registration dot with an ink keyline. */
+.vb-trip-destination {
+  width: 22px;
+  height: 22px;
+  background: var(--vw-coral);
+  border: 4px solid var(--vw-paper);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--vw-ink), 2px 3px 0 var(--vw-lime);
+}
+
+.vb-popup-attribution { padding: 0 16px 8px; font-size: 11px; color: var(--vw-muted); }
+
+.vb-hub-label {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  translate: -50% 0;
+  width: max-content;
+  max-width: 150px;
+  padding: 3px 7px;
+  border-radius: var(--vw-r-chip);
+  background: var(--vw-paper);
+  color: var(--vw-ink);
+  font: 600 12px/1.3 var(--vw-font);
+  text-align: center;
+  box-shadow: var(--vw-shadow-control);
+  pointer-events: none;
+}
+.vb-route-hub.label-above .vb-hub-label { top: auto; bottom: calc(100% + 6px); }
 
 /* Glow is a focus cue, absent from the normal Discovery map. */
 body[data-focus="search"] .pin-body { filter: drop-shadow(0 0 4px color-mix(in srgb, var(--pin-color) 45%, transparent)); }
 body[data-focus="search"] .vb-origin-dot,
-body[data-focus="navigation"] .vb-origin-dot { box-shadow: 0 0 9px rgba(26, 115, 232, .55); }
+body[data-focus="navigation"] .vb-origin-dot { box-shadow: 0 0 0 2px var(--vw-paper), 0 0 9px #245E9C99; }
 
-.vb-route-hub.label-above .vb-hub-label { top: auto; bottom: calc(100% + 6px); }
-
-.pin-name { position: absolute; width: max-content; max-width: 180px; padding: 3px 2px; background: transparent; color: #5f6368; font-family: 'Noto Sans', Arial, sans-serif; font-size: 12px; font-weight: 400; letter-spacing: normal; line-height: 1.3; -webkit-text-stroke: 2.5px #fff; paint-order: stroke fill; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; visibility: hidden; pointer-events: none; }
+/*
+ * Pin names: ink on a paper keyline, legible over Carbon and over every
+ * light or dark vibe scene. Plain Familjen; never decorative lettering.
+ */
+.pin-name {
+  position: absolute;
+  width: max-content;
+  max-width: 180px;
+  padding: 3px 2px;
+  background: transparent;
+  color: var(--vw-ink);
+  font-family: var(--vw-font);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.3;
+  -webkit-text-stroke: 3px var(--vw-paper);
+  paint-order: stroke fill;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  visibility: hidden;
+  pointer-events: none;
+}
 .pin-name.is-visible { visibility: visible; }
-.pin-name.is-priority { max-width: 250px; white-space: normal; color: #3c4043; font-size: 13px; font-weight: 600; }
+.pin-name.is-priority { max-width: 250px; white-space: normal; font-size: 13px; font-weight: 700; }
 .vb-marker-hidden .pin-name, body[data-focus="navigation"] .pin .pin-name { visibility: hidden !important; }
+
+/* ---------- Deal rows (only for places with supplied deal records) ---------- */
 
 .deal-list {
   list-style: none;
   margin: 8px 0 0;
   padding: 0;
   display: grid;
-  gap: 12px;
+  gap: 10px;
   font-size: 14px;
+}
+
+.deal-list > li {
+  padding: 10px 12px;
+  border: 1px solid var(--vw-border);
+  border-radius: 13px 7px 16px 8px;
+  background: var(--vw-elevated);
 }
 
 .deal-title {
   display: flex;
-  gap: 14px;
-  font-weight: 600;
+  gap: 10px;
+  font-weight: 700;
 }
 
 .deal-when,
 .deal-meta {
-  margin-left: 34px;
-  color: var(--text-muted);
+  margin-left: 30px;
+  color: var(--vw-muted);
   font-size: 13px;
 }
 
 .deal-active {
-  color: inherit;
-  font-weight: 600;
+  color: var(--vw-success);
+  font-weight: 700;
 }
 
 .deal-meta {
@@ -407,13 +646,8 @@ body[data-focus="navigation"] .vb-origin-dot { box-shadow: 0 0 9px rgba(26, 115,
   gap: 4px 10px;
 }
 
-
-.vb-popup-section { margin: 12px 16px 0; font-size: 14px; }
-.vb-popup .deal-list { padding: 0 16px; }
+.vb-popup-section { margin: 14px 0 0; font: 700 16px/1.25 var(--vw-display); letter-spacing: -0.3px; }
 .detail-icon { width: 20px; text-align: center; flex-shrink: 0; }
 @media (prefers-reduced-motion: reduce) {
   .pin-shadow-cast { transition: none; }
 }
-
-/* Long deal lists stay usable on small screens. */
-.vb-popup { max-height: min(70dvh, 560px); overflow-y: auto; }

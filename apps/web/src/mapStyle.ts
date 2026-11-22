@@ -15,10 +15,14 @@ import type {
 type Filter = ExpressionSpecification;
 
 /**
- * Every color the map style uses. The vibe theme (src/features/vibeTheme)
- * blends these toward a user's top vibes; `basePalette` is the plain map.
+ * Every color the map style uses, in the original light daylight palette.
+ *
+ * `basePalette` is the reference the scene compiler, contrast guard,
+ * atmosphere and building engines are tuned against (their day/night and
+ * readability semantics read its lightness), so themed scenes still compile
+ * from it. What the map *shows* with no vibe scene is `neutralPalette`.
  */
-export const basePalette = mapPaletteForPreview({
+export const basePalette = {
   land: '#f3f3f0',
   urban: '#eceae6',
   water: '#9fcaf5',
@@ -50,10 +54,18 @@ export const basePalette = mapPaletteForPreview({
   sky: '#bcd9f7',
   horizon: '#e9f2fb',
   light: '#ffffff',
-});
+};
 export type PaletteKey = keyof typeof basePalette;
 /** Colors as `#rrggbb`. */
 export type Palette = Record<PaletteKey, string>;
+
+/**
+ * The neutral city the map displays when no vibe scene is active: Carbon,
+ * the approved Vibewise V3 foundation (see design/visualFoundation.ts).
+ * Vibe scenes transition away from and back to it with ordinary paint
+ * transitions; the style is never reloaded.
+ */
+export const neutralPalette: Palette = mapPaletteForPreview(basePalette);
 
 /** How long paint changes (e.g. a theme change) animate, in ms. */
 export const THEME_TRANSITION_MS = 800;
@@ -425,7 +437,7 @@ export const DEFAULT_SCENE_STYLE: Readonly<SceneStyle> = Object.freeze({
 export function buildMapStyle(palette: Palette, scene: Readonly<SceneStyle> = DEFAULT_SCENE_STYLE): StyleSpecification {
   return {
     version: 8,
-    name: 'Vibenta Maps Draft',
+    name: 'Vibewise Carbon',
     glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
     sources: {
       [SOURCE]: { type: 'vector', url: 'https://tiles.openfreemap.org/planet' },
@@ -447,7 +459,7 @@ export function buildMapStyle(palette: Palette, scene: Readonly<SceneStyle> = DE
   };
 }
 
-export const mapStyle: StyleSpecification = buildMapStyle(basePalette);
+export const mapStyle: StyleSpecification = buildMapStyle(neutralPalette);
 
 /** Screen angle (deg) pin shadows fall at for a light azimuth: directly opposite the light. */
 export const lightShadowAngle = (azimuth: number) => (((azimuth + 180) % 360) + 360) % 360;

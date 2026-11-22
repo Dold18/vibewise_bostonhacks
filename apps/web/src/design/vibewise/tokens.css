@@ -1,0 +1,199 @@
+/*
+ * Vibewise V3 — Layered Sheets. Design tokens and base primitives.
+ *
+ * Source of truth: design/identity-exploration/v3/{tokens.css, DESIGN_SYSTEM.md}
+ * at identity commit e4588f4. Values are copied, not reinterpreted.
+ *
+ * Every component stylesheet reads these tokens. The legacy names used by
+ * the existing modules (--surface, --text, --accent, ...) are redefined here
+ * in V3 terms so older selectors inherit the identity instead of being
+ * overridden one by one.
+ */
+
+/* Self-hosted type (SIL OFL, see fonts/*-OFL.txt). No network font dependency. */
+@font-face { font-family: 'Familjen Grotesk'; src: url('./fonts/familjen-400.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Familjen Grotesk'; src: url('./fonts/familjen-500.ttf') format('truetype'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Familjen Grotesk'; src: url('./fonts/familjen-600.ttf') format('truetype'); font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Familjen Grotesk'; src: url('./fonts/familjen-700.ttf') format('truetype'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Syne'; src: url('./fonts/syne-600.ttf') format('truetype'); font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Syne'; src: url('./fonts/syne-700.ttf') format('truetype'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Syne'; src: url('./fonts/syne-800.ttf') format('truetype'); font-weight: 800; font-display: swap; }
+
+:root {
+  /* ---- Surfaces ---- */
+  --vw-paper: #EFF2EE;          /* main sheet, popup, account, controls */
+  --vw-secondary: #E1E7DF;      /* secondary buttons, quiet inset groups */
+  --vw-secondary-hover: #CFDACD;
+  --vw-elevated: #FCFDF9;       /* inputs, answer cards, menus */
+  --vw-elevated-hover: #F5F8EF;
+  --vw-smoke: #26332F;          /* Quick Tools */
+  --vw-smoke-hover: #455748;
+  --vw-artifact: #DDE5D3;       /* summary artifact front */
+  --vw-inset: #E5EBDD;          /* upload zone */
+
+  /* ---- Ink and registration ---- */
+  --vw-ink: #182523;
+  --vw-ink-hover: #33473F;
+  --vw-muted: #52605B;
+  --vw-placeholder: #5E6C63;
+  --vw-coral: #FF765E;          /* backing, primary action, selected registration edge */
+  --vw-coral-hover: #FF8D77;
+  --vw-lime: #D7EE73;           /* small selected artifacts, progress, icon second ink */
+  --vw-lime-edge: #6E8144;
+
+  /* ---- Lines ---- */
+  --vw-border: #B8C3B9;         /* quiet dividers; never the only control cue */
+  --vw-border-soft: #C8D2C4;
+  --vw-keyline: #80917F;        /* map controls, popups */
+  --vw-menu-line: #8FA28F;      /* dropdown / autocomplete sheets */
+  --vw-menu-register: #C6D4BE;
+  --vw-answer-line: #A6B59F;
+  --vw-answer-hover-line: #6B805D;
+  --vw-field-hover-line: #798D7D;
+
+  /* ---- States ---- */
+  --vw-focus: #245E9C;
+  --vw-hover: #E4EBD8;
+  --vw-selected: #E8EFCB;
+  --vw-disabled: #D8DED8;
+  --vw-disabled-ink: #5B655F;
+  --vw-success: #24553D;
+  --vw-success-bg: #DCEBDD;
+  --vw-warning: #694319;
+  --vw-warning-bg: #F4E6C9;
+  --vw-error: #9A302C;
+  --vw-error-hover: #7D2522;
+  --vw-error-bg: #F8E1DB;
+
+  /* ---- Geometry (asymmetric, cut-paper corners) ---- */
+  --vw-r-button: 15px 10px 16px 9px;
+  --vw-r-input: 13px 8px 14px 9px;
+  --vw-r-field: 12px 8px 13px 8px;
+  --vw-r-menu: 10px 7px 14px 8px;
+  --vw-r-answer: 18px 9px 20px 8px;
+  --vw-r-answer-alt: 10px 19px 9px 20px;
+  --vw-r-media: 17px 8px 16px 8px;
+  --vw-r-frame: 18px 8px 20px 8px;
+  --vw-r-surface: 18px 10px 20px 10px;
+  --vw-r-control: 14px 8px 15px 8px;
+  --vw-r-notice: 10px 7px 12px 7px;
+  --vw-r-chip: 8px 5px 9px 5px;
+  --vw-r-tools: 25px 12px 25px 12px;
+  --vw-r-artifact: 10px 20px 8px 24px;
+  --vw-r-toast: 12px 7px 14px 8px;
+
+  /* ---- Depth (no heavy outline system) ---- */
+  --vw-shadow: 0 8px 20px #0B171524;
+  --vw-shadow-control: 0 2px 6px #00000022;
+  --vw-register: 4px 5px 0 var(--vw-coral);       /* secondary surfaces */
+  --vw-register-sm: 3px 4px 0 var(--vw-coral);    /* toasts, selected media */
+  --vw-sheet-drop: drop-shadow(0 10px 16px #0A18142A);
+
+  /* ---- Type ---- */
+  --vw-font: 'Familjen Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --vw-display: 'Syne', 'Familjen Grotesk', system-ui, sans-serif;
+
+  /* ---- Motion ---- */
+  --vw-fast: 120ms;
+  --vw-normal: 200ms;
+  --vw-slow: 320ms;
+  --vw-ease: cubic-bezier(.2, .8, .2, 1);
+
+  /* ---- Map category hues (pinColors.ts, unchanged) ---- */
+  --vw-cat-restaurants: #F2711C;
+  --vw-cat-coffee: #A5673F;
+  --vw-cat-bars: #C2185B;
+  --vw-cat-parks: #1E8E3E;
+  --vw-cat-museums: #1A73E8;
+  --vw-cat-landmarks: #8E24AA;
+  --vw-cat-entertainment: #F9A825;
+  --vw-cat-search: #EA4335;
+
+  /* ---- Legacy names, now in V3 terms ---- */
+  --surface: var(--vw-paper);
+  --surface-hover: var(--vw-hover);
+  --text: var(--vw-ink);
+  --text-muted: var(--vw-muted);
+  --accent: var(--vw-ink);
+  --border: var(--vw-border);
+  --shadow: var(--vw-shadow);
+  --radius: 18px;
+
+  font-family: var(--vw-font);
+  color: var(--vw-ink);
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--vw-font);
+  /* The Carbon land color, so a slow tile load never flashes white. */
+  background: #202426;
+}
+
+/* ---- Icons ---- */
+.vw-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+  overflow: visible;
+  /* Coral registration and lime second ink, overridable per surface. */
+  --ia: var(--vw-coral);
+  --iw: var(--vw-lime);
+}
+
+/* ---- Layered sheets (sheets.ts paintSheet) ---- */
+.vw-sheet {
+  position: relative;
+  isolation: isolate;
+}
+.vw-sheet-art {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.vw-sheet-art svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  /* Static; repaints only when the sheet resizes. */
+  filter: var(--vw-sheet-drop);
+}
+.vw-sheet-front { fill: var(--vw-paper); }
+.vw-sheet-back { fill: var(--vw-coral); }
+
+/* ---- Wordmarks ---- */
+.vw-wordmark { display: block; flex-shrink: 0; object-fit: contain; }
+
+/* ---- Visually hidden ---- */
+.vw-sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+/* ---- Spinner (loading always pairs with text) ---- */
+.vw-spinner {
+  display: inline-block;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--vw-border);
+  border-top-color: var(--vw-ink);
+  border-radius: 50%;
+  animation: vw-spin 900ms linear infinite;
+}
+@keyframes vw-spin { to { rotate: 360deg; } }
+
+@keyframes vw-enter {
+  from { opacity: 0; transform: translateY(6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vw-spinner { animation: none; }
+}

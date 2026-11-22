@@ -1,9 +1,11 @@
 import { AttributionControl, LngLatBounds, Map as MapLibreMap, Marker, setWorkerUrl } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import './design/vibewise/tokens.css';
 import './style.css';
-import './design/visualFoundation.css';
 import { activateVisualPreview } from './design/visualFoundation';
-import { BUILDING_3D_LAYERS, BUILDING_3D_OPACITY, mapStyle } from './mapStyle';
+import { hydrateIcons } from './design/vibewise/brand';
+import { iconForCategoryMark } from './design/vibewise/icons';
+import { BUILDING_3D_LAYERS, BUILDING_3D_OPACITY, mapStyle, neutralPalette } from './mapStyle';
 import { PIN_COLORS } from './pinColors';
 import { outingProfiles } from './features/vibe/publisher';
 import type { Ranking } from './features/vibe/adapters';
@@ -74,6 +76,8 @@ const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as 
 
 // The opt-in visual preview changes paint and CSS only; no layout or map camera changes.
 activateVisualPreview();
+// V3 icons for the static map controls and toast in index.html.
+hydrateIcons();
 
 // Served untouched by the `maplibre-worker` plugin in vite.config.ts.
 setWorkerUrl(`${import.meta.env.BASE_URL}maplibre-gl-worker.mjs`);
@@ -166,6 +170,11 @@ function pinElement(): HTMLElement {
   // Two-tone contrast ring (issue #40): a dark ring under the head's light edge,
   // so every pin stays visible on light, mid-tone and dark map themes.
   body.innerHTML = `<svg viewBox="0 0 28 40" width="28" height="40" aria-hidden="true"><path class="pin-ring" d="${PIN_PATH}" /><path class="pin-head" d="${PIN_PATH}" /></svg>`;
+  // V3 category glyph (style.css .pin-glyph); hidden until a category sets data-glyph.
+  const glyph = document.createElement('span');
+  glyph.className = 'pin-glyph';
+  glyph.setAttribute('aria-hidden', 'true');
+  body.append(glyph);
   el.append(body);
   return el;
 }
@@ -195,6 +204,7 @@ function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: 
     el.dataset.index = String(i);
     el.setAttribute('aria-label', place.name);
     const popupLook = { color: look.color, icon: typeof icon === 'function' ? icon(place) : icon };
+    el.dataset.glyph = iconForCategoryMark(popupLook.icon);
     pinLooks.set(place.id, popupLook);
     pinById.set(place.id, el);
     el.addEventListener('click', (e) => {
@@ -351,6 +361,7 @@ function openPlace(place: Place, look: { color: string; icon?: string }) {
   if (!pinById.has(place.id) && !searchMarkers.has(place.id)) {
     const el = pinElement(); el.classList.add('selected', 'vb-temporary-place'); el.setAttribute('aria-label', place.name);
     el.style.setProperty('--pin-color', look.color);
+    el.dataset.glyph = iconForCategoryMark(look.icon);
     temporaryPlaceMarker = new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
     pinsFlat = false;
     syncPinPerspective();
@@ -403,8 +414,10 @@ function focusPlace(place: Place) {
 
 const toast = $<HTMLElement>('toast');
 let toastTimer: number | undefined;
+const toastText = $<HTMLElement>('toast-text');
+$('toast-close').addEventListener('click', () => hideToast());
 function showToast(message: string, sticky = false) {
-  toast.textContent = message;
+  toastText.textContent = message;
   toast.hidden = false;
   window.clearTimeout(toastTimer);
   if (!sticky) toastTimer = window.setTimeout(() => (toast.hidden = true), 3500);
@@ -429,6 +442,7 @@ function showSearchResults(places: Place[]) {
   for (const place of places) {
     const el = pinElement(); el.dataset.markerKind = 'search'; el.setAttribute('aria-label', place.name);
     el.style.setProperty('--pin-color', CATEGORY_COLORS.search);
+    el.dataset.glyph = 'search';
     el.addEventListener('click', e => {
       e.stopPropagation();
       trip.dispatch({ type: 'setTo', endpoint: endpointFor(place) });
@@ -961,6 +975,8 @@ const isStylized = (state: SceneState | null) => {
 };
 const scene = mountScene({
   assets: runtimeAssets,
+  // Scenes compile from, and return to, the neutral city the map displays (Carbon).
+  base: neutralPalette,
   context: { performance: window.innerWidth < 640 ? 'low' : detectQuality(readDevice()).quality, variationSeed },
   capabilities: city.capabilities(),
   // The existing account theme keeps its UI behavior; the city owns map rendering.

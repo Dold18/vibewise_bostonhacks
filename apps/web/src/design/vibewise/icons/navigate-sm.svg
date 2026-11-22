@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none" role="img" aria-label="Navigate">
+<title>Navigate</title>
+<path d="M8.4 44.4 L8.4 21 L18.4 11.4 L18.4 44.4 Z" fill="currentColor"/>
+<path d="M8.4 21 L8.4 11.4 L18.4 11.4 Z" style="fill:var(--iw,#D7EE73)"/>
+<path d="M18.4 11.4 L29.4 11.4 L29.4 3.8 L45 16.4 L29.4 29 L29.4 21.4 L18.4 21.4 Z" fill="currentColor"/>
+</svg>

@@ -17,6 +17,7 @@ import { detectQuality, readDevice } from '../atmosphere/quality';
 import { MAP_RENDERER_V1, type CapabilityProfile } from './capabilities';
 import { connectProfiles, type OutingProfileLike, type ProfileSource } from './profiles';
 import { PRESET_IDS, type ScenePresetId } from './presets';
+import type { Palette } from '../../mapStyle';
 import { createSceneSession, type SceneSession, type SceneUpdate, type SubmitResult } from './session';
 
 export interface SceneThemeTarget {
@@ -56,6 +57,12 @@ export interface SceneMountOptions {
   /** Tick scheduler for navigation coalescing (default queueMicrotask). */
   readonly defer?: (fn: () => void) => void;
   readonly onError?: (error: unknown) => void;
+  /**
+   * The neutral palette scenes compile from (session `base`). The live app
+   * passes mapStyle.neutralPalette so the neutral scene is exactly the map it
+   * displays; defaults to the compiler's reference palette.
+   */
+  readonly base?: Palette;
 }
 
 export interface SceneMount {
@@ -85,6 +92,7 @@ export function mountScene(options: SceneMountOptions): SceneMount {
       reducedMotion: options.reducedMotion?.matches ?? false,
     },
     onError: options.onError,
+    ...(options.base ? { base: options.base } : {}),
   });
 
   let destroyed = false;

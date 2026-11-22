@@ -3,36 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vibenta Maps</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600&family=Roboto:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
+    <meta name="theme-color" content="#202426" />
+    <title>Vibewise</title>
+    <link rel="icon" type="image/svg+xml" href="/src/design/vibewise/wordmarks/compact.svg" />
   </head>
   <body>
     <div id="map" aria-label="Map of Boston"></div>
 
-    <div class="map-controls">
+    <div class="map-controls" role="group" aria-label="Map controls">
       <button type="button" class="control tilt" id="tilt-toggle" title="Switch to 2D view">2D</button>
-      <button type="button" class="control" id="compass" title="Reset to north">
-        <svg viewBox="0 0 24 24" width="24" height="24" id="compass-needle">
-          <path d="M12 2 8 12h8z" fill="#ea4335" />
-          <path d="M12 22l4-10H8z" fill="#9aa0a6" />
-        </svg>
+      <button type="button" class="control" id="compass" title="Reset to north" aria-label="Reset to north">
+        <span id="compass-needle" class="compass-needle" data-vw-icon="compass" data-size="24"></span>
       </button>
       <div class="control-stack">
-        <button type="button" class="control" id="zoom-in" aria-label="Zoom in">
-          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z" /></svg>
+        <button type="button" class="control" id="zoom-in" aria-label="Zoom in" title="Zoom in">
+          <span data-vw-icon="plus" data-size="22"></span>
         </button>
-        <button type="button" class="control" id="zoom-out" aria-label="Zoom out">
-          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M19 13H5v-2h14z" /></svg>
+        <button type="button" class="control" id="zoom-out" aria-label="Zoom out" title="Zoom out">
+          <span data-vw-icon="minus" data-size="22"></span>
         </button>
       </div>
     </div>
 
-    <div class="toast" id="toast" role="status" hidden></div>
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden>
+      <span data-vw-icon="info" data-size="18"></span>
+      <span class="toast-text" id="toast-text"></span>
+      <button type="button" class="toast-close" id="toast-close" aria-label="Dismiss message">
+        <span data-vw-icon="close" data-size="18"></span>
+      </button>
+    </div>
 
     <script type="module" src="/src/main.ts"></script>
   </body>
