@@ -1,12 +1,11 @@
-# Vibenta visual identity redesign: handoff
+# Vibenta visual identity redesign: status
 
-Status as of 2026-11-22. This file is for resuming the work in a new session or account. The original brief was the "VIBENTA — COMPLETE VISUAL REDESIGN AND BASE CITY REFINEMENT" prompt (Phases 1–5).
+Status as of 2026-11-22. Covers the graphite identity (Phases 1–5 of the redesign brief): base city and roads, identity, ground textures, scene coherence and QA.
 
 ## Where the work lives
 
-- **Worktree:** `/Users/jdold/Desktop/vibenta-identity`
-- **Branch:** `design/vibenta-identity-20261122`, local only and **not pushed**. It was created from `origin/main` at `9f4689e` and has **PR #44 merged in** (`origin/fix/v2-quiz-immediate-launch-20261121`). That merge was clean, so the V2 quiz-launch fixes are preserved.
-- **Main checkout:** `/Users/jdold/Desktop/vibenta_bostonhacks`, on branch `fix/v2-quiz-immediate-launch-20261121`. It has the user's **uncommitted** quiz-media work, which I did not touch. That work edits `features/vibe/ui/quiz.css` and `liveQuiz.ts`. To avoid conflicts, the redesign styles the quiz from `design/identity/quiz.css` (scoped under `.vb-discovery`), including the upcoming `.vb-media-*` and `[data-mood]` classes.
+- **Branch:** `design/vibenta-identity-20261122`. It started from `main` at `9f4689e`, merged PR #44 (V2 quiz launch) before it landed, and later merged `main` again (#54–#58, including the multimodal quiz), so the diff against `main` is redesign-only.
+- The quiz is styled from `design/identity/quiz.css` (scoped under `.vb-discovery`), including the `.vb-media-*` and `[data-mood]` classes of the multimodal quiz, so `features/vibe/ui/quiz.css` is not edited.
 - **PR #51** (Carbon Studio draft) was reviewed but **not** merged or stacked on. The new identity is a separate, default implementation.
 - **Do not merge to `main` without approval.**
 
@@ -16,20 +15,22 @@ Status as of 2026-11-22. This file is for resuming the work in a new session or 
 2. `f4fb1de` **Phase 1**: road widths, neutral atlas palette, OSM material tones, contact shadows, QA harness
 3. `30bd45c` **Phase 2**: identity (icons, wordmark, type, die-cut surfaces, scene accent)
 4. `2f2df52` **Phase 3**: ground material textures, facade spike evidence
-5. A **Phase 5 fixes** commit (see below): scene accent without an extra session listener, static material layers, keyboard input in the harness, and this handoff file
+5. `70d4ac3` **Phase 5 fixes**: scene accent without an extra session listener, static material layers, keyboard input in the harness
+6. `cb4d265`, `431d694`, `d552329`: navigation-suite identity check and animation settle, brick tone, urban texture removal, zoomOut icon, final evidence
+7. Merge of `main` (#54–#58)
 
 ## Running it
 
 ```sh
-cd /Users/jdold/Desktop/vibenta-identity/apps/web
-npm ci                       # node_modules is already installed in this worktree
+cd apps/web
+npm ci
 npx vite --host 127.0.0.1 --port 5196 --strictPort    # the redesigned app
 npm test                     # vitest
 npm run build                # tsc + vite build
 node scripts/visual-identity-browser.mjs [shots.json]  # screenshots (headless Chrome, GPU)
 ```
 
-- The baseline comparison worktree is a detached checkout of `a680902` at `/private/tmp/claude-503/.../scratchpad/baseline-wt`, served on port 5197. It's temporary: remove it with `git worktree remove --force <path>` when done.
+- Before/after comparisons were made against a detached worktree of the pre-redesign commit `a680902` served on port 5197 (`git worktree add --detach <dir> a680902`).
 - Dev console hooks:
   - `vibentaScene.preset('neon_city', 1)` (also `amber_refuge`, `noir_nocturne`, `neutral`, …)
   - `vibentaScene.map`
@@ -96,7 +97,7 @@ node scripts/visual-identity-browser.mjs [shots.json]  # screenshots (headless C
 
 - `npm test`: **697 / 697 pass** (57 files, plus new `features/map/__tests__/baseMaterials.test.ts` and `design/__tests__/identity.test.ts`). Tests updated: `mapStyle.test.ts` (paint-only color check, material and width tests) and `vibeTheme/__tests__/apply.test.ts` (expects 5 material layers per band).
 - `npm run build`: passes. The chunk-size warning was already there.
-- **Browser regression suites, branch vs baseline (port 5197):**
+- **Browser regression suites, branch vs baseline (`a680902`):**
 
   | Suite | Branch | Baseline | Notes |
   |---|---|---|---|
@@ -108,9 +109,17 @@ node scripts/visual-identity-browser.mjs [shots.json]  # screenshots (headless C
   - **Vibe:** the `listeners===1` failure is fixed by `withSceneAccent`. Confirmed 30/30.
   - **Session B:** the same 4 failures exist on the untouched baseline (390 px "preview leaves map unchanged", the two "Gemini failure authored B1/B2" checks, and harness `Invalid InterceptionId` errors), so they're pre-existing.
   - **Software-GL frame rate:** a 1 s rAF count after opening mobile Directions gives **3 fps on the branch vs 6 fps on the baseline** (swiftshader). On a GPU both run at about 55 fps (above). The extra cost comes from 30 building layers, contact shadows and material overlays. Machines that fall back to software WebGL will feel it. A cheaper path would be collapsing materials to one layer per band when the GL renderer string (`WEBGL_debug_renderer_info`) reports SwiftShader or another software renderer. Not done.
-- **Screenshots** captured: 1440×900, 1366×768, 390×844, 360×640. States: default, dropdown, vibe step, quiz, quiz launch, search, saved, venue popup, mobile sheet, mobile dropdown, keyboard focus. Road zooms: z12/z13 2D, z14/z15/z16/z17.5 tilt, z16 2D. Scratch copies are in `/private/tmp/claude-503/.../scratchpad/`; committed evidence is in `docs/qa/visual-identity/`.
+- **Screenshots** captured: 1440×900, 1366×768, 390×844, 360×640. States: default, dropdown, vibe step, quiz, quiz launch, search, saved, venue popup, mobile sheet, mobile dropdown, keyboard focus. Road zooms: z12/z13 2D, z14/z15/z16/z17.5 tilt, z16 2D. Committed evidence is in `docs/qa/visual-identity/`.
 - **Keyboard:** Tab and Enter work. Focus rings are cobalt-light (`#a3b5ff`); field triggers show focus with a cobalt border and ring. Tab order still starts at the map pins (their DOM order), which is existing behavior.
 - **Reduced motion:** the harness emulates `prefers-reduced-motion: reduce` by default, and the identity's transforms and transitions are disabled under it.
+
+### After merging `main` (#54–#58)
+
+- `npm test`: **721 / 721 pass** (60 files). `npm run build` passes.
+- `check-navigation-browser.mjs`: **56 / 56**.
+- `vibe-browser.mjs`: 29 pass, 1 fail: `fallback answer reaches MiniLM with explicit exclusion`. **Pristine `main` (`7148c1b`) fails the same check**, so it comes from the #57/#58 vibe changes, not the redesign.
+- `quiz-media-browser.mjs` (multimodal quiz; local director, no Gemini key): **16 / 16 behavior checks** at 1440 and 390. Screenshots show the media stage, credits, view toggles, free-text answer and option cards in the identity.
+- `session-b-browser.mjs` was retired on `main` and is no longer run.
 
 ## Remaining work / next steps
 
