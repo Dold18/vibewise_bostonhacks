@@ -908,7 +908,7 @@ const scene = mountScene({
   onError: (error) => console.error('[scene]', error),
 });
 if (import.meta.env.DEV) Object.assign(window, { vibentaScene: sceneDevHook(scene, map) });
-// Ground textures (water, parks, urban ground, plazas) over the palette fills; loads lazily.
+// Ground textures (water, parks, plazas) over the palette fills; loads lazily.
 const materials = mountBaseMaterials(map);
 if (import.meta.env.DEV) Object.assign(window, { vibentaMaterials: materials });
 // One publisher feeds the existing compiler/session and the existing pin system.

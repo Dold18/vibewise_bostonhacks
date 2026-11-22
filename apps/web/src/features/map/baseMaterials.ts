@@ -11,18 +11,20 @@
  *    placeholder image keeps the plain palette fill (the fallback);
  *  - a scene sets grain strength declaratively (SceneStyle.materialStrength).
  *
- * Only four small textures load, lazily after the map is idle. Sources are the
+ * Only three small textures load, lazily after the map is idle. Sources are the
  * repository's original scene assets (public/scene-assets), referenced by id.
  *
  * Not supported on purpose: textured 3D facades. `fill-extrusion-pattern`
  * replaces the extrusion color (losing scene palettes), puts the same image on
  * roofs and walls, tiles at a fixed screen scale and streaks on walls at close
- * zoom (browser spike, docs/qa/visual-identity). Buildings use palette-derived
+ * zoom (browser spike, docs/qa/visual-identity). No urban-ground texture: the
+ * only candidate (v1/concrete-pores) is a flat grey wash with sub-pixel dots, so
+ * it tinted districts without adding visible grain. Buildings use palette-derived
  * OSM material tones instead (mapStyle.ts).
  */
 import type { Map as MapLibreMap, LayerSpecification } from 'maplibre-gl';
 
-export type MaterialSurface = 'water' | 'park' | 'urban' | 'plaza';
+export type MaterialSurface = 'water' | 'park' | 'plaza';
 
 export interface MaterialSource {
   /** Asset id from public/scene-assets (v1 file stem or v2 atlas asset id). */
@@ -45,7 +47,6 @@ export interface SurfaceSpec {
 export const BASE_MATERIALS: readonly SurfaceSpec[] = [
   { surface: 'water', source: { asset: 'water-shimmer', kind: 'v1', pixelRatio: 2 }, over: ['water'], opacity: 0.8 },
   { surface: 'park', source: { asset: 'nature_ground.short_grass.warm', kind: 'v2-atlas-cell', pixelRatio: 3 }, over: ['park', 'landcover-grass'], opacity: 0.5 },
-  { surface: 'urban', source: { asset: 'concrete-pores', kind: 'v1', pixelRatio: 2 }, over: ['landuse-urban'], opacity: 0.4 },
   { surface: 'plaza', source: { asset: 'cobblestone-hatch', kind: 'v1', pixelRatio: 2.5 }, over: ['transport-area'], opacity: 0.32 },
 ];
 

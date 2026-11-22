@@ -134,7 +134,7 @@ const MATERIAL_COLOURS: Record<'brick' | 'stone' | 'glass', readonly string[]> =
 const MATERIAL_SHIFT: Record<BuildingMaterial, readonly [number, number, number]> = {
   neutral: [0, 0, 0],
   'neutral-alt': [-0.028, 0.002, 0.006],
-  brick: [-0.07, 0.013, 0.016],
+  brick: [-0.065, 0.0095, 0.012],
   stone: [0.012, 0.002, 0.016],
   glass: [-0.045, -0.008, -0.026],
 };

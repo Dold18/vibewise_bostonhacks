@@ -82,9 +82,9 @@ node scripts/visual-identity-browser.mjs [shots.json]  # screenshots (headless C
 - Ground materials are rendered as MapLibre `fill-pattern` overlays of neutral alpha detail drawn over the palette fills:
   - water: `v1/water-shimmer`
   - parks and grass: `v2 nature_ground.short_grass.warm`, an atlas cell converted by `toDetail`
-  - urban ground: `v1/concrete-pores`
   - plazas and piers: `v1/cobblestone-hatch`
-- Only those 4 assets load, lazily after the map is idle.
+- Only those 3 assets load, lazily after the map is idle.
+- **No urban-ground texture** (session 2). `v1/concrete-pores` was dropped: it's a flat 13% grey wash with sub-pixel dots at 1–17% opacity, so on/off screenshots of the South End showed no visible grain at 0.4 or 0.6 opacity, only a tint. Dropping it also removes a full-coverage overlay layer.
 - The overlay layers are **part of the base style** (`withMaterialOverlays` in `buildMapStyle`). Images start as transparent placeholders (via `styleimagemissing` and pre-registration) and get their real pixels through `map.updateImage`.
 - **Textured 3D facades are deliberately not shipped.** The `fill-extrusion-pattern` spikes showed four problems: it replaces the scene color, puts the same image on roofs and walls, tiles at a fixed screen scale, and streaks on walls at close zoom. Evidence is in `docs/qa/visual-identity/spike-*.jpg`.
 
@@ -114,15 +114,15 @@ node scripts/visual-identity-browser.mjs [shots.json]  # screenshots (headless C
 
 ## Remaining work / next steps
 
-1. **Re-verify after the last refactor.** Re-run `vibe-browser.mjs` and the materials screenshots, because the static overlay layers plus `updateImage` haven't been visually re-checked since the change. Confirm `vibentaMaterials.stats().loaded` lists all 4 surfaces and the grain is visible on City Hall Plaza, the Common, and the harbor.
+1. ~~Re-verify after the last refactor~~ Done (session 2): vibe 30/30, navigation 56/56, `stats().loaded` lists every surface with no errors, and grain is visible on City Hall Plaza, the Common and the harbor (`materials-*.jpg` recaptured).
 2. ~~Update the outdated navigation check~~ Done (session 2).
 3. **Account popover:** styled but **unverified in the browser**, because accounts are disabled without Supabase env ("Accounts unavailable"). Verify it with credentials.
-4. **Route planner and Directions** on desktop: covered by the navigation suite, but no visual review screenshot was taken yet.
-5. **Recapture the final evidence** (the road/building before-after was shot before the final brick-tone reduction), and add 1366 and 360 screenshots to `docs/qa/visual-identity/`.
+4. ~~Route planner and Directions screenshots~~ Done (session 2): `directions-1440-before-after.jpg`. District labels on the dimmed navigation map render as hollow outlines on **both** baseline and branch (pre-existing, not changed here).
+5. ~~Recapture the final evidence~~ Done (session 2): road/building pairs re-shot after the brick change; `ui-1366-default.jpg`, `ui-360-sheet.jpg` added.
 6. **Optional polish:**
    - The `zoomOut` icon's pop smear could be calmer.
-   - The z17 brick roof tone is still slightly warm.
-   - The `v1/concrete-pores` urban grain is barely visible; raise it or drop it.
+   - ~~z17 brick roof tone too warm~~ Brick OKLab shift reduced from [-0.07, 0.013, 0.016] to [-0.065, 0.0095, 0.012] (session 2).
+   - ~~`v1/concrete-pores` urban grain~~ Dropped (session 2, see Phase 3).
 7. ~~Update `apps/web/src/design/README.md` with an Identity section~~ Done (session 2).
 8. **Push the branch and open a draft PR** against `main`, but only with the user's approval. Note in the PR that it's stacked on #44.
 
