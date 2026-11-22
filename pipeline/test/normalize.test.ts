@@ -63,3 +63,12 @@ test('pickOsmTags keeps only vibe-relevant keys', () => {
   assert.deepEqual(pickOsmTags({ amenity: 'cafe', outdoor_seating: 'yes', 'diet:vegan': 'yes', name: 'X', 'addr:street': 'Y' }),
     { amenity: 'cafe', outdoor_seating: 'yes', 'diet:vegan': 'yes' });
 });
+
+test('pickOsmTags keeps photo-link and vibe tags', () => {
+  const out = pickOsmTags({ name: 'X', wikidata: 'Q1', wikimedia_commons: 'File:A.jpg', image: 'https://x/y.jpg', live_music: 'yes', smoking: 'no', brand: 'B' });
+  assert.deepEqual(out, { wikidata: 'Q1', wikimedia_commons: 'File:A.jpg', image: 'https://x/y.jpg', live_music: 'yes', smoking: 'no' });
+});
+
+test('pickOsmTags keeps happy_hours', () => {
+  assert.deepEqual(pickOsmTags({ happy_hours: 'Mo-Fr 16:00-18:00', foo: 'x' }), { happy_hours: 'Mo-Fr 16:00-18:00' });
+});

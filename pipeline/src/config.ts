@@ -29,3 +29,10 @@ export const OVERPASS_MIRRORS = [
   'https://overpass.private.coffee/api/interpreter',
 ] as const;
 export const OVERPASS_REQUEST_TIMEOUT_MS = 200_000;
+
+// Boston open data (data.boston.gov CKAN datastore). Resource ids verified 2026-11-21.
+export const BOSTON_DATASTORE_SEARCH = 'https://data.boston.gov/api/3/action/datastore_search';
+export const BOSTON_ENTERTAINMENT_RESOURCE = 'eb683641-e358-4c2c-95de-c84f32c09147'; // Annual Entertainment Licenses - With Detail
+export const BOSTON_ALCOHOL_RESOURCE = 'aab353c1-c797-4053-a3fc-e893f5ccf547'; // Section 12 Licenses (Alcohol)
+export const BOSTON_ENTERTAINMENT_PAGE = 'https://data.boston.gov/dataset/entertainment-licenses-legacy';
+export const BOSTON_ALCOHOL_PAGE = 'https://data.boston.gov/dataset/liquor-licenses';

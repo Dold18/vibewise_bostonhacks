@@ -47,6 +47,9 @@ The repository currently contains only a minimal starting README and planning do
 
 Setup, run, lint and test commands will be added **after** the scaffold exists. No sample command in this README should be mistaken for a working command today.
 
+### Place photos and vibe inputs (pipeline)
+`npm run enrich:media --prefix pipeline` finds free photos for each place (its website, Wikimedia Commons, Mapillary) and collects free vibe inputs (website text, Wikipedia/Wikivoyage, OSM tags, Boston license data, student reviews) into Supabase. Flags: `--dry-run`, `--tiers 1,2`, `--limit N`, `--concurrency N`, `--refresh`. It needs `SUPABASE_URL` and `SUPABASE_SECRET_KEY` in `pipeline/.env` and the migration `20261121200000_create_place_media.sql` applied. `MAPILLARY_TOKEN` is optional, and an optional `pipeline/demo-places.txt` (one `place_id` per line) is processed first. Design: `docs/superpowers/specs/2026-11-21-place-photos-vibe-sources-design.md`. Then `npm run enrich:photos --prefix pipeline` stores an 800 px WebP copy of each photo in the `place-photos` bucket (`--max-mb`, default 800, caps total storage; `--dry-run`, `--limit N`, `--concurrency N`).
+
 ## Demo integrity
 No fake venues, student demographics, discounts, live transit journeys, or private event details. Clearly distinguish live provider responses from labeled sample fixtures. Don't publish secrets or scrape protected business databases.
 

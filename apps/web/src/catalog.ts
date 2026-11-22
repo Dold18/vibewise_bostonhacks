@@ -13,6 +13,7 @@
  *     range, fetched by place id and cached, so panning back costs nothing.
  */
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { toDeals, type Deal } from './deals';
 import { metersBetween, type CategorizedPlace, type Category, type Place } from './osm';
 
 /** Map category id → catalog `category` value. */
@@ -24,6 +25,8 @@ const CATALOG_CATEGORY: Record<string, string> = {
 
 const INDEX_COLUMNS = 'place_id, source, source_id, name, category, location';
 const DETAIL_COLUMNS = 'place_id, address, website, phone, cuisines, hours_raw, osm_tags, attribution, price_band, price_source';
+/** PostgREST embed of the place's deals (place_deals.restaurant_id → restaurants.id); RLS hides hidden rows. */
+export const DEALS_EMBED = 'place_deals(kind, title, timing, schedule, source, source_url, checked_at)';
 const PAGE_SIZE = 1000; // PostgREST max_rows
 const DETAIL_CHUNK = 100; // place ids per request, keeps the URL short
 
@@ -50,6 +53,8 @@ export interface CatalogDetails {
   price_band: string;
   /** 'menu' (read from a menu) or 'estimate' (LLM guess, labeled "(est.)"); null when unknown. */
   price_source: string | null;
+  /** Validated deals; empty when none or when the deals embed is unavailable. */
+  deals: Deal[];
 }
 
 interface IndexRow {
@@ -111,7 +116,7 @@ export function pinToPlace(pin: CatalogPin, details?: CatalogDetails): Place {
   if (details?.price_source) tags['catalog:price_source'] = details.price_source;
   const kind = details?.osm_tags?.amenity ?? pin.category;
   const cuisine = details?.cuisines?.[0];
-  return {
+  const place: Place = {
     // OSM ids stay bare ("node/1") so "View on OpenStreetMap" links to the feature.
     id: pin.source === 'osm' ? pin.sourceId : pin.placeId,
     name: pin.name,
@@ -120,6 +125,8 @@ export function pinToPlace(pin: CatalogPin, details?: CatalogDetails): Place {
     category: humanize(cuisine ? `${cuisine} ${kind}` : kind),
     tags,
   };
+  if (details?.deals?.length) place.deals = details.deals;
+  return place;
 }
 
 const PRICE_BANDS = new Set(['$', '$$', '$$$', '$$$$']);
@@ -188,17 +195,50 @@ async function fetchIndex(supabase: SupabaseClient): Promise<CatalogPin[]> {
 }
 
 const detailsCache = new Map<string, CatalogDetails>();
-async function fetchDetails(supabase: SupabaseClient, placeIds: string[]): Promise<void> {
+/** Once the embed fails (e.g. the place_deals migration isn't applied), skip it for the rest of the page load. */
+let dealsEmbedAvailable = true;
+
+type DetailsQuery = (columns: string, ids: string[]) => Promise<{ data: unknown[] | null; error: { message: string } | null }>;
+
+/** Test hook: re-enable the deals embed. */
+export function resetDealsEmbedForTests(): void {
+  dealsEmbedAvailable = true;
+  detailsCache.clear();
+}
+
+/** Cached details for a place id, if fetched. */
+export function getCachedDetails(placeId: string): CatalogDetails | undefined {
+  return detailsCache.get(placeId);
+}
+
+/** Fetch and cache details for ids not yet cached, in chunks, via `query`. Throws if a request fails even without the deals embed. */
+export async function fetchDetailsWith(query: DetailsQuery, placeIds: string[]): Promise<void> {
   const missing = placeIds.filter((id) => !detailsCache.has(id));
   for (let i = 0; i < missing.length; i += DETAIL_CHUNK) {
     const ids = missing.slice(i, i + DETAIL_CHUNK);
-    const { data, error } = await supabase.from('restaurants').select(DETAIL_COLUMNS).in('place_id', ids);
-    if (error) throw new Error(error.message);
-    for (const row of (data ?? []) as (CatalogDetails & { place_id: string })[]) {
-      const { place_id, ...details } = row;
-      detailsCache.set(place_id, details);
+    let result = await query(dealsEmbedAvailable ? `${DETAIL_COLUMNS}, ${DEALS_EMBED}` : DETAIL_COLUMNS, ids);
+    if (result.error && dealsEmbedAvailable) {
+      const embedError = result.error.message;
+      result = await query(DETAIL_COLUMNS, ids);
+      // Only blame the embed when the plain request works; otherwise it's a general outage.
+      if (!result.error) {
+        dealsEmbedAvailable = false;
+        console.warn('[catalog] deals unavailable:', embedError);
+      }
+    }
+    if (result.error) throw new Error(result.error.message);
+    for (const row of (result.data ?? []) as (Omit<CatalogDetails, 'deals'> & { place_id: string; place_deals?: unknown })[]) {
+      const { place_id, place_deals, ...details } = row;
+      detailsCache.set(place_id, { ...details, deals: toDeals(place_deals) });
     }
   }
+}
+
+function fetchDetails(supabase: SupabaseClient, placeIds: string[]): Promise<void> {
+  return fetchDetailsWith(async (columns, ids) => {
+    const { data, error } = await supabase.from('restaurants').select(columns).in('place_id', ids);
+    return { data: data as unknown[] | null, error };
+  }, placeIds);
 }
 
 /**
@@ -234,7 +274,7 @@ export async function catalogPlacesNear(
   } catch (err) {
     console.warn('[catalog] details unavailable:', (err as Error).message);
   }
-  return near.map(({ categoryId, pin }) => ({ categoryId, place: pinToPlace(pin, detailsCache.get(pin.placeId)) }));
+  return near.map(({ categoryId, pin }) => ({ categoryId, place: pinToPlace(pin, getCachedDetails(pin.placeId)) }));
 }
 
 function humanize(s: string): string {
