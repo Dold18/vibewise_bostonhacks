@@ -26,6 +26,8 @@ export function themeFor(state: AccountState): ThemeTarget | null {
 export interface ThemeController {
   /** Theme the map from sample scores without saving anything (dev tool). Cleared by the next account change. */
   preview(scores: VibeScores, strength: number): void;
+  setOuting(target:ThemeTarget|null):void;
+  setNavigation(active:boolean):void;
   destroy(): void;
 }
 
@@ -34,16 +36,19 @@ export function startThemeController(map: MapLibreMap, store: AccountStore): The
   let current: Palette = basePalette;
   let target: ThemeTarget | null = themeFor(store.getState());
   let ready = false;
+  let outing:ThemeTarget|null=null;
+  let navigating=false;
 
   function render() {
     if (!ready) return;
-    const blend = target ? blendPalette(basePalette, target.tags, target.strength) : null;
+    const active=resolveThemeTarget(target,outing,navigating);
+    const blend = active ? blendPalette(basePalette, active.tags, active.strength) : null;
     const next = blend?.palette ?? basePalette;
     applyPalette(map, current, next);
     current = next;
     // Effects follow the taste itself, not the contrast-limited palette
     // strength, so a vibe can show before it's strong enough to recolor.
-    effects.render(target ? effectLayers(target.tags, target.strength) : [], blend?.darkMode ?? false);
+    effects.render(active ? effectLayers(active.tags, active.strength) : [], blend?.darkMode ?? false);
   }
 
   const onLoad = () => {
@@ -67,6 +72,8 @@ export function startThemeController(map: MapLibreMap, store: AccountStore): The
           : null;
       render();
     },
+    setOuting(next) { outing=next; render(); },
+    setNavigation(active) { navigating=active;render(); },
     destroy() {
       unsubscribe();
       map.off('load', onLoad);
@@ -75,3 +82,6 @@ export function startThemeController(map: MapLibreMap, store: AccountStore): The
     },
   };
 }
+
+/** Safety > current outing > saved account taste > default. Never persists provisional answers. */
+export function resolveThemeTarget(saved:ThemeTarget|null,outing:ThemeTarget|null,navigating:boolean):ThemeTarget|null {return navigating?null:outing??saved;}
