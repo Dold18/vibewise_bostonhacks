@@ -178,8 +178,10 @@ const MUSEUMS = nonFood(
 const ENTERTAINMENT = nonFood(
   'entertainment',
   [
+    // Checked first: a ballpark or arena that also hosts concerts (Fenway Park: amenity=music_venue) is a stadium.
+    { key: 'leisure', values: ['stadium'] },
     { key: 'amenity', values: ['theatre', 'cinema', 'arts_centre', 'music_venue', 'events_venue', 'nightclub'] },
-    { key: 'leisure', values: ['bowling_alley', 'amusement_arcade', 'escape_game', 'miniature_golf', 'trampoline_park', 'ice_rink', 'stadium'] },
+    { key: 'leisure', values: ['bowling_alley', 'amusement_arcade', 'escape_game', 'miniature_golf', 'trampoline_park', 'ice_rink'] },
     { key: 'tourism', values: ['zoo', 'aquarium', 'theme_park'] },
   ],
   [AE, SR],

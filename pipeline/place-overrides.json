@@ -1,0 +1,9 @@
+[
+  {
+    "place_id": "osm:relation/65053",
+    "set": { "address": "1 Franklin Park Road, Boston 02121" },
+    "reason": "Franklin Park: the merged Foursquare entry's street (Pier Point Rd) is not the park's address",
+    "source_url": "https://www.boston.gov/parks/franklin-park",
+    "checked_on": "2026-11-22"
+  }
+]

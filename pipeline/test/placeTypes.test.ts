@@ -15,6 +15,13 @@ test('parseTypeOption validates the --type value', () => {
   assert.throws(() => parseTypeOption('zoo'), { message: `invalid --type 'zoo' (expected one of ${LIST})` });
 });
 
+test('a stadium that is also tagged as a music venue is a stadium', () => {
+  const fenway = { name: 'Fenway Park', amenity: 'music_venue', leisure: 'stadium', sport: 'baseball' };
+  assert.deepEqual(classifyOsm(fenway), { type: 'entertainment', kind: 'stadium' });
+  assert.deepEqual(classifyOsm({ name: 'Paradise', amenity: 'music_venue' }), { type: 'entertainment', kind: 'music_venue' });
+  assert.equal(PLACE_TYPE_CONFIG.entertainment.keepOsm(fenway, null), true);
+});
+
 test('classifyOsm maps tags and applies precedence in PLACE_TYPES order', () => {
   assert.deepEqual(classifyOsm({ amenity: 'cafe', name: 'X' }), { type: 'restaurants', kind: 'cafe' });
   assert.equal(classifyOsm({ tourism: 'museum', historic: 'building', wikidata: 'Q1' })?.type, 'museums');
