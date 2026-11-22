@@ -5,6 +5,8 @@
  * The one write it makes is `state.status`, set to the first validation error
  * (or cleared) when the user picks, drops or removes a photo, before `onFile`.
  * It never reads or uploads the photo; that happens on send (`prepareMessage`).
+ * Status text is shown in the attachment and copied into the host's `announcer`, a
+ * persistent live region the host never re-creates, so a new message is announced.
  */
 import { h, icon } from '../../../discovery/ui/dom';
 import { ACCEPTED_VIBE_IMAGE_TYPES, MAX_VIBE_IMAGE_BYTES, appendVibeImages } from '../../../discovery/vibeImages';
@@ -32,7 +34,7 @@ function releaseThumbnail(file: File) {
   thumbnails.delete(file);
 }
 
-export function createPhotoAttachment(o: { state: PhotoAttachmentState; onFile: (file: File | null) => void; access: PhotoAccessSource; signInLabel: string; dropZone?: boolean }): { root: HTMLElement; destroy(): void } {
+export function createPhotoAttachment(o: { state: PhotoAttachmentState; onFile: (file: File | null) => void; access: PhotoAccessSource; signInLabel: string; announcer: HTMLElement; dropZone?: boolean }): { root: HTMLElement; destroy(): void } {
   const { state, access } = o;
   const root = h('div', { class: o.dropZone ? 'vb-photo-attachment vb-upload-zone' : 'vb-photo-attachment' });
   let rendered: PhotoAccessStatus | null = null;
@@ -61,7 +63,8 @@ export function createPhotoAttachment(o: { state: PhotoAttachmentState; onFile: 
   }
 
   function statusLine(): HTMLElement {
-    const line = h('p', { class: state.status?.kind === 'error' ? 'vb-upload-status vb-photo-status is-error' : 'vb-upload-status vb-photo-status', role: 'status', 'aria-live': 'polite' });
+    // Visible copy only; screen readers hear the message through the host's announcer.
+    const line = h('p', { class: state.status?.kind === 'error' ? 'vb-upload-status vb-photo-status is-error' : 'vb-upload-status vb-photo-status' });
     line.textContent = state.status?.text ?? '';
     return line;
   }
@@ -94,6 +97,9 @@ export function createPhotoAttachment(o: { state: PhotoAttachmentState; onFile: 
 
   function render() {
     if (destroyed) return;
+    // Change the live region's text only when the message changes, so a re-created attachment isn't re-announced.
+    const message = state.status?.text ?? '';
+    if (o.announcer.textContent !== message) o.announcer.textContent = message;
     rendered = access.status();
     if (thumbFile && (rendered !== 'signed_in' || state.file !== thumbFile)) { releaseThumbnail(thumbFile); thumbFile = null; }
     // While sign-in status loads, show no controls; a pending message still shows.

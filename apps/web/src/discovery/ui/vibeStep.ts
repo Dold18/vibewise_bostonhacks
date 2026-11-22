@@ -91,11 +91,14 @@ export function createVibeStep(prefs: Store<InitialPreferences, PreferencesActio
   // The photo draft: the file lives in the preferences store; its description,
   // status and busy flag are screen state set by the attachment and the panel.
   const photo: PhotoAttachmentState = { file: null, description: null, status: null, busy: false };
+  // One live region for photo messages, kept across attachment re-creation so new messages are announced.
+  const photoAnnouncer = h('p', { class: 'vb-photo-announcer', role: 'status', 'aria-live': 'polite' });
   let pickedHere = false;
   const mountAttachment = () => createPhotoAttachment({
     state: photo,
     access: photoAccess,
     signInLabel: 'Sign in to add a reference photo',
+    announcer: photoAnnouncer,
     dropZone: true,
     onFile: (file) => {
       pickedHere = true;
@@ -172,6 +175,7 @@ export function createVibeStep(prefs: Store<InitialPreferences, PreferencesActio
     ),
     h('section', { class: 'vb-vibe-upload-section', 'aria-label': 'Photo inspiration' },
       attachment.root,
+      photoAnnouncer,
       quotaLine,
     ),
   );

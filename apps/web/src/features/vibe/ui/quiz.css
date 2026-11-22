@@ -95,6 +95,7 @@
 .vb-photo-attached { display:flex; align-items:flex-start; gap:12px; min-width:0; }
 .vb-photo-thumb { flex:none; width:88px; grid-template-rows:minmax(0,1fr); }
 .vb-photo-description { flex:1; min-width:0; margin:0; font-size:12px; line-height:1.5; color:var(--vb-text,#202124); overflow-wrap:anywhere; }
+.vb-photo-announcer { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
 .vb-photo-unavailable { margin:0; font-size:12px; line-height:1.4; color:var(--vb-muted,#5f6368); }
 .vb-photo-quota { margin:0; font-size:11px; line-height:1.4; color:var(--vb-muted,#5f6368); }
 .vb-photo-quota[hidden] { display:none; }

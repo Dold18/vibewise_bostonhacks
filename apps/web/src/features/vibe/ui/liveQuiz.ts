@@ -43,6 +43,8 @@ function restoreFocus(root:HTMLElement,key:string|null) {
 export function createLiveQuiz(onBack:()=>void) {
  const session=createLiveVibeSession(apiGenerationProvider(),apiEmbeddingProvider(),outingProfiles);
  const root=h('section',{class:'vb-live-quiz','aria-label':'Vibe quiz',tabindex:'-1',hidden:true});
+ // One live region for photo messages that re-renders never remove, so a new message is announced.
+ const photoAnnouncer=h('p',{class:'vb-photo-announcer',role:'status','aria-live':'polite'});root.append(photoAnnouncer);
  let editing:number|null=null;let active=false;let lastQuestion='';let lastSignature='';
  const previews=new Map<string,ScenePreviewState>();
  const mediaViews=new Map<string,MediaViewState>();
@@ -69,7 +71,7 @@ export function createLiveQuiz(onBack:()=>void) {
   // Destroy the replaced attachment only after its successor exists, so the shared thumbnail URL is kept, not revoked and re-made.
   const replaced=attachment;attachment=null;
   const key=questionKey(p);if(photoDraft?.key!==key)photoDraft=key?{key,state:{file:null,description:null,status:null,busy:false}}:null;
-  root.replaceChildren();root.removeAttribute('aria-busy');if(!p){replaced?.destroy();return;}
+  for(const child of [...root.childNodes])if(child!==photoAnnouncer)child.remove();root.removeAttribute('aria-busy');if(!p){photoAnnouncer.textContent='';replaced?.destroy();return;}
   // Controls that answer, move or leave the question; disabled while its photo is read so the read is never discarded.
   const locked:HTMLButtonElement[]=[];const lock=<T extends HTMLButtonElement>(b:T)=>{locked.push(b);return b;};
   // The quiz palette mirrors the latest interpretation (presentation only; the map follows the publisher).
@@ -109,7 +111,7 @@ export function createLiveQuiz(onBack:()=>void) {
     photo.busy=false;photo.status={text:result.message,kind:result.reason==='empty'?'info':'error'};refresh();
    };
    const readingVia=(kind:'correction'|'text')=>photo.busy&&!!photo.file&&draftState.via===kind;
-   attachment=createPhotoAttachment({state:photo,access:photoAccess,signInLabel:'Sign in to answer with a photo',onFile:file=>{photo.file=file;photo.description=file?photoClient.cached(file,question.prompt)??null:null;refresh();}});
+   attachment=createPhotoAttachment({state:photo,access:photoAccess,signInLabel:'Sign in to answer with a photo',announcer:photoAnnouncer,onFile:file=>{photo.file=file;photo.description=file?photoClient.cached(file,question.prompt)??null:null;refresh();}});
    // A free-text question's own box is the natural place for the photo; otherwise it sits with the own-words box.
    const photoInStage=media?.format==='free_text';
    if(media) {
@@ -175,6 +177,7 @@ export function createLiveQuiz(onBack:()=>void) {
   if(editing!==null)root.append(lock(button('Cancel edit',()=>{editing=null;render(session.getSnapshot());})));
   if(p.originalInput.imageCount>0||p.history.some(a=>(a.response.kind==='correction'||a.response.kind==='text')&&hasPhotoLine(a.response.text)))root.append(h('p',{class:'vb-quiz-photo-note'},"Photos are sent to Google Gemini to get a short text description. Vibenta doesn't store them; the description is part of what this quiz uses."));
   if(photoDraft?.state.busy)for(const b of locked)b.disabled=true;
+  if(!attachment)photoAnnouncer.textContent='';
   replaced?.destroy();restoreFocus(root,focusKey);
  }
  // Media and scene stages can redraw their own options (Inspect, an image error), so also refuse option clicks while a photo is read.
