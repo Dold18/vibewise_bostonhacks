@@ -1,5 +1,4 @@
 import { readFileSync } from 'node:fs';
-import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 
@@ -31,9 +30,12 @@ function maplibreWorker(): Plugin {
 // Explicit files may have any name. Values remain in Node's environment;
 // Vite only forwards its default VITE_ prefix to browser code.
 if (process.env.VIBENTA_ENV_FILE) process.loadEnvFile(process.env.VIBENTA_ENV_FILE);
-const rootEnvDir = fileURLToPath(new URL('../../', import.meta.url));
+// Browser settings (VITE_SUPABASE_*, VITE_CATALOG_EMBEDDING_MODEL_KEY) live in
+// apps/web/.env. Server keys stay in the root .env or VIBENTA_ENV_FILE, which the
+// API process loads itself; VITE_ values already in the environment win.
+const webEnvDir = fileURLToPath(new URL('./', import.meta.url));
 export default defineConfig(({ mode }) => {
-  const envDir = process.env.VIBENTA_ENV_FILE ? dirname(process.env.VIBENTA_ENV_FILE) : rootEnvDir;
+  const envDir = webEnvDir;
   const env = loadEnv(mode, envDir, '');
   return {
     plugins: [maplibreWorker()],
