@@ -27,9 +27,9 @@ Asking an LLM to fill all 178 settings each turn would be expensive, produce con
 
 ```ts
 type ScenePresetId =
-  | "neutral" | "amber_refuge" | "noir_jazz" | "neon_city" | "dream_pastel"
+  | "neutral" | "amber_refuge" | "noir_nocturne" | "neon_city" | "dream_pastel"
   | "sunlit_coast" | "woodland_story" | "underground_indie"
-  | "retro_atlas" | "minimal_modern"; // proposed, versioned independently
+  | "retro_atlas" | "minimal_modern"; // ratified 2026-11-21, versioned independently
 
 interface SceneOverride {
   /** Must match group.id + "." + setting.id in the versioned JSON registry. */
@@ -70,7 +70,7 @@ A full SceneState is generated **locally** from the stable registry and presets.
   "schemaVersion": "1.0.0",
   "sessionVersion": 7,
   "presets": [
-    {"id": "noir_jazz", "weight": 0.48},
+    {"id": "noir_nocturne", "weight": 0.48},
     {"id": "neon_city", "weight": 0.32},
     {"id": "amber_refuge", "weight": 0.20}
   ],
@@ -208,7 +208,7 @@ These paths are **proposals only**:
 - Vibe-owner adapter: produces `SceneIntent` without changing `Place` or routing contracts.
 
 ### Questions for the implementation owners to agree on
-1. Which initial preset IDs are ratified beyond the ten *account-level vibe tags*? Do not conflate account taste with ephemeral current-outing scene.
+1. ~~Which initial preset IDs are ratified beyond the ten *account-level vibe tags*?~~ **Resolved 2026-11-21:** the ten IDs above are ratified (nine aesthetics plus `neutral`). Preset names describe an aesthetic, never an unverified venue feature (hence `noir_nocturne`, not `noir_jazz`: music- or cuisine-specific props need verified context). Do not conflate account taste with ephemeral current-outing scene.
 2. Which visual options are actually implemented by the first runtime release? Build a feature detection table—not guesses.
 3. How do we normalize/balance semantically conflicting adjectives and user constraints?
 4. Which effects should be disabled during transit directions or focus mode?
