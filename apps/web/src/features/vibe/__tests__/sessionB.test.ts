@@ -1,7 +1,9 @@
-import { describe,it,expect,vi } from 'vitest';
+import { describe,it,expect,vi,beforeAll,afterAll } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { sessionBQuestion,scenePresentation,selectedCoffeeScene } from '../sessionB';
+import { sessionBQuestion,scenePresentation,selectedCoffeeScene,setAuthoredSessionB } from '../sessionB';
+// The authored opener is retired in the product; these tests keep the dormant module correct.
+beforeAll(()=>setAuthoredSessionB(true));afterAll(()=>setAuthoredSessionB(false));
 import { validContext,validQuestion,validateGeneration } from '../validation';
 import { createLiveVibeSession,replay } from '../liveEngine';
 import { createProfilePublisher } from '../publisher';

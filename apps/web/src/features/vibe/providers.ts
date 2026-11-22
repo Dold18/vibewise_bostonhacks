@@ -4,7 +4,7 @@ async function post(url:string,body:unknown,signal:AbortSignal,timeout:number) {
  const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.any([signal,AbortSignal.timeout(timeout)])});
  if(!res.ok)throw Error(`Vibe service unavailable (${res.status})`);return res.json();
 }
-export function apiGenerationProvider():GenerationProvider {return {async generate(c:GenerationContext,signal){return validateGeneration(await post('/api/vibe/generate',c,signal,22000),c);}};}
+export function apiGenerationProvider():GenerationProvider {return {async generate(c:GenerationContext,signal){return validateGeneration(await post('/api/vibe/generate',c,signal,40000),c);}};}
 export function apiEmbeddingProvider():EmbeddingProvider {
  const cache=new Map<string,readonly number[]>();
  const pending=new Map<string,Promise<{modelKey:string;vector:readonly number[]}>>();
