@@ -18,6 +18,17 @@ const [modelibr,kaykit,layouts,recipes]=await Promise.all([
  read(path.join(base,'composites','layouts.v1.json')),
  read(path.join(base,'composites','recipes.v1.json'))
 ]);
+/**
+ * Layout activation vocabulary. A layout may only appear under its activation rule;
+ * the Scene Composer triggers `vibe_selected` from the vibe alone and never the others.
+ */
+const ACTIVATIONS={
+ explicit_or_verified_context:'cuisine/genre layouts: explicit user interest or independently verified venue context',
+ vibe_selected:'mood-only fictional decoration the composer may choose from the outing vibe',
+ user_opt_in:'shown only after the user turns it on',
+ explicit_or_verified_seasonal_context:'seasonal decoration: explicit request or verified seasonal context, never inferred from mood',
+ explicit_holiday_request_only:'cultural or religious observance: only when the user explicitly asks for it',
+};
 const errors=[],warnings=[];
 const fail=(ok,msg)=>{if(!ok)errors.push(msg);};
 const ids=new Map();
@@ -35,7 +46,9 @@ for(const s of layouts.scenes){
  fail(typeof s.id==='string'&&s.id.length>0&&!defined.has(s.id),'duplicate/missing scene ID '+s.id);
  defined.add(s.id);
  fail(!!s.context&&!!s.mood,'scene must include context and mood: '+s.id);
- fail(['explicit_or_verified_context','vibe_selected','user_opt_in'].includes(s.activation),'unrecognized activation: '+s.id);
+ fail(Object.hasOwn(ACTIVATIONS,s.activation),'unrecognized activation '+JSON.stringify(s.activation)+': '+s.id);
+ // Observances are never decoration the composer may infer from a mood.
+ if(s.mood==='respectful')fail(s.activation==='explicit_holiday_request_only','observance layout must be explicit_holiday_request_only: '+s.id);
  const slots=s.slots||{};
  fail(Object.keys(slots).sort().join('|')==='ambient_accent|hero_installation','wrong slot structure: '+s.id);
  fail(s.displayPolicy?.fictionalDecoration===true,'fictional decoration flag absent: '+s.id);
