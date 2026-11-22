@@ -18,7 +18,7 @@ import { MODEL_KEY, validateVector } from './features/vibe/profile';
  *     place id and cached, so panning back costs nothing.
  */
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { toDeals, type Deal } from './deals';
+import { activeKinds, toDeals, type Deal } from './deals';
 import { metersBetween, type CategorizedPlace, type Category, type Place } from './osm';
 
 /** Map layer id → which catalog rows back it. */
@@ -183,13 +183,18 @@ export function priceLabel(band: string | undefined, source: string | undefined)
   return 'Price unknown';
 }
 
-/** Per map category: pins within `radiusMeters` of `center`, nearest first, at most `limit` each. */
+/**
+ * Per map category: pins within `radiusMeters` of `center`, at most `limit` each,
+ * listed nearest first. When the cap bites, `priority` pins (e.g. a deal on now)
+ * take the slots before nearer ordinary pins; nothing outside the radius is added.
+ */
 export function nearestByCategory(
   pins: CatalogPin[],
   categories: Category[],
   center: { lat: number; lon: number },
   radiusMeters: number,
   limit: number,
+  priority: (pin: CatalogPin) => boolean = () => false,
 ): { categoryId: string; pin: CatalogPin }[] {
   const out: { categoryId: string; pin: CatalogPin }[] = [];
   for (const category of categories) {
@@ -197,11 +202,26 @@ export function nearestByCategory(
     if (!layer) continue;
     const near = pins
       .filter((p) => p.placeType === layer.placeType && (layer.kind === undefined || p.kind === layer.kind))
-      .map((pin) => ({ pin, distance: metersBetween(center, pin) }))
+      .map((pin) => ({ pin, distance: metersBetween(center, pin), first: priority(pin) }))
       .filter((x) => x.distance <= radiusMeters)
-      .sort((a, b) => a.distance - b.distance)
-      .slice(0, limit);
+      .sort((a, b) => Number(b.first) - Number(a.first) || a.distance - b.distance)
+      .slice(0, limit)
+      .sort((a, b) => a.distance - b.distance);
     for (const { pin } of near) out.push({ categoryId: category.id, pin });
+  }
+  return out;
+}
+
+/** Validates PostgREST `place_deals` rows embedding `places(place_id)` into catalog place id → deals. */
+export function dealsByPlace(raw: unknown): Map<string, Deal[]> {
+  const out = new Map<string, Deal[]>();
+  if (!Array.isArray(raw)) return out;
+  for (const row of raw) {
+    const placeId = (row as { places?: { place_id?: unknown } | null } | null)?.places?.place_id;
+    if (typeof placeId !== 'string') continue;
+    const [deal] = toDeals([row]);
+    if (!deal) continue;
+    out.set(placeId, [...(out.get(placeId) ?? []), deal]);
   }
   return out;
 }
@@ -233,6 +253,33 @@ async function fetchIndex(supabase: SupabaseClient): Promise<CatalogPin[]> {
     }
     if (!data || data.length === 0) return pins;
   }
+}
+
+/**
+ * Every visible deal, keyed by catalog place id, fetched once per page load so pin
+ * selection can favour places with a deal on (a few hundred small rows). Never
+ * rejects: without it, selection is simply nearest first.
+ */
+let dealIndexPromise: Promise<Map<string, Deal[]>> | undefined;
+async function fetchDealIndex(supabase: SupabaseClient): Promise<Map<string, Deal[]>> {
+  const rows: unknown[] = [];
+  try {
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data, error } = await supabase
+        .from('place_deals')
+        .select('kind, title, timing, schedule, source, source_url, checked_at, places(place_id)')
+        .order('id')
+        .range(from, from + PAGE_SIZE - 1);
+      if (error) throw new Error(error.message);
+      if (!data || data.length === 0) break;
+      rows.push(...data);
+    }
+  } catch (err) {
+    console.warn('[catalog] deal priority unavailable:', (err as Error).message);
+    dealIndexPromise = undefined; // try again on the next load
+    return new Map();
+  }
+  return dealsByPlace(rows);
 }
 
 const detailsCache = new Map<string, CatalogDetails>();
@@ -309,6 +356,7 @@ export async function catalogPlacesNear(
   const supabase = getClient();
   if (!supabase) return null;
   let pins: CatalogPin[];
+  dealIndexPromise ??= fetchDealIndex(supabase); // in parallel with the pin index
   try {
     indexPromise ??= fetchIndex(supabase);
     pins = await indexPromise;
@@ -325,7 +373,10 @@ export async function catalogPlacesNear(
   // First call only: the caller partitioned before the index was known. If a requested
   // type has no rows, decline so every layer takes the tiles/Overpass path this once.
   if (emptyCategories(pins, categories).length) return null;
-  const near = nearestByCategory(pins, categories, center, radiusMeters, limit);
+  const deals = await dealIndexPromise;
+  const now = new Date();
+  const dealOn = (pin: CatalogPin) => activeKinds(deals.get(pin.placeId) ?? [], now).size > 0;
+  const near = nearestByCategory(pins, categories, center, radiusMeters, limit, dealOn);
   try {
     await fetchDetails(supabase, near.map((n) => n.pin));
   } catch (err) {
