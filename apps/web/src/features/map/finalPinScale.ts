@@ -26,3 +26,23 @@ export function finalPinRanks(scores: readonly number[]): number[] {
   order.forEach(({ i }, k) => { ranks[i] = k + 1; });
   return ranks;
 }
+
+/** How many of the strongest matches carry a number badge (1, 2, 3) in ranked view. */
+export const TOP_MATCH_BADGES = 3;
+
+/**
+ * Each result's 1-based match position: the highest score is 1. Equal scores keep the server's order
+ * (the earlier result ranks higher), so the numbering is deterministic and never depends on where pins
+ * happen to land on screen. Non-finite scores rank last.
+ */
+export function matchPositions(scores: readonly number[]): number[] {
+  const order = scores.map((s, i) => ({ s: Number.isFinite(s) ? s : -Infinity, i })).sort((a, b) => b.s - a.s || a.i - b.i);
+  const positions = Array<number>(scores.length);
+  order.forEach(({ i }, k) => { positions[i] = k + 1; });
+  return positions;
+}
+
+/** A pin's place in the restrained size range, 0 (weakest) to 1 (strongest), for its secondary emphasis. */
+export function matchStrength(scale: number): number {
+  return Math.min(1, Math.max(0, (scale - MIN_SCALE) / (MAX_SCALE - MIN_SCALE)));
+}

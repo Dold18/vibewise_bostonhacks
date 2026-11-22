@@ -9,7 +9,7 @@ import type { ImageAsset, TrackAsset } from './types.ts';
 const storyboard = (scene: 'bakery' | 'nook', beat: 'arrive' | 'stay' | 'leave', subject: string, evokes: string, tags: string): ImageAsset => ({
   id: `img-storyboard-${scene}-${beat}`, kind: 'original_storyboard', src: `/quiz-scenes/session-b-v1/${scene}-${beat}.svg`, width: 640, height: 360,
   subject, alt: `Original storyboard illustration: ${subject}`, tags: tags.split(' '), evokes,
-  rights: { source: 'team_original', license: 'Team original (placeholder storyboard)', author: 'Vibenta team (code-native SVG)', sourceUrl: '/quiz-scenes/session-b-v1/manifest.json', verifiedAt: '2026-11-21', verification: 'SHA-256 recorded in Session B manifest', adaptation: true },
+  rights: { source: 'team_original', license: 'Team original (placeholder storyboard)', author: 'Vibewise team (code-native SVG)', sourceUrl: '/quiz-scenes/session-b-v1/manifest.json', verifiedAt: '2026-11-21', verification: 'SHA-256 recorded in Session B manifest', adaptation: true },
 });
 const STORYBOARDS: readonly ImageAsset[] = [
   storyboard('bakery', 'arrive', 'a warm bakery counter with pastry trays and a coffee cup', 'A bakery counter with a little everyday activity to watch', 'cozy bakery warm cafe counter'),
@@ -25,7 +25,7 @@ export { REFERENCE_BY_ID };
 
 /** Display credit for an image. Required by CC BY/BY-SA; harmless elsewhere. */
 export function imageCredit(image: ImageAsset): string {
-  if (image.rights.source === 'team_original') return 'Original storyboard · Vibenta team · not a real venue';
+  if (image.rights.source === 'team_original') return 'Original storyboard · Vibewise team · not a real venue';
   const film = image.film ? `Still from ${image.film} · ` : '';
   return `${film}${image.rights.author} · ${image.rights.license} · Wikimedia Commons`;
 }

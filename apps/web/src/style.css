@@ -185,6 +185,59 @@ button {
   transition: fill 0.3s ease;
 }
 
+/*
+ * Rank My Matches (main.ts syncMatchRanking): final recommendations sized by match score through
+ * --pin-scale, plus a restrained secondary signal. Weaker matches lose a little saturation
+ * (--pin-strength 0..1); the top three get a soft glow in their own color and a number on the head.
+ * Unranked pins carry none of these classes.
+ */
+.pin-body {
+  position: relative; /* anchors the rank number on the head */
+}
+
+.pin.is-ranked .pin-body {
+  filter: saturate(calc(0.6 + 0.4 * var(--pin-strength, 1)));
+  transition:
+    transform 0.15s ease,
+    opacity 0.2s ease,
+    filter 0.3s ease,
+    --pin-scale 0.3s ease;
+}
+
+.pin.is-top-match .pin-body {
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--pin-color) 80%, transparent))
+    drop-shadow(0 1px 2px rgba(26, 29, 36, 0.35));
+}
+
+/* Top matches paint over other pins, in rank order, even in the depth-stacked tilted view. */
+.pin.is-top-match {
+  z-index: calc(50000 + var(--pin-rank, 0));
+}
+
+/* A white disc on the pin's round head (centered at 14,14 of the 28x40 pin), scaling with the pin. */
+.pin-rank {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  translate: -50% -50%;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(26, 29, 36, 0.25);
+  color: #1a1d24;
+  font: 700 12px/17px Roboto, system-ui, sans-serif;
+  text-align: center;
+  pointer-events: none;
+  /* Grows with the pin, but never below its 17px design size on screen: perspective shrinks far pins
+     in the tilted view, and the number must stay readable there (like the deal chip). */
+  scale: max(1, calc(1 / (var(--pin-scale, 1) * var(--pin-distance, 1))));
+}
+
+.pin-rank[hidden] {
+  display: none;
+}
+
 .pin:hover,
 .pin.selected {
   z-index: 100000; /* above every depth-stacked pin */
@@ -333,6 +386,70 @@ button {
   display: none;
 }
 
+/* ---------- Match-strength legend (only while Rank My Matches is on) ---------- */
+
+.vb-match-legend {
+  position: absolute;
+  /* Top right, under the account button: clear of the map controls, toast and "Stylized view" note. */
+  top: 72px;
+  right: 12px;
+  display: grid;
+  gap: 5px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: var(--shadow);
+  color: #202124;
+  font-size: 12px;
+  line-height: 1.3;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.vb-match-legend[hidden] {
+  display: none;
+}
+
+.vb-legend-title {
+  font-weight: 600;
+}
+
+.vb-legend-scale,
+.vb-legend-top {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  color: #3c4043;
+}
+
+.vb-legend-top {
+  align-items: center;
+}
+
+.vb-legend-pin {
+  overflow: visible;
+}
+
+.vb-legend-pin path {
+  fill: var(--pin-color);
+  stroke: #1a1d24;
+  stroke-opacity: 0.6;
+  stroke-width: 1.5;
+}
+
+.vb-legend-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 3px var(--pin-color);
+  color: #1a1d24;
+  font-weight: 700;
+  font-size: 11px;
+}
+
 /* ---------- Attribution ---------- */
 
 .maplibregl-ctrl-attrib {
@@ -344,6 +461,13 @@ button {
 @media (max-width: 640px) {
   .map-controls {
     bottom: 40px;
+  }
+
+  /* The discovery panel is a bottom sheet here: keep the legend on the visible map, left of the account button. */
+  .vb-match-legend {
+    top: 12px;
+    left: 12px;
+    right: auto;
   }
 }
 

@@ -77,7 +77,7 @@ export function renderMediaStage(question: Question, state: MediaViewState, comm
       const top = picture(image, state, draw, { style: `filter:${FILTERS[b.to]};opacity:${state.blend / 100}`, 'data-layer': 'to', alt: '' });
       const slider = h('input', { type: 'range', min: '0', max: '100', step: '1', value: String(state.blend), class: 'vb-media-slider', 'aria-label': `Blend from ${b.fromLabel} to ${b.toLabel}`, 'aria-valuetext': `${100 - state.blend}% ${b.fromLabel}, ${state.blend}% ${b.toLabel}` }) as HTMLInputElement;
       slider.addEventListener('input', () => { state.blend = Number(slider.value); const layer = root.querySelector<HTMLElement>('[data-layer="to"]'); if (layer) layer.style.opacity = String(state.blend / 100); slider.setAttribute('aria-valuetext', `${100 - state.blend}% ${b.fromLabel}, ${state.blend}% ${b.toLabel}`); });
-      root.append(h('p', { class: 'vb-media-kind' }, `${kindLabel(image)} · light filters applied by Vibenta`), h('div', { class: 'vb-media-blend' }, base, top), h('div', { class: 'vb-media-slider-row' }, h('span', {}, b.fromLabel), slider, h('span', {}, b.toLabel)), credit(image, ' · filtered'), optionCards(question, commit, previous));
+      root.append(h('p', { class: 'vb-media-kind' }, `${kindLabel(image)} · light filters applied by Vibewise`), h('div', { class: 'vb-media-blend' }, base, top), h('div', { class: 'vb-media-slider-row' }, h('span', {}, b.fromLabel), slider, h('span', {}, b.toLabel)), credit(image, ' · filtered'), optionCards(question, commit, previous));
     } else if (p.format === 'listening') {
       const track = TRACK_BY_ID.get(p.trackId!)!;
       const player = state.playerLoaded
