@@ -1,6 +1,7 @@
 import { h } from '../../../discovery/ui/dom';
 import type { Question, Response } from '../profile';
 import { presentationOf } from '../media/presentation';
+import { answerLetter } from './quizParts';
 import { IMAGE_BY_ID, imageCredit, REFERENCE_BY_ID, TRACK_BY_ID, trackEmbedUrl, trackWatchUrl } from '../media/registry';
 import type { ImageAsset, Transform } from '../media/types';
 
@@ -36,7 +37,7 @@ const kindLabel = (image: ImageAsset) => image.kind === 'photo' ? 'Real photogra
 function optionCards(question: Question, commit: (r: Response) => void, previous?: Response) {
   const cards = h('div', { class: 'vb-quiz-answers' });
   for (const option of question.options) {
-    const b = h('button', { type: 'button', class: 'vb-quiz-answer', 'data-option': option.id, 'aria-pressed': String(previous?.kind === 'choice' && previous.optionId === option.id) }, h('strong', {}, option.label), h('span', {}, option.description));
+    const b = h('button', { type: 'button', class: 'vb-quiz-answer', 'data-option': option.id, 'aria-pressed': String(previous?.kind === 'choice' && previous.optionId === option.id) }, answerLetter(cards.childElementCount), h('span', { class: 'vb-quiz-answer-copy' }, h('strong', {}, option.label), h('span', {}, option.description)));
     b.addEventListener('click', () => commit({ kind: 'choice', optionId: option.id }));
     cards.append(b);
   }
@@ -56,7 +57,7 @@ export function renderMediaStage(question: Question, state: MediaViewState, comm
       for (const row of p.optionImages!) {
         const option = question.options.find((o) => o.id === row.optionId)!; const image = IMAGE_BY_ID.get(row.imageId)!;
         const pressed = previous?.kind === 'choice' && previous.optionId === option.id;
-        const card = h('button', { type: 'button', class: 'vb-media-card', 'data-option': option.id, 'aria-pressed': String(pressed) }, picture(image, state, draw), h('strong', {}, option.label), h('span', {}, option.description));
+        const card = h('button', { type: 'button', class: 'vb-media-card', 'data-option': option.id, 'aria-pressed': String(pressed) }, picture(image, state, draw), h('span', { class: 'vb-media-label' }, h('strong', {}, option.label), h('span', {}, option.description)));
         card.addEventListener('click', () => commit({ kind: 'choice', optionId: option.id }));
         grid.append(h('figure', { class: 'vb-media-figure' }, card, credit(image)));
       }
