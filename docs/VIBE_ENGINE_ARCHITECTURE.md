@@ -1,6 +1,8 @@
+> **Superseded in part by [VIBE_QUIZ_DESIGN.md](VIBE_QUIZ_DESIGN.md) and [EMBEDDING_PIPELINE.md](EMBEDDING_PIPELINE.md) as of 2026-11-21.** The candidate-discriminative question selection, per-answer place re-ranking, early stopping, and separate feature/embedding channels described below were not adopted for the quiz. The accepted design uses a fixed 10-question flow that accumulates a `vibe_so_far` text passage, embedded with the single catalog-wide MiniLM space. The rest of this document is left unedited for reference.
+
 # Vibe Engine — Embeddings, Candidate Ranking & Adaptive Questions
 
-> **Status: design proposal, not yet implemented.** Companion to [VIBE_QUIZ_DESIGN.md](VIBE_QUIZ_DESIGN.md).  
+> **Status: design proposal, not yet implemented.** Companion to [VIBE_CONVERGENCE_QUIZ.md](VIBE_CONVERGENCE_QUIZ.md) (superseded).  
 > **Product requirement:** After **every quiz answer**, update the user's semantic preference representation, re-rank real place candidates, update the Living Map, and choose a question that would most usefully separate the remaining candidate venues. Typical 3–4 questions; absolute maximum **10**, with early exit and optional continued refinement.
 >
 > **Implementation boundary:** This is a planned replacement/extension of the seven-axis scaffold in PR #23, not a claim that embeddings or active learning are currently implemented.
@@ -237,7 +239,7 @@ interface RankingUpdate {
     matchedSignals: string[];
     missingEvidence?: string[];
   }>;
-  nextQuestion: CandidateQuestion | null;    // from VIBE_QUIZ_DESIGN.md proposal
+  nextQuestion: CandidateQuestion | null;    // from VIBE_CONVERGENCE_QUIZ.md proposal (superseded)
   shouldRecommend: boolean;
   reason: "still_discriminative" | "stable" | "low_information" | "max_questions" | "user_exit";
 }
