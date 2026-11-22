@@ -4,8 +4,9 @@ import {
 } from './config.ts';
 import { metersBetween } from './geo.ts';
 import { nameKey } from './normalize.ts';
+import { boundsAreaHa, type PlaceType, type PlaceTypeConfig } from './placeTypes.ts';
 import { fsqRow, osmRow } from './sources.ts';
-import type { DroppedDuplicate, FsqPlace, MatchPair, OsmPlace, RestaurantRow, Source } from './types.ts';
+import type { DroppedDuplicate, FsqPlace, MatchPair, OsmPlace, PlaceRow, Source } from './types.ts';
 
 type Located = { name: string; lat: number; lng: number };
 
@@ -153,11 +154,35 @@ export function freshness(dateRefreshed: string | null, today: string): 'fresh' 
   return Math.round(utcDay(today) - day) <= FSQ_MAX_AGE_DAYS ? 'fresh' : 'stale';
 }
 
+export interface DroppedSubVenue { fsqId: string; name: string; insideOf: string; insideName: string }
+
+/**
+ * Non-food only: Foursquare lists rooms and wings of a place (e.g. galleries inside a museum) as places of their own.
+ * Returns, for each given Foursquare place whose point lies inside the bounds of an OSM place, that OSM place (the
+ * smallest by area when several contain it). Nodes have no bounds and contain nothing; restaurants are never checked.
+ */
+export function findFsqSubVenues(osm: OsmPlace[], fsq: FsqPlace[], type: PlaceType): Map<string, DroppedSubVenue> {
+  const out = new Map<string, DroppedSubVenue>();
+  if (type === 'restaurants') return out;
+  const areas = osm
+    .filter((o) => o.bounds !== null)
+    .map((o) => ({ o, b: o.bounds!, ha: boundsAreaHa(o.bounds!) }))
+    .sort((a, b) => a.ha - b.ha || osmIdOrder(a.o.osmId, b.o.osmId));
+  for (const f of fsq) {
+    const hit = areas.find(({ b }) => f.lat >= b.minlat && f.lat <= b.maxlat && f.lng >= b.minlon && f.lng <= b.maxlon);
+    if (hit) out.set(f.fsqId, { fsqId: f.fsqId, name: f.name, insideOf: `osm:${hit.o.osmId}`, insideName: hit.o.name });
+  }
+  return out;
+}
+
 export function mergePlaces(
   osm: OsmPlace[],
   fsq: FsqPlace[],
-  opts: { runStart: string; today: string },
-): { rows: RestaurantRow[]; matches: MatchPair[]; dropped: DroppedDuplicate[]; staleFsqDropped: number; unparseableDates: number } {
+  opts: { runStart: string; today: string; cfg: PlaceTypeConfig },
+): {
+  rows: PlaceRow[]; matches: MatchPair[]; dropped: DroppedDuplicate[]; staleFsqDropped: number; unparseableDates: number;
+  subVenuesDropped: DroppedSubVenue[];
+} {
   const o = dedupeWithin(osm, (p) => p.osmId, 'osm', osmFieldCount);
   const f = dedupeWithin(fsq, (p) => p.fsqId, 'foursquare', fsqFieldCount);
   const matches = matchSources(o.kept, f.kept);
@@ -165,16 +190,19 @@ export function mergePlaces(
   const matchedFsq = new Set(matches.map((m) => m.fsqId));
   const fsqById = new Map(f.kept.map((p) => [p.fsqId, p]));
 
-  const rows: RestaurantRow[] = [];
+  const rows: PlaceRow[] = [];
   for (const p of o.kept) {
-    const row = osmRow(p, opts.runStart);
+    const row = osmRow(p, opts.runStart, opts.cfg);
     const fsqId = fsqByMatchedOsm.get(p.osmId);
     if (fsqId !== undefined) {
-      const fr = fsqRow(fsqById.get(fsqId)!, opts.runStart);
+      const fr = fsqRow(fsqById.get(fsqId)!, opts.runStart, opts.cfg);
       row.address ??= fr.address;
       row.website ??= fr.website;
       row.phone ??= fr.phone;
-      row.source_cuisines = [...new Set([...row.source_cuisines, ...fr.source_cuisines])];
+      // Food rows union cuisines; other rows keep the OSM kind.
+      if ('source_cuisines' in row && 'source_cuisines' in fr) {
+        row.source_cuisines = [...new Set([...row.source_cuisines, ...fr.source_cuisines])];
+      }
       row.fsq_place_id = fsqId;
       row.attribution = ATTRIBUTION_MERGED;
     }
@@ -182,6 +210,7 @@ export function mergePlaces(
   }
   let staleFsqDropped = 0;
   let unparseableDates = 0;
+  const freshFsqOnly: FsqPlace[] = [];
   for (const p of f.kept) {
     if (matchedFsq.has(p.fsqId)) continue;
     const fresh = freshness(p.dateRefreshed, opts.today);
@@ -190,13 +219,20 @@ export function mergePlaces(
       if (fresh === 'unparseable') unparseableDates++;
       continue;
     }
-    rows.push(fsqRow(p, opts.runStart));
+    freshFsqOnly.push(p);
   }
-  return { rows, matches, dropped: [...o.dropped, ...f.dropped], staleFsqDropped, unparseableDates };
+  const subVenues = findFsqSubVenues(o.kept, freshFsqOnly, opts.cfg.type);
+  for (const p of freshFsqOnly) {
+    if (!subVenues.has(p.fsqId)) rows.push(fsqRow(p, opts.runStart, opts.cfg));
+  }
+  return {
+    rows, matches, dropped: [...o.dropped, ...f.dropped], staleFsqDropped, unparseableDates,
+    subVenuesDropped: [...subVenues.values()],
+  };
 }
 
 /** Throws if two rows share a `source:source_id` or a non-null fsq_place_id (the upsert/rekey would corrupt data). */
-export function assertUniqueKeys(rows: RestaurantRow[]): void {
+export function assertUniqueKeys(rows: PlaceRow[]): void {
   const seenKeys = new Set<string>();
   const seenFsq = new Set<string>();
   const dupKeys: string[] = [];

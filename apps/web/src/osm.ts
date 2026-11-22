@@ -102,6 +102,14 @@ export const CATEGORIES: Category[] = [
     selector: '["tourism"~"^(museum|gallery)$"]',
     tileSubclasses: ['museum', 'gallery'],
   },
+  { id: 'landmarks', label: 'Landmarks', icon: '🗿', selector: '["tourism"~"^(attraction|viewpoint)$"]', tileSubclasses: ['attraction', 'viewpoint'] },
+  {
+    id: 'entertainment',
+    label: 'Entertainment',
+    icon: '🎭',
+    selector: '["amenity"~"^(theatre|cinema|arts_centre|music_venue|nightclub)$"]',
+    tileSubclasses: ['theatre', 'cinema', 'arts_centre', 'nightclub'],
+  },
 ];
 
 interface OverpassElement {

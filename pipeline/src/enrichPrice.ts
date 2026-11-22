@@ -5,13 +5,14 @@
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { connect, fetchPriceCandidates, writePriceBands } from './db.ts';
+import { PLACE_TYPE_CONFIG, parseTypeOption, type PlaceType } from './placeTypes.ts';
 import { DEFAULT_GEMINI_MODEL, createPriceEstimator } from './gemini.ts';
 import {
   needsRetry, parseEstimates, planWrites, toPromptPlace,
   type PriceAnswer, type PriceCandidate, type PromptPlace, type WritePlan,
 } from './price.ts';
 
-export interface PriceArgs { dryRun: boolean; limit: number | null; force: boolean; batchSize: number; rpm: number }
+export interface PriceArgs { type: PlaceType; dryRun: boolean; limit: number | null; force: boolean; batchSize: number; rpm: number }
 
 function positiveInt(name: string, raw: string | undefined, fallback: number): number {
   if (raw === undefined) return fallback;
@@ -24,6 +25,7 @@ export function parsePriceArgs(argv: string[]): PriceArgs {
   const { values } = parseArgs({
     args: argv,
     options: {
+      type: { type: 'string' },
       'dry-run': { type: 'boolean', default: false },
       force: { type: 'boolean', default: false },
       limit: { type: 'string' },
@@ -32,7 +34,10 @@ export function parsePriceArgs(argv: string[]): PriceArgs {
     },
     strict: true,
   });
+  const type = parseTypeOption(values.type);
+  if (!PLACE_TYPE_CONFIG[type].priceEstimates) throw new Error('price estimates only apply to restaurants');
   return {
+    type,
     dryRun: values['dry-run'],
     limit: values.limit === undefined ? null : positiveInt('limit', values.limit, 0),
     force: values.force,

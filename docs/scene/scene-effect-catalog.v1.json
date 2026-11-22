@@ -1,0 +1,2590 @@
+{
+  "schemaVersion": "1.0.0",
+  "title": "Vibenta Scene Effect Catalog",
+  "status": "design_proposal_not_implemented",
+  "generatedFor": "MapLibre GL JS 6.x + Vite TypeScript + existing vibeTheme primitives",
+  "note": "Variation ids are curated choices, not runnable effects. 'foundation' means existing project primitives could support the category, not that every option is implemented. 'extension' requires new layers/logic, 'custom' requires custom graphics/assets. Continuous ranges and additional curated variants may be added in future catalog versions.",
+  "runtimePolicy": {
+    "modelOutput": "SceneIntent, not raw catalog directives or arbitrary CSS, map style expressions, code or coordinates",
+    "compiler": "resolve all settings from versioned preset anchors plus bounded overrides",
+    "overrides": [
+      "hard_navigation",
+      "focus_mode",
+      "active_outing",
+      "saved_account_taste",
+      "neutral"
+    ],
+    "safety": [
+      "never alter street/building geometry or factual POI claims",
+      "no autoplay",
+      "no fake live weather",
+      "preserve map click targets and MBTA route leg colors",
+      "maintain labels and attribution",
+      "honor prefers-reduced-motion",
+      "avoid new third-party media without usage rights"
+    ],
+    "aiOverrideLimit": 12,
+    "maxWeightedPresets": 3,
+    "fullStateResolvedLocally": true
+  },
+  "groups": [
+    {
+      "id": "global_grade",
+      "renderer": "maplibre_paint",
+      "settings": [
+        {
+          "id": "palette_family",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "warm_amber",
+            "cool_blue",
+            "neon_night",
+            "pastel",
+            "earthy",
+            "monochrome",
+            "vintage_film",
+            "sunwashed",
+            "luxury_dark",
+            "watercolor",
+            "paper_atlas"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "hue_bias",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "amber",
+            "rose",
+            "violet",
+            "indigo",
+            "cyan",
+            "teal",
+            "green",
+            "copper",
+            "gold",
+            "slate"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "saturation",
+          "type": "enum",
+          "default": "natural",
+          "values": [
+            "natural",
+            "muted",
+            "desaturated",
+            "grayscale",
+            "vibrant",
+            "hypercolor"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "contrast_curve",
+          "type": "enum",
+          "default": "balanced",
+          "values": [
+            "balanced",
+            "low_soft",
+            "high_filmic",
+            "dramatic",
+            "flat_print"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "temperature",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "candle_warm",
+            "sun_warm",
+            "twilight_cool",
+            "moon_blue",
+            "ice_cold"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "shadow_tint",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "navy",
+            "purple",
+            "deep_teal",
+            "brown",
+            "warm_gray"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "highlight_tint",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "cream",
+            "gold",
+            "peach",
+            "cyan",
+            "ice_blue",
+            "magenta"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "selective_color",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "accent_only",
+            "warm_only",
+            "cool_only",
+            "venue_only"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "grade_finish",
+          "type": "enum",
+          "default": "clean",
+          "values": [
+            "clean",
+            "matte",
+            "faded_print",
+            "cross_processed",
+            "cinematic",
+            "high_gloss"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        }
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
+    },
+    {
+      "id": "sky_and_horizon",
+      "renderer": "maplibre_light_sky",
+      "settings": [
+        {
+          "id": "sky_mode",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "clear_blue",
+            "warm_dawn",
+            "golden_hour",
+            "rose_dusk",
+            "purple_twilight",
+            "night_indigo",
+            "storm_gray",
+            "dream_pastel"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "horizon_glow",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "warm_band",
+            "cool_band",
+            "rose_band",
+            "neon_band",
+            "pale_mist"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "horizon_blend",
+          "type": "enum",
+          "default": "natural",
+          "values": [
+            "natural",
+            "soft_diffuse",
+            "sharp_silhouette"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "fog_horizon_color",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "silver",
+            "blue_gray",
+            "purple",
+            "golden",
+            "rose"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "celestial_symbol",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "sun_disc",
+            "crescent_moon",
+            "full_moon",
+            "abstract_orb"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "cloud_form",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "wispy",
+            "cotton",
+            "overcast",
+            "storm_mass",
+            "abstract_layers"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "cloud_motion",
+          "type": "enum",
+          "default": "still",
+          "values": [
+            "still",
+            "slow_drift",
+            "gentle_parallax",
+            "dramatic_shift"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "starfield",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "few",
+            "subtle",
+            "dense",
+            "illustrated_constellations"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "sky_illustration",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "watercolor",
+            "paper_grain",
+            "retro_gradient",
+            "space_dust"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        }
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
+    },
+    {
+      "id": "lighting_and_shadows",
+      "renderer": "maplibre_light_sky",
+      "settings": [
+        {
+          "id": "light_preset",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "soft_day",
+            "golden_hour",
+            "overcast",
+            "blue_hour",
+            "moonlit",
+            "noir",
+            "neon_reflection"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "light_color",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "white",
+            "amber",
+            "gold",
+            "pink",
+            "violet",
+            "cyan",
+            "icy_blue"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "light_angle",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "morning_low",
+            "noon_high",
+            "evening_low",
+            "side_lit",
+            "back_lit"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "light_intensity",
+          "type": "enum",
+          "default": "balanced",
+          "values": [
+            "balanced",
+            "dim",
+            "subtle",
+            "bright",
+            "high_key"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "ambient_fill",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "warm",
+            "cool",
+            "muted",
+            "deep_shadow"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "shadow_character",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "soft",
+            "crisp",
+            "dramatic",
+            "graphic"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "rim_light",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "warm_edge",
+            "cool_edge",
+            "neon_pink",
+            "neon_cyan"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "bounce_light",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "amber",
+            "violet",
+            "cyan",
+            "mixed_neon"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "local_spotlights",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "few_warm",
+            "few_cool",
+            "neon_pools",
+            "venue_targeted"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "bloom",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "subtle",
+            "dreamy",
+            "neon",
+            "cinematic"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "shadow_projection",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "stylized_short",
+            "stylized_long"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        }
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
+    },
+    {
+      "id": "building_surfaces",
+      "renderer": "maplibre_paint",
+      "settings": [
+        {
+          "id": "wall_palette",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "sandstone",
+            "brick_amber",
+            "soft_plaster",
+            "weathered_stone",
+            "concrete_gray",
+            "slate",
+            "glass_cyan",
+            "glass_violet",
+            "gold_tone",
+            "pastel",
+            "ink_black"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "roof_palette",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "terracotta",
+            "slate",
+            "copper",
+            "gold",
+            "cream",
+            "midnight",
+            "pastel"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "wall_vertical_gradient",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "flat",
+            "subtle",
+            "strong_height_shift",
+            "warm_top",
+            "cool_top"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "height_color_treatment",
+          "type": "enum",
+          "default": "normal",
+          "values": [
+            "normal",
+            "warm_towers",
+            "cool_towers",
+            "gold_towers",
+            "dark_towers",
+            "muted_lowrise"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "building_outline",
+          "type": "enum",
+          "default": "subtle",
+          "values": [
+            "subtle",
+            "none",
+            "ink",
+            "cream",
+            "gold",
+            "cyan_glow",
+            "magenta_glow"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "corner_appearance",
+          "type": "enum",
+          "default": "angular",
+          "values": [
+            "angular",
+            "softened",
+            "rounded_illustration"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "building_opacity",
+          "type": "enum",
+          "default": "solid",
+          "values": [
+            "solid",
+            "soft_translucent",
+            "ghosted"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "building_highlight",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "rooftop_tint",
+            "selective_facade",
+            "top_match_only"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "facade_look",
+          "type": "enum",
+          "default": "simple",
+          "values": [
+            "simple",
+            "brick_illustration",
+            "stone_blocks",
+            "glass_grid",
+            "wood_slats",
+            "smooth_cement",
+            "paper_cutout"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "window_pattern",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "sparse_warm",
+            "randomized_warm",
+            "office_cool",
+            "full_grid",
+            "neon_accent"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "window_glow",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "warm_low",
+            "warm_high",
+            "cold_white",
+            "blue",
+            "mixed"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "emissive_trim",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "fine_gold",
+            "fine_cyan",
+            "fine_magenta",
+            "white_architectural"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "roof_details",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "abstract_hatch",
+            "illustrated_equipment",
+            "soft_halo"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "building_material_finish",
+          "type": "enum",
+          "default": "matte",
+          "values": [
+            "matte",
+            "weathered",
+            "polished",
+            "glassy_illusion",
+            "wet_sheen"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "silhouette_style",
+          "type": "enum",
+          "default": "natural",
+          "values": [
+            "natural",
+            "crisp_ink",
+            "light_outline",
+            "luminous_edge"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        }
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
+    },
+    {
+      "id": "roads_and_ground",
+      "renderer": "maplibre_paint",
+      "settings": [
+        {
+          "id": "road_color",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "ivory",
+            "warm_pavement",
+            "cool_slate",
+            "coal",
+            "neon_dark",
+            "sandstone"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "major_road_emphasis",
+          "type": "enum",
+          "default": "normal",
+          "values": [
+            "normal",
+            "soft",
+            "strong",
+            "diagrammatic"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "minor_road_emphasis",
+          "type": "enum",
+          "default": "normal",
+          "values": [
+            "normal",
+            "dimmed",
+            "minimal",
+            "equal"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "road_casing",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "muted",
+            "dark_ink",
+            "warm_gold",
+            "neon_cyan",
+            "neon_pink"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "pedestrian_paths",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "fine_dashes",
+            "rounded_dots",
+            "soft_glow",
+            "sketch"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "rail_treatment",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "subtle",
+            "warm",
+            "cool",
+            "luminous"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "street_material",
+          "type": "enum",
+          "default": "clean",
+          "values": [
+            "clean",
+            "aged_asphalt",
+            "wet_asphalt",
+            "stone",
+            "cobblestone_illustration",
+            "paper_texture"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "wet_sheen",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "subtle",
+            "moderate",
+            "rainy_night"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "lane_detail",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "fine_lines",
+            "strong_graphic",
+            "retro_diagram"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "crosswalk_treatment",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "high_contrast",
+            "subtle",
+            "illustrated"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "street_lights",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "sparse_amber",
+            "dense_amber",
+            "cold_white",
+            "neon"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "road_reflections",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "subtle",
+            "neon_streaks",
+            "warm_streaks"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "ground_shadows",
+          "type": "enum",
+          "default": "normal",
+          "values": [
+            "normal",
+            "soft_contact",
+            "illustrated",
+            "dark_edge"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        }
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
+    },
+    {
+      "id": "natural_land",
+      "renderer": "maplibre_paint",
+      "settings": [
+        {
+          "id": "park_palette",
+          "type": "enum",
+          "default": "natural",
+          "values": [
+            "natural",
+            "spring",
+            "summer_lush",
+            "autumn",
+            "winter_muted",
+            "sage",
+            "storybook",
+            "moonlit"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "wood_palette",
+          "type": "enum",
+          "default": "natural",
+          "values": [
+            "natural",
+            "deep_forest",
+            "olive",
+            "golden_autumn",
+            "teal_illustrative",
+            "muted"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "sand_palette",
+          "type": "enum",
+          "default": "natural",
+          "values": [
+            "natural",
+            "cream",
+            "golden",
+            "cold_gray",
+            "sunset_pink"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "foliage_density_illusion",
+          "type": "enum",
+          "default": "normal",
+          "values": [
+            "normal",
+            "sparse",
+            "minimal",
+            "lush",
+            "dense_illustration"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "leaf_particles",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "falling_leaves",
+            "petals",
+            "blossoms"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "seasonal_visual",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "spring_blush",
+            "summer_sun",
+            "autumn_gold",
+            "winter_frost"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "tree_symbol_style",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "minimal_circle",
+            "illustrated_canopy",
+            "fine_line",
+            "low_poly"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "grass_texture",
+          "type": "enum",
+          "default": "flat",
+          "values": [
+            "flat",
+            "grainy",
+            "watercolor",
+            "soft_dapple"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "floral_accents",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "delicate",
+            "wildflowers",
+            "bright_spring"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "park_glow",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "soft_green",
+            "golden_sun",
+            "storybook"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "hillshade_style",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "subtle",
+            "topographic",
+            "dramatic"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        }
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
+    },
+    {
+      "id": "water_and_coast",
+      "renderer": "maplibre_paint",
+      "settings": [
+        {
+          "id": "water_palette",
+          "type": "enum",
+          "default": "natural",
+          "values": [
+            "natural",
+            "turquoise",
+            "aqua",
+            "deep_teal",
+            "midnight_navy",
+            "silver",
+            "purple_twilight",
+            "black_ink"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "coastline_line",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "soft",
+            "ink",
+            "gold",
+            "luminous_cyan"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "water_texture",
+          "type": "enum",
+          "default": "flat",
+          "values": [
+            "flat",
+            "gentle_ripples",
+            "ink_wash",
+            "watercolor",
+            "fine_lines"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "surface_motion",
+          "type": "enum",
+          "default": "still",
+          "values": [
+            "still",
+            "slow_ripple",
+            "gentle_wave",
+            "dramatic_wave"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "water_reflectivity",
+          "type": "enum",
+          "default": "matte",
+          "values": [
+            "matte",
+            "soft_sheen",
+            "moon_streak",
+            "sun_glint",
+            "neon_reflect"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "harbor_mist",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "low",
+            "medium",
+            "dense"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "shimmer_speed",
+          "type": "enum",
+          "default": "static",
+          "values": [
+            "static",
+            "slow",
+            "moderate",
+            "lively"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "reflected_colors",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "gold",
+            "blue",
+            "rose",
+            "mixed_neon"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "water_depth_look",
+          "type": "enum",
+          "default": "uniform",
+          "values": [
+            "uniform",
+            "subtle_gradient",
+            "deep_edge",
+            "contour"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        }
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
+    },
+    {
+      "id": "air_and_atmosphere",
+      "renderer": "css_overlay",
+      "settings": [
+        {
+          "id": "fog_volume",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "whisper",
+            "light",
+            "medium",
+            "heavy"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "fog_hue",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "silver",
+            "pearl",
+            "blue",
+            "violet",
+            "warm_gold",
+            "rose"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "haze_profile",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "horizon",
+            "edge",
+            "ground",
+            "waterfront"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "vignette",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "soft",
+            "cinematic",
+            "strong",
+            "warm",
+            "cool"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "grain",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "fine_film",
+            "coarse_film",
+            "analog_noise",
+            "paper_grain"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "dust_motes",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "subtle",
+            "visible",
+            "sunlit"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "rain",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "drizzle",
+            "light",
+            "cinematic",
+            "storm_visual"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "snow",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "few_flakes",
+            "gentle",
+            "dense"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "sparkle",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "tiny",
+            "playful",
+            "magical",
+            "neon"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "fireflies",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "few",
+            "gentle",
+            "many"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "petals",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "few",
+            "slow_fall",
+            "whimsical"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "light_shafts",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "subtle",
+            "sunbeams",
+            "night_beams"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "lens_glare",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "subtle",
+            "film_lens",
+            "starburst"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "chromatic_aberration",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "very_subtle",
+            "retro_glitch"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "scanlines",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "subtle",
+            "retro_monitor",
+            "holographic"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "distortion",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "dream_shimmer",
+            "heat_haze",
+            "holographic_warp"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "volumetric_weather",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "local_mist",
+            "dramatic_fog",
+            "heavy_rain"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        }
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
+    },
+    {
+      "id": "cinematic_and_artistic",
+      "renderer": "css_overlay",
+      "settings": [
+        {
+          "id": "render_aesthetic",
+          "type": "enum",
+          "default": "clean_map",
+          "values": [
+            "clean_map",
+            "editorial_atlas",
+            "watercolor",
+            "storybook",
+            "noir",
+            "cyberpunk",
+            "vintage_film",
+            "retro_game",
+            "blueprint",
+            "paper_diorama",
+            "comic_ink"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "paper_texture",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "cream_fiber",
+            "aged_parchment",
+            "blueprint_paper",
+            "grainy_print"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "ink_edges",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "fine_line",
+            "heavy_outline",
+            "hand_drawn"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "halftone",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "subtle",
+            "comic_print",
+            "retro_newsprint"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "color_banding",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "posterized",
+            "duotone",
+            "tritone"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "analog_aging",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "faded_film",
+            "light_leak",
+            "film_burn"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "decorative_frame",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "thin_gold",
+            "cinema_letterbox",
+            "vintage_border",
+            "technical_hud"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "grid_overlay",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "faint_blueprint",
+            "sci_fi",
+            "subtle_graph"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "parallax_decoration",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "mist_layers",
+            "paper_layers",
+            "abstract_shapes"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "illustration_props",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "lanterns",
+            "floating_geometric",
+            "seasonal_icons",
+            "hologram_glyphs"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        }
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
+    },
+    {
+      "id": "camera_and_perspective",
+      "renderer": "camera",
+      "settings": [
+        {
+          "id": "pitch_preference",
+          "type": "enum",
+          "default": "preserve_user",
+          "values": [
+            "preserve_user",
+            "top_down",
+            "soft_3d",
+            "cinematic_3d",
+            "deep_3d"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        },
+        {
+          "id": "bearing_preference",
+          "type": "enum",
+          "default": "preserve_user",
+          "values": [
+            "preserve_user",
+            "north_up",
+            "slight_angle",
+            "diagonal_cinematic"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        },
+        {
+          "id": "zoom_behavior",
+          "type": "enum",
+          "default": "preserve_user",
+          "values": [
+            "preserve_user",
+            "contextual_frame",
+            "strongest_match",
+            "top_group_fit"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        },
+        {
+          "id": "framing",
+          "type": "enum",
+          "default": "preserve_user",
+          "values": [
+            "preserve_user",
+            "venue_center",
+            "neighborhood_story",
+            "waterfront_focus",
+            "skyline_framing"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        },
+        {
+          "id": "transition_easing",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "soft_ease",
+            "cinematic_slow",
+            "swift_clean"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        },
+        {
+          "id": "reveal_motion",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "gentle_push",
+            "short_orbit",
+            "wide_establish",
+            "vertical_tilt"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        },
+        {
+          "id": "camera_idle_motion",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "gentle_drift",
+            "very_slow_orbit"
+          ],
+          "tier": "extension",
+          "allowIntensity": false
+        },
+        {
+          "id": "parallax_strength",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "subtle",
+            "medium"
+          ],
+          "tier": "extension",
+          "allowIntensity": false
+        },
+        {
+          "id": "focus_depth",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "subtle_blur",
+            "foreground_emphasis"
+          ],
+          "tier": "custom",
+          "allowIntensity": false
+        },
+        {
+          "id": "camera_shake",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "tiny_artistic"
+          ],
+          "tier": "extension",
+          "allowIntensity": false
+        }
+      ],
+      "aiSelectable": false,
+      "selectPolicy": "user_controlled_unless_explicit_reveal"
+    },
+    {
+      "id": "marker_recommendations",
+      "renderer": "dom",
+      "settings": [
+        {
+          "id": "pin_shape",
+          "type": "enum",
+          "default": "teardrop",
+          "values": [
+            "teardrop",
+            "circle",
+            "diamond",
+            "pill",
+            "minimal_dot",
+            "constellation"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "pin_material",
+          "type": "enum",
+          "default": "flat",
+          "values": [
+            "flat",
+            "glossy",
+            "soft_glass",
+            "outlined",
+            "metallic_illusion"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "pin_color_language",
+          "type": "enum",
+          "default": "category",
+          "values": [
+            "category",
+            "scene_accent",
+            "match_gradient",
+            "neutral_monochrome"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "match_scale",
+          "type": "enum",
+          "default": "fixed",
+          "values": [
+            "fixed",
+            "subtle",
+            "moderate",
+            "dramatic"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "low_match_treatment",
+          "type": "enum",
+          "default": "normal",
+          "values": [
+            "normal",
+            "dim",
+            "shrink",
+            "desaturate",
+            "soft_hide"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "pin_glow",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "subtle",
+            "soft_halo",
+            "neon_halo",
+            "warm_halo"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "pin_pulse",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "slow",
+            "gentle",
+            "attention_on_top1"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "selected_ring",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "halo",
+            "double_ring",
+            "spotlight",
+            "soft_pulse"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "pin_shadow",
+          "type": "enum",
+          "default": "natural",
+          "values": [
+            "natural",
+            "soft",
+            "dramatic",
+            "tinted"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "cluster_mode",
+          "type": "enum",
+          "default": "normal",
+          "values": [
+            "normal",
+            "dense_compact",
+            "soft_groups",
+            "count_badges"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "rank_annotation",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "top_3",
+            "top_5",
+            "match_labels"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "arrival_emphasis",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "selected_destination",
+            "destination_and_stops"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "visual_match_heat",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "spotlight_regions",
+            "soft_heatmap",
+            "localized_tint"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        }
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
+    },
+    {
+      "id": "neighborhood_and_places",
+      "renderer": "maplibre_layer",
+      "settings": [
+        {
+          "id": "local_hotspots",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "top1",
+            "top3",
+            "top5",
+            "soft_regions"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "matched_building_outline",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "subtle",
+            "accent",
+            "bright_glow"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "relevant_neighborhood_tint",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "subtle",
+            "moderate"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "local_light_pools",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "warm",
+            "cold",
+            "color_mixed"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "place_scene_particles",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "ambient",
+            "rare",
+            "gathered"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "venue_material_highlight",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "gold_hint",
+            "soft_neon",
+            "illustrated_rim"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "local_fog_clearing",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "reveal_near_matches",
+            "clear_route_area"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "district_story_labels",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "subtle",
+            "editorial"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "match_connections",
+          "type": "enum",
+          "default": "off",
+          "values": [
+            "off",
+            "fine_lines",
+            "soft_light_paths",
+            "constellation_lines"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        }
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
+    },
+    {
+      "id": "text_and_labels",
+      "renderer": "maplibre_paint",
+      "settings": [
+        {
+          "id": "label_color_system",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "warm_dark",
+            "cool_dark",
+            "light_on_dark",
+            "gold_accent",
+            "cyan_accent"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "label_font_personality",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "editorial",
+            "classic_serif",
+            "geometric",
+            "technical",
+            "hand_drawn"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "label_weight",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "light",
+            "medium",
+            "bold"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "label_letterspacing",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "airy",
+            "tight"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "label_caps",
+          "type": "enum",
+          "default": "normal",
+          "values": [
+            "normal",
+            "neighborhood_caps",
+            "all_upper"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "label_halo",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "light_soft",
+            "dark_soft",
+            "strong",
+            "minimal"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "label_density",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "clean",
+            "minimal",
+            "detailed"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "road_label_priority",
+          "type": "enum",
+          "default": "normal",
+          "values": [
+            "normal",
+            "major_only",
+            "neighborhoods",
+            "detailed"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "cartographic_icon_style",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "minimal_line",
+            "illustrated",
+            "outlined"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "place_name_flair",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "subtle_emphasis",
+            "editorial_headers"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        }
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
+    },
+    {
+      "id": "interface_and_cards",
+      "renderer": "dom",
+      "settings": [
+        {
+          "id": "panel_surface",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "warm_frost",
+            "dark_glass",
+            "paper",
+            "polished_cream",
+            "ink_dark"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "panel_translucency",
+          "type": "enum",
+          "default": "opaque",
+          "values": [
+            "opaque",
+            "subtle_glass",
+            "medium_glass",
+            "strong_glass"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "panel_border",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "hairline",
+            "gold",
+            "neon_edge",
+            "soft_shadow"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "card_surface",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "matte",
+            "frosted",
+            "paper",
+            "dark_glass"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "card_shadow",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "soft",
+            "floating",
+            "dramatic"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "accent_token",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "amber",
+            "rose",
+            "cyan",
+            "teal",
+            "violet",
+            "gold",
+            "forest"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "button_treatment",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "soft_pill",
+            "outlined",
+            "glassy",
+            "minimal_line"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "progress_meter",
+          "type": "enum",
+          "default": "neutral",
+          "values": [
+            "neutral",
+            "soft_track",
+            "glow",
+            "fine_line",
+            "constellation"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "icon_treatment",
+          "type": "enum",
+          "default": "standard",
+          "values": [
+            "standard",
+            "thin",
+            "geometric",
+            "illustrated"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "focus_frame",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "soft_vignette",
+            "letterbox",
+            "thin_glow"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "panel_background_blur",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "light",
+            "medium",
+            "high"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        }
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
+    },
+    {
+      "id": "animation_and_morph",
+      "renderer": "css_overlay",
+      "settings": [
+        {
+          "id": "scene_transition",
+          "type": "enum",
+          "default": "soft_crossfade",
+          "values": [
+            "soft_crossfade",
+            "quick_fade",
+            "cinematic",
+            "deliberate",
+            "instant"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "effect_stagger",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "subtle",
+            "building_then_sky",
+            "sky_then_building"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "color_wave",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "radial",
+            "lateral",
+            "around_matches"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "ambient_pace",
+          "type": "enum",
+          "default": "still",
+          "values": [
+            "still",
+            "slow",
+            "balanced",
+            "lively"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "particle_motion",
+          "type": "enum",
+          "default": "still",
+          "values": [
+            "still",
+            "drift",
+            "float",
+            "twinkle",
+            "swirl"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "pin_update_motion",
+          "type": "enum",
+          "default": "soft_scale",
+          "values": [
+            "soft_scale",
+            "fade_scale",
+            "gentle_spring",
+            "instant"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        },
+        {
+          "id": "light_shift_motion",
+          "type": "enum",
+          "default": "slow_gradient",
+          "values": [
+            "slow_gradient",
+            "sweep",
+            "pulse"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "sky_shift_motion",
+          "type": "enum",
+          "default": "soft_fade",
+          "values": [
+            "soft_fade",
+            "dusk_roll",
+            "cloud_pan"
+          ],
+          "tier": "extension",
+          "allowIntensity": true
+        },
+        {
+          "id": "building_reveal_motion",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "subtle_fade",
+            "vertical_wave",
+            "block_cascade"
+          ],
+          "tier": "custom",
+          "allowIntensity": true
+        },
+        {
+          "id": "motion_texture",
+          "type": "enum",
+          "default": "none",
+          "values": [
+            "none",
+            "breathe",
+            "float",
+            "flicker",
+            "ambient_drift"
+          ],
+          "tier": "foundation",
+          "allowIntensity": true
+        }
+      ],
+      "aiSelectable": true,
+      "selectPolicy": "model_intent_with_compiler_guard"
+    },
+    {
+      "id": "navigation_safe",
+      "renderer": "coordinator",
+      "settings": [
+        {
+          "id": "route_treatment",
+          "type": "enum",
+          "default": "provider_leg_colors",
+          "values": [
+            "provider_leg_colors",
+            "high_contrast_leg_colors"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        },
+        {
+          "id": "walk_line",
+          "type": "enum",
+          "default": "contrasting_dashed",
+          "values": [
+            "contrasting_dashed",
+            "contrasting_dotted"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        },
+        {
+          "id": "station_icon",
+          "type": "enum",
+          "default": "focus_only",
+          "values": [
+            "focus_only",
+            "navigation_only"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        },
+        {
+          "id": "focus_marker_visibility",
+          "type": "enum",
+          "default": "selected_only",
+          "values": [
+            "selected_only",
+            "route_relevant"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        },
+        {
+          "id": "map_label_safety",
+          "type": "enum",
+          "default": "contrast_guard_required",
+          "values": [
+            "contrast_guard_required"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        },
+        {
+          "id": "reduced_motion",
+          "type": "enum",
+          "default": "respect_system",
+          "values": [
+            "respect_system",
+            "disabled"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        },
+        {
+          "id": "attribution",
+          "type": "enum",
+          "default": "always_visible",
+          "values": [
+            "always_visible"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        },
+        {
+          "id": "geographic_accuracy",
+          "type": "enum",
+          "default": "preserve_geometry",
+          "values": [
+            "preserve_geometry"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        },
+        {
+          "id": "route_layer_integrity",
+          "type": "enum",
+          "default": "never_replace_style",
+          "values": [
+            "never_replace_style"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        },
+        {
+          "id": "route_highlight_priority",
+          "type": "enum",
+          "default": "above_scene_effects",
+          "values": [
+            "above_scene_effects"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        },
+        {
+          "id": "selection_preservation",
+          "type": "enum",
+          "default": "never_clear_on_theme_change",
+          "values": [
+            "never_clear_on_theme_change"
+          ],
+          "tier": "foundation",
+          "allowIntensity": false
+        }
+      ],
+      "aiSelectable": false,
+      "selectPolicy": "locked_system_safety"
+    }
+  ]
+}

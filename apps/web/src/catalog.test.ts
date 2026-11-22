@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Deal } from './deals';
 import { CATEGORIES, type Category } from './osm';
-import { DEALS_EMBED, fetchDetailsWith, getCachedDetails, nearestByCategory, resetDealsEmbedForTests, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
+import { DEALS_EMBED, emptyCategories, noteIndex, resetIndexForTests, fetchDetailsForPins, fetchDetailsWith, isCatalogCategory, getCachedDetails, nearestByCategory, resetDealsEmbedForTests, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
 
 const cat = (id: string) => CATEGORIES.find((c) => c.id === id) as Category;
 const CENTER = { lat: 42.3555, lon: -71.0636 };
@@ -23,7 +23,8 @@ function pin(overrides: Partial<CatalogPin> = {}): CatalogPin {
     source: 'osm',
     sourceId: 'node/1',
     name: 'Tatte Bakery',
-    category: 'cafe',
+    placeType: 'restaurants',
+    kind: 'cafe',
     lat: 42.3555,
     lon: -71.0636,
     ...overrides,
@@ -71,11 +72,11 @@ describe('parsePoint', () => {
 describe('toPin', () => {
   it('keeps the catalog id and decoded location for each place', () => {
     expect(
-      toPin({ place_id: 'osm:node/1', source: 'osm', source_id: 'node/1', name: 'Tatte Bakery', category: 'cafe', location: ewkb(-71.0636, 42.3555) }),
+      toPin({ place_id: 'osm:node/1', place_type: 'restaurants', source: 'osm', source_id: 'node/1', name: 'Tatte Bakery', kind: 'cafe', location: ewkb(-71.0636, 42.3555) }),
     ).toEqual(pin());
   });
   it('drops rows without a usable location', () => {
-    expect(toPin({ place_id: 'x', source: 'osm', source_id: 'node/9', name: 'X', category: 'cafe', location: 'bad' })).toBeNull();
+    expect(toPin({ place_id: 'x', place_type: 'restaurants', source: 'osm', source_id: 'node/9', name: 'X', kind: 'cafe', location: 'bad' })).toBeNull();
   });
 });
 
@@ -119,7 +120,7 @@ describe('nearestByCategory', () => {
   const near = pin({ placeId: 'osm:node/1', name: 'Near', lat: 42.3556 });
   const far = pin({ placeId: 'osm:node/2', name: 'Far', lat: 42.36 });
   const outside = pin({ placeId: 'osm:node/3', name: 'Outside', lat: 42.38 });
-  const bar = pin({ placeId: 'osm:node/4', name: 'Bar', category: 'nightlife' });
+  const bar = pin({ placeId: 'osm:node/4', name: 'Bar', kind: 'nightlife' });
 
   it('keeps pins within the radius, nearest first, per map category', () => {
     const result = nearestByCategory([far, outside, near, bar], [cat('coffee'), cat('bars')], CENTER, 1000, 10);
@@ -134,6 +135,16 @@ describe('nearestByCategory', () => {
   });
   it('ignores map categories the catalog does not hold', () => {
     expect(nearestByCategory([near], [cat('parks')], CENTER, 1000, 10)).toEqual([]);
+  });
+  it('matches the layer place type as well as the kind', () => {
+    const other = pin({ placeId: 'osm:node/5', name: 'Other', placeType: 'entertainment', kind: 'cafe' });
+    expect(nearestByCategory([other, near], [cat('coffee')], CENTER, 1000, 10).map((r) => r.pin.name)).toEqual(['Near']);
+  });
+});
+
+describe('isCatalogCategory', () => {
+  it('backs the food and non-food layers', () => {
+    for (const id of ['coffee', 'museums', 'parks', 'landmarks', 'entertainment']) expect(isCatalogCategory(cat(id)), id).toBe(true);
   });
 });
 
@@ -182,12 +193,12 @@ describe('fetchDetailsWith', () => {
     const query = vi.fn(async (_columns: string, ids: string[]) => ({
       data: ids.map((id) => ({
         ...baseRow(id),
-        place_deals: [{ kind: 'student', title: 'T', timing: 'any_time', schedule: null, source: 'curated', source_url: null, checked_at: '2026-11-01T00:00:00Z' }, { junk: true }],
+        places: { place_deals: [{ kind: 'student', title: 'T', timing: 'any_time', schedule: null, source: 'curated', source_url: null, checked_at: '2026-11-01T00:00:00Z' }, { junk: true }] },
       })),
       error: null,
     }));
     await fetchDetailsWith(query, ['ok:1']);
-    expect(query.mock.calls[0][0]).toContain(DEALS_EMBED);
+    expect(query.mock.calls[0][0].endsWith(`, ${DEALS_EMBED}`)).toBe(true);
     expect(getCachedDetails('ok:1')?.deals).toHaveLength(1);
   });
 
@@ -221,5 +232,54 @@ describe('fetchDetailsWith', () => {
     await expect(fetchDetailsWith(query, ['bad:1'])).rejects.toThrow('boom');
     expect(query.mock.calls[2][0]).toContain('place_deals');
     warn.mockRestore();
+  });
+});
+
+describe('non-food places', () => {
+  beforeEach(resetDealsEmbedForTests);
+  const museum = pin({ placeId: 'osm:node/9', placeType: 'museums', kind: 'art_museum', name: 'MFA' });
+  const details = (extra: Partial<CatalogDetails>): CatalogDetails => ({ address: null, website: null, phone: null, hours_raw: null, osm_tags: null, attribution: 'x', deals: [], ...extra });
+
+  it('labels a museum by its kind, keeps the website and sets no price tags', () => {
+    const place = pinToPlace(museum, details({ kind: 'art_museum', website: 'https://x' } as Partial<CatalogDetails>));
+    expect(place.category).toBe('Art museum');
+    expect(place.tags.website).toBe('https://x');
+    expect(place.tags['catalog:price_band']).toBeUndefined();
+    expect(place.tags['catalog:price_source']).toBeUndefined();
+  });
+
+  it('queries one table per place type for a mixed list', async () => {
+    const calls: string[] = [];
+    const queryFor = (table: string) => async (columns: string, ids: string[]) => {
+      calls.push(`${table}:${columns.split(',')[0]}:${ids.join('|')}`);
+      return { data: ids.map((id) => ({ place_id: id, attribution: 'x' })), error: null };
+    };
+    await fetchDetailsForPins(queryFor, [
+      pin({ placeId: 'r:1', placeType: 'restaurants' }),
+      pin({ placeId: 'p:1', placeType: 'parks' }),
+      pin({ placeId: 'r:2', placeType: 'restaurants' }),
+    ]);
+    expect(calls).toEqual(['restaurants:place_id:r:1|r:2', 'parks:place_id:p:1']);
+  });
+});
+
+describe('per-type fallback', () => {
+  beforeEach(resetIndexForTests);
+  const food = pin({ placeId: 'r:1', placeType: 'restaurants' });
+  const museumPin = pin({ placeId: 'm:1', placeType: 'museums', kind: 'museum' });
+
+  it('hands a type with no pins back to the non-catalog path once the index is known', () => {
+    expect(isCatalogCategory(cat('museums'))).toBe(true); // index not loaded yet
+    noteIndex([food]);
+    expect(isCatalogCategory(cat('museums'))).toBe(false);
+    expect(isCatalogCategory(cat('parks'))).toBe(false);
+    expect(isCatalogCategory(cat('coffee'))).toBe(true);
+    expect(emptyCategories([food], [cat('coffee'), cat('museums')]).map((c) => c.id)).toEqual(['museums']);
+  });
+
+  it('serves a type from the catalog when the index has pins for it', () => {
+    noteIndex([food, museumPin]);
+    expect(isCatalogCategory(cat('museums'))).toBe(true);
+    expect(emptyCategories([food, museumPin], [cat('coffee'), cat('museums')])).toEqual([]);
   });
 });

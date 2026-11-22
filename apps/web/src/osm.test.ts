@@ -12,6 +12,8 @@ describe('matchesSelector', () => {
       bars: { amenity: 'pub' },
       parks: { leisure: 'park' },
       museums: { tourism: 'gallery' },
+      landmarks: { tourism: 'viewpoint' },
+      entertainment: { amenity: 'cinema' },
     };
     for (const category of CATEGORIES) {
       for (const [id, tags] of Object.entries(samples)) {

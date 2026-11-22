@@ -1,6 +1,6 @@
 import type { DealRow, DealWindow } from './types.ts';
 
-export type CuratedRow = DealRow & { restaurantId: number };
+export type CuratedRow = DealRow & { placeRef: number };
 
 const TIME = /^(\d{2}):(\d{2})$/;
 const DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -65,8 +65,8 @@ export function validateCurated(raw: unknown, placeIds: Map<string, number>, now
     const fail = (why: string) => errors.push(`entry ${i}: ${why}`);
     const e = (entry ?? {}) as Record<string, unknown>;
 
-    const restaurantId = typeof e.place_id === 'string' ? placeIds.get(e.place_id) : undefined;
-    if (restaurantId === undefined) { fail(`unknown place_id ${JSON.stringify(e.place_id)}`); continue; }
+    const placeRef = typeof e.place_id === 'string' ? placeIds.get(e.place_id) : undefined;
+    if (placeRef === undefined) { fail(`unknown place_id ${JSON.stringify(e.place_id)}`); continue; }
     if (e.kind !== 'student' && e.kind !== 'special') { fail('kind must be "student" or "special"'); continue; }
     const kind = e.kind;
     if (typeof e.title !== 'string' || e.title.trim() === '') { fail('title is required'); continue; }
@@ -85,7 +85,7 @@ export function validateCurated(raw: unknown, placeIds: Map<string, number>, now
     if (schedule && e.timing === 'unconfirmed') { fail('a schedule cannot be combined with timing "unconfirmed"'); continue; }
 
     const timing = schedule ? 'scheduled' : e.timing === 'unconfirmed' ? 'unconfirmed' : kind === 'student' ? 'any_time' : 'unconfirmed';
-    rows.push({ restaurantId, kind, title: e.title, quote: null, timing, schedule, source: 'curated', sourceUrl: e.source_url, checkedAt });
+    rows.push({ placeRef, kind, title: e.title, quote: null, timing, schedule, source: 'curated', sourceUrl: e.source_url, checkedAt });
   }
   return { rows, errors };
 }

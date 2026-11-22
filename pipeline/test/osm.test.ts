@@ -4,7 +4,8 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { buildOverpassQuery, fetchOverpass, loadOsmElements } from '../src/osm.ts';
-import { OSM_AMENITIES, STUDY_BBOX, USER_AGENT } from '../src/config.ts';
+import { STUDY_BBOX, USER_AGENT } from '../src/config.ts';
+import { PLACE_TYPE_CONFIG } from '../src/placeTypes.ts';
 import type { OverpassElement } from '../src/sources.ts';
 
 const EL: OverpassElement = { type: 'node', id: 1, lat: 42.35, lon: -71.06, tags: { name: 'A', amenity: 'cafe' } };
@@ -27,11 +28,23 @@ function harness(responses: Array<() => Response | Promise<Response>>) {
 }
 
 test('buildOverpassQuery pins bbox order south,west,north,east and the amenity regex', () => {
-  const q = buildOverpassQuery(STUDY_BBOX, [...OSM_AMENITIES]);
-  assert.ok(q.includes('(42.227,-71.191,42.418,-70.986)'));
-  assert.ok(q.includes('^(restaurant|fast_food|cafe|bar|pub|ice_cream|food_court)$'));
-  assert.ok(q.startsWith('[out:json][timeout:180];'));
-  assert.ok(q.endsWith('out center tags;'));
+  const q = buildOverpassQuery(STUDY_BBOX, PLACE_TYPE_CONFIG.restaurants);
+  assert.equal(
+    q,
+    '[out:json][timeout:180];nwr["amenity"~"^(restaurant|fast_food|cafe|bar|pub|ice_cream|food_court)$"]["name"](42.227,-71.191,42.418,-70.986);out center tags;',
+  );
+});
+
+test('buildOverpassQuery unions several filters and asks for bounding boxes for non-food types', () => {
+  const box = '42.227,-71.191,42.418,-70.986';
+  assert.equal(
+    buildOverpassQuery(STUDY_BBOX, PLACE_TYPE_CONFIG.parks),
+    `[out:json][timeout:180];(nwr["leisure"~"^(park|garden|nature_reserve)$"]["name"](${box});nwr["natural"="beach"]["name"](${box}););out tags bb;`,
+  );
+  assert.equal(
+    buildOverpassQuery(STUDY_BBOX, PLACE_TYPE_CONFIG.museums),
+    `[out:json][timeout:180];nwr["tourism"~"^(museum|gallery)$"]["name"](${box});out tags bb;`,
+  );
 });
 
 test('sends the descriptive User-Agent as a POST data= form body', async () => {
@@ -102,13 +115,13 @@ test('loadOsmElements writes the cache after a fetch, then serves it without fet
   const dir = await tmpDir();
   try {
     const h = harness([() => json({ elements: [EL] })]);
-    const first = await loadOsmElements({ refresh: false, cacheDir: dir, today: '2026-11-21' }, h.deps);
+    const first = await loadOsmElements({ refresh: false, cacheDir: dir, today: '2026-11-21', cfg: PLACE_TYPE_CONFIG.restaurants }, h.deps);
     assert.equal(first.fromCache, false);
     assert.equal(h.calls.length, 1);
-    const cached = JSON.parse(await fs.readFile(path.join(dir, 'osm-2026-11-21.json'), 'utf8'));
+    const cached = JSON.parse(await fs.readFile(path.join(dir, 'osm-restaurants-2026-11-21.json'), 'utf8'));
     assert.deepEqual(cached, [EL]);
 
-    const second = await loadOsmElements({ refresh: false, cacheDir: dir, today: '2026-11-21' }, h.deps);
+    const second = await loadOsmElements({ refresh: false, cacheDir: dir, today: '2026-11-21', cfg: PLACE_TYPE_CONFIG.restaurants }, h.deps);
     assert.equal(second.fromCache, true);
     assert.deepEqual(second.elements, [EL]);
     assert.equal(h.calls.length, 1);
@@ -120,12 +133,12 @@ test('loadOsmElements writes the cache after a fetch, then serves it without fet
 test('loadOsmElements refresh bypasses an existing cache and rewrites it', async () => {
   const dir = await tmpDir();
   try {
-    await fs.writeFile(path.join(dir, 'osm-2026-11-21.json'), JSON.stringify([{ type: 'node', id: 99 }]));
+    await fs.writeFile(path.join(dir, 'osm-restaurants-2026-11-21.json'), JSON.stringify([{ type: 'node', id: 99 }]));
     const h = harness([() => json({ elements: [EL] })]);
-    const out = await loadOsmElements({ refresh: true, cacheDir: dir, today: '2026-11-21' }, h.deps);
+    const out = await loadOsmElements({ refresh: true, cacheDir: dir, today: '2026-11-21', cfg: PLACE_TYPE_CONFIG.restaurants }, h.deps);
     assert.equal(out.fromCache, false);
     assert.equal(h.calls.length, 1);
-    assert.deepEqual(JSON.parse(await fs.readFile(path.join(dir, 'osm-2026-11-21.json'), 'utf8')), [EL]);
+    assert.deepEqual(JSON.parse(await fs.readFile(path.join(dir, 'osm-restaurants-2026-11-21.json'), 'utf8')), [EL]);
   } finally {
     await fs.rm(dir, { recursive: true, force: true });
   }
@@ -134,11 +147,23 @@ test('loadOsmElements refresh bypasses an existing cache and rewrites it', async
 test('loadOsmElements ignores a cache file from another day', async () => {
   const dir = await tmpDir();
   try {
-    await fs.writeFile(path.join(dir, 'osm-2026-11-20.json'), JSON.stringify([{ type: 'node', id: 99 }]));
+    await fs.writeFile(path.join(dir, 'osm-restaurants-2026-11-20.json'), JSON.stringify([{ type: 'node', id: 99 }]));
     const h = harness([() => json({ elements: [EL] })]);
-    const out = await loadOsmElements({ refresh: false, cacheDir: dir, today: '2026-11-21' }, h.deps);
+    const out = await loadOsmElements({ refresh: false, cacheDir: dir, today: '2026-11-21', cfg: PLACE_TYPE_CONFIG.restaurants }, h.deps);
     assert.equal(out.fromCache, false);
     assert.equal(h.calls.length, 1);
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('loadOsmElements names the cache by place type', async () => {
+  const dir = await tmpDir();
+  try {
+    const h = harness([() => json({ elements: [EL] })]);
+    await loadOsmElements({ refresh: false, cacheDir: dir, today: '2026-11-21', cfg: PLACE_TYPE_CONFIG.museums }, h.deps);
+    assert.deepEqual(await fs.readdir(dir), ['osm-museums-2026-11-21.json']);
+    assert.ok(decodeURIComponent(String(h.calls[0]!.init.body)).includes('["tourism"~"^(museum|gallery)$"]'));
   } finally {
     await fs.rm(dir, { recursive: true, force: true });
   }

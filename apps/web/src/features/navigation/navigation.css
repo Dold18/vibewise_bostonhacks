@@ -1,0 +1,123 @@
+/* Trip planner overlay. Shares tokens/controls with the discovery panel via .vb-ui (discovery.css). */
+
+.vb-planner { display: flex; flex-direction: column; min-height: 0; overflow-y: auto; width: 100%; }
+
+.vb-planner[hidden] {
+  display: none !important;
+}
+
+.vb-planner-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--vb-surface);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 8px 4px 18px;
+}
+
+.vb-planner-icon {
+  fill: var(--vb-accent);
+  flex-shrink: 0;
+}
+
+.vb-planner-title {
+  flex: 1;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.vb-planner-fields {
+  position: relative;
+  padding: 6px 18px 0;
+}
+
+.vb-planner-fields .vb-field {
+  margin-bottom: 10px;
+  /* Leave room on the right for the swap button. */
+  padding-right: 44px;
+}
+
+.vb-planner-swap {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  translate: 0 -40%;
+  border: 1px solid var(--vb-border) !important;
+  background: var(--vb-surface) !important;
+}
+
+.vb-planner-actions {
+  padding: 2px 18px 10px;
+}
+
+.vb-planner-find {
+  width: 100%;
+}
+
+.vb-planner-find:disabled {
+  background: #e8eaed;
+  color: var(--vb-muted) !important;
+  cursor: not-allowed;
+}
+
+.vb-planner-results {
+  padding: 0 18px 16px;
+}
+
+.vb-planner-results:empty {
+  display: none;
+}
+
+.vb-planner-hint {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--vb-muted);
+}
+
+.vb-planner-notice {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f8f9fa;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--vb-muted);
+}
+
+.vb-planner-notice strong {
+  color: var(--vb-text);
+  font-weight: 500;
+}
+
+.vb-route-option {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--vb-border);
+}
+
+.vb-route-summary {
+  margin: 0 0 4px;
+  font-weight: 500;
+}
+
+.vb-route-legs {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--vb-muted);
+}
+
+.vb-planner-source {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--vb-muted);
+}
+
+.vb-line-chip { display: inline-block; padding: 3px 8px; margin-top: 8px; background: #f1f3f4; color: #202124; border-radius: 4px; }
+.vb-route-legs li { padding: 6px 0; line-height: 1.5; }
+.vb-route-legs li.vb-leg-wait { padding-left: 8px; border-left: 3px dotted #9ca3af; font-style: italic; }
+
+.vb-directions-pill-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.vb-directions-estimates { font-size: 10px; color: #345577; font-weight: 500; }

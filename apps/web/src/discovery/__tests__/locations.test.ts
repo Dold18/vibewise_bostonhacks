@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { BOSTON_LOCATIONS } from '../data/bostonLocations.generated';
 import {
+  combineProviders,
   createLocalSuggestionProvider,
+  createPlaceListProvider,
   isInGreaterBoston,
   matchScore,
   normalizeForSearch,
@@ -155,5 +157,47 @@ describe('current location', () => {
       ok: false,
       reason: 'insecure',
     });
+  });
+});
+
+describe('place-list and combined providers (trip planner suggestions)', () => {
+  /** Development fixtures shaped like map pins. */
+  const pins = [
+    { id: 'node/1', name: 'Fixture Kenmore Cafe', lat: 42.349, lon: -71.095, category: 'Cafe' },
+    { id: 'tile/42.3,-71.0', name: 'Fixture Park', lat: 42.3, lon: -71.0, category: 'Park' },
+    { id: 'node/9', name: 'Broken Pin', lat: Number.NaN, lon: -71.0, category: 'Cafe' },
+  ];
+
+  it('suggests current map places with their real coordinates and ids', async () => {
+    let current = pins;
+    const mapPlaces = createPlaceListProvider(() => current, { description: 'On the map', source: 'map_place', kind: 'place', secondary: 'On the map' });
+    const [first] = await mapPlaces.search('kenmore');
+    expect(first).toEqual({
+      id: 'map_place:node/1',
+      label: 'Fixture Kenmore Cafe',
+      secondary: 'On the map · Cafe',
+      kind: 'place',
+      location: { lat: 42.349, lng: -71.095 },
+      source: 'map_place',
+      sourceRef: 'node/1',
+    });
+    expect(await mapPlaces.search('broken')).toEqual([]); // no valid coordinates, never suggested
+    current = []; // reads the live list each time
+    expect(await mapPlaces.search('kenmore')).toEqual([]);
+  });
+
+  it('combines providers in order and dedupes the same place', async () => {
+    const mapPlaces = createPlaceListProvider(() => pins, { description: 'map', source: 'map_place', kind: 'place' });
+    const dup = createPlaceListProvider(() => [pins[0]], { description: 'saved', source: 'saved_place', kind: 'saved' });
+    const both = combineProviders([mapPlaces, dup, provider], 'all');
+    const results = await both.search('kenmore');
+    expect(results[0].source).toBe('map_place');
+    expect(results.filter((r) => r.label === 'Fixture Kenmore Cafe')).toHaveLength(1);
+    expect(results.some((r) => r.label === 'Kenmore station')).toBe(true);
+  });
+
+  it('a failing provider does not break the others', async () => {
+    const failing = { description: 'x', live: false, search: async () => Promise.reject(new Error('boom')) };
+    expect((await combineProviders([failing, provider], 'all').search('kenm'))[0].label).toBe('Kenmore station');
   });
 });

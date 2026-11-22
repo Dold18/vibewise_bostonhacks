@@ -1,9 +1,16 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { STUDY_BBOX } from './config.ts';
+import type { PlaceTypeConfig } from './placeTypes.ts';
 import type { Bbox } from './types.ts';
 
-export function buildFsqQuery(release: string, bbox: Bbox): string {
+function primaryLabelFilter(topLevels: string[]): string {
+  if (topLevels.length === 0) throw new Error('no Foursquare top-level categories configured');
+  const tests = topLevels.map((t) => `starts_with(fsq_category_labels[1], '${t.replaceAll("'", "''")}')`);
+  return tests.length === 1 ? `  and ${tests[0]}` : `  and (${tests.join(' or ')})`;
+}
+
+export function buildFsqQuery(release: string, bbox: Bbox, cfg: PlaceTypeConfig): string {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(release)) throw new Error(`invalid FSQ release '${release}' (expected YYYY-MM-DD)`);
   return [
     'select fsq_place_id, name, latitude, longitude, address, locality, postcode, tel, website,',
@@ -12,15 +19,15 @@ export function buildFsqQuery(release: string, bbox: Bbox): string {
     `where latitude between ${bbox.south} and ${bbox.north}`,
     `  and longitude between ${bbox.west} and ${bbox.east}`,
     '  and date_closed is null',
-    "  and starts_with(fsq_category_labels[1], 'Dining and Drinking')",
+    primaryLabelFilter(cfg.fsqTopLevels),
   ].join('\n');
 }
 
 export async function loadFsqRows(
-  opts: { hfToken: string | undefined; release: string; refresh: boolean; cacheDir: string },
+  opts: { hfToken: string | undefined; release: string; refresh: boolean; cacheDir: string; cfg: PlaceTypeConfig },
 ): Promise<{ rows: Record<string, unknown>[]; skipped: boolean; fromCache: boolean }> {
-  const query = buildFsqQuery(opts.release, STUDY_BBOX);
-  const file = path.join(opts.cacheDir, `fsq-${opts.release}.json`);
+  const query = buildFsqQuery(opts.release, STUDY_BBOX, opts.cfg);
+  const file = path.join(opts.cacheDir, `fsq-${opts.cfg.type}-${opts.release}.json`);
   if (!opts.refresh) {
     try {
       const rows = JSON.parse(await fs.readFile(file, 'utf8')) as Record<string, unknown>[];

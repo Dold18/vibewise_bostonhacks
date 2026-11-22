@@ -28,12 +28,18 @@ function ctx(over: Partial<EnrichContext> = {}): EnrichContext {
   };
 }
 
+test('parseMediaArgs requires --type', () => {
+  assert.equal(parseMediaArgs(['--type', 'parks']).type, 'parks');
+  assert.throws(() => parseMediaArgs([]), /missing --type/);
+  assert.throws(() => parseMediaArgs(['--type', 'zoo']), /invalid --type/);
+});
+
 test('parseMediaArgs defaults and flags', () => {
-  assert.deepEqual(parseMediaArgs([]), { dryRun: false, refresh: false, limit: null, concurrency: 4, tiers: [1, 2, 3] });
-  assert.deepEqual(parseMediaArgs(['--dry-run', '--refresh', '--limit', '50', '--concurrency', '2', '--tiers', '1,2']),
-    { dryRun: true, refresh: true, limit: 50, concurrency: 2, tiers: [1, 2] });
-  assert.throws(() => parseMediaArgs(['--tiers', '4']), /tiers/);
-  assert.throws(() => parseMediaArgs(['--limit', 'x']), /limit/);
+  assert.deepEqual(parseMediaArgs(['--type', 'restaurants']), { type: 'restaurants', dryRun: false, refresh: false, limit: null, concurrency: 4, tiers: [1, 2, 3] });
+  assert.deepEqual(parseMediaArgs(['--type', 'restaurants', '--dry-run', '--refresh', '--limit', '50', '--concurrency', '2', '--tiers', '1,2']),
+    { type: 'restaurants', dryRun: true, refresh: true, limit: 50, concurrency: 2, tiers: [1, 2] });
+  assert.throws(() => parseMediaArgs(['--type', 'restaurants', '--tiers', '4']), /tiers/);
+  assert.throws(() => parseMediaArgs(['--type', 'restaurants', '--limit', 'x']), /limit/);
 });
 
 test('one failing source is recorded and the rest still return', async () => {

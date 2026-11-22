@@ -1,42 +1,54 @@
+import { MODEL_KEY, validateVector } from './features/vibe/profile';
 /**
- * Read-only access to our own place catalog: the Supabase `restaurants` table
- * filled offline by `pipeline/` (OpenStreetMap + Foursquare OS Places).
+ * Read-only access to our own place catalog, filled offline by `pipeline/`
+ * (OpenStreetMap + Foursquare OS Places): one table per place type
+ * (`restaurants`, `museums`, `parks`, `landmarks`, `entertainment`) sharing ids
+ * from the `places` registry, plus the `catalog_places` view that unions them.
  *
  * The browser uses the publishable key only; Row Level Security allows reads
- * and nothing else. The catalog holds food and drink places, so it backs the
- * Restaurants / Coffee / Bars map categories. Everything else stays on tiles/Overpass.
+ * and nothing else. CATALOG_LAYERS lists the map layers the catalog backs:
+ * the food layers plus museums, parks, landmarks and entertainment. A layer
+ * whose type has no catalog rows, and every other layer, uses tiles/Overpass.
  *
  * Two steps, so the page never downloads details it won't show:
- *  1. The pin index: every place's id, name, category and location, fetched
- *     once per page load (a few thousand small rows).
- *  2. Details (address, website, phone, hours, cuisines) for just the pins in
- *     range, fetched by place id and cached, so panning back costs nothing.
+ *  1. The pin index: every place's id, type, name, kind and location from
+ *     `catalog_places`, fetched once per page load (a few thousand small rows).
+ *  2. Details (address, website, phone, hours, and per type cuisines, price and
+ *     deals) for just the pins in range, read from each pin's own type table by
+ *     place id and cached, so panning back costs nothing.
  */
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { toDeals, type Deal } from './deals';
 import { metersBetween, type CategorizedPlace, type Category, type Place } from './osm';
 
-/** Map category id → catalog `category` value. */
-const CATALOG_CATEGORY: Record<string, string> = {
-  restaurants: 'restaurant',
-  coffee: 'cafe',
-  bars: 'nightlife',
+/** Map layer id → which catalog rows back it. */
+export const CATALOG_LAYERS: Record<string, { placeType: string; kind?: string }> = {
+  restaurants: { placeType: 'restaurants', kind: 'restaurant' },
+  coffee: { placeType: 'restaurants', kind: 'cafe' },
+  bars: { placeType: 'restaurants', kind: 'nightlife' },
+  museums: { placeType: 'museums' },
+  parks: { placeType: 'parks' },
+  landmarks: { placeType: 'landmarks' },
+  entertainment: { placeType: 'entertainment' },
 };
 
-const INDEX_COLUMNS = 'place_id, source, source_id, name, category, location';
+const INDEX_COLUMNS = 'place_id, place_type, source, source_id, name, kind, location';
 const DETAIL_COLUMNS = 'place_id, address, website, phone, cuisines, hours_raw, osm_tags, attribution, price_band, price_source';
-/** PostgREST embed of the place's deals (place_deals.restaurant_id → restaurants.id); RLS hides hidden rows. */
-export const DEALS_EMBED = 'place_deals(kind, title, timing, schedule, source, source_url, checked_at)';
+/** Non-food type tables have a kind but no price or cuisine columns. */
+const KIND_DETAIL_COLUMNS = 'place_id, address, website, phone, kind, hours_raw, osm_tags, attribution';
+/** PostgREST embed of the place's deals (restaurants.id → places.id ← place_deals.place_ref); RLS hides hidden rows. */
+export const DEALS_EMBED = 'places(place_deals(kind, title, timing, schedule, source, source_url, checked_at))';
 const PAGE_SIZE = 1000; // PostgREST max_rows
 const DETAIL_CHUNK = 100; // place ids per request, keeps the URL short
 
 /** One place in the pin index. `placeId` is the catalog's stable id, e.g. "osm:node/1" or "fsq:abc". */
 export interface CatalogPin {
   placeId: string;
+  placeType: string;
   source: 'osm' | 'foursquare';
   sourceId: string;
   name: string;
-  category: string;
+  kind: string;
   lat: number;
   lon: number;
 }
@@ -45,31 +57,59 @@ export interface CatalogDetails {
   address: string | null;
   website: string | null;
   phone: string | null;
-  cuisines: string[] | null;
+  /** Restaurants only. */
+  cuisines?: string[] | null;
+  /** Non-food types only. */
+  kind?: string;
   hours_raw: string | null;
   osm_tags: Record<string, string> | null;
   attribution: string;
-  /** '$'..'$$$$' or 'unknown'; never null. */
-  price_band: string;
+  /** Restaurants only: '$'..'$$$$' or 'unknown'. */
+  price_band?: string;
   /** 'menu' (read from a menu) or 'estimate' (LLM guess, labeled "(est.)"); null when unknown. */
-  price_source: string | null;
+  price_source?: string | null;
   /** Validated deals; empty when none or when the deals embed is unavailable. */
   deals: Deal[];
 }
 
 interface IndexRow {
   place_id: string;
+  place_type: string;
   source: 'osm' | 'foursquare';
   source_id: string;
   name: string;
-  category: string;
+  kind: string;
   /** geography(Point): PostgREST returns hex EWKB; GeoJSON is accepted too. */
   location: unknown;
 }
 
-/** True when the catalog can back this map category. */
+/** Place types with at least one pin, once the index has loaded; undefined before that. */
+let loadedTypes: Set<string> | undefined;
+
+/** Record which place types the loaded index holds. */
+export function noteIndex(pins: CatalogPin[]): void {
+  loadedTypes = new Set(pins.map((p) => p.placeType));
+}
+
+/** Test hook: forget the loaded index. */
+export function resetIndexForTests(): void {
+  loadedTypes = undefined;
+}
+
+/** Requested catalog categories whose place type has no pins in `pins`. */
+export function emptyCategories(pins: CatalogPin[], categories: Category[]): Category[] {
+  const types = new Set(pins.map((p) => p.placeType));
+  return categories.filter((c) => !types.has(CATALOG_LAYERS[c.id]?.placeType));
+}
+
+/**
+ * True when the catalog can back this map category. Once the index has loaded,
+ * a layer whose place type has no rows is not catalog-backed, so callers send it
+ * to map tiles / Overpass exactly as before the catalog held that type.
+ */
 export function isCatalogCategory(category: Category): boolean {
-  return category.id in CATALOG_CATEGORY;
+  const layer = CATALOG_LAYERS[category.id];
+  return !!layer && (!loadedTypes || loadedTypes.has(layer.placeType));
 }
 
 /** A point from hex EWKB or GeoJSON; null for anything else, including (0,0). */
@@ -98,7 +138,7 @@ export function parsePoint(value: unknown): { lat: number; lon: number } | null 
 export function toPin(row: IndexRow): CatalogPin | null {
   const point = parsePoint(row.location);
   if (!point) return null;
-  return { placeId: row.place_id, source: row.source, sourceId: row.source_id, name: row.name, category: row.category, ...point };
+  return { placeId: row.place_id, placeType: row.place_type, source: row.source, sourceId: row.source_id, name: row.name, kind: row.kind, ...point };
 }
 
 /**
@@ -106,16 +146,17 @@ export function toPin(row: IndexRow): CatalogPin | null {
  * reads them; without details the card shows name and type only.
  */
 export function pinToPlace(pin: CatalogPin, details?: CatalogDetails): Place {
+  const food = pin.placeType === 'restaurants';
   const tags: Record<string, string> = { 'catalog:place_id': pin.placeId, 'catalog:source': pin.source };
   if (details?.address) tags.display_name = details.address;
   if (details?.website) tags.website = details.website;
   if (details?.phone) tags.phone = details.phone;
   if (details?.hours_raw) tags.opening_hours = details.hours_raw;
   if (details?.attribution) tags['catalog:attribution'] = details.attribution;
-  if (details?.price_band) tags['catalog:price_band'] = details.price_band;
-  if (details?.price_source) tags['catalog:price_source'] = details.price_source;
-  const kind = details?.osm_tags?.amenity ?? pin.category;
-  const cuisine = details?.cuisines?.[0];
+  if (food && details?.price_band) tags['catalog:price_band'] = details.price_band;
+  if (food && details?.price_source) tags['catalog:price_source'] = details.price_source;
+  const kind = food ? (details?.osm_tags?.amenity ?? pin.kind) : pin.kind;
+  const cuisine = food ? details?.cuisines?.[0] : undefined;
   const place: Place = {
     // OSM ids stay bare ("node/1") so "View on OpenStreetMap" links to the feature.
     id: pin.source === 'osm' ? pin.sourceId : pin.placeId,
@@ -152,10 +193,10 @@ export function nearestByCategory(
 ): { categoryId: string; pin: CatalogPin }[] {
   const out: { categoryId: string; pin: CatalogPin }[] = [];
   for (const category of categories) {
-    const wanted = CATALOG_CATEGORY[category.id];
-    if (!wanted) continue;
+    const layer = CATALOG_LAYERS[category.id];
+    if (!layer) continue;
     const near = pins
-      .filter((p) => p.category === wanted)
+      .filter((p) => p.placeType === layer.placeType && (layer.kind === undefined || p.kind === layer.kind))
       .map((pin) => ({ pin, distance: metersBetween(center, pin) }))
       .filter((x) => x.distance <= radiusMeters)
       .sort((a, b) => a.distance - b.distance)
@@ -181,7 +222,7 @@ async function fetchIndex(supabase: SupabaseClient): Promise<CatalogPin[]> {
   const pins: CatalogPin[] = [];
   for (let from = 0; ; from += PAGE_SIZE) {
     const { data, error } = await supabase
-      .from('restaurants')
+      .from('catalog_places')
       .select(INDEX_COLUMNS)
       .order('id')
       .range(from, from + PAGE_SIZE - 1);
@@ -212,14 +253,14 @@ export function getCachedDetails(placeId: string): CatalogDetails | undefined {
 }
 
 /** Fetch and cache details for ids not yet cached, in chunks, via `query`. Throws if a request fails even without the deals embed. */
-export async function fetchDetailsWith(query: DetailsQuery, placeIds: string[]): Promise<void> {
+export async function fetchDetailsWith(query: DetailsQuery, placeIds: string[], detailColumns = DETAIL_COLUMNS): Promise<void> {
   const missing = placeIds.filter((id) => !detailsCache.has(id));
   for (let i = 0; i < missing.length; i += DETAIL_CHUNK) {
     const ids = missing.slice(i, i + DETAIL_CHUNK);
-    let result = await query(dealsEmbedAvailable ? `${DETAIL_COLUMNS}, ${DEALS_EMBED}` : DETAIL_COLUMNS, ids);
+    let result = await query(dealsEmbedAvailable ? `${detailColumns}, ${DEALS_EMBED}` : detailColumns, ids);
     if (result.error && dealsEmbedAvailable) {
       const embedError = result.error.message;
-      result = await query(DETAIL_COLUMNS, ids);
+      result = await query(detailColumns, ids);
       // Only blame the embed when the plain request works; otherwise it's a general outage.
       if (!result.error) {
         dealsEmbedAvailable = false;
@@ -227,18 +268,30 @@ export async function fetchDetailsWith(query: DetailsQuery, placeIds: string[]):
       }
     }
     if (result.error) throw new Error(result.error.message);
-    for (const row of (result.data ?? []) as (Omit<CatalogDetails, 'deals'> & { place_id: string; place_deals?: unknown })[]) {
-      const { place_id, place_deals, ...details } = row;
-      detailsCache.set(place_id, { ...details, deals: toDeals(place_deals) });
+    for (const row of (result.data ?? []) as (Omit<CatalogDetails, 'deals'> & { place_id: string; places?: { place_deals?: unknown } | null })[]) {
+      const { place_id, places, ...details } = row;
+      detailsCache.set(place_id, { ...details, deals: toDeals(places?.place_deals) });
     }
   }
 }
 
-function fetchDetails(supabase: SupabaseClient, placeIds: string[]): Promise<void> {
-  return fetchDetailsWith(async (columns, ids) => {
-    const { data, error } = await supabase.from('restaurants').select(columns).in('place_id', ids);
-    return { data: data as unknown[] | null, error };
-  }, placeIds);
+/** Details per place type: each type's table is queried for just its own ids. */
+export async function fetchDetailsForPins(queryFor: (table: string) => DetailsQuery, pins: CatalogPin[]): Promise<void> {
+  const byType = new Map<string, string[]>();
+  for (const pin of pins) byType.set(pin.placeType, [...(byType.get(pin.placeType) ?? []), pin.placeId]);
+  for (const [placeType, ids] of byType) {
+    await fetchDetailsWith(queryFor(placeType), ids, placeType === 'restaurants' ? DETAIL_COLUMNS : KIND_DETAIL_COLUMNS);
+  }
+}
+
+async function fetchDetails(supabase: SupabaseClient, pins: CatalogPin[]): Promise<void> {
+  await fetchDetailsForPins(
+    (table) => async (columns, chunk) => {
+      const { data, error } = await supabase.from(table).select(columns).in('place_id', chunk);
+      return { data: data as unknown[] | null, error };
+    },
+    pins,
+  );
 }
 
 /**
@@ -268,9 +321,13 @@ export async function catalogPlacesNear(
     indexPromise = undefined; // maybe loaded later; ask again next time
     return null;
   }
+  noteIndex(pins);
+  // First call only: the caller partitioned before the index was known. If a requested
+  // type has no rows, decline so every layer takes the tiles/Overpass path this once.
+  if (emptyCategories(pins, categories).length) return null;
   const near = nearestByCategory(pins, categories, center, radiusMeters, limit);
   try {
-    await fetchDetails(supabase, near.map((n) => n.pin.placeId));
+    await fetchDetails(supabase, near.map((n) => n.pin));
   } catch (err) {
     console.warn('[catalog] details unavailable:', (err as Error).message);
   }
@@ -280,4 +337,22 @@ export async function catalogPlacesNear(
 function humanize(s: string): string {
   const t = s.replace(/_/g, ' ');
   return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+/** Optional single-model vectors for currently eligible places. No schema writes or secondary catalog. */
+export async function catalogSemanticCandidates(places:readonly Place[],signal:AbortSignal) {
+  const supabase=getClient();
+  if(!supabase||import.meta.env.VITE_CATALOG_EMBEDDING_MODEL_KEY!==MODEL_KEY)return [];
+  const indexed=new Map(places.filter(p=>p.tags['catalog:place_id']).map(p=>[p.tags['catalog:place_id'],p]));
+  const ids=[...indexed.keys()];if(!ids.length)return [];
+  const out:import('./features/vibe/adapters').SemanticCandidate[]=[];
+  for(let i=0;i<ids.length;i+=100){
+    const {data,error}=await supabase.from('restaurants').select('place_id,embedding').in('place_id',ids.slice(i,i+100)).abortSignal(signal);
+    if(error)throw Error('Catalog vectors unavailable');
+    for(const row of data??[]){
+      const p=indexed.get(row.place_id);if(!p||!row.embedding)continue;
+      try{const raw=typeof row.embedding==='string'?JSON.parse(row.embedding):row.embedding;const embedding=validateVector(raw,MODEL_KEY);out.push({id:p.id,location:{lat:p.lat,lng:p.lon},embedding,modelKey:MODEL_KEY,eligible:true,provenance:'catalog'});}catch{/* Unknown vectors never become fabricated scores. */}
+    }
+  }
+  return out;
 }

@@ -27,49 +27,31 @@ export function createStore<S, A>(reducer: (state: S, action: A) => S, initial: 
 // ---------------------------------------------------------------------------
 
 /**
- * The panel is either expanded or collapsed to a one-line summary.
- *
- * - `preferred` is what the user last chose with no destination card open.
- * - While the map's destination card is open the panel collapses so the card
- *   has room, but the user may still expand it on top (`peekWhileCard`).
- * - When the card closes, the panel returns to `preferred`.
+ * The panel is either expanded or collapsed to a one-line summary, and only
+ * the user changes that (minimize / summary buttons). Map interactions such
+ * as opening or closing a destination popup or the trip planner never do.
  */
 export interface LayoutState {
   preferred: 'expanded' | 'collapsed';
-  cardOpen: boolean;
-  peekWhileCard: boolean;
 }
 
-export type LayoutAction =
-  | { type: 'toggle' }
-  | { type: 'expand' }
-  | { type: 'collapse' }
-  | { type: 'cardOpened' }
-  | { type: 'cardClosed' };
+export type LayoutAction = { type: 'toggle' } | { type: 'expand' } | { type: 'collapse' };
 
-export const initialLayout = (preferred: LayoutState['preferred']): LayoutState => ({
-  preferred,
-  cardOpen: false,
-  peekWhileCard: false,
-});
+export const initialLayout = (preferred: LayoutState['preferred']): LayoutState => ({ preferred });
 
 export function isExpanded(s: LayoutState): boolean {
-  return s.cardOpen ? s.peekWhileCard : s.preferred === 'expanded';
+  return s.preferred === 'expanded';
 }
 
 export function layoutReducer(s: LayoutState, action: LayoutAction): LayoutState {
   switch (action.type) {
     case 'toggle':
-      return layoutReducer(s, { type: isExpanded(s) ? 'collapse' : 'expand' });
+      return { preferred: isExpanded(s) ? 'collapsed' : 'expanded' };
     case 'expand':
-      if (isExpanded(s)) return s;
-      return s.cardOpen ? { ...s, peekWhileCard: true } : { ...s, preferred: 'expanded' };
+      return isExpanded(s) ? s : { preferred: 'expanded' };
     case 'collapse':
-      if (!isExpanded(s)) return s;
-      return s.cardOpen ? { ...s, peekWhileCard: false } : { ...s, preferred: 'collapsed' };
-    case 'cardOpened':
-      return s.cardOpen ? s : { ...s, cardOpen: true, peekWhileCard: false };
-    case 'cardClosed':
-      return s.cardOpen ? { ...s, cardOpen: false, peekWhileCard: false } : s;
+      return isExpanded(s) ? { preferred: 'collapsed' } : s;
+    default:
+      return s;
   }
 }

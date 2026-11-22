@@ -11,12 +11,12 @@ const activities = (...ids: string[]) =>
 
 describe('mapLayersFor', () => {
   it('only uses layer ids the map actually has', () => {
-    expect(LAYERS.map((l) => l.id)).toEqual(['restaurants', 'coffee', 'bars', 'parks', 'museums']);
+    expect(LAYERS.map((l) => l.id)).toEqual(['restaurants', 'coffee', 'bars', 'parks', 'museums', 'landmarks', 'entertainment']);
   });
 
   it('before any choice, shows every layer from map tiles only (no network lookups)', () => {
     expect(mapLayersFor(initialPreferences(), LAYERS)).toEqual({
-      layerIds: ['restaurants', 'coffee', 'bars', 'parks', 'museums'],
+      layerIds: ['restaurants', 'coffee', 'bars', 'parks', 'museums', 'landmarks', 'entertainment'],
       detail: 'tiles',
       unsupportedActivityTypes: [],
     });
@@ -40,7 +40,7 @@ describe('mapLayersFor', () => {
   });
 
   it('Activities with no type chosen loads every supported activity layer', () => {
-    expect(mapLayersFor(activities(), LAYERS).layerIds).toEqual(['bars', 'parks', 'museums']);
+    expect(mapLayersFor(activities(), LAYERS).layerIds).toEqual(['bars', 'parks', 'museums', 'landmarks', 'entertainment']);
   });
 
   it('several activity types load the union of their layers', () => {
@@ -50,10 +50,15 @@ describe('mapLayersFor', () => {
   });
 
   it('reports unsupported types and never substitutes other layers for them', () => {
-    expect(mapLayersFor(activities('live_music', 'student_events'), LAYERS)).toEqual({
+    expect(mapLayersFor(activities('sightseeing', 'live_music'), LAYERS)).toEqual({
+      layerIds: ['landmarks', 'entertainment'],
+      detail: 'full',
+      unsupportedActivityTypes: [],
+    });
+    expect(mapLayersFor(activities('student_events'), LAYERS)).toEqual({
       layerIds: [],
       detail: 'full',
-      unsupportedActivityTypes: ['live_music', 'student_events'],
+      unsupportedActivityTypes: ['student_events'],
     });
     expect(mapLayersFor(activities('shopping', 'outdoors_parks'), LAYERS)).toMatchObject({
       layerIds: ['parks'],
@@ -63,7 +68,7 @@ describe('mapLayersFor', () => {
 
   it('Open to anything loads every layer with full detail', () => {
     expect(mapLayersFor(prefs({ type: 'setActivity', activity: 'anything' }), LAYERS)).toMatchObject({
-      layerIds: ['restaurants', 'coffee', 'bars', 'parks', 'museums'],
+      layerIds: ['restaurants', 'coffee', 'bars', 'parks', 'museums', 'landmarks', 'entertainment'],
       detail: 'full',
     });
   });

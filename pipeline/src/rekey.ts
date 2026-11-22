@@ -1,14 +1,14 @@
-import type { ExistingRow, RekeyAction, RestaurantRow } from './types.ts';
+import type { ExistingRow, RekeyAction, PlaceRow } from './types.ts';
 
 /**
  * Decides which existing rows must be re-keyed before the upsert (spec 6.7).
  * Pure: inputs are not mutated. Actions are ordered clear_fsq, promote, collapse,
  * each group by existing row id ascending.
  */
-export function planRekey(existing: ExistingRow[], rows: RestaurantRow[]): RekeyAction[] {
-  const newBySourceId = new Map<string, RestaurantRow>();
-  const newOsmByFsq = new Map<string, RestaurantRow>();
-  const newHolderByFsq = new Map<string, RestaurantRow>(); // any new row (OSM or FSQ-only) carrying the id
+export function planRekey(existing: ExistingRow[], rows: PlaceRow[]): RekeyAction[] {
+  const newBySourceId = new Map<string, PlaceRow>();
+  const newOsmByFsq = new Map<string, PlaceRow>();
+  const newHolderByFsq = new Map<string, PlaceRow>(); // any new row (OSM or FSQ-only) carrying the id
   for (const row of rows) {
     if (row.fsq_place_id !== null) newHolderByFsq.set(row.fsq_place_id, row);
     if (row.source !== 'osm') continue;

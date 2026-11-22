@@ -99,7 +99,9 @@ export const TONIGHT_END_HOUR = 3;
 // State
 // ---------------------------------------------------------------------------
 
-export type OriginSource = 'local_suggestion' | 'device_geolocation' | 'live_geocoder';
+/** Where a location came from. Map and saved places carry their real OSM coordinates. */
+export type OriginSource = 'local_suggestion' | 'device_geolocation' | 'live_geocoder' | 'map_place' | 'saved_place';
+export const ORIGIN_SOURCES: readonly OriginSource[] = ['local_suggestion', 'device_geolocation', 'live_geocoder', 'map_place', 'saved_place'];
 
 export interface Origin {
   label: string;
@@ -152,7 +154,7 @@ export interface InitialPreferences {
   timingError: TimingError | null;
   /** Free text for the future Vibe Engine. Never used by practical filtering. */
   vibeText: string;
-  /** Browser-memory-only references; files are never sent to a server by this panel. */
+  /** Local File references only; never uploaded or serialized by this UI. */
   vibeImages: File[];
 }
 
@@ -245,7 +247,6 @@ export function preferencesReducer(state: InitialPreferences, action: Preference
       return { ...state, vibeText: action.text.slice(0, VIBE_TEXT_MAX_LENGTH) };
 
     case 'setVibeImages':
-      // Files stay in memory; reject unsupported or oversized inputs at the state boundary too.
       return { ...state, vibeImages: action.files.filter(supportedVibeImage).slice(0, MAX_VIBE_IMAGES) };
 
     case 'reset':
@@ -408,8 +409,7 @@ export function normalizePreferences(input: unknown, now: Date = new Date()): In
     cuisines: activity === 'food_drinks' ? pick(raw.cuisines, CUISINE_OPTIONS) : [],
     activityTypes: activity === 'activities' ? pick(raw.activityTypes, ACTIVITY_TYPE_OPTIONS) : [],
     vibeText: typeof raw.vibeText === 'string' ? raw.vibeText.slice(0, VIBE_TEXT_MAX_LENGTH) : '',
-    // Restored JSON cannot contain usable File objects. Require a new local selection.
-    vibeImages: [],
+    vibeImages: [], // File objects cannot be restored from JSON.
   };
 
   const budget = raw.budget as Partial<Budget> | null | undefined;
@@ -419,8 +419,9 @@ export function normalizePreferences(input: unknown, now: Date = new Date()): In
 
   const origin = raw.origin as Partial<Origin> | null | undefined;
   if (origin && typeof origin === 'object' && typeof origin.label === 'string' && isValidGeoPoint(origin.location)) {
-    const source: OriginSource =
-      origin.source === 'device_geolocation' || origin.source === 'live_geocoder' ? origin.source : 'local_suggestion';
+    const source: OriginSource = ORIGIN_SOURCES.includes(origin.source as OriginSource)
+      ? (origin.source as OriginSource)
+      : 'local_suggestion';
     state = {
       ...state,
       origin: {
