@@ -16,27 +16,28 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { toDeals, type Deal } from './deals';
 import { metersBetween, type CategorizedPlace, type Category, type Place } from './osm';
 
-/** Map category id → catalog `category` value. */
-const CATALOG_CATEGORY: Record<string, string> = {
-  restaurants: 'restaurant',
-  coffee: 'cafe',
-  bars: 'nightlife',
+/** Map layer id → which catalog rows back it. PR 1 holds only the food layers. */
+export const CATALOG_LAYERS: Record<string, { placeType: string; kind?: string }> = {
+  restaurants: { placeType: 'restaurants', kind: 'restaurant' },
+  coffee: { placeType: 'restaurants', kind: 'cafe' },
+  bars: { placeType: 'restaurants', kind: 'nightlife' },
 };
 
-const INDEX_COLUMNS = 'place_id, source, source_id, name, category, location';
+const INDEX_COLUMNS = 'place_id, place_type, source, source_id, name, kind, location';
 const DETAIL_COLUMNS = 'place_id, address, website, phone, cuisines, hours_raw, osm_tags, attribution, price_band, price_source';
-/** PostgREST embed of the place's deals (place_deals.restaurant_id → restaurants.id); RLS hides hidden rows. */
-export const DEALS_EMBED = 'place_deals(kind, title, timing, schedule, source, source_url, checked_at)';
+/** PostgREST embed of the place's deals (restaurants.id → places.id ← place_deals.place_ref); RLS hides hidden rows. */
+export const DEALS_EMBED = 'places(place_deals(kind, title, timing, schedule, source, source_url, checked_at))';
 const PAGE_SIZE = 1000; // PostgREST max_rows
 const DETAIL_CHUNK = 100; // place ids per request, keeps the URL short
 
 /** One place in the pin index. `placeId` is the catalog's stable id, e.g. "osm:node/1" or "fsq:abc". */
 export interface CatalogPin {
   placeId: string;
+  placeType: string;
   source: 'osm' | 'foursquare';
   sourceId: string;
   name: string;
-  category: string;
+  kind: string;
   lat: number;
   lon: number;
 }
@@ -59,17 +60,18 @@ export interface CatalogDetails {
 
 interface IndexRow {
   place_id: string;
+  place_type: string;
   source: 'osm' | 'foursquare';
   source_id: string;
   name: string;
-  category: string;
+  kind: string;
   /** geography(Point): PostgREST returns hex EWKB; GeoJSON is accepted too. */
   location: unknown;
 }
 
 /** True when the catalog can back this map category. */
 export function isCatalogCategory(category: Category): boolean {
-  return category.id in CATALOG_CATEGORY;
+  return category.id in CATALOG_LAYERS;
 }
 
 /** A point from hex EWKB or GeoJSON; null for anything else, including (0,0). */
@@ -98,7 +100,7 @@ export function parsePoint(value: unknown): { lat: number; lon: number } | null 
 export function toPin(row: IndexRow): CatalogPin | null {
   const point = parsePoint(row.location);
   if (!point) return null;
-  return { placeId: row.place_id, source: row.source, sourceId: row.source_id, name: row.name, category: row.category, ...point };
+  return { placeId: row.place_id, placeType: row.place_type, source: row.source, sourceId: row.source_id, name: row.name, kind: row.kind, ...point };
 }
 
 /**
@@ -114,7 +116,7 @@ export function pinToPlace(pin: CatalogPin, details?: CatalogDetails): Place {
   if (details?.attribution) tags['catalog:attribution'] = details.attribution;
   if (details?.price_band) tags['catalog:price_band'] = details.price_band;
   if (details?.price_source) tags['catalog:price_source'] = details.price_source;
-  const kind = details?.osm_tags?.amenity ?? pin.category;
+  const kind = details?.osm_tags?.amenity ?? pin.kind;
   const cuisine = details?.cuisines?.[0];
   const place: Place = {
     // OSM ids stay bare ("node/1") so "View on OpenStreetMap" links to the feature.
@@ -152,10 +154,10 @@ export function nearestByCategory(
 ): { categoryId: string; pin: CatalogPin }[] {
   const out: { categoryId: string; pin: CatalogPin }[] = [];
   for (const category of categories) {
-    const wanted = CATALOG_CATEGORY[category.id];
-    if (!wanted) continue;
+    const layer = CATALOG_LAYERS[category.id];
+    if (!layer) continue;
     const near = pins
-      .filter((p) => p.category === wanted)
+      .filter((p) => p.placeType === layer.placeType && (layer.kind === undefined || p.kind === layer.kind))
       .map((pin) => ({ pin, distance: metersBetween(center, pin) }))
       .filter((x) => x.distance <= radiusMeters)
       .sort((a, b) => a.distance - b.distance)
@@ -181,7 +183,7 @@ async function fetchIndex(supabase: SupabaseClient): Promise<CatalogPin[]> {
   const pins: CatalogPin[] = [];
   for (let from = 0; ; from += PAGE_SIZE) {
     const { data, error } = await supabase
-      .from('restaurants')
+      .from('catalog_places')
       .select(INDEX_COLUMNS)
       .order('id')
       .range(from, from + PAGE_SIZE - 1);
@@ -227,18 +229,23 @@ export async function fetchDetailsWith(query: DetailsQuery, placeIds: string[]):
       }
     }
     if (result.error) throw new Error(result.error.message);
-    for (const row of (result.data ?? []) as (Omit<CatalogDetails, 'deals'> & { place_id: string; place_deals?: unknown })[]) {
-      const { place_id, place_deals, ...details } = row;
-      detailsCache.set(place_id, { ...details, deals: toDeals(place_deals) });
+    for (const row of (result.data ?? []) as (Omit<CatalogDetails, 'deals'> & { place_id: string; places?: { place_deals?: unknown } | null })[]) {
+      const { place_id, places, ...details } = row;
+      detailsCache.set(place_id, { ...details, deals: toDeals(places?.place_deals) });
     }
   }
 }
 
-function fetchDetails(supabase: SupabaseClient, placeIds: string[]): Promise<void> {
-  return fetchDetailsWith(async (columns, ids) => {
-    const { data, error } = await supabase.from('restaurants').select(columns).in('place_id', ids);
-    return { data: data as unknown[] | null, error };
-  }, placeIds);
+/** Details per place type: each type's table is queried for just its own ids (PR 1: only `restaurants`). */
+async function fetchDetails(supabase: SupabaseClient, pins: CatalogPin[]): Promise<void> {
+  const byType = new Map<string, string[]>();
+  for (const pin of pins) byType.set(pin.placeType, [...(byType.get(pin.placeType) ?? []), pin.placeId]);
+  for (const [placeType, ids] of byType) {
+    await fetchDetailsWith(async (columns, chunk) => {
+      const { data, error } = await supabase.from(placeType).select(columns).in('place_id', chunk);
+      return { data: data as unknown[] | null, error };
+    }, ids);
+  }
 }
 
 /**
@@ -270,7 +277,7 @@ export async function catalogPlacesNear(
   }
   const near = nearestByCategory(pins, categories, center, radiusMeters, limit);
   try {
-    await fetchDetails(supabase, near.map((n) => n.pin.placeId));
+    await fetchDetails(supabase, near.map((n) => n.pin));
   } catch (err) {
     console.warn('[catalog] details unavailable:', (err as Error).message);
   }
