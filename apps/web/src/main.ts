@@ -1,4 +1,4 @@
-import { AttributionControl, LngLatBounds, Map as MapLibreMap, Marker, setWorkerUrl } from 'maplibre-gl';
+import { AttributionControl, Map as MapLibreMap, Marker, setWorkerUrl } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
 import './design/visualFoundation.css';
@@ -65,6 +65,9 @@ import { createFinalSearch, filtersFor, type FinalSearchState } from './features
 import { matchesBrowsingFilters } from './discovery/browsingFilters';
 import type { SearchFilters } from './features/vibe/searchContract';
 import { createResultsGate } from './features/map/resultsGate';
+import { TOP_MATCH_BADGES, finalPinRanks, finalPinScales, matchPositions, matchStrength } from './features/map/finalPinScale';
+import { matchesView } from './features/vibe/matchesView';
+import { focusZoom, previouslyAuthorizedLocation, recommendationFocus } from './features/map/recommendationFocus';
 import { activeKinds, chipText } from './deals';
 
 const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
@@ -104,6 +107,14 @@ let markers: Marker[] = [];
 let shadows: Marker[] = [];
 let selectedPin: HTMLElement | null = null;
 let semanticRanking: Ranking | null = null;
+/**
+ * The quiz's final recommendations while they own the map (place id → match data from the server's actual
+ * scores). Pins show uniform until the user presses Rank My Matches (matchesView.ranked); then `scale`
+ * sizes them, `position` numbers the top three and `strength` drives the restrained emphasis.
+ */
+const finalPins = new Map<string, { scale: number; position: number; strength: number }>();
+/** The final pin's ranked look, or undefined when ranking is off or this is not a final recommendation. */
+const rankedPin = (id: string) => (resultsGate.active && matchesView.getState().ranked ? finalPins.get(id) : undefined);
 let refreshConvergence = () => {};
 // True while the quiz's final search results (or its error) own the pins: category reloads must not replace them.
 const resultsGate = createResultsGate();
@@ -135,20 +146,22 @@ function shadowElement(): HTMLElement {
 }
 
 /**
- * How one pin looks. Today every pin in a result set shares a look; the plan
- * is for each place's match score to drive both (better match = stronger
- * color, bigger pin). `scale` 1 is the default 28×40px pin; its shadow
- * scales with it.
+ * How one pin looks. `scale` 1 is the default 28×40px pin; its shadow scales
+ * with it. The quiz's final recommendations size each pin by its match score
+ * (finalPinScale.ts) and set `rank` so stronger matches paint over weaker
+ * ones on a flat map (a tilted map keeps its depth order, see --pin-z).
  */
 interface PinLook {
   color: string;
   scale: number;
+  rank?: number;
 }
 
 function applyPinLook(pin: HTMLElement, shadow: HTMLElement, look: PinLook) {
   pin.style.setProperty('--pin-color', look.color);
   pin.style.setProperty('--pin-scale', String(look.scale));
   shadow.style.setProperty('--pin-scale', String(look.scale));
+  if (look.rank !== undefined) pin.style.setProperty('--pin-rank', String(look.rank));
 }
 
 /** A solid teardrop pin, colored and sized entirely by --pin-color / --pin-scale. */
@@ -166,6 +179,13 @@ function pinElement(): HTMLElement {
   // Two-tone contrast ring (issue #40): a dark ring under the head's light edge,
   // so every pin stays visible on light, mid-tone and dark map themes.
   body.innerHTML = `<svg viewBox="0 0 28 40" width="28" height="40" aria-hidden="true"><path class="pin-ring" d="${PIN_PATH}" /><path class="pin-head" d="${PIN_PATH}" /></svg>`;
+  // Top-three number for ranked final recommendations, on the pin's head (syncMatchRanking); the pin's
+  // aria-label carries the rank for screen readers.
+  const rank = document.createElement('span');
+  rank.className = 'pin-rank';
+  rank.hidden = true;
+  rank.setAttribute('aria-hidden', 'true');
+  body.append(rank);
   el.append(body);
   return el;
 }
@@ -193,6 +213,7 @@ function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: 
     const el = pinElement();
     applyPinLook(el, shadows[i].getElement(), look);
     el.dataset.index = String(i);
+    el.dataset.name = place.name; // the visible map label (pinLabels.ts); aria-label may add a deal or rank
     el.setAttribute('aria-label', place.name);
     const popupLook = { color: look.color, icon: typeof icon === 'function' ? icon(place) : icon };
     pinLooks.set(place.id, popupLook);
@@ -220,6 +241,12 @@ function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: 
   refreshConvergence();
 }
 
+/** A pin's accessible name: the place, an active deal, and its match rank while ranking is on. */
+function pinLabel(place: Place, dealOn: boolean): string {
+  const ranked = rankedPin(place.id);
+  return [place.name, dealOn ? 'deal on now' : '', ranked ? `match ${ranked.position} of ${finalPins.size} for your vibe` : ''].filter(Boolean).join(', ');
+}
+
 /** Refresh deal badges as schedules and freshness change. */
 function updateDealChips(now: Date) {
   markers.forEach((marker, i) => {
@@ -230,7 +257,7 @@ function updateDealChips(now: Date) {
     const text = chipText(activeKinds(place.deals ?? [], now));
     chip.textContent = text;
     chip.hidden = text === '';
-    pin.setAttribute('aria-label', text ? `${place.name}, deal on now` : place.name);
+    pin.setAttribute('aria-label', pinLabel(place, text !== ''));
   });
   placePopup.refreshDeals(now);
   scheduleCull(); // a deal starting or ending changes which pins win overlaps
@@ -448,12 +475,14 @@ function syncMarkerVisibility() {
   for (const [id, pin] of pinById) {
     const appearance = semanticMarkerState(semanticRanking, id, mode, relevant, mapDisplay.showAll);
     const visible = appearance.visible && !(mode === 'search' && searchMarkers.has(id));
+    // Final recommendations are uniform unless ranked (score-based size); the live ranking only sizes provisional pins.
+    const scale = resultsGate.active && finalPins.has(id) ? rankedPin(id)?.scale ?? 1 : appearance.scale;
     setMarkerVisible(pin, visible);
-    pin.style.setProperty('--pin-scale', String(appearance.scale));
+    pin.style.setProperty('--pin-scale', String(scale));
     const shadow = shadows[Number(pin.dataset.index)]?.getElement();
     if (shadow) {
       setMarkerVisible(shadow, visible);
-      shadow.style.setProperty('--pin-scale', String(appearance.scale));
+      shadow.style.setProperty('--pin-scale', String(scale));
     }
   }
   for (const [id, { marker }] of searchMarkers) setMarkerVisible(marker.getElement(), markerVisible(mode, 'search', id, mode === 'discovery' ? [placePopup.current()?.id ?? ''] : relevant));
@@ -509,7 +538,9 @@ const radiusFor = (zoom: number) => Math.min(4000, Math.max(400, 1200 * 2 ** (16
  */
 async function showCategories(categories: Category[], detail: 'tiles' | 'full', { refresh = false } = {}) {
   // A user-driven reload (not a map move) hands the pins back to the categories; a map move must not touch final results.
+  const hadResults = resultsGate.active;
   if (!resultsGate.enterReload(refresh)) return;
+  if (hadResults) leaveFinalResults();
   const filters = browsingFilters;
   const filtering = !!(filters.maxPriceBand || filters.cuisines);
   const matches = (place: Place) => matchesBrowsingFilters(place, filters, getCachedDetails(place.tags['catalog:place_id'])?.cuisines);
@@ -1042,18 +1073,22 @@ const stopConvergence = discovery.subscribe(refreshConvergence);
 function applyFinalSearch(state: FinalSearchState) {
   if (state.status === 'idle') {
     hideToast();
+    finalPins.clear();
     if (!resultsGate.active) return;
     resultsGate.set(false); // quiz left results: hand the pins back to the activity layers
     if (currentSelection) void showCategories(currentSelection.categories, currentSelection.detail, { refresh: true });
     else { clearPins(); refreshConvergence(); }
     return;
   }
-  if (state.status === 'loading') { showToast('Finding your matches…', true); return; }
+  if (state.status === 'loading') { matchesView.loading(); showToast('Finding your matches…', true); return; }
   resultsGate.set(true);
+  semanticRanking = null; // the provisional ranking must not resize or hide final pins
+  finalPins.clear();
   closePopup();
   if (state.status === 'error') {
     // Honest failure: the provisional pins are removed rather than left up looking final.
     showPlaces([], () => ({ color: CATEGORY_COLORS.search, scale: 1 }));
+    matchesView.failed(state.message);
     showToast(`Couldn't load your final matches: ${state.message} Press “Show My Matches” to try again.`, true);
     return;
   }
@@ -1061,25 +1096,101 @@ function applyFinalSearch(state: FinalSearchState) {
   pinCategory.clear();
   for (const place of state.places) if (foodCategory) pinCategory.set(place.id, foodCategory.id);
   const color = CATEGORY_COLORS[foodCategory?.id ?? ''] ?? CATEGORY_COLORS.search;
-  showPlaces(state.places, () => ({ color, scale: 1 }), foodCategory?.icon);
+  // Places arrive in result order, so index i is the server's score for place i. Pins start uniform;
+  // Rank My Matches applies these sizes and numbers without re-fetching or re-creating markers.
+  const scores = state.response.results.map(r => r.score);
+  const scales = finalPinScales(scores), stack = finalPinRanks(scores), positions = matchPositions(scores);
+  state.places.forEach((place, i) => finalPins.set(place.id, { scale: scales[i] ?? 1, position: positions[i] ?? i + 1, strength: matchStrength(scales[i] ?? 1) }));
+  const lookById = new Map(state.places.map((place, i) => [place.id, { color, scale: 1, rank: stack[i] }]));
+  showPlaces(state.places, place => lookById.get(place.id) ?? { color, scale: 1 }, foodCategory?.icon);
+  matchesView.shown(state.places.length); // only now are the final matches actually on the map
   if (state.places.length === 0) {
     showToast('No places match your vibe and filters. Try a wider budget or fewer cuisines.', true);
     return;
   }
   hideToast();
-  const bounds = new LngLatBounds();
-  for (const place of state.places) bounds.extend([place.lon, place.lat]);
-  const origin = discovery.getPreferences().origin;
-  if (origin) bounds.extend([origin.location.lng, origin.location.lat]);
-  map.fitBounds(bounds, { padding: 80, maxZoom: 15, duration: 800 });
+  void focusRecommendations(state.response);
+}
+
+/** The last device location the user granted this session (via "Use my location"); never requested here. */
+let lastDeviceFix: { lat: number; lng: number } | null = null;
+discovery.subscribe(prefs => {
+  if (prefs.origin?.source === 'device_geolocation') lastDeviceFix = { ...prefs.origin.location };
+});
+
+/** Center the final recommendations around the user (recommendationFocus.ts), not around the results. */
+async function focusRecommendations(response: Extract<FinalSearchState, { status: 'ready' }>['response']) {
+  const origin = discovery.getPreferences().origin?.location ?? null;
+  const deviceFix = origin ? null : lastDeviceFix ?? await previouslyAuthorizedLocation({
+    permissions: navigator.permissions,
+    geolocation: navigator.geolocation,
+  });
+  // A newer search or leaving results while waiting for a fix must not move the camera.
+  const current = finalSearch.getState();
+  if (!resultsGate.active || current.status !== 'ready' || current.response !== response) return;
+  const here = map.getCenter();
+  const focusAt = recommendationFocus({ origin, deviceFix, current: { lat: here.lat, lng: here.lng } });
+  map.easeTo({ center: [focusAt.center.lng, focusAt.center.lat], zoom: focusZoom(focusAt.source, map.getZoom()), duration: 800 });
 }
 const finalSearch = createFinalSearch({ getPrefs: () => discovery.getPreferences(), getDetails: getCachedDetails, onState: applyFinalSearch });
-const stopFinalSearch = outingProfiles.subscribe(profile => finalSearch.evaluate(profile));
+/**
+ * The final search runs only for a quiz session whose matches the user asked for (Show My Matches,
+ * see matchesView.ts). Leaving results forgets that request, which idles the search and hands the pins back.
+ */
+function evaluateFinalSearch(fromPrefs = false) {
+  const profile = outingProfiles.getSnapshot();
+  matchesView.syncProfile(profile);
+  finalSearch.evaluate(profile && matchesView.isRequested(profile.sessionId) ? profile : null, fromPrefs);
+}
+/** The user handed the map back to the activity layers (a chip or category choice): final results are gone. */
+function leaveFinalResults() {
+  matchesView.reset();
+  finalSearch.evaluate(null);
+}
+const stopFinalSearch = outingProfiles.subscribe(() => evaluateFinalSearch());
+const stopMatchRequests = matchesView.onRequest(() => evaluateFinalSearch());
+
+// ---------------------------------------------------------------------------
+// Rank My Matches: score-sized pins, top-three numbers, restrained emphasis and a legend.
+// Presentation only: same places, same markers, same camera; nothing is re-fetched.
+// ---------------------------------------------------------------------------
+
+const matchLegend = document.createElement('div');
+matchLegend.className = 'vb-match-legend';
+matchLegend.hidden = true;
+matchLegend.setAttribute('role', 'note');
+matchLegend.setAttribute('aria-label', 'Match strength: larger pins fit your vibe more closely. Pins numbered 1 to 3 are your top matches.');
+const legendPin = (scale: number) => `<svg class="vb-legend-pin" viewBox="0 0 28 40" width="${(14 * scale).toFixed(1)}" height="${(20 * scale).toFixed(1)}" aria-hidden="true"><path d="${PIN_PATH}" /></svg>`;
+matchLegend.innerHTML = `<span class="vb-legend-title">Match strength</span>
+  <span class="vb-legend-scale" aria-hidden="true"><span>Weaker</span>${legendPin(0.8)}${legendPin(1.2)}${legendPin(1.6)}<span>Stronger</span></span>
+  <span class="vb-legend-top" aria-hidden="true"><span class="vb-legend-badge">1</span> Top matches are numbered 1–3</span>`;
+matchLegend.style.setProperty('--pin-color', CATEGORY_COLORS.restaurants ?? CATEGORY_COLORS.search);
+document.body.append(matchLegend);
+
+/** Apply (or remove) the ranked look on the existing final pins. Never moves the camera or re-creates markers. */
+function syncMatchRanking() {
+  for (const [id, pin] of pinById) {
+    const ranked = rankedPin(id);
+    const top = !!ranked && ranked.position <= TOP_MATCH_BADGES;
+    pin.classList.toggle('is-ranked', !!ranked);
+    pin.classList.toggle('is-top-match', top);
+    if (ranked) pin.style.setProperty('--pin-strength', ranked.strength.toFixed(3));
+    else pin.style.removeProperty('--pin-strength');
+    const badge = pin.querySelector<HTMLElement>('.pin-rank');
+    if (badge) { badge.hidden = !top; badge.textContent = top ? String(ranked!.position) : ''; }
+    if (ranked) pin.dataset.matchPosition = String(ranked.position);
+    else delete pin.dataset.matchPosition;
+  }
+  matchLegend.hidden = !(resultsGate.active && matchesView.getState().ranked && finalPins.size > 0);
+  updateDealChips(new Date()); // refreshes each pin's accessible name (rank included) and re-culls
+  syncMarkerVisibility(); // applies the sizes; overlaps then favor the stronger match
+}
+const stopMatchRanking = matchesView.subscribe(syncMatchRanking);
 const stopFinalPrefs = discovery.subscribe(prefs => {
   const { maxPriceBand, cuisines } = filtersFor(prefs);
   const changed = maxPriceBand !== browsingFilters.maxPriceBand || cuisines?.join() !== browsingFilters.cuisines?.join();
   browsingFilters = { maxPriceBand, cuisines };
-  finalSearch.evaluate(outingProfiles.getSnapshot(), true);
+  evaluateFinalSearch(true);
   if (changed && currentSelection && outingProfiles.getSnapshot()?.phase !== 'results') {
     void showCategories(currentSelection.categories, currentSelection.detail, { refresh: true });
   }
@@ -1165,6 +1276,9 @@ if (import.meta.hot) import.meta.hot.dispose(() => {
   composer.destroy();
   stopConvergence();
   stopFinalSearch();
+  stopMatchRequests();
+  stopMatchRanking();
+  matchLegend.remove();
   stopFinalPrefs();
   finalSearch.destroy();
   convergence.destroy();

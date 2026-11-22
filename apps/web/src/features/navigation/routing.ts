@@ -102,7 +102,7 @@ export function toRouteResult(r: FetchRouteResult, provider: string, retrievedAt
 }
 
 export function createApiRouteProvider(fetchImpl?: typeof fetch, now: () => Date = () => new Date()): RouteProvider {
-  const name = 'MBTA V3 via the Vibenta transit API';
+  const name = 'MBTA V3 via the Vibewise transit API';
   const point = (e: RouteEndpoint): LatLng => ({ lat: e.location.lat, lng: e.location.lng });
   return {
     name,
