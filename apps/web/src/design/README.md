@@ -1,4 +1,24 @@
-# Vibenta Visual Foundation — live previews (design experiment)
+# Vibenta design
+
+## Identity (default UI)
+
+The shipped look is the Vibenta identity, on by default with no flag. The `?visual=` previews described further down are an earlier experiment; they still work but are superseded.
+
+- `icons.ts`: the original 26-icon screen-print family (`vx-i-pop` colour region, `vx-i-ink` strokes). Served through `icon()`/`ICONS` in `features/discovery/ui/dom.ts`; the pop colour is set per meaning (cobalt = wayfinding, coral = personal/saved, lime = default).
+- `wordmark.ts`: the hand-lettered SVG wordmark in the Preferences header.
+- `sceneAccent.ts`: `withSceneAccent(target)` wraps the scene theme target in `main.ts`. Only `--vx-scene-accent` and `data-scene-tone` follow the rendered scene; the rest of the UI stays constant.
+- `identity/` CSS, imported last in `main.ts` through `index.css`:
+  - `tokens.css`: Carbon ramp, accent roles, silhouette tokens, and legacy aliases (`--surface`, `--accent`, `--vb-*`).
+  - `base.css`: type roles, icons, wordmark, motifs, buttons, fields, popovers, focus.
+  - `surfaces.css`: per-widget silhouettes (Quick Tools, Preferences, Search/Saved, Directions, venue popup, account, map controls, toast, phones).
+  - `quiz.css`: vibe entry, the Start vibe quiz button, quiz cards, Session B stage and `.vb-media-*`, scoped under `.vb-discovery`.
+- Fonts (SIL OFL, Google Fonts in `index.html`): Londrina Solid (display), Bricolage Grotesque (interface), Space Mono (labels).
+- Silhouettes use CSS `corner-shape` (Chromium 139+). Other browsers fall back to asymmetric rounded corners.
+- Ground textures live in `features/map/baseMaterials.ts`; building material tones and road widths in `mapStyle.ts`.
+
+Checks: `__tests__/identity.test.ts`, `features/map/__tests__/baseMaterials.test.ts`, screenshots via `node scripts/visual-identity-browser.mjs [shots.json]`. Evidence is in `docs/qa/visual-identity/`; the full status is in `docs/VISUAL_IDENTITY_HANDOFF.md`.
+
+## Visual Foundation previews (superseded experiment)
 
 The purpose of this branch is **art direction in the real UI and real 3D MapLibre map**, not a layout redesign. It is based on `feature/scene-map-integration` (draft PR #42) so the neutral baseline also feeds Scene Composer. All experiments are off unless explicitly requested in a local Vite development URL.
 

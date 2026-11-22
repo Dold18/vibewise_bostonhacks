@@ -100,13 +100,14 @@ node scripts/visual-identity-browser.mjs [shots.json]  # screenshots (headless C
 
   | Suite | Branch | Baseline | Notes |
   |---|---|---|---|
-  | `check-navigation-browser.mjs` | 55 pass, 1 fail | 56 pass, 0 fail | See below |
-  | `vibe-browser.mjs` | 29 pass, 1 fail* | 30 pass, 0 fail | *Fixed since, not yet re-run |
+  | `check-navigation-browser.mjs` | 56 pass, 0 fail | 56 pass, 0 fail | Re-run 2026-11-22 (session 2), see below |
+  | `vibe-browser.mjs` | 30 pass, 0 fail | 30 pass, 0 fail | Re-run 2026-11-22 (session 2) |
   | `session-b-browser.mjs` | 73 pass, 4 fail | 73 pass, 4 fail | Same 4 failures on both |
 
-  - **Navigation:** the only failure is `preferences keep blue header and field accents`, which asserts the **old blue design**, so the redesign fails it intentionally. **TODO:** update that check (`scripts/check-navigation-browser.mjs` line 41) to assert the new identity. The `mobile Directions … onScreen` failure seen earlier was timing on the slide-in animation; it passed in the two latest runs.
-  - **Vibe:** it failed `scene session … listeners===1` because the old `connectSceneAccent` subscribed separately. That's fixed by `withSceneAccent`. **Re-run it to confirm.**
+  - **Navigation:** the old blue-header check now asserts the identity (header in `--vx-text` with Londrina, coral `::after` marker, `--vx-text-faint` labels), resolved through a token probe. The baseline fails it, as it should. `mobile Directions … onScreen` was flaky, and the cause wasn't the CSS: under swiftshader the page runs at a few fps, so the sheet was measured on the first frame of `vb-sheet` + `vb-enter` (24 + 8 = 32 px below the fold). The suite now waits for finite animations to finish (`settled()`) before measuring. `Exit … releases pitch` failed once, only while two swiftshader suites ran in parallel. Run the suites one at a time.
+  - **Vibe:** the `listeners===1` failure is fixed by `withSceneAccent`. Confirmed 30/30.
   - **Session B:** the same 4 failures exist on the untouched baseline (390 px "preview leaves map unchanged", the two "Gemini failure authored B1/B2" checks, and harness `Invalid InterceptionId` errors), so they're pre-existing.
+  - **Software-GL frame rate:** a 1 s rAF count after opening mobile Directions gives **3 fps on the branch vs 6 fps on the baseline** (swiftshader). On a GPU both run at about 55 fps (above). The extra cost comes from 30 building layers, contact shadows and material overlays. Machines that fall back to software WebGL will feel it. A cheaper path would be collapsing materials to one layer per band when the GL renderer string (`WEBGL_debug_renderer_info`) reports SwiftShader or another software renderer. Not done.
 - **Screenshots** captured: 1440×900, 1366×768, 390×844, 360×640. States: default, dropdown, vibe step, quiz, quiz launch, search, saved, venue popup, mobile sheet, mobile dropdown, keyboard focus. Road zooms: z12/z13 2D, z14/z15/z16/z17.5 tilt, z16 2D. Scratch copies are in `/private/tmp/claude-503/.../scratchpad/`; committed evidence is in `docs/qa/visual-identity/`.
 - **Keyboard:** Tab and Enter work. Focus rings are cobalt-light (`#a3b5ff`); field triggers show focus with a cobalt border and ring. Tab order still starts at the map pins (their DOM order), which is existing behavior.
 - **Reduced motion:** the harness emulates `prefers-reduced-motion: reduce` by default, and the identity's transforms and transitions are disabled under it.
@@ -114,7 +115,7 @@ node scripts/visual-identity-browser.mjs [shots.json]  # screenshots (headless C
 ## Remaining work / next steps
 
 1. **Re-verify after the last refactor.** Re-run `vibe-browser.mjs` and the materials screenshots, because the static overlay layers plus `updateImage` haven't been visually re-checked since the change. Confirm `vibentaMaterials.stats().loaded` lists all 4 surfaces and the grain is visible on City Hall Plaza, the Common, and the harbor.
-2. **Update the outdated navigation check** (blue header) to the new identity's colors.
+2. ~~Update the outdated navigation check~~ Done (session 2).
 3. **Account popover:** styled but **unverified in the browser**, because accounts are disabled without Supabase env ("Accounts unavailable"). Verify it with credentials.
 4. **Route planner and Directions** on desktop: covered by the navigation suite, but no visual review screenshot was taken yet.
 5. **Recapture the final evidence** (the road/building before-after was shot before the final brick-tone reduction), and add 1366 and 360 screenshots to `docs/qa/visual-identity/`.
@@ -122,7 +123,7 @@ node scripts/visual-identity-browser.mjs [shots.json]  # screenshots (headless C
    - The `zoomOut` icon's pop smear could be calmer.
    - The z17 brick roof tone is still slightly warm.
    - The `v1/concrete-pores` urban grain is barely visible; raise it or drop it.
-7. Update `apps/web/src/design/README.md` with an Identity section. The `?visual=` previews are now superseded but left in place.
+7. ~~Update `apps/web/src/design/README.md` with an Identity section~~ Done (session 2).
 8. **Push the branch and open a draft PR** against `main`, but only with the user's approval. Note in the PR that it's stacked on #44.
 
 ## Known limitations
