@@ -333,6 +333,118 @@
           "placement": "contextual_hero_or_accent"
         }
       ]
+    },
+    {
+      "id": "greek-taverna",
+      "packSlug": "greek-island-village-and-harbour",
+      "sourceUrl": "https://3dassets.dev/packs/greek-island-village-and-harbour",
+      "wanted": [
+        {
+          "title": "Taverna Front With Awning",
+          "tags": [
+            "greek",
+            "mediterranean",
+            "restaurant"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Taverna Serving Counter",
+          "tags": [
+            "greek",
+            "dining",
+            "restaurant"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Grape Pergola With Vine",
+          "tags": [
+            "greek",
+            "mediterranean",
+            "romantic"
+          ],
+          "placement": "contextual_hero_or_accent"
+        }
+      ]
+    },
+    {
+      "id": "korean-market",
+      "packSlug": "korean-hanok-village-and-street",
+      "sourceUrl": "https://3dassets.dev/packs/korean-hanok-village-and-street",
+      "wanted": [
+        {
+          "title": "Low Table",
+          "tags": [
+            "korean",
+            "dining",
+            "cozy"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Hanging Paper Lantern",
+          "tags": [
+            "korean",
+            "warm",
+            "traditional"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Market Stall With Awning",
+          "tags": [
+            "korean",
+            "market",
+            "street_food"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Produce Basket Set",
+          "tags": [
+            "korean",
+            "food",
+            "market"
+          ],
+          "placement": "contextual_hero_or_accent"
+        }
+      ]
+    },
+    {
+      "id": "music-studio",
+      "packSlug": "music-recording-studio-and-instruments",
+      "sourceUrl": "https://3dassets.dev/packs/music-recording-studio-and-instruments",
+      "wanted": [
+        {
+          "title": "Vocal Microphone with Pop Shield",
+          "tags": [
+            "hip_hop",
+            "pop",
+            "rnb_soul",
+            "recording"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Synth Keyboard on an X Stand",
+          "tags": [
+            "lofi",
+            "electronic",
+            "indie_alternative"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Mixing Console",
+          "tags": [
+            "recording",
+            "music",
+            "lofi"
+          ],
+          "placement": "contextual_hero_or_accent"
+        }
+      ]
     }
   ]
 }
