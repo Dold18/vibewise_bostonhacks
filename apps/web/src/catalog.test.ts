@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Deal } from './deals';
 import { CATEGORIES, type Category } from './osm';
-import { nearestByCategory, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
+import { DEALS_EMBED, fetchDetailsWith, getCachedDetails, nearestByCategory, resetDealsEmbedForTests, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
 
 const cat = (id: string) => CATEGORIES.find((c) => c.id === id) as Category;
 const CENTER = { lat: 42.3555, lon: -71.0636 };
@@ -39,6 +40,17 @@ const DETAILS: CatalogDetails = {
   attribution: '© OpenStreetMap contributors (ODbL)',
   price_band: 'unknown',
   price_source: null,
+  deals: [],
+};
+
+const DEAL: Deal = {
+  kind: 'student',
+  title: '10% off with student ID',
+  timing: 'any_time',
+  schedule: null,
+  source: 'curated',
+  sourceUrl: null,
+  checkedAt: '2026-11-01T00:00:00Z',
 };
 
 describe('parsePoint', () => {
@@ -149,5 +161,65 @@ describe('price on the card', () => {
 
   it('omits price tags without details', () => {
     expect(pinToPlace(pin()).tags['catalog:price_band']).toBeUndefined();
+  });
+});
+
+describe('deals on places', () => {
+  it('puts non-empty deals on the place', () => {
+    expect(pinToPlace(pin(), { ...DETAILS, deals: [DEAL] }).deals).toEqual([DEAL]);
+  });
+  it('leaves deals undefined when there are none', () => {
+    expect(pinToPlace(pin(), DETAILS).deals).toBeUndefined();
+    expect(pinToPlace(pin()).deals).toBeUndefined();
+  });
+});
+
+describe('fetchDetailsWith', () => {
+  beforeEach(resetDealsEmbedForTests);
+  const baseRow = (id: string) => ({ place_id: id, address: null, website: null, phone: null, cuisines: null, hours_raw: null, osm_tags: null, attribution: 'x', price_band: 'unknown', price_source: null });
+
+  it('requests the deals embed and parses embedded rows, dropping malformed ones', async () => {
+    const query = vi.fn(async (_columns: string, ids: string[]) => ({
+      data: ids.map((id) => ({
+        ...baseRow(id),
+        place_deals: [{ kind: 'student', title: 'T', timing: 'any_time', schedule: null, source: 'curated', source_url: null, checked_at: '2026-11-01T00:00:00Z' }, { junk: true }],
+      })),
+      error: null,
+    }));
+    await fetchDetailsWith(query, ['ok:1']);
+    expect(query.mock.calls[0][0]).toContain(DEALS_EMBED);
+    expect(getCachedDetails('ok:1')?.deals).toHaveLength(1);
+  });
+
+  it('retries without the embed once, warns once, and skips the embed afterwards', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const query = vi.fn(async (columns: string, ids: string[]) =>
+      columns.includes('place_deals')
+        ? { data: null, error: { message: 'relation place_deals does not exist' } }
+        : { data: ids.map(baseRow), error: null },
+    );
+    await fetchDetailsWith(query, ['fb:1']);
+    expect(query).toHaveBeenCalledTimes(2);
+    expect(query.mock.calls[0][0]).toContain('place_deals');
+    expect(query.mock.calls[1][0]).not.toContain('place_deals');
+    expect(getCachedDetails('fb:1')?.deals).toEqual([]);
+
+    await fetchDetailsWith(query, ['fb:2']);
+    expect(query).toHaveBeenCalledTimes(3);
+    expect(query.mock.calls[2][0]).not.toContain('place_deals');
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toBe('[catalog] deals unavailable:');
+    warn.mockRestore();
+  });
+
+  it('keeps the embed enabled and does not warn when the plain retry fails too (outage)', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const query = vi.fn(async (_columns: string, _ids: string[]) => ({ data: null, error: { message: 'boom' } }));
+    await expect(fetchDetailsWith(query, ['bad:1'])).rejects.toThrow('boom');
+    expect(query).toHaveBeenCalledTimes(2);
+    expect(warn).not.toHaveBeenCalled();
+    await expect(fetchDetailsWith(query, ['bad:1'])).rejects.toThrow('boom');
+    expect(query.mock.calls[2][0]).toContain('place_deals');
+    warn.mockRestore();
   });
 });

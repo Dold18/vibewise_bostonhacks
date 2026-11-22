@@ -96,6 +96,7 @@
 - [ ] Public/authorized event records with date, price, location and visibility.
 - [ ] Student feedback contribution and opt-in verification foundation.
 - [ ] Do not display false visitor age or fabricated campus attendance.
+- [ ] Deal markers on map pins (student discounts and specials, proposed P-015): `docs/superpowers/specs/2026-11-21-deal-markers-design.md`.
 
 ### M9 — Recreate and multi-stop outings
 - [ ] Compare image reference to authorized real destination photographs.

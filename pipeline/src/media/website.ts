@@ -121,12 +121,12 @@ const THIRD_PARTY_HOSTS = [
   'beacons.ai', 'linkin.bio', 'zmenu.com', 'restaurantji.com', 'menufy.com',
 ];
 
-function isThirdParty(url: string): boolean {
+export function isThirdParty(url: string): boolean {
   const host = new URL(url).hostname.toLowerCase().replace(/\.$/, '');
   return THIRD_PARTY_HOSTS.some((h) => host === h || host.endsWith(`.${h}`));
 }
 
-function websiteUrl(raw: string): string | null {
+export function websiteUrl(raw: string): string | null {
   const v = raw.trim();
   try {
     const u = new URL(/^https?:\/\//i.test(v) ? v : `https://${v}`);

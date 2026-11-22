@@ -145,6 +145,17 @@ Migration `supabase/migrations/20261121200000_create_place_media.sql`. Full desi
 | `restaurant_points` view | `restaurants` with plain `lat`/`lng` for the pipeline | Service role only |
 | Storage bucket `place-photos` | Student uploads under `<user_id>/…`, JPEG/PNG/WebP, 5 MB max | Public read; users write their own folder |
 
+## 3c. Deals (proposed, P-015)
+Migration `supabase/migrations/20261122090000_create_place_deals.sql`. Full design: `docs/superpowers/specs/2026-11-21-deal-markers-design.md` §1, §2.
+
+| Table / object | Purpose | Access |
+|---|---|---|
+| `place_deals` | Student discounts and specials per place: `kind` (`student`/`special`), `title`, public `quote`, `timing` (`any_time`/`scheduled`/`unconfirmed`), `schedule` (JSON windows in Boston time, set iff `scheduled`), `source` (`curated`/`osm`/`website`), `source_url`, `checked_at`, `hidden` | Everyone reads non-hidden rows; no client writes |
+| `restaurants.deals_checked_at` | When `enrich:deals` last scanned the place's website | — |
+| `restaurant_points` view | Gains `deals_checked_at` and `last_seen_at` | Service role only |
+
+Checks: `any_time` only for `kind = 'student'`; `schedule` is non-null if and only if `timing = 'scheduled'`; `title` ≤ 120 and `quote` ≤ 200 characters. A deal is active only when `checked_at` is within 90 days **and** either `any_time` or (`scheduled` and now in a window).
+
 ## 4. Offline enrichment pipeline
 Extends brief §3.1. All steps run as a batch job, never from the browser. The principles and input tiers live in [EMBEDDING_PIPELINE.md §4](EMBEDDING_PIPELINE.md); the mechanics of each step (scraping, caching, staging) are owned by the pipeline workstream.
 

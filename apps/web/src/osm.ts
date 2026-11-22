@@ -9,6 +9,7 @@
  * The editing API at api.openstreetmap.org is deliberately not used: its
  * policy reserves it for editing, not for apps reading data.
  */
+import type { Deal } from './deals';
 
 export interface Place {
   /** OSM identity, e.g. "node/123", when known; otherwise a synthetic id. */
@@ -18,6 +19,8 @@ export interface Place {
   lon: number;
   category: string;
   tags: Record<string, string>;
+  /** Student discounts and specials, when the catalog has any for this place. */
+  deals?: Deal[];
 }
 
 const NOMINATIM = 'https://nominatim.openstreetmap.org/search';
