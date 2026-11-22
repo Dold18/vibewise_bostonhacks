@@ -1087,6 +1087,72 @@
       "priority": "P1",
       "status": "sourced_not_downloaded",
       "caveat": "Check model-level files, usable formats, license text and content before importing."
+    },
+    {
+      "id": "3dassets-greek-island",
+      "publisher": "3DAssets.dev",
+      "name": "Greek Island Village and Harbour",
+      "sourceUrl": "https://3dassets.dev/packs/greek-island-village-and-harbour",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 61,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "greek",
+        "mediterranean",
+        "romantic",
+        "taverna",
+        "coastal"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Includes Greek taverna front, serving counter and grape pergola; scene must not be treated as real Boston architecture."
+    },
+    {
+      "id": "3dassets-korean-hanok",
+      "publisher": "3DAssets.dev",
+      "name": "Korean Hanok Village and Street",
+      "sourceUrl": "https://3dassets.dev/packs/korean-hanok-village-and-street",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 62,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "korean",
+        "traditional",
+        "market",
+        "street_food"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Low table, paper lantern and market props; contains no verified Korean BBQ meal props."
+    },
+    {
+      "id": "3dassets-music-studio",
+      "publisher": "3DAssets.dev",
+      "name": "Music Recording Studio and Instruments",
+      "sourceUrl": "https://3dassets.dev/packs/music-recording-studio-and-instruments",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 48,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "music",
+        "recording",
+        "lofi",
+        "hip_hop",
+        "pop",
+        "rnb_soul"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Studio equipment includes vocal mic, synthesizer and mixing console; no audio playback is included."
     }
   ],
   "recipes": [
@@ -1533,9 +1599,9 @@
   "openGaps": [
     "Specific cuisine hero objects (pasta plates, pizza oven, ramen lanterns, taco stand) require per-model inspection; source theme tags do not prove inclusion.",
     "Art/museum/science installations and sports-specific accents need dedicated sourcing.",
-    "Custom set-piece compositions must be authored from licensed primitives; none of the proposed recipes are prebuilt.",
     "Download, hash, license-file archiving, GLB conversion, compression, scale normalization and browser performance validation are still pending.",
-    "Jazz sources now identified, but no musical props have been imported or browser-QA tested."
+    "Jazz sources now identified, but no musical props have been imported or browser-QA tested.",
+    "Custom set-piece compositions must be authored from licensed primitives; none of the proposed recipes are prebuilt."
   ],
   "acceptanceForImport": [
     "Select concrete models by verified filename/thumbnail, not inferred pack title.",
@@ -1557,6 +1623,9 @@
     "noAssumptions": "Never infer actual venue cuisine, music programming or cultural detail from the visual theme alone. Only mix genres explicitly supplied by user or supported by venue data.",
     "qualityPriority": "Prefer fewer recognizable, versatile, visually coherent hero/ambient props over high generic asset counts.",
     "licenseRestriction": "Do not import free-for-use packs with 'do not redistribute' terms into public GitHub; permit explicit authorized embedding only after legal review.",
-    "countRule": "Advertised model counts and conceptual recipes are not imported or renderer-ready assets."
+    "countRule": "Advertised model counts and conceptual recipes are not imported or renderer-ready assets.",
+    "curatedGLBFile": "apps/web/public/scene-assets/sources/curated-3dassets.v1.json",
+    "curatedDownloader": "scripts/import-3dassets-curated.mjs",
+    "curatedStatus": "40 exact-named models selected from ten packs; not yet downloaded or rendered"
   }
 }
