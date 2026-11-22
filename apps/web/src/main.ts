@@ -14,6 +14,7 @@ import { focalLengthPx, perspectiveScale, quantizeScale } from './pinPerspective
 import { CAMERA_KEYS, cameraStep, isTypingTarget } from './keyboardCamera';
 import { cullOrder, cullOverlapping, cullsAtZoom, type PinBox } from './pinCulling';
 import { mountAccount } from './features/account';
+import { photoAccess, fromAccountStore } from './features/vibe/photoAccess';
 import { mountScene, sceneDevHook } from './features/scene';
 import {
   CATEGORIES,
@@ -913,6 +914,7 @@ const discovery = mountDiscoveryPanel(document.body, {
 });
 // Account taste and the scene composer retain ownership of map appearance.
 const account = mountAccount(document.body, { map });
+photoAccess.connect(fromAccountStore(account.store, account.openSignIn));
 const scene = mountScene({
   theme: account.theme,
   account: account.store,

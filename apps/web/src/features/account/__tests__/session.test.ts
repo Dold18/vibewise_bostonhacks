@@ -32,12 +32,17 @@ class FakeBackend implements AccountBackend {
   holdEvents: ReturnType<typeof deferred<void>> | null = null;
   inserts = 0;
   loads = 0;
+  tokenCalls = 0;
 
   private emit() {
     for (const l of this.listeners) l(this.user);
   }
   async getUser() {
     return this.user;
+  }
+  async getAccessToken() {
+    this.tokenCalls++;
+    return this.user ? 'tok' : null;
   }
   onAuthChange(cb: (u: AccountUser | null) => void) {
     this.listeners.add(cb);
@@ -113,6 +118,20 @@ function signedIn(state: AccountState) {
 describe('account store', () => {
   it('is unavailable without a backend', () => {
     expect(createAccountStore(null, { includeDev: false }).getState()).toEqual({ status: 'unavailable' });
+  });
+
+  it('getAccessToken returns the backend token when signed in', async () => {
+    const { backend, store } = await setup();
+    backend.user = A;
+    await store.start();
+    expect(await store.getAccessToken()).toBe('tok');
+  });
+
+  it('getAccessToken is null when signed out and does not ask the backend', async () => {
+    const { backend, store } = await setup();
+    await store.start();
+    expect(await store.getAccessToken()).toBeNull();
+    expect(backend.tokenCalls).toBe(0);
   });
 
   it('starts signed out when there is no session', async () => {
