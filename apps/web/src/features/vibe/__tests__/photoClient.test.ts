@@ -76,7 +76,11 @@ describe('photoClient', () => {
     expect(fetchImpl).toHaveBeenCalledTimes(2);
   });
   it('quota parses the body, null when signed out or 401', async () => {
-    expect(await setup(() => res(200, { remainingToday: 3, limit: 5 })).client.quota()).toEqual({ remainingToday: 3, limit: 5 });
+    const q = setup(() => res(200, { remainingToday: 3, limit: 5 }));
+    expect(await q.client.quota()).toEqual({ remainingToday: 3, limit: 5 });
+    const [url, init] = q.fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe('/api/vibe/photo-quota');
+    expect((init.headers as Record<string, string>).Authorization).toBe('Bearer t');
     expect(await setup(() => res(401, {})).client.quota()).toBeNull();
     expect(await setup(() => res(200, {}), null).client.quota()).toBeNull();
   });

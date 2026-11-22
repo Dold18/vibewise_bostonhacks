@@ -16,7 +16,7 @@ export const PHOTO_MESSAGES: Record<PhotoFailure, string> = {
   unavailable: 'Photo reading is unavailable right now. Retry, or remove the photo to send your words.',
 };
 const DESCRIBE_URL = '/api/vibe/describe-image';
-const QUOTA_URL = '/api/vibe/describe-image/quota';
+const QUOTA_URL = '/api/vibe/photo-quota';
 const TIMEOUT_MS = 30_000;
 const fail = (reason: PhotoFailure): PhotoResult => ({ ok: false, reason, message: PHOTO_MESSAGES[reason] });
 
