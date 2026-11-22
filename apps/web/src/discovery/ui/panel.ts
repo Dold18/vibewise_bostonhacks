@@ -144,6 +144,8 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
       // Editing the draft or pressing Clear all while the photo is read cancels this start.
       const isCurrent = () => prefs.getState().vibeText === p.vibeText && prefs.getState().vibeImages[0] === p.vibeImages[0];
       result = await prepareMessage({ text: p.vibeText, photo, client: photoClient, isCurrent });
+      // As before photos: an empty description still opens the quiz, which asks its first question from nothing.
+      if (!result.ok && result.reason === 'empty') result = { ok: true, text: '', imageCount: 0 };
     } finally {
       startingQuiz = false;
       beginQuiz.disabled = false;
@@ -156,7 +158,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     }
     if (!result.ok) {
       // Stay on the vibe screen with the draft and the reason.
-      vibeStep.setPhoto({ status: { text: result.message, kind: result.reason === 'empty' ? 'info' : 'error' }, busy: false });
+      vibeStep.setPhoto({ status: { text: result.message, kind: 'error' }, busy: false });
       return;
     }
     vibeStep.setPhoto(photo ? { description: photoClient.cached(photo) ?? null, status: null, busy: false } : { status: null });
