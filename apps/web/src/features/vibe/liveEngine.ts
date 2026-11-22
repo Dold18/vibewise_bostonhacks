@@ -1,3 +1,4 @@
+import { sessionBQuestion } from './sessionB.ts';
 import { constraintsText, embeddingText, evidenceFrom } from './evidence.ts';
 import { mapDisplay } from './convergence.ts';
 import { fallbackQuestion, guidanceFor } from './families.ts';
@@ -49,7 +50,9 @@ export function createLiveVibeSession(generator:GenerationProvider,embedder:Embe
   if(!state)return;generation?.abort();const abort=new AbortController();generation=abort;
   const p=state,id=p.sessionId,v=p.version,c=contextFor(p);
   try {
-   const result=validateGeneration(await generator.generate(c,abort.signal),c);
+   const generated=await generator.generate(c,abort.signal);
+   const authored=sessionBQuestion(c);
+   const result=validateGeneration(authored?{...generated,nextQuestion:authored}:generated,c);
    if(!own(id,v)||abort.signal.aborted)return;
    const constraints=constraintsText(state!.evidence);
    const summary=[result.vibe_so_far,constraints].filter(Boolean).join(' ');
@@ -62,7 +65,7 @@ export function createLiveVibeSession(generator:GenerationProvider,embedder:Embe
    void embedCurrent();
   } catch {
    if(!own(id,v)||abort.signal.aborted)return;
-   const question=fallbackQuestion(c), completion=completionFor(state!,'refine');
+   const question=sessionBQuestion(c)??fallbackQuestion(c), completion=completionFor(state!,'refine');
    publish({...state!,question,phase:userResults||!question?'results':'question',generation:'fallback',completion:userResults?{...completion,recommended:true,reason:'user_request'}:completion,
     notice:'Using a local question while the AI is unavailable. Your last AI summary is unchanged; new answers still update semantic matching.'});
    void embedCurrent();

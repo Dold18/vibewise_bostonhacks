@@ -1,0 +1,117 @@
+{
+  "schema": "session-b-assets/1",
+  "sensoryAcceptance": "pending; storyboards are functional placeholders, not finished atmospheric art",
+  "inspection": "Adaptive engine branch has no public scene imagery. Visual-preview worktree library was inspected read-only: map textures and 3D packs are not composed caf\u00e9 POVs and were not reused.",
+  "rights": "Original code-native SVGs; no third-party media or AI bitmap generation. No claim of legal review or final creative approval.",
+  "assets": [
+    {
+      "assetId": "session-b-v1-bakery-arrive",
+      "file": "apps/web/public/quiz-scenes/session-b-v1/bakery-arrive.svg",
+      "scene": "bakery",
+      "beat": "arrive",
+      "sha256": "117f5241f326c329906224ed68d55904e720364df569ea84b494515af040f935",
+      "status": "original_storyboard_placeholder",
+      "creator": "Codex, original SVG geometry authored for this prototype",
+      "sourceInputs": "Original written Session B brief; no external images, characters, models or traced artwork",
+      "date": "2026-11-21",
+      "use": "Temporary quiz-only illustration; never a venue photo",
+      "productionNeeded": "Art-directed atmospheric final image, continuity review and human alt-text review before sensory acceptance"
+    },
+    {
+      "assetId": "session-b-v1-bakery-settle",
+      "file": "apps/web/public/quiz-scenes/session-b-v1/bakery-settle.svg",
+      "scene": "bakery",
+      "beat": "settle",
+      "sha256": "188a033fb66d840998707627ab2f5b89454e87b91b782b029e96d9cb66027053",
+      "status": "original_storyboard_placeholder",
+      "creator": "Codex, original SVG geometry authored for this prototype",
+      "sourceInputs": "Original written Session B brief; no external images, characters, models or traced artwork",
+      "date": "2026-11-21",
+      "use": "Temporary quiz-only illustration; never a venue photo",
+      "productionNeeded": "Art-directed atmospheric final image, continuity review and human alt-text review before sensory acceptance"
+    },
+    {
+      "assetId": "session-b-v1-bakery-stay",
+      "file": "apps/web/public/quiz-scenes/session-b-v1/bakery-stay.svg",
+      "scene": "bakery",
+      "beat": "stay",
+      "sha256": "5be81f9502020e5ed79182182a2cb4f4c94fdd89429c7fc6a6e1e63db22977ca",
+      "status": "original_storyboard_placeholder",
+      "creator": "Codex, original SVG geometry authored for this prototype",
+      "sourceInputs": "Original written Session B brief; no external images, characters, models or traced artwork",
+      "date": "2026-11-21",
+      "use": "Temporary quiz-only illustration; never a venue photo",
+      "productionNeeded": "Art-directed atmospheric final image, continuity review and human alt-text review before sensory acceptance"
+    },
+    {
+      "assetId": "session-b-v1-bakery-leave",
+      "file": "apps/web/public/quiz-scenes/session-b-v1/bakery-leave.svg",
+      "scene": "bakery",
+      "beat": "leave",
+      "sha256": "2f593d088d32cec12655b5f01c9330c67ebf0545af6373870406de59e885ba46",
+      "status": "original_storyboard_placeholder",
+      "creator": "Codex, original SVG geometry authored for this prototype",
+      "sourceInputs": "Original written Session B brief; no external images, characters, models or traced artwork",
+      "date": "2026-11-21",
+      "use": "Temporary quiz-only illustration; never a venue photo",
+      "productionNeeded": "Art-directed atmospheric final image, continuity review and human alt-text review before sensory acceptance"
+    },
+    {
+      "assetId": "session-b-v1-nook-arrive",
+      "file": "apps/web/public/quiz-scenes/session-b-v1/nook-arrive.svg",
+      "scene": "nook",
+      "beat": "arrive",
+      "sha256": "dbe42168b081b0beb19b1262c340341528e4120b095c251df7ce5f4662f011d2",
+      "status": "original_storyboard_placeholder",
+      "creator": "Codex, original SVG geometry authored for this prototype",
+      "sourceInputs": "Original written Session B brief; no external images, characters, models or traced artwork",
+      "date": "2026-11-21",
+      "use": "Temporary quiz-only illustration; never a venue photo",
+      "productionNeeded": "Art-directed atmospheric final image, continuity review and human alt-text review before sensory acceptance"
+    },
+    {
+      "assetId": "session-b-v1-nook-settle",
+      "file": "apps/web/public/quiz-scenes/session-b-v1/nook-settle.svg",
+      "scene": "nook",
+      "beat": "settle",
+      "sha256": "4ed2a7e0085942d1f2362718e4db76ccf7275fdb7a71af26af0aa1a1a5bbbf02",
+      "status": "original_storyboard_placeholder",
+      "creator": "Codex, original SVG geometry authored for this prototype",
+      "sourceInputs": "Original written Session B brief; no external images, characters, models or traced artwork",
+      "date": "2026-11-21",
+      "use": "Temporary quiz-only illustration; never a venue photo",
+      "productionNeeded": "Art-directed atmospheric final image, continuity review and human alt-text review before sensory acceptance"
+    },
+    {
+      "assetId": "session-b-v1-nook-stay",
+      "file": "apps/web/public/quiz-scenes/session-b-v1/nook-stay.svg",
+      "scene": "nook",
+      "beat": "stay",
+      "sha256": "46cf224d3c2151d053666e94a14f78b5a6c28f8ba7c2a61159e3a98708080bb1",
+      "status": "original_storyboard_placeholder",
+      "creator": "Codex, original SVG geometry authored for this prototype",
+      "sourceInputs": "Original written Session B brief; no external images, characters, models or traced artwork",
+      "date": "2026-11-21",
+      "use": "Temporary quiz-only illustration; never a venue photo",
+      "productionNeeded": "Art-directed atmospheric final image, continuity review and human alt-text review before sensory acceptance"
+    },
+    {
+      "assetId": "session-b-v1-nook-leave",
+      "file": "apps/web/public/quiz-scenes/session-b-v1/nook-leave.svg",
+      "scene": "nook",
+      "beat": "leave",
+      "sha256": "f25b00c912d4476e5562677827e7ddf169245fc2e74ba01a412a2c1e404d4641",
+      "status": "original_storyboard_placeholder",
+      "creator": "Codex, original SVG geometry authored for this prototype",
+      "sourceInputs": "Original written Session B brief; no external images, characters, models or traced artwork",
+      "date": "2026-11-21",
+      "use": "Temporary quiz-only illustration; never a venue photo",
+      "productionNeeded": "Art-directed atmospheric final image, continuity review and human alt-text review before sensory acceptance"
+    }
+  ],
+  "referenceOnly": {
+    "title": "Kiki's Delivery Service",
+    "source": "https://www.ghibli.jp/works/majo/",
+    "media": "none; optional text association only"
+  }
+}

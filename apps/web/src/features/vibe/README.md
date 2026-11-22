@@ -13,6 +13,8 @@ From `apps/web`, run `npm test`, `npm run build`, or `npm run dev:all`. Put `GEM
 
 Missing Gemini produces a labeled local question while preserving summary/history. Missing MiniLM publishes unavailable. Missing catalog fingerprint retains ordinary map pins; exact catalog setup is in EMBEDDING_PIPELINE.md. Photos are preserved locally but not analyzed. Automated fixtures never call paid providers or represent real Boston rankings. Session state is not durable across reloads.
 
+Session B's bounded scene-stage prototype activates for `Coffee. Brain's fried.` (punctuation and apostrophe variants accepted). See [implementation, asset limitations and verification](../../../../../docs/SESSION_B_PROTOTYPE.md). Other inputs keep the ordinary adaptive quiz. Inspecting frames is UI-only; explicit scene/continuation selections use existing question/answer contracts.
+
 The integrated map connects `outingProfiles` once through
 `scene.connectProfiles(outingProfiles)`. The existing Scene Session compiles
 wanted evidence into a guarded scene and sends it to the existing theme's

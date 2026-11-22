@@ -1,3 +1,4 @@
+import { canonicalSceneQuestion, sessionBQuestion } from './sessionB.ts';
 import { FAMILY_IDS, guidanceFor, TOPICS } from './families.ts';
 import type { GenerationContext, GenerationResult, Question } from './profile.ts';
 const obj=(v:unknown):v is Record<string,unknown>=>!!v&&typeof v==='object'&&!Array.isArray(v);
@@ -8,6 +9,9 @@ export function validContext(v:unknown):v is GenerationContext {
 }
 export function validQuestion(q:unknown):q is Question {
  if(!obj(q)||!text(q.id,80)||!text(q.family,40)||!FAMILY_IDS.has(q.family as never)||!TOPICS.includes(q.topic as never)||!text(q.prompt,500,20)||typeof q.cultural!=='boolean'||!Array.isArray(q.options)||q.options.length<2||q.options.length>4)return false;
+ if(q.id.startsWith('session-b/')) {
+  if(!canonicalSceneQuestion(q as unknown as Question))return false;
+ }
  return q.options.every(o=>obj(o)&&text(o.id,80)&&text(o.label,100,3)&&text(o.description,350,20)&&['want','avoid'].includes(String(o.preference)))&&new Set(q.options.map(o=>o.id)).size===q.options.length&&new Set(q.options.map(o=>String(o.label).toLowerCase())).size===q.options.length;
 }
 const normalized=(s:string)=>s.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
@@ -19,7 +23,9 @@ export function validateGeneration(v:unknown,c:GenerationContext):GenerationResu
   if(c.history.at(-1)?.response.kind==='unfamiliar'&&q.cultural)throw Error('Use a culturally neutral question after unfamiliarity');
   const avoidCrowds=c.evidence.some(e=>e.polarity!=='want'&&/crowd|packed/i.test(e.text));
   if(avoidCrowds&&q.options.some(o=>o.preference==='want'&&/\b(crowded|packed|elbow.to.elbow)\b/i.test(o.description)&&!/(?:not|no|without|avoid|un)\s*(?:a |the |too )?(?:crowd|packed)/i.test(o.description)))throw Error('An option contradicts an explicit crowd exclusion');
-  if(!guide.families.some(f=>f.id===q.family)||!guide.topics.includes(q.topic))throw Error('Repeated or irrelevant family/topic');
+  const authored=sessionBQuestion(c);
+  if(q.id.startsWith('session-b/')&&q.id!==authored?.id)throw Error('Scene does not continue the selected history');
+  if(!canonicalSceneQuestion(q)&&(!guide.families.some(f=>f.id===q.family)||!guide.topics.includes(q.topic)))throw Error('Repeated or irrelevant family/topic');
   if(c.history.some(a=>a.question.id===q.id||normalized(a.question.prompt)===normalized(q.prompt)||a.question.topic===q.topic))throw Error('Repeated semantic question');
   if(/^(?:do you prefer|are you more|would you rather be) (?:quiet|loud|indoor|outdoor|vintage|modern|relax|excit)/i.test(q.prompt))throw Error('Generic personality question');
   const meanings=q.options.map(o=>new Set(normalized(o.description).split(' ').filter(w=>w.length>3)));
