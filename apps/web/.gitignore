@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 
 .env
+# Vercel CLI project link and local build output
+.vercel
