@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
-  applyRekey, fetchExisting, fetchOtherTypePlaces, fetchRegisteredTypes, listNotSeen, registerPlaces, upsertRows,
+  applyRekey, deleteRegistryRows, fetchExisting, fetchOtherTypePlaces, fetchRegisteredTypes, fetchRegistry, listNotSeen,
+  registerPlaces, upsertRows,
 } from '../src/db.ts';
 import type { KindRow, PlaceRow } from '../src/types.ts';
 
@@ -122,4 +123,24 @@ test('fetchRegisteredTypes looks up place_ids in chunks of 200', async () => {
   assert.deepEqual(ins.map((c) => (c.args[1] as string[]).length), [200, 50]);
   assert.ok(calls.every((c) => c.table === 'places'));
   assert.equal(out.get('osm:node/1'), 'landmarks');
+});
+
+test('fetchRegistry returns the registry id and type of each found place_id', async () => {
+  const { client, calls } = fakeClient(() => ({ data: [{ id: 9, place_id: 'osm:way/1', place_type: 'parks' }], error: null }));
+  const out = await fetchRegistry(client, ['osm:way/1', 'osm:way/2']);
+  assert.ok(calls.some((c) => c.table === 'places' && c.op === 'select' && c.args[0] === 'id, place_id, place_type'));
+  assert.deepEqual([...out], [['osm:way/1', { id: 9, placeType: 'parks' }]]);
+});
+
+test('deleteRegistryRows deletes only registry rows of the type by id', async () => {
+  const { client, calls } = fakeClient(() => ({ error: null }));
+  await deleteRegistryRows(client, 'parks', [11, 12]);
+  assert.deepEqual(calls, [
+    { table: 'places', op: 'delete', args: [] },
+    { table: 'places', op: 'in', args: ['id', [11, 12]] },
+    { table: 'places', op: 'eq', args: ['place_type', 'parks'] },
+  ]);
+  const none = fakeClient(() => ({ error: null }));
+  await deleteRegistryRows(none.client, 'parks', []);
+  assert.equal(none.calls.length, 0);
 });

@@ -65,16 +65,38 @@ export async function fetchOtherTypePlaces(client: SupabaseClient, type: PlaceTy
   }
 }
 
+export interface RegistryEntry { id: number; placeType: PlaceType }
+
+/** The registry row (id and type) of each given place_id that is in the registry. */
+export async function fetchRegistry(client: SupabaseClient, placeIds: string[]): Promise<Map<string, RegistryEntry>> {
+  const out = new Map<string, RegistryEntry>();
+  for (let i = 0; i < placeIds.length; i += ID_CHUNK) {
+    const chunk = placeIds.slice(i, i + ID_CHUNK);
+    const { data, error } = await client.from('places').select('id, place_id, place_type').in('place_id', chunk);
+    if (error) throw new Error(`fetchRegistry failed: ${error.message}`);
+    for (const r of data as Array<{ id: number; place_id: string; place_type: PlaceType }>) {
+      out.set(r.place_id, { id: r.id, placeType: r.place_type });
+    }
+  }
+  return out;
+}
+
 /** The registered type of each given place_id that is in the registry. */
 export async function fetchRegisteredTypes(client: SupabaseClient, placeIds: string[]): Promise<Map<string, PlaceType>> {
   const out = new Map<string, PlaceType>();
-  for (let i = 0; i < placeIds.length; i += ID_CHUNK) {
-    const chunk = placeIds.slice(i, i + ID_CHUNK);
-    const { data, error } = await client.from('places').select('place_id, place_type').in('place_id', chunk);
-    if (error) throw new Error(`fetchRegisteredTypes failed: ${error.message}`);
-    for (const r of data as Array<{ place_id: string; place_type: PlaceType }>) out.set(r.place_id, r.place_type);
-  }
+  for (const [placeId, e] of await fetchRegistry(client, placeIds)) out.set(placeId, e.placeType);
   return out;
+}
+
+/**
+ * Deletes registry rows of `type` by id. Only for orphans (registry rows with no type row, left by a run that
+ * stopped between registering and upserting): with no type row, nothing in the catalog points at them.
+ */
+export async function deleteRegistryRows(client: SupabaseClient, type: PlaceType, ids: number[]): Promise<void> {
+  for (let i = 0; i < ids.length; i += ID_CHUNK) {
+    const { error } = await client.from('places').delete().in('id', ids.slice(i, i + ID_CHUNK)).eq('place_type', type);
+    if (error) throw new Error(`deleteRegistryRows failed: ${error.message}`);
+  }
 }
 
 /** Creates registry rows for new places of `type`; returns place_id -> registry id. */

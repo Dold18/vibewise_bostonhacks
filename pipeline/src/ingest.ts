@@ -2,9 +2,10 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { DEFAULT_FSQ_RELEASE } from './config.ts';
-import { findCrossTypeDuplicates, splitTypeConflicts } from './crossType.ts';
+import { findCrossTypeDuplicates, splitTypeConflicts, type TypeConflict } from './crossType.ts';
 import {
-  applyRekey, connect, fetchExisting, fetchOtherTypePlaces, fetchRegisteredTypes, listNotSeen, registerPlaces, upsertRows,
+  applyRekey, connect, deleteRegistryRows, fetchExisting, fetchOtherTypePlaces, fetchRegistry, listNotSeen, registerPlaces,
+  upsertRows, type RegistryEntry,
 } from './db.ts';
 import { loadFsqRows } from './foursquare.ts';
 import { assertUniqueKeys, mergePlaces } from './merge.ts';
@@ -12,7 +13,7 @@ import { loadOsmElements } from './osm.ts';
 import { PLACE_TYPE_CONFIG, parseTypeOption, type PlaceType } from './placeTypes.ts';
 import { planRekey } from './rekey.ts';
 import { parseFsqRows, parseOverpass } from './sources.ts';
-import type { FsqPlace, OsmPlace, PlaceRow, RekeyAction } from './types.ts';
+import type { ExistingRow, FsqPlace, OsmPlace, PlaceRow, RekeyAction } from './types.ts';
 
 const CACHE_DIR = path.resolve(import.meta.dirname, '..', '.cache');
 
@@ -72,11 +73,57 @@ export function assignIds(
   });
 }
 
+/**
+ * A rekey promote sets the FSQ-only row's place_id to the OSM target's, and the registry copies it (unique place_id).
+ * `registry` holds the registry rows of the promote targets of `planRekey(existing, rows)`:
+ * - a target registered under another type is a type conflict: its OSM row is dropped from this run and the plan is
+ *   redone without it, so the FSQ-only row stays as it is (dropping rows only removes promotes, never adds one);
+ * - a target registered as this type is an orphan (planRekey only promotes to a key with no row in this table):
+ *   its registry row is to be deleted before the rekey so the promote can take the place_id.
+ */
+export function resolvePromoteTargets(
+  existing: ExistingRow[], rows: PlaceRow[], registry: Map<string, RegistryEntry>, type: PlaceType,
+): { rows: PlaceRow[]; actions: RekeyAction[]; conflicts: TypeConflict[]; orphanIds: number[] } {
+  const actions = planRekey(existing, rows);
+  const conflicts: TypeConflict[] = [];
+  const orphanIds: number[] = [];
+  for (const a of actions) {
+    if (a.kind !== 'promote') continue;
+    const entry = registry.get(a.placeId);
+    if (entry === undefined) continue;
+    if (entry.placeType === type) orphanIds.push(entry.id);
+    else conflicts.push({ placeId: a.placeId, registeredAs: entry.placeType });
+  }
+  if (conflicts.length === 0) return { rows, actions, conflicts, orphanIds };
+  const dropped = new Set(conflicts.map((c) => c.placeId));
+  const kept = rows.filter((r) => !dropped.has(r.place_id));
+  return { rows: kept, actions: planRekey(existing, kept), conflicts, orphanIds };
+}
+
+/**
+ * New rows (no row in this type's table) whose place_id is already registered as this type are orphans left by a
+ * run that stopped between registering and upserting: their registry id is reused. Unregistered ones are to be
+ * registered. Rows registered under another type are in neither (splitTypeConflicts has removed them).
+ */
+export function reuseOrphanIds(
+  newRows: PlaceRow[], registry: Map<string, RegistryEntry>, type: PlaceType,
+): { reused: Map<string, number>; toRegister: string[] } {
+  const reused = new Map<string, number>();
+  const toRegister: string[] = [];
+  for (const r of newRows) {
+    const entry = registry.get(r.place_id);
+    if (entry === undefined) toRegister.push(r.place_id);
+    else if (entry.placeType === type) reused.set(r.place_id, entry.id);
+  }
+  return { reused, toRegister };
+}
+
 export interface SummaryInput {
   type: PlaceType;
   osm: number; fsq: number; matches: number; dropped: number; staleFsqDropped: number; unparseableDates?: number;
   existingKeys: Set<string>; rows: PlaceRow[]; actions: RekeyAction[]; notSeen: number | null;
   crossTypeSkipped: number | null; conflictsSkipped: number | null;   // null in a dry run (no database read)
+  orphansReused: number | null; orphansCleared: number | null;
 }
 
 const orDryRun = (n: number | null): string => (n === null ? 'n/a (dry run)' : String(n));
@@ -103,6 +150,8 @@ export function summarize(input: SummaryInput): string {
     `Collapsed: ${collapsedText}`,
     `Cross-type duplicates skipped: ${orDryRun(input.crossTypeSkipped)}`,
     `Type conflicts skipped: ${orDryRun(input.conflictsSkipped)}`,
+    `Orphan registry ids reused: ${orDryRun(input.orphansReused)}`,
+    `Orphan registry rows cleared: ${orDryRun(input.orphansCleared)}`,
     `Not seen this run: ${orDryRun(input.notSeen)}`,
     ...(input.type === 'restaurants'
       ? [`Rows missing cuisine: ${input.rows.filter((r) => 'source_cuisines' in r && r.source_cuisines.length === 0).length}`]
@@ -161,6 +210,7 @@ async function main(): Promise<void> {
     await fs.writeFile(cacheFile('matches'), JSON.stringify({ matches: merged.matches, dropped: merged.dropped }, null, 2));
     console.log(summarize({
       ...base, existingKeys: new Set(), rows, actions: [], notSeen: null, crossTypeSkipped: null, conflictsSkipped: null,
+      orphansReused: null, orphansCleared: null,
     }));
     return;
   }
@@ -172,28 +222,27 @@ async function main(): Promise<void> {
   const client = connect(requireEnv('SUPABASE_URL'), requireEnv('SUPABASE_SECRET_KEY'));
   const table = args.type;
   const existing = await fetchExisting(client, table);
-  const actions = planRekey(existing, rows);
+  // Check promote targets against the registry first: a promote onto a registered place_id would hit its unique key.
+  const promoteTargets = planRekey(existing, rows).flatMap((a) => (a.kind === 'promote' ? [a.placeId] : []));
+  const resolved = resolvePromoteTargets(existing, rows, await fetchRegistry(client, promoteTargets), table);
+  const { actions } = resolved;
+  await deleteRegistryRows(client, table, resolved.orphanIds);
   await applyRekey(client, table, actions);
   // Re-read after rekey so promoted rows are found under their new key and collapsed ones are gone.
   const idByKey = new Map((await fetchExisting(client, table)).map((e) => [`${e.source}:${e.source_id}`, e.id]));
   const isNew = (r: PlaceRow) => !idByKey.has(`${r.source}:${r.source_id}`);
 
   // Only new rows are checked: ingest never moves a place that is already in this type's table.
-  const cross = findCrossTypeDuplicates(rows.filter(isNew), await fetchOtherTypePlaces(client, table));
-  const registered = await fetchRegisteredTypes(client, cross.kept.map((r) => r.place_id));
+  const cross = findCrossTypeDuplicates(resolved.rows.filter(isNew), await fetchOtherTypePlaces(client, table));
+  const registry = await fetchRegistry(client, cross.kept.map((r) => r.place_id));
+  const registered = new Map([...registry].map(([placeId, e]) => [placeId, e.placeType]));
   const split = splitTypeConflicts(cross.kept, registered, table);
-  const orphans = split.kept.filter((r) => registered.get(r.place_id) === table);
-  if (orphans.length > 0) {
-    // A registry row of this type without a type row: an earlier run stopped between registering and upserting.
-    throw new Error(
-      `refusing to write: ${orphans.length} place_id(s) registered as ${table} without a ${table} row `
-      + `(first: ${orphans.slice(0, 5).map((r) => r.place_id).join(', ')}); delete those places rows and re-run`,
-    );
-  }
-  const newIds = await registerPlaces(client, table, split.kept.map((r) => r.place_id));
+  const { reused, toRegister } = reuseOrphanIds(split.kept, registry, table);
+  const newIds = new Map([...reused, ...await registerPlaces(client, table, toRegister)]);
 
+  const conflicts = [...resolved.conflicts, ...split.conflicts];
   const skipped = new Set([...cross.duplicates.map((d) => d.placeId), ...split.conflicts.map((c) => c.placeId)]);
-  const toWrite = assignIds(rows.filter((r) => !skipped.has(r.place_id)), idByKey, newIds);
+  const toWrite = assignIds(resolved.rows.filter((r) => !skipped.has(r.place_id)), idByKey, newIds);
   await upsertRows(client, table, toWrite);
   const notSeenIds = await listNotSeen(client, table, runStart);
 
@@ -201,12 +250,13 @@ async function main(): Promise<void> {
   await fs.writeFile(cacheFile('not-seen'), JSON.stringify(notSeenIds, null, 2));
   await fs.writeFile(
     cacheFile('skipped'),
-    JSON.stringify({ crossTypeDuplicates: cross.duplicates, typeConflicts: split.conflicts }, null, 2),
+    JSON.stringify({ crossTypeDuplicates: cross.duplicates, typeConflicts: conflicts }, null, 2),
   );
   const existingKeys = new Set(existing.map((e) => `${e.source}:${e.source_id}`));
   console.log(summarize({
     ...base, existingKeys, rows: toWrite, actions, notSeen: notSeenIds.length,
-    crossTypeSkipped: cross.duplicates.length, conflictsSkipped: split.conflicts.length,
+    crossTypeSkipped: cross.duplicates.length, conflictsSkipped: conflicts.length,
+    orphansReused: reused.size, orphansCleared: resolved.orphanIds.length,
   }));
 }
 

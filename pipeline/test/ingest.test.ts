@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assignIds, assertWritable, parseCliArgs, summarize } from '../src/ingest.ts';
-import type { KindRow, PlaceRow, RekeyAction, RestaurantRow } from '../src/types.ts';
+import {
+  assignIds, assertWritable, parseCliArgs, resolvePromoteTargets, reuseOrphanIds, summarize,
+} from '../src/ingest.ts';
+import type { ExistingRow, KindRow, PlaceRow, RekeyAction, RestaurantRow } from '../src/types.ts';
 
 function row(n: number, extra: Partial<RestaurantRow> = {}): RestaurantRow {
   return {
@@ -16,6 +18,7 @@ const baseInput = {
   osm: 3, fsq: 2, matches: 1, dropped: 0, staleFsqDropped: 0,
   existingKeys: new Set<string>(), rows: [] as PlaceRow[], actions: [] as RekeyAction[], notSeen: 0 as number | null,
   type: 'restaurants' as const, crossTypeSkipped: 0 as number | null, conflictsSkipped: 0 as number | null,
+  orphansReused: 0 as number | null, orphansCleared: 0 as number | null,
 };
 
 test('parseCliArgs defaults and flags', () => {
@@ -113,4 +116,60 @@ test('summarize prints missing cuisine only for restaurants', () => {
   assert.ok(parks.includes('Rows missing address: 1'));
   const food = summarize({ ...baseInput, rows: [row(1, { source_cuisines: [] })] }).split('\n');
   assert.ok(food.includes('Rows missing cuisine: 1'));
+});
+
+test('summarize counts orphan registry ids reused and cleared', () => {
+  const lines = summarize({ ...baseInput, orphansReused: 2, orphansCleared: 1 }).split('\n');
+  assert.ok(lines.includes('Orphan registry ids reused: 2'));
+  assert.ok(lines.includes('Orphan registry rows cleared: 1'));
+  const dry = summarize({ ...baseInput, orphansReused: null, orphansCleared: null }).split('\n');
+  assert.ok(dry.includes('Orphan registry ids reused: n/a (dry run)'));
+});
+
+// An existing FSQ-only park (id 4) that this run matched to the new OSM way/1: planRekey promotes it to osm:way/1.
+const FSQ_ONLY: ExistingRow = { id: 4, source: 'foursquare', source_id: 'f1', fsq_place_id: 'f1' };
+const promoteRows = () => [kindRow(1, { fsq_place_id: 'f1' }), kindRow(2)];
+
+test('resolvePromoteTargets keeps a promote whose target is not in the registry', () => {
+  const rows = promoteRows();
+  const out = resolvePromoteTargets([FSQ_ONLY], rows, new Map(), 'parks');
+  assert.deepEqual(out.actions, [{ kind: 'promote', id: 4, sourceId: 'way/1', placeId: 'osm:way/1' }]);
+  assert.deepEqual(out.rows, rows);
+  assert.deepEqual(out.conflicts, []);
+  assert.deepEqual(out.orphanIds, []);
+});
+
+test('resolvePromoteTargets drops a promote whose target is registered under another type', () => {
+  const out = resolvePromoteTargets(
+    [FSQ_ONLY], promoteRows(), new Map([['osm:way/1', { id: 10, placeType: 'landmarks' as const }]]), 'parks',
+  );
+  assert.deepEqual(out.actions, []);
+  assert.deepEqual(out.rows.map((r) => r.place_id), ['osm:way/2']);
+  assert.deepEqual(out.conflicts, [{ placeId: 'osm:way/1', registeredAs: 'landmarks' }]);
+  assert.deepEqual(out.orphanIds, []);
+});
+
+test('resolvePromoteTargets clears a same-type orphan target so the promote can proceed', () => {
+  const out = resolvePromoteTargets(
+    [FSQ_ONLY], promoteRows(), new Map([['osm:way/1', { id: 11, placeType: 'parks' as const }]]), 'parks',
+  );
+  assert.deepEqual(out.actions, [{ kind: 'promote', id: 4, sourceId: 'way/1', placeId: 'osm:way/1' }]);
+  assert.equal(out.rows.length, 2);
+  assert.deepEqual(out.conflicts, []);
+  assert.deepEqual(out.orphanIds, [11]);
+});
+
+test('a same-type orphan registry id is reused by assignIds instead of registering again', () => {
+  const rows = [kindRow(1), kindRow(2)];
+  const { reused, toRegister } = reuseOrphanIds(rows, new Map([['osm:way/1', { id: 9, placeType: 'parks' as const }]]), 'parks');
+  assert.deepEqual([...reused], [['osm:way/1', 9]]);
+  assert.deepEqual(toRegister, ['osm:way/2']);
+  const out = assignIds(rows, new Map(), new Map([...reused, ['osm:way/2', 20]]));
+  assert.deepEqual(out.map((r) => r.id), [9, 20]);
+});
+
+test('reuseOrphanIds never reuses an id registered under another type', () => {
+  const { reused, toRegister } = reuseOrphanIds([kindRow(1)], new Map([['osm:way/1', { id: 9, placeType: 'landmarks' as const }]]), 'parks');
+  assert.equal(reused.size, 0);
+  assert.deepEqual(toRegister, []);
 });
