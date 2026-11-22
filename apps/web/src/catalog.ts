@@ -200,6 +200,12 @@ let dealsEmbedAvailable = true;
 
 type DetailsQuery = (columns: string, ids: string[]) => Promise<{ data: unknown[] | null; error: { message: string } | null }>;
 
+/** Test hook: re-enable the deals embed. */
+export function resetDealsEmbedForTests(): void {
+  dealsEmbedAvailable = true;
+  detailsCache.clear();
+}
+
 /** Cached details for a place id, if fetched. */
 export function getCachedDetails(placeId: string): CatalogDetails | undefined {
   return detailsCache.get(placeId);
@@ -212,9 +218,13 @@ export async function fetchDetailsWith(query: DetailsQuery, placeIds: string[]):
     const ids = missing.slice(i, i + DETAIL_CHUNK);
     let result = await query(dealsEmbedAvailable ? `${DETAIL_COLUMNS}, ${DEALS_EMBED}` : DETAIL_COLUMNS, ids);
     if (result.error && dealsEmbedAvailable) {
-      dealsEmbedAvailable = false;
-      console.warn('[catalog] deals unavailable:', result.error.message);
+      const embedError = result.error.message;
       result = await query(DETAIL_COLUMNS, ids);
+      // Only blame the embed when the plain request works; otherwise it's a general outage.
+      if (!result.error) {
+        dealsEmbedAvailable = false;
+        console.warn('[catalog] deals unavailable:', embedError);
+      }
     }
     if (result.error) throw new Error(result.error.message);
     for (const row of (result.data ?? []) as (Omit<CatalogDetails, 'deals'> & { place_id: string; place_deals?: unknown })[]) {

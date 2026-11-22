@@ -1,7 +1,7 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Deal } from './deals';
 import { CATEGORIES, type Category } from './osm';
-import { DEALS_EMBED, fetchDetailsWith, getCachedDetails, nearestByCategory, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
+import { DEALS_EMBED, fetchDetailsWith, getCachedDetails, nearestByCategory, resetDealsEmbedForTests, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
 
 const cat = (id: string) => CATEGORIES.find((c) => c.id === id) as Category;
 const CENTER = { lat: 42.3555, lon: -71.0636 };
@@ -175,6 +175,7 @@ describe('deals on places', () => {
 });
 
 describe('fetchDetailsWith', () => {
+  beforeEach(resetDealsEmbedForTests);
   const baseRow = (id: string) => ({ place_id: id, address: null, website: null, phone: null, cuisines: null, hours_raw: null, osm_tags: null, attribution: 'x', price_band: 'unknown', price_source: null });
 
   it('requests the deals embed and parses embedded rows, dropping malformed ones', async () => {
@@ -190,7 +191,6 @@ describe('fetchDetailsWith', () => {
     expect(getCachedDetails('ok:1')?.deals).toHaveLength(1);
   });
 
-  // The fallback tests run last: they flip the module-level "embed unavailable" flag for the rest of the file.
   it('retries without the embed once, warns once, and skips the embed afterwards', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const query = vi.fn(async (columns: string, ids: string[]) =>
@@ -212,8 +212,14 @@ describe('fetchDetailsWith', () => {
     warn.mockRestore();
   });
 
-  it('throws when the request fails even without the embed', async () => {
-    const query = async () => ({ data: null, error: { message: 'boom' } });
+  it('keeps the embed enabled and does not warn when the plain retry fails too (outage)', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const query = vi.fn(async (_columns: string, _ids: string[]) => ({ data: null, error: { message: 'boom' } }));
     await expect(fetchDetailsWith(query, ['bad:1'])).rejects.toThrow('boom');
+    expect(query).toHaveBeenCalledTimes(2);
+    expect(warn).not.toHaveBeenCalled();
+    await expect(fetchDetailsWith(query, ['bad:1'])).rejects.toThrow('boom');
+    expect(query.mock.calls[2][0]).toContain('place_deals');
+    warn.mockRestore();
   });
 });
