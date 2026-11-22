@@ -1,0 +1,1036 @@
+{
+  "schemaVersion": "1.0.0",
+  "title": "Vibenta contextual/thematic asset source registry",
+  "collectedOn": "2026-11-21",
+  "status": "source_pages_verified_assets_NOT_downloaded_or_imported",
+  "note": "Pack-level source inventory for a future curated, optimized 3D/2D library. Advertised counts are NOT tested file counts, not unique across packs, and not yet usable scene objects. Do not add them to the existing 225 generated assets.",
+  "reusePolicy": {
+    "requiredLicense": "CC0-1.0",
+    "retainProvenance": true,
+    "inspectDownloadedLicense": true,
+    "doNotCommitRawPacks": true,
+    "convert3dToGlb": true,
+    "lazyLoadPerTheme": true,
+    "protectRoutesLabelsAndProviderAttribution": true
+  },
+  "sources": [
+    {
+      "id": "kenney-food",
+      "publisher": "Kenney",
+      "name": "Food Kit",
+      "sourceUrl": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 200,
+      "assetClass": "3d",
+      "tags": [
+        "food",
+        "italian",
+        "date_night",
+        "casual_dining"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-graveyard",
+      "publisher": "Kenney",
+      "name": "Graveyard Kit",
+      "sourceUrl": "https://kenney.nl/assets/graveyard-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 90,
+      "assetClass": "3d",
+      "tags": [
+        "haunted",
+        "halloween",
+        "gothic",
+        "mystery"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-nature",
+      "publisher": "Kenney",
+      "name": "Nature Kit",
+      "sourceUrl": "https://kenney.nl/assets/nature-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 330,
+      "assetClass": "3d",
+      "tags": [
+        "outdoor",
+        "nature",
+        "romantic",
+        "calm"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-fantasy-town",
+      "publisher": "Kenney",
+      "name": "Fantasy Town Kit",
+      "sourceUrl": "https://kenney.nl/assets/fantasy-town-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 160,
+      "assetClass": "3d",
+      "tags": [
+        "storybook",
+        "historic",
+        "fantasy",
+        "romantic"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-city-commercial",
+      "publisher": "Kenney",
+      "name": "City Kit (Commercial)",
+      "sourceUrl": "https://kenney.nl/assets/city-kit-commercial",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 50,
+      "assetClass": "3d",
+      "tags": [
+        "urban",
+        "nightlife",
+        "modern",
+        "architecture"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-city-suburban",
+      "publisher": "Kenney",
+      "name": "City Kit (Suburban)",
+      "sourceUrl": "https://kenney.nl/assets/city-kit-suburban",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 40,
+      "assetClass": "3d",
+      "tags": [
+        "cozy",
+        "neighborhood",
+        "relaxed",
+        "residential"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-furniture",
+      "publisher": "Kenney",
+      "name": "Furniture Kit",
+      "sourceUrl": "https://kenney.nl/assets/furniture-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 140,
+      "assetClass": "3d",
+      "tags": [
+        "dining",
+        "cafe",
+        "romantic",
+        "interior"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-holiday",
+      "publisher": "Kenney",
+      "name": "Holiday Kit",
+      "sourceUrl": "https://kenney.nl/assets/holiday-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 100,
+      "assetClass": "3d",
+      "tags": [
+        "winter",
+        "holiday",
+        "festive",
+        "cozy"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-retro-urban",
+      "publisher": "Kenney",
+      "name": "Retro Urban Kit",
+      "sourceUrl": "https://kenney.nl/assets/retro-urban-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 120,
+      "assetClass": "3d",
+      "tags": [
+        "retro",
+        "urban",
+        "nostalgic",
+        "indie"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-mini-market",
+      "publisher": "Kenney",
+      "name": "Mini Market",
+      "sourceUrl": "https://kenney.nl/assets/mini-market",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 20,
+      "assetClass": "3d",
+      "tags": [
+        "market",
+        "food",
+        "shopping",
+        "neighborhood"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-mini-arcade",
+      "publisher": "Kenney",
+      "name": "Mini Arcade",
+      "sourceUrl": "https://kenney.nl/assets/mini-arcade",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 20,
+      "assetClass": "3d",
+      "tags": [
+        "arcade",
+        "playful",
+        "nightlife",
+        "retro"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-pirate",
+      "publisher": "Kenney",
+      "name": "Pirate Kit",
+      "sourceUrl": "https://kenney.nl/assets/pirate-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 70,
+      "assetClass": "3d",
+      "tags": [
+        "nautical",
+        "adventure",
+        "coastal",
+        "fantasy"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-space",
+      "publisher": "Kenney",
+      "name": "Space Kit",
+      "sourceUrl": "https://kenney.nl/assets/space-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 150,
+      "assetClass": "3d",
+      "tags": [
+        "futuristic",
+        "scifi",
+        "space",
+        "playful"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-generic-items",
+      "publisher": "Kenney",
+      "name": "Generic Items",
+      "sourceUrl": "https://kenney.nl/assets/generic-items",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 160,
+      "assetClass": "2d",
+      "tags": [
+        "miscellaneous",
+        "symbols",
+        "playful"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "2D sprite source; not 3D models."
+    },
+    {
+      "id": "kenney-light-masks",
+      "publisher": "Kenney",
+      "name": "Light Masks",
+      "sourceUrl": "https://kenney.nl/assets/light-masks",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 150,
+      "assetClass": "2d_vfx",
+      "tags": [
+        "spotlight",
+        "lanterns",
+        "romantic",
+        "noir",
+        "nightlife"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-particles",
+      "publisher": "Kenney",
+      "name": "Particle Pack",
+      "sourceUrl": "https://kenney.nl/assets/particle-pack",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 80,
+      "assetClass": "2d_vfx",
+      "tags": [
+        "sparkles",
+        "magic",
+        "weather",
+        "ambient"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-smoke",
+      "publisher": "Kenney",
+      "name": "Smoke Particles",
+      "sourceUrl": "https://kenney.nl/assets/smoke-particles",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 70,
+      "assetClass": "2d_vfx",
+      "tags": [
+        "haunted",
+        "fog",
+        "noir",
+        "industrial"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-foliage",
+      "publisher": "Kenney",
+      "name": "Foliage Pack",
+      "sourceUrl": "https://kenney.nl/assets/foliage-pack",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 100,
+      "assetClass": "2d_vfx",
+      "tags": [
+        "nature",
+        "autumn",
+        "spring",
+        "romantic"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-skyboxes",
+      "publisher": "Kenney",
+      "name": "Skyboxes",
+      "sourceUrl": "https://kenney.nl/assets/skyboxes",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 5,
+      "assetClass": "background",
+      "tags": [
+        "sky",
+        "atmosphere",
+        "futuristic"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-roads",
+      "publisher": "Kenney",
+      "name": "City Kit (Roads)",
+      "sourceUrl": "https://kenney.nl/assets/city-kit-roads",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 90,
+      "assetClass": "3d",
+      "tags": [
+        "urban",
+        "street",
+        "decorative_only"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "For illustration-only street-scene dioramas; never replace factual road geometry."
+    },
+    {
+      "id": "kaykit-restaurant",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "Restaurant Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/restaurant-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 140,
+      "assetClass": "3d",
+      "tags": [
+        "food",
+        "restaurant",
+        "italian",
+        "dining",
+        "kitchen"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Free tier 140+ models; pizza/ice-cream EXTRAs are paid, do not assume included."
+    },
+    {
+      "id": "kaykit-halloween",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "Halloween Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/halloween-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 60,
+      "assetClass": "3d",
+      "tags": [
+        "haunted",
+        "halloween",
+        "spooky",
+        "autumn"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Free tier 60+ models, additional spooky objects in paid EXTRA."
+    },
+    {
+      "id": "kaykit-furniture",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "Furniture Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/furniture-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 50,
+      "assetClass": "3d",
+      "tags": [
+        "cafe",
+        "lounge",
+        "romantic",
+        "interior"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kaykit-city-builder",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "City Builder Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/city-builder-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 32,
+      "assetClass": "3d",
+      "tags": [
+        "city",
+        "park",
+        "modern",
+        "urban"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kaykit-space-base",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "Space Base Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/space-base-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 48,
+      "assetClass": "3d",
+      "tags": [
+        "space",
+        "futuristic",
+        "scifi"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kaykit-holiday",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "Holiday Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/holiday-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 55,
+      "assetClass": "3d",
+      "tags": [
+        "winter",
+        "festive",
+        "holiday",
+        "food"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "Free tier 55+ models, gingerbread expansion in paid EXTRA."
+    },
+    {
+      "id": "kaykit-resources",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "Resource Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/resource-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 75,
+      "assetClass": "3d",
+      "tags": [
+        "nature",
+        "minerals",
+        "outdoors",
+        "fantasy"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kaykit-rpg-tools",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "RPG Tools Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/rpg-tools-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 45,
+      "assetClass": "3d",
+      "tags": [
+        "fantasy",
+        "craft",
+        "adventure",
+        "historic"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kaykit-boardgame",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "Board Game Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/board-game-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 75,
+      "assetClass": "3d",
+      "tags": [
+        "playful",
+        "games",
+        "date_night",
+        "group"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "quaternius-downtown",
+      "publisher": "Quaternius",
+      "name": "Downtown City MegaKit",
+      "sourceUrl": "https://quaternius.com/packs/downtowncitymegakit.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "full_pack_count_free_subset_only",
+      "advertisedCount": 315,
+      "assetClass": "3d",
+      "tags": [
+        "boston",
+        "city",
+        "urban",
+        "architectural_accents"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "315 total in full kit, not free-tier count. Creator says the basic download includes approximately 60–70% of the pack."
+    },
+    {
+      "id": "quaternius-fantasy-props",
+      "publisher": "Quaternius",
+      "name": "Fantasy Props MegaKit",
+      "sourceUrl": "https://quaternius.com/packs/fantasypropsmegakit.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "full_pack_count_free_subset_only",
+      "advertisedCount": 211,
+      "assetClass": "3d",
+      "tags": [
+        "storybook",
+        "market",
+        "fantasy",
+        "historic",
+        "gothic"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "211 total in full kit, not free-tier count. Creator says the basic download includes approximately 60–70% of the pack."
+    },
+    {
+      "id": "quaternius-medieval-village",
+      "publisher": "Quaternius",
+      "name": "Medieval Village MegaKit",
+      "sourceUrl": "https://quaternius.com/packs/medievalvillagemegakit.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "full_pack_count_free_subset_only",
+      "advertisedCount": 304,
+      "assetClass": "3d",
+      "tags": [
+        "historical",
+        "fantasy",
+        "storybook",
+        "romantic"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "304 total in full kit, not free-tier count. Creator says the basic download includes approximately 60–70% of the pack."
+    },
+    {
+      "id": "quaternius-stylized-nature",
+      "publisher": "Quaternius",
+      "name": "Stylized Nature MegaKit",
+      "sourceUrl": "https://quaternius.com/packs/stylizednaturemegakit.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "full_pack_count_free_subset_only",
+      "advertisedCount": 116,
+      "assetClass": "3d",
+      "tags": [
+        "nature",
+        "dreamy",
+        "romantic",
+        "outdoor"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "116 total in full kit, not free-tier count. Creator says the basic download includes approximately 60–70% of the pack."
+    },
+    {
+      "id": "quaternius-cyberpunk",
+      "publisher": "Quaternius",
+      "name": "Cyberpunk Game Kit",
+      "sourceUrl": "https://quaternius.com/packs/cyberpunkgamekit.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 71,
+      "assetClass": "3d",
+      "tags": [
+        "cyberpunk",
+        "neon",
+        "nightlife",
+        "futuristic"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "quaternius-sushi",
+      "publisher": "Quaternius",
+      "name": "Sushi Restaurant Kit",
+      "sourceUrl": "https://quaternius.com/packs/sushirestaurantkit.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 108,
+      "assetClass": "3d",
+      "tags": [
+        "japanese_food",
+        "restaurant",
+        "food",
+        "playful"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "quaternius-food",
+      "publisher": "Quaternius",
+      "name": "Ultimate Food Pack",
+      "sourceUrl": "https://quaternius.com/packs/ultimatefood.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 103,
+      "assetClass": "3d",
+      "tags": [
+        "food",
+        "italian",
+        "dining",
+        "street_food"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "Primary page lists FBX, OBJ and Blend; glTF conversion is required."
+    },
+    {
+      "id": "quaternius-monsters",
+      "publisher": "Quaternius",
+      "name": "Ultimate Monsters",
+      "sourceUrl": "https://quaternius.com/packs/ultimatemonsters.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 50,
+      "assetClass": "animated_3d",
+      "tags": [
+        "haunted",
+        "fantasy",
+        "playful",
+        "spooky"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "quaternius-ruins",
+      "publisher": "Quaternius",
+      "name": "Ultimate Modular Ruins Pack",
+      "sourceUrl": "https://quaternius.com/packs/ultimatemodularruins.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 90,
+      "assetClass": "3d",
+      "tags": [
+        "haunted",
+        "gothic",
+        "historic",
+        "fantasy"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "Primary page lists FBX, OBJ and Blend; glTF conversion is required."
+    },
+    {
+      "id": "quaternius-pirate",
+      "publisher": "Quaternius",
+      "name": "Pirate Kit",
+      "sourceUrl": "https://quaternius.com/packs/piratekit.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 71,
+      "assetClass": "3d",
+      "tags": [
+        "nautical",
+        "adventure",
+        "coastal",
+        "fantasy"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "quaternius-stylized-trees",
+      "publisher": "Quaternius",
+      "name": "Stylized Tree Pack",
+      "sourceUrl": "https://quaternius.com/packs/stylizedtree.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 45,
+      "assetClass": "3d",
+      "tags": [
+        "nature",
+        "romantic",
+        "colorful",
+        "outdoors"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "Primary page lists FBX, OBJ and Blend; glTF conversion is required."
+    }
+  ],
+  "recipes": [
+    {
+      "id": "italian_romantic",
+      "context": [
+        "italian_food",
+        "romantic"
+      ],
+      "hero": "stylized trattoria vignette: dining table, warm lantern and arch/vine cluster",
+      "accent": "food display or terracotta planters",
+      "sourceIds": [
+        "kenney-food",
+        "kaykit-restaurant",
+        "kenney-furniture",
+        "kenney-fantasy-town",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "italian_haunted",
+      "context": [
+        "italian_food",
+        "haunted"
+      ],
+      "hero": "gothic trattoria facade vignette with muted warm lamps",
+      "accent": "ghostly smoke and autumn foliage",
+      "sourceIds": [
+        "kenney-food",
+        "kenney-graveyard",
+        "quaternius-ruins",
+        "kenney-smoke"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "haunted_mystery",
+      "context": [
+        "haunted",
+        "mysterious"
+      ],
+      "hero": "compact graveyard gate, crooked tree and lantern cluster",
+      "accent": "subtle spectral wisps",
+      "sourceIds": [
+        "kenney-graveyard",
+        "kaykit-halloween",
+        "quaternius-ruins",
+        "kenney-smoke"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "neon_nightlife",
+      "context": [
+        "nightlife",
+        "cyberpunk"
+      ],
+      "hero": "neon sci-fi facade vignette with abstract light panels",
+      "accent": "holographic-style ambient light",
+      "sourceIds": [
+        "quaternius-cyberpunk",
+        "quaternius-downtown",
+        "kenney-light-masks",
+        "kenney-particles"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "romantic_garden",
+      "context": [
+        "date_night",
+        "outdoor",
+        "soft"
+      ],
+      "hero": "small garden arbor and flower/lantern vignette",
+      "accent": "petals, foliage, warm pools of light",
+      "sourceIds": [
+        "quaternius-stylized-nature",
+        "kenney-nature",
+        "kenney-foliage",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "cozy_cafe",
+      "context": [
+        "coffee",
+        "cozy"
+      ],
+      "hero": "cafe table and decorative storefront vignette",
+      "accent": "planters or warm light",
+      "sourceIds": [
+        "kenney-furniture",
+        "kaykit-furniture",
+        "quaternius-downtown",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "sushi_playful",
+      "context": [
+        "japanese_food",
+        "playful"
+      ],
+      "hero": "stylized sushi and restaurant counter diorama",
+      "accent": "food-object arrangement and soft glowing accent",
+      "sourceIds": [
+        "quaternius-sushi",
+        "kenney-food",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "winter_festive",
+      "context": [
+        "holiday",
+        "cozy",
+        "winter"
+      ],
+      "hero": "decorated small tree and market-stall vignette",
+      "accent": "low-intensity snow or particles",
+      "sourceIds": [
+        "kenney-holiday",
+        "kaykit-holiday",
+        "kenney-particles"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "fantasy_storybook",
+      "context": [
+        "storybook",
+        "fantasy"
+      ],
+      "hero": "storybook arch, market props and warm lanterns",
+      "accent": "subtle sparkles and flowers",
+      "sourceIds": [
+        "kenney-fantasy-town",
+        "quaternius-fantasy-props",
+        "kenney-particles"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "outdoor_adventure",
+      "context": [
+        "hiking",
+        "outdoors",
+        "adventure"
+      ],
+      "hero": "rocks, trees and small camping vignette",
+      "accent": "foliage or nature particles",
+      "sourceIds": [
+        "kenney-nature",
+        "quaternius-stylized-nature",
+        "kenney-foliage"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "arcade_retro",
+      "context": [
+        "games",
+        "playful",
+        "retro"
+      ],
+      "hero": "mini arcade cabinet cluster",
+      "accent": "abstract retro neon or pixel particles",
+      "sourceIds": [
+        "kenney-mini-arcade",
+        "kenney-retro-urban",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "harbor_adventure",
+      "context": [
+        "coastal",
+        "nautical"
+      ],
+      "hero": "dock-themed diorama with maritime props",
+      "accent": "subtle blue-toned environmental sparkle",
+      "sourceIds": [
+        "kenney-pirate",
+        "quaternius-pirate",
+        "kenney-particles"
+      ],
+      "requiresCuration": true
+    }
+  ],
+  "openGaps": [
+    "Distinct music/jazz instruments and venue-specific performance props need individually verified source packs.",
+    "Specific cuisine hero objects (pasta plates, pizza oven, ramen lanterns, taco stand) require per-model inspection; source theme tags do not prove inclusion.",
+    "Art/museum/science installations and sports-specific accents need dedicated sourcing.",
+    "Custom set-piece compositions must be authored from licensed primitives; none of the proposed recipes are prebuilt.",
+    "Download, hash, license-file archiving, GLB conversion, compression, scale normalization and browser performance validation are still pending."
+  ],
+  "acceptanceForImport": [
+    "Select concrete models by verified filename/thumbnail, not inferred pack title.",
+    "Record author, original URL, license snapshot, source file, SHA-256, converted file and texture dependencies.",
+    "Validate transforms, orientation, pivots, GLB materials, triangle count, draw calls, compressed file size, and available LOD.",
+    "Tag every selected model with themes, semantic context, size class, anchor type, interaction-safe bounding footprint and accessibility fallback.",
+    "Never render an invented physical object as factual local venue data; maintain navigational paths, station icons, labels, attribution, and interaction hit targets."
+  ]
+}
