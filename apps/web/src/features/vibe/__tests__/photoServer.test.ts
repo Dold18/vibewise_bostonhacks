@@ -15,11 +15,15 @@ describe('photo describer',()=>{
  it('sends an inline image with a structured schema, header, no tools and default model',async()=>{
   const f=reply('{"description":"Warm amber light."}');await make(f).describe(img,sig());
   const {url,init,body}=call(f);
-  expect(url).toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent');
+  expect(url).toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent');
   expect((init.headers as Record<string,string>)['x-goog-api-key']).toBe('TEST-FIXTURE-NOT-A-KEY');
   const parts=body.contents[0].parts;expect(parts[0].text).toBeTypeOf('string');expect(parts[1]).toEqual({inlineData:{mimeType:'image/jpeg',data:'QUJD'}});
   expect(body.generationConfig.responseMimeType).toBe('application/json');expect(body.generationConfig.responseSchema).toEqual(PHOTO_SCHEMA);
-  expect(body.generationConfig.thinkingConfig).toEqual({thinkingBudget:0});expect(body.tools).toBeUndefined();
+  expect(body.generationConfig.thinkingConfig).toEqual({thinkingLevel:'low'});expect(body.generationConfig.maxOutputTokens).toBe(1024);expect(body.tools).toBeUndefined();
+ });
+ it('keeps thinking off for gemini-2.5 models',async()=>{
+  const f=reply('{"description":"x"}');await createGeminiPhotoDescriber({apiKey:'TEST-FIXTURE-NOT-A-KEY',model:'gemini-2.5-flash',fetchImpl:f as unknown as typeof fetch}).describe(img,sig());
+  const {url,body}=call(f);expect(url).toContain('/models/gemini-2.5-flash:');expect(body.generationConfig.thinkingConfig).toEqual({thinkingBudget:0});
  });
  it('includes the question only when given',async()=>{
   const a=reply('{"description":"x"}');await make(a).describe({...img,question:'What kind of lighting?'},sig());expect(call(a).body.contents[0].parts[0].text).toContain('What kind of lighting?');
