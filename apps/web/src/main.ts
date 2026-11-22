@@ -9,9 +9,7 @@ import { mountAccount } from './features/account';
 import { mountScene, sceneDevHook } from './features/scene';
 import {
   CATEGORIES,
-  formatAddress,
   metersBetween,
-  osmUrl,
   placesFromTiles,
   placesNearAny,
   searchPlaces,
@@ -20,10 +18,34 @@ import {
   type Place,
   type TilePoi,
 } from './osm';
-import { mountDiscoveryPanel, type DiscoveryPanelHandle } from './discovery';
-import { activeKinds, chipText, dealStatus, describeSchedule, type Deal } from './deals';
-import { catalogPlacesNear, isCatalogCategory, priceLabel } from './catalog';
-import { clearRoute, drawRoute, fetchRoute, renderRouteState, type LatLng, type RouteState } from './transitRoute';
+import {
+  bostonCommon,
+  combineProviders,
+  createBostonSuggestionProvider,
+  createPlaceListProvider,
+  createSavedStore,
+  mountDiscoveryPanel,
+  savedToPlace,
+  type MapLayerSelection,
+  type PlaceSearchProvider,
+} from './discovery';
+import { createOriginMarker, mapLibreOriginDeps, recenterTarget, shouldRevealOrigin } from './features/map/originMarker';
+import { createPlacePopup, POPUP_PIN_GAP } from './features/map/placePopup';
+import { pinTarget, popupRevealShift } from './features/map/popupPlacement';
+import { createApiRouteProvider, placeIdFor, sameLocation, type RouteEndpoint } from './features/navigation/routing';
+import { createRoutePlanner } from './features/navigation/ui/routePlannerView';
+import { createStore } from './discovery/store';
+import { initialTripState, tripReducer, createTripRouter } from './features/navigation/trip';
+import { createTripSearch } from './features/navigation/ui/searchView';
+import { createPitchLock } from './features/map/pitchLock';
+import { createFocusController } from './features/map/focusMode';
+import { createPinLabels } from './features/map/pinLabels';
+import { markerVisible, setMarkerVisible } from './features/map/markerVisibility';
+import { createRouteHubs } from './features/map/routeHubs';
+import { paddingAround } from './features/map/routeFrame';
+import { drawRoute, clearRoute, routeBounds, routeStations } from './transitRoute';
+import { catalogPlacesNear, isCatalogCategory } from './catalog';
+import { activeKinds, chipText } from './deals';
 
 const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
 const TILTED = { pitch: 60, bearing: -20 };
@@ -62,8 +84,7 @@ let shadows: Marker[] = [];
 let selectedPin: HTMLElement | null = null;
 let markerPlaces: Place[] = [];
 let dealTimer: ReturnType<typeof setInterval> | undefined;
-// The open card's place and its Deals list, so the 60 s tick can refresh statuses.
-let openDeals: { place: Place; list: HTMLElement } | null = null;
+let temporaryPlaceMarker: Marker | null = null;
 
 /*
  * MapLibre positions every marker by rewriting its element's inline
@@ -122,9 +143,18 @@ function pinElement(): HTMLElement {
   return el;
 }
 
-/** `icon` is the card icon: one for every place, or chosen per place (mixed categories). */
+/** What each shown pin looks like, for the popup and saved places (pin id → look). */
+let shownPlaces: Place[] = [];
+const pinLooks = new Map<string, { color: string; icon?: string }>();
+const pinById = new Map<string, HTMLElement>();
+const searchMarkers = new Map<string, { place: Place; marker: Marker }>();
+
+/** `icon` is the popup icon: one for every place, or chosen per place (mixed categories). */
 function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: string | ((place: Place) => string | undefined)) {
   clearPins();
+  shownPlaces = places;
+  pinLooks.clear();
+  pinById.clear();
   // Shadows first so every pin draws above every shadow.
   shadows = places.map((place) =>
     new Marker({ element: shadowElement(), anchor: 'bottom', pitchAlignment: 'map', rotationAlignment: 'viewport' })
@@ -137,20 +167,30 @@ function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: 
     applyPinLook(el, shadows[i].getElement(), look);
     el.dataset.index = String(i);
     el.setAttribute('aria-label', place.name);
+    const popupLook = { color: look.color, icon: typeof icon === 'function' ? icon(place) : icon };
+    pinLooks.set(place.id, popupLook);
+    pinById.set(place.id, el);
     el.addEventListener('click', (e) => {
       e.stopPropagation();
       selectPin(el);
-      openCard(place, look.color, typeof icon === 'function' ? icon(place) : icon);
-      void showRouteTo(place);
+      openPlace(place, popupLook);
+      revealPopup(place);
     });
     return new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
   });
   markerPlaces = places;
   updateDealChips(new Date());
   dealTimer = setInterval(() => updateDealChips(new Date()), 60_000);
+  // Pins refreshed under an open popup (the map moved): keep its place highlighted.
+  const open = placePopup?.current();
+  const refreshed = open ? places.find(place => place.id === open.id) : undefined;
+  if (refreshed) placePopup.open(refreshed, pinLooks.get(refreshed.id)!);
+  const openPin = open ? pinById.get(open.id) : undefined;
+  if (openPin) { selectPin(openPin); temporaryPlaceMarker?.remove(); temporaryPlaceMarker = null; }
+  syncMarkerVisibility();
 }
 
-/** Refresh every pin's deal chip (and the open card's deal statuses) for `now`. */
+/** Refresh deal badges as schedules and freshness change. */
 function updateDealChips(now: Date) {
   markers.forEach((marker, i) => {
     const place = markerPlaces[i];
@@ -162,11 +202,8 @@ function updateDealChips(now: Date) {
     chip.hidden = text === '';
     pin.setAttribute('aria-label', text ? `${place.name}, deal on now` : place.name);
   });
-  if (openDeals && !card.hidden) renderDealRows(openDeals.place, openDeals.list, now);
+  placePopup.refreshDeals(now);
 }
-
-/** Every pin the same: what search results and location types use until match scores exist. */
-const uniformLook = (color: string) => (): PinLook => ({ color, scale: 1 });
 
 function clearPins() {
   [...markers, ...shadows].forEach((m) => m.remove());
@@ -192,186 +229,77 @@ function selectPin(el: HTMLElement) {
 }
 
 // ---------------------------------------------------------------------------
-// Place card
+// Destination popup (anchored to the selected place)
 // ---------------------------------------------------------------------------
 
-const card = $<HTMLElement>('place-card');
+const saved = createSavedStore();
+/** Map category each shown place came from (for saving with the right pin colour). */
+const pinCategory = new Map<string, string>();
 
-function el<K extends keyof HTMLElementTagNameMap>(tag: K, className?: string, text?: string) {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text) node.textContent = text;
-  return node;
-}
+const placePopup = createPlacePopup(map, {
+  onNavigate: (place) => openPlanner(place),
+  saved: {
+    has: (id) => saved.has(id),
+    toggle: (place) => saved.toggle(place, { categoryId: pinCategory.get(place.id) }),
+  },
+  onClose: () => {
+    setPinSelected(selectedPin, false);
+    selectedPin = null;
+    for (const { marker } of searchMarkers.values()) marker.getElement().classList.remove('selected');
+    queueMicrotask(syncTrip);
+    temporaryPlaceMarker?.remove(); temporaryPlaceMarker = null;
+  },
+});
 
-function safeHttpUrl(raw: string | undefined): string | undefined {
-  if (!raw) return undefined;
-  try {
-    const url = new URL(raw.startsWith('http') ? raw : `https://${raw}`);
-    return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : undefined;
-  } catch {
-    return undefined;
+// The popup never changes the discovery panel (no collapse/expand/move);
+// instead the camera keeps the popup clear of the panel where it can.
+function openPlace(place: Place, look: { color: string; icon?: string }) {
+  temporaryPlaceMarker?.remove(); temporaryPlaceMarker = null;
+  if (!pinById.has(place.id) && !searchMarkers.has(place.id)) {
+    const el = pinElement(); el.classList.add('selected', 'vb-temporary-place'); el.setAttribute('aria-label', place.name);
+    el.style.setProperty('--pin-color', look.color);
+    temporaryPlaceMarker = new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
   }
+  placePopup.open(place, look);
+  syncMarkerVisibility();
 }
 
-const shortDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'America/New_York' });
-
-function dealStatusText(deal: Deal, now: Date): string {
-  const status = dealStatus(deal, now);
-  switch (status.kind) {
-    case 'active':
-      return 'Active now';
-    case 'next':
-      return status.label;
-    case 'unconfirmed':
-      return 'Times not confirmed';
-    case 'stale':
-      return 'Not recently checked';
-  }
+function closePopup() {
+  placePopup.close();
 }
 
-function renderDealRows(place: Place, list: HTMLElement, now: Date) {
-  list.replaceChildren();
-  for (const deal of place.deals ?? []) {
-    const li = el('li', 'deal-row');
-    const head = el('div', 'deal-title');
-    head.append(el('span', 'detail-icon', deal.kind === 'student' ? '🎓' : '%'), el('span', undefined, deal.title));
-    li.append(head);
-    const status = dealStatus(deal, now);
-    const when = el('div', `deal-when${status.kind === 'active' ? ' deal-active' : ''}`);
-    when.textContent = [describeSchedule(deal), dealStatusText(deal, now)].filter(Boolean).join(' · ');
-    li.append(when);
-    const meta = el('div', 'deal-meta');
-    const href = deal.source === 'osm' ? osmUrl(place) : safeHttpUrl(deal.sourceUrl ?? undefined);
-    if (href) {
-      const a = el('a', undefined, 'Source');
-      a.href = href;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      meta.append(a);
-    }
-    const checked = new Date(deal.checkedAt);
-    if (!Number.isNaN(checked.getTime())) meta.append(el('span', undefined, `checked ${shortDate.format(checked)}`));
-    if (deal.source === 'website') meta.append(el('span', undefined, 'found on venue site'));
-    li.append(meta);
-    list.append(li);
-  }
+/** Screen rects (relative to the map) for camera placement around the discovery panel. */
+function placementFrame() {
+  const box = map.getContainer().getBoundingClientRect();
+  const container = { left: 0, top: 0, right: box.width, bottom: box.height };
+  const panelEl = discovery?.element();
+  const p = panelEl?.getBoundingClientRect();
+  const panel = p && p.width > 0 ? { left: p.left - box.left, top: p.top - box.top, right: p.right - box.left, bottom: p.bottom - box.top } : null;
+  return { container, panel };
 }
 
-function openCard(place: Place, color: string, icon?: string) {
-  card.replaceChildren();
-  openDeals = null;
-
-  const hero = el('div', 'card-hero');
-  hero.style.setProperty('--hero-color', color);
-  hero.append(el('span', 'card-hero-icon', icon ?? '📍'));
-  const close = el('button', 'card-close', '×');
-  close.setAttribute('aria-label', 'Close');
-  close.addEventListener('click', closeCard);
-  hero.append(close);
-
-  const body = el('div', 'card-body');
-  body.append(el('h2', 'card-title', place.name), el('p', 'card-category', place.category));
-
-  const details = el('ul', 'card-details');
-  const address = formatAddress(place.tags) ?? place.tags.display_name;
-  const rows: [string, string | undefined][] = [
-    ['📍', address],
-    ['🕒', place.tags.opening_hours],
-    // Catalog places only, once their details loaded; Overpass places have no price data.
-    ['💲', place.tags['catalog:price_band'] ? priceLabel(place.tags['catalog:price_band'], place.tags['catalog:price_source']) : undefined],
-    ['📞', place.tags.phone ?? place.tags['contact:phone']],
-  ];
-  for (const [glyph, value] of rows) {
-    if (!value) continue;
-    const li = el('li');
-    li.append(el('span', 'detail-icon', glyph), el('span', undefined, value));
-    details.append(li);
-  }
-
-  const actions = el('div', 'card-actions');
-  const website = safeHttpUrl(place.tags.website ?? place.tags['contact:website']);
-  if (website) actions.append(linkButton('Website', website));
-  actions.append(linkButton('View on OpenStreetMap', osmUrl(place)));
-
-  if (details.childElementCount > 0) body.append(details);
-  if (place.deals?.length) {
-    const list = el('ul', 'deal-list');
-    renderDealRows(place, list, new Date());
-    openDeals = { place, list };
-    body.append(el('h3', 'card-section', 'Deals'), list);
-  }
-  body.append(actions);
-  routeBox = el('div', 'route-box');
-  routeBox.setAttribute('aria-live', 'polite');
-  body.append(routeBox);
-  // Foursquare OS Places is Apache 2.0: keep its attribution with its data (OSM's is on the map).
-  const attribution = place.tags['catalog:attribution'];
-  if (attribution?.includes('Foursquare')) body.append(el('p', 'card-category', `Data: ${attribution}`));
-  card.append(hero, body);
-  card.hidden = false;
+/** After a pin tap: pan only if the popup above the pin would overlap the panel or leave the map. */
+function revealPopup(place: Place) {
+  const size = placePopup.size();
+  if (!size) return;
+  const { container, panel } = placementFrame();
+  const pin = map.project([place.lon, place.lat]);
+  const shift = popupRevealShift(pin, size, POPUP_PIN_GAP, container, panel);
+  if (!shift) return;
+  // Ease the pin itself to its target point. (panBy moves the map centre by
+  // pixels, which on the tilted map moves a pin lower on screen by a
+  // different amount.)
+  const offset: [number, number] = [pin.x + shift.x - container.right / 2, pin.y + shift.y - container.bottom / 2];
+  map.easeTo({ center: [place.lon, place.lat], offset, duration: 400 });
 }
 
-function linkButton(label: string, href: string) {
-  const a = el('a', 'action-btn', label);
-  a.href = href;
-  a.target = '_blank';
-  a.rel = 'noopener noreferrer';
-  return a;
-}
-
-function closeCard() {
-  cancelRoute();
-  openDeals = null;
-  card.hidden = true;
-  setPinSelected(selectedPin, false);
-  selectedPin = null;
-}
-
-// ---------------------------------------------------------------------------
-// Transit route for the selected place (server API; see transitRoute.ts)
-// ---------------------------------------------------------------------------
-
-let routeBox: HTMLElement | null = null;
-let routeSeq = 0; // id of the current selection's request; anything older is stale
-let routeAbort: AbortController | undefined;
-let routePlace: Place | null = null;
-let scene: ReturnType<typeof mountScene> | undefined; // assigned once accounts mount, at the bottom
-let discovery: DiscoveryPanelHandle | undefined; // assigned when the panel mounts, at the bottom
-
-const currentOrigin = (): LatLng | null => discovery?.getPreferences().origin?.location ?? null;
-
-/** Invalidate any in-flight request and remove the drawn route. */
-function cancelRoute() {
-  routeSeq++;
-  routeAbort?.abort();
-  routePlace = null;
-  scene?.setNavigation(false);
-  clearRoute(map);
-}
-
-async function showRouteTo(place: Place) {
-  cancelRoute();
-  routePlace = place;
-  // Coalesced with the cancel above: switching destinations stays in navigation.
-  scene?.setNavigation(true);
-  const box = routeBox; // this selection's own box; a newer card replaces routeBox
-  if (!box) return;
-  const seq = routeSeq;
-  const show = (state: RouteState) => renderRouteState(box, state, () => void showRouteTo(place));
-
-  const origin = currentOrigin();
-  if (!origin) return show({ kind: 'origin_required' });
-  show({ kind: 'loading' });
-  const abort = (routeAbort = new AbortController());
-  try {
-    const state = await fetchRoute(origin, { lat: place.lat, lng: place.lon }, abort.signal);
-    if (seq !== routeSeq) return; // a different pin was picked meanwhile: drop this response
-    show(state);
-    if (state.kind === 'result' && state.result.status === 'ok') drawRoute(map, state.result.option.legs);
-  } catch {
-    /* aborted: a newer selection owns the card now */
-  }
+/** Fly to a place (search result, saved place) so it and its open popup land clear of the panel. */
+function focusPlace(place: Place) {
+  const size = placePopup.size() ?? { width: 304, height: 240 };
+  const { container, panel } = placementFrame();
+  const target = pinTarget(size, POPUP_PIN_GAP, container, panel);
+  const offset: [number, number] = [target.x - container.right / 2, target.y - container.bottom / 2];
+  map.flyTo({ center: [place.lon, place.lat], zoom: Math.max(map.getZoom(), 16.5), pitch: pitchLock.isLocked() ? 0 : map.getPitch(), bearing: pitchLock.isLocked() ? 0 : map.getBearing(), offset, essential: true });
 }
 
 // ---------------------------------------------------------------------------
@@ -391,74 +319,63 @@ function hideToast() {
 }
 
 // ---------------------------------------------------------------------------
-// Search (Nominatim — submit only, never search-as-you-type)
+// Search (Nominatim, submit only; the UI lives in the discovery panel)
 // ---------------------------------------------------------------------------
 
-const form = $<HTMLFormElement>('search-form');
-const input = $<HTMLInputElement>('search-input');
-const clearBtn = $<HTMLButtonElement>('search-clear');
-const resultsList = $<HTMLUListElement>('results');
-let searchAbort: AbortController | undefined;
+const searchProvider: PlaceSearchProvider = {
+  name: 'OpenStreetMap Nominatim',
+  search: (query, signal) => searchPlaces(query, signal),
+};
 
-input.addEventListener('input', () => {
-  clearBtn.hidden = input.value.length === 0;
-});
-
-clearBtn.addEventListener('click', () => {
-  input.value = '';
-  clearBtn.hidden = true;
-  resultsList.hidden = true;
-  clearPins();
-  closeCard();
-  cancelCategory();
-  input.focus();
-});
-
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const query = input.value.trim();
-  if (!query) return;
-  searchAbort?.abort();
-  searchAbort = new AbortController();
-  cancelCategory();
-  showToast('Searching…', true);
-  try {
-    const places = await searchPlaces(query, searchAbort.signal);
-    hideToast();
-    renderResults(places);
-  } catch (err) {
-    if ((err as Error).name !== 'AbortError') showToast('Search is unavailable right now. Try again in a moment.');
-  }
-});
-
-function renderResults(places: Place[]) {
-  resultsList.replaceChildren();
-  if (places.length === 0) {
-    resultsList.append(el('li', 'result-empty', 'No results found'));
-    resultsList.hidden = false;
-    return;
-  }
-  const color = CATEGORY_COLORS.search;
-  showPlaces(places, uniformLook(color));
-  for (const [i, place] of places.entries()) {
-    const li = el('li');
-    const btn = el('button', 'result');
-    btn.type = 'button';
-    btn.append(el('span', 'result-name', place.name), el('span', 'result-sub', place.tags.display_name));
-    btn.addEventListener('click', () => {
-      resultsList.hidden = true;
-      const marker = markers[i];
-      if (marker) selectPin(marker.getElement());
-      // Shift the target away from the place card so the pin stays visible.
-      const offset: [number, number] = window.innerWidth > 640 ? [200, 40] : [0, -window.innerHeight * 0.22];
-      map.flyTo({ center: [place.lon, place.lat], zoom: 17, ...TILTED, offset, essential: true });
-      openCard(place, color);
-      void showRouteTo(place);
+function showSearchResults(places: Place[]) {
+  closePopup(); hideToast();
+  for (const { marker } of searchMarkers.values()) marker.remove();
+  searchMarkers.clear();
+  for (const place of places) {
+    const el = pinElement(); el.dataset.markerKind = 'search'; el.setAttribute('aria-label', place.name);
+    el.style.setProperty('--pin-color', CATEGORY_COLORS.search);
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      trip.dispatch({ type: 'setTo', endpoint: endpointFor(place) });
+      openSearchResult(place);
     });
-    li.append(btn);
-    resultsList.append(li);
+    const marker = new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
+    searchMarkers.set(place.id, { place, marker });
   }
-  resultsList.hidden = false;
+  syncMarkerVisibility();
+}
+function syncMarkerVisibility() {
+  const s = trip.getState();
+  const relevant = [placePopup.current()?.id, s.from?.placeId, s.to?.placeId].filter((id): id is string => !!id);
+  const mode = focus.mode();
+  for (const [id, pin] of pinById) {
+    const visible = markerVisible(mode, 'discovery', id, relevant) && !(mode === 'search' && searchMarkers.has(id));
+    setMarkerVisible(pin, visible);
+    const shadow = shadows[Number(pin.dataset.index)]?.getElement();
+    if (shadow) setMarkerVisible(shadow, visible);
+  }
+  for (const [id, { marker }] of searchMarkers) setMarkerVisible(marker.getElement(), markerVisible(mode, 'search', id, mode === 'discovery' ? [placePopup.current()?.id ?? ''] : relevant));
+  if (temporaryPlaceMarker) setMarkerVisible(temporaryPlaceMarker.getElement(), mode !== 'navigation');
+}
+
+function openSearchResult(place: Place) {
+  const pin = pinById.get(place.id);
+  if (pin) selectPin(pin);
+  if (!pin) { setPinSelected(selectedPin, false); selectedPin = null; }
+  for (const [id, { marker }] of searchMarkers) marker.getElement().classList.toggle('selected', id === place.id);
+  openPlace(place, pinLooks.get(place.id) ?? { color: CATEGORY_COLORS.search });
+  focusPlace(place);
+}
+
+/** Saved destinations reuse pins or one temporary marker, without changing activity filters. */
+function openSavedPlace(place: Place, categoryId?: string) {
+  place = shownPlaces.find(current => current.id === place.id) ?? place;
+  const category = CATEGORIES.find(c => c.id === categoryId);
+  const pin = pinById.get(place.id);
+  if (pin) selectPin(pin);
+  openPlace(place, pinLooks.get(place.id) ?? { color: CATEGORY_COLORS[categoryId ?? ''] ?? CATEGORY_COLORS.search, icon: category?.icon });
+  discovery.showView('preferences');
+  focusPlace(place);
 }
 
 // ---------------------------------------------------------------------------
@@ -470,12 +387,6 @@ let categoryAbort: AbortController | undefined;
 let currentSelection: { categories: Category[]; detail: 'tiles' | 'full' } | null = null;
 /** Where the category pins were last loaded. */
 let lastView: { center: { lat: number; lon: number }; zoom: number } | null = null;
-
-/** Stop any category lookup still in flight, so it can't overwrite newer pins (e.g. search results). */
-function cancelCategory() {
-  categoryAbort?.abort();
-  currentSelection = null;
-}
 
 /** Roughly the visible area around the centre; wider when zoomed out. */
 const radiusFor = (zoom: number) => Math.min(4000, Math.max(400, 1200 * 2 ** (16 - zoom)));
@@ -495,10 +406,7 @@ const radiusFor = (zoom: number) => Math.min(4000, Math.max(400, 1200 * 2 ** (16
 async function showCategories(categories: Category[], detail: 'tiles' | 'full', { refresh = false } = {}) {
   categoryAbort?.abort();
   currentSelection = categories.length > 0 ? { categories, detail } : null;
-  if (!refresh) {
-    closeCard();
-    resultsList.hidden = true;
-  }
+  if (!refresh) closePopup();
   if (categories.length === 0) {
     clearPins();
     hideToast();
@@ -527,6 +435,10 @@ async function showCategories(categories: Category[], detail: 'tiles' | 'full', 
     }
     return merged;
   };
+  const remember = () => {
+    pinCategory.clear();
+    for (const [id, cat] of categoryOf) pinCategory.set(id, cat.id);
+  };
   const lookFor = (place: Place): PinLook => ({
     color: CATEGORY_COLORS[categoryOf.get(place.id)?.id ?? ''] ?? CATEGORY_COLORS.search,
     scale: 1,
@@ -541,6 +453,7 @@ async function showCategories(categories: Category[], detail: 'tiles' | 'full', 
     const quick = merge(categories.map((cat) => [cat, placesFromTiles(tilePois(cat), center, radius, perCategory)]));
     quickCount = quick.length;
     showPlaces(quick, lookFor, iconFor);
+    remember();
     if (quickCount > 0) hideToast();
   };
   showQuick();
@@ -569,6 +482,7 @@ async function showCategories(categories: Category[], detail: 'tiles' | 'full', 
       if (abort.signal.aborted) return;
       const others = otherCategories.map((cat): [Category, Place[]] => [cat, placesFromTiles(tilePois(cat), center, radius, perCategory)]);
       showPlaces(merge([...groupsOf(fromCatalog), ...others]), lookFor, iconFor);
+      remember();
       hideToast();
     };
     showWithTiles();
@@ -587,6 +501,7 @@ async function showCategories(categories: Category[], detail: 'tiles' | 'full', 
     if (detailed.length > 0) {
       haveDetailed = true;
       showPlaces(merge(groupsOf(detailed)), lookFor, iconFor);
+      remember();
       hideToast();
     } else if (quickCount === 0) {
       showToast(`No ${label} found here. Try moving the map.`);
@@ -597,6 +512,7 @@ async function showCategories(categories: Category[], detail: 'tiles' | 'full', 
       // Overpass failed for the other categories; still show what the catalog has.
       haveDetailed = true;
       showPlaces(merge(groupsOf(fromCatalog)), lookFor, iconFor);
+      remember();
       showToast('Showing food & drink only. The OSM details service is busy right now.');
       return;
     }
@@ -635,10 +551,10 @@ map.on('moveend', () => {
   }, 500);
 });
 
-// Clicking empty map closes the open card and result list.
-map.on('click', () => {
-  closeCard();
-  resultsList.hidden = true;
+// Clicking empty map closes the popup.
+map.on('click', () => closePopup());
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && placePopup.isOpen() && !planner.isOpen()) closePopup();
 });
 
 // ---------------------------------------------------------------------------
@@ -653,6 +569,7 @@ $('zoom-out').addEventListener('click', () => map.zoomOut());
 $('compass').addEventListener('click', () => map.easeTo({ bearing: 0 }));
 
 tiltBtn.addEventListener('click', () => {
+  if (pitchLock.isLocked()) return;
   const flat = map.getPitch() < 5;
   map.easeTo(flat ? { ...TILTED, duration: 1000 } : { pitch: 0, bearing: 0, duration: 1000 });
 });
@@ -661,7 +578,10 @@ function syncControls() {
   needle.style.transform = `rotate(${-map.getBearing()}deg)`;
   const flat = map.getPitch() < 5;
   tiltBtn.textContent = flat ? '3D' : '2D';
-  tiltBtn.title = flat ? 'Switch to 3D view' : 'Switch to top-down view';
+  const locked = pitchLock.isLocked();
+  tiltBtn.disabled = locked;
+  tiltBtn.title = locked ? 'Navigation keeps the map in 2D. Close Directions to restore 3D.' : flat ? 'Switch to 3D view' : 'Switch to top-down view';
+  tiltBtn.setAttribute('aria-label', tiltBtn.title);
 }
 
 /**
@@ -682,33 +602,96 @@ map.on('pitch', () => {
   syncControls();
   syncDepth();
 });
-syncControls();
 syncDepth();
 
 // ---------------------------------------------------------------------------
-// Discovery panel: the left-hand interface. Its Activity choice decides which
-// categories the map loads; it only reads the map's DOM otherwise.
+// Shared Search / Navigation state and MBTA route provider
 // ---------------------------------------------------------------------------
 
-discovery = mountDiscoveryPanel(document.body, {
-  placeCard: card,
-  mapLayers: {
-    available: CATEGORIES,
-    onChange: ({ layerIds, detail }) => {
-      void showCategories(
-        CATEGORIES.filter((c) => layerIds.includes(c.id)),
-        detail,
-      );
-    },
-  },
+const mapPlaceSuggestions = createPlaceListProvider(() => [...shownPlaces, ...[...searchMarkers.values()].map(x => x.place)], {
+  description: 'Places on the map',
+  source: 'map_place',
+  kind: 'place',
+  secondary: 'On the map',
+});
+const savedSuggestions = createPlaceListProvider(() => saved.list().map(savedToPlace), {
+  description: 'Saved places',
+  source: 'saved_place',
+  kind: 'saved',
+  secondary: 'Saved',
+});
+const bostonSuggestions = createBostonSuggestionProvider();
+
+const trip = createStore(tripReducer, initialTripState());
+const fromSuggestions = combineProviders([bostonSuggestions, savedSuggestions, mapPlaceSuggestions], 'Offline Boston list, saved places and places on the map');
+const toSuggestions = combineProviders([mapPlaceSuggestions, savedSuggestions, bostonSuggestions], 'Places on the map, saved places and the offline Boston list');
+const pitchLock = createPitchLock(map, { reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches, onChange: () => queueMicrotask(syncControls) });
+const focus = createFocusController(map, pitchLock, { reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches });
+const resolvePlaceId = (id: string) => {
+  const p = shownPlaces.find(p => p.id === id) ?? saved.list().map(savedToPlace).find(p => p.id === id);
+  return p ? placeIdFor(p) : undefined;
+};
+const planner = createRoutePlanner({ store: trip, fromSuggestions, toSuggestions, resolvePlaceId, provider: createApiRouteProvider() });
+
+syncControls();
+const endpointFor = (place: Place): RouteEndpoint => ({ label: place.name, location: { lat: place.lat, lng: place.lon }, source: 'map_place', placeId: placeIdFor(place) });
+const discoveryEndpoint = (): RouteEndpoint | null => {
+  const o = discovery.getPreferences().origin;
+  return o ? { ...o, location: { ...o.location } } : null;
+};
+function openPlanner(place: Place) {
+  trip.dispatch({ type: 'navigateTo', destination: endpointFor(place), discoveryOrigin: discoveryEndpoint() });
+  closePopup();
+}
+function previewEndpoint(e: RouteEndpoint) {
+  const place = shownPlaces.find(p => p.id === e.placeId) ?? saved.list().map(savedToPlace).find(p => p.id === e.placeId)
+    ?? { id: e.placeId ?? 'trip-preview', name: e.label, lat: e.location.lat, lon: e.location.lng, category: 'Chosen location', tags: {} };
+  openSearchResult(place);
+}
+const tripSearch = createTripSearch({ store: trip, fromSuggestions, toSuggestions, resolvePlaceId, provider: searchProvider,
+  onDestination: previewEndpoint,
+  onOpen: () => trip.dispatch({ type: 'openSearch', discoveryOrigin: discoveryEndpoint(), selectedPlace: placePopup.current() ? endpointFor(placePopup.current()!) : null }),
+  onClose: () => discovery.showView('preferences'), onResults: showSearchResults,
+  onSelect: place => { trip.dispatch({ type: 'setTo', endpoint: endpointFor(place) }); openSearchResult(place); discovery.showView('preferences'); },
 });
 
-// Accounts: sign-in in the top right; the map theme follows the user's vibes.
-const account = mountAccount(document.body, { map });
+// ---------------------------------------------------------------------------
+// Discovery panel: the left-hand interface. Its Activity choice decides which
+// categories the map loads; Quick Tools give search, saved places and recenter.
+// ---------------------------------------------------------------------------
 
-// Scene Composer: the session owns the map's look (account taste until an
-// outing scene exists). Navigation keeps the palette and drops decorations.
-scene = mountScene({
+const loadLayers = (selection: MapLayerSelection) => {
+  void showCategories(
+    CATEGORIES.filter((c) => selection.layerIds.includes(c.id)),
+    selection.detail,
+  );
+};
+
+const discovery = mountDiscoveryPanel(document.body, {
+  mapLayers: { available: CATEGORIES, onChange: loadLayers },
+  search: tripSearch,
+  directions: { panel: planner.root, control: planner.control },
+  saved: {
+    store: saved,
+    onSelect: (s) => openSavedPlace(savedToPlace(s), s.categoryId),
+  },
+  onRecenter: () => {
+    // No starting point: Boston Common, from the bundled OpenStreetMap list.
+    const common = bostonCommon()?.location;
+    const target = recenterTarget(discovery.getPreferences().origin, common ?? BOSTON);
+    const flat = pitchLock.isLocked() || map.getPitch() < 5;
+    map.flyTo({
+      center: target.center,
+      zoom: 16,
+      pitch: flat ? 0 : TILTED.pitch,
+      bearing: flat ? 0 : TILTED.bearing,
+      essential: true,
+    });
+  },
+});
+// Account taste and the scene composer retain ownership of map appearance.
+const account = mountAccount(document.body, { map });
+const scene = mountScene({
   theme: account.theme,
   account: account.store,
   reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)'),
@@ -716,11 +699,73 @@ scene = mountScene({
 });
 if (import.meta.env.DEV) Object.assign(window, { vibentaScene: sceneDevHook(scene, map) });
 
-// A different starting point makes the shown route wrong: re-plan for the open card's place.
-let lastOrigin = currentOrigin();
-discovery.subscribe((prefs) => {
-  const next = prefs.origin?.location ?? null;
-  if (next?.lat === lastOrigin?.lat && next?.lng === lastOrigin?.lng) return;
-  lastOrigin = next;
-  if (routePlace && !card.hidden) void showRouteTo(routePlace);
-});
+saved.subscribe(() => placePopup.refreshSaved());
+
+// Starting-point marker, driven by the panel's origin preference.
+const originMarker = createOriginMarker(mapLibreOriginDeps(map));
+const syncOrigin = () => {
+  const origin = discovery.getPreferences().origin;
+  const update = originMarker.update(origin);
+  if (!origin) return;
+  const lngLat: [number, number] = [origin.location.lng, origin.location.lat];
+  if (shouldRevealOrigin(update, map.getBounds().contains(lngLat))) map.easeTo({ center: lngLat, duration: 800 });
+};
+discovery.subscribe(syncOrigin);
+syncOrigin();
+
+// Trip markers and route layers follow only the current generation.
+const tripOrigin = createOriginMarker(mapLibreOriginDeps(map));
+const hubs = createRouteHubs(map);
+let destinationMarker: Marker | null = null;
+let renderedGeneration = -1;
+let userMovedWhileLoading = false;
+let navigationWasOpen = false;
+let routeStyleReady = map.isStyleLoaded();
+map.on('movestart', e => { if (e.originalEvent && trip.getState().route.kind === 'loading') userMovedWhileLoading = true; });
+const syncTrip = () => {
+  const s = trip.getState();
+  if (s.navigationOpen && !navigationWasOpen) { navigationWasOpen = true; closePopup(); }
+  if (!s.navigationOpen) navigationWasOpen = false;
+  scene.setNavigation(s.navigationOpen);
+  focus.apply(s);
+  syncMarkerVisibility();
+  discovery.setDirectionsExpanded(s.navigationOpen && s.directionsExpanded);
+  if (!s.searchOpen && discovery.element().dataset.panelView === 'search') discovery.showView('preferences');
+  const discoveryOrigin = discovery.getPreferences().origin;
+  const focused = focus.mode() !== 'discovery';
+  originMarker.update(!focused || (s.from && sameLocation(s.from.location, discoveryOrigin?.location)) ? discoveryOrigin : null);
+  tripOrigin.update(focused && s.from && !sameLocation(s.from.location, discoveryOrigin?.location) ? s.from : null);
+  const needsDestinationMarker = s.navigationOpen || (s.searchOpen && s.to && !placePopup.isOpen() && !pinById.has(s.to.placeId ?? '') && !searchMarkers.has(s.to.placeId ?? ''));
+  if (needsDestinationMarker && s.to) {
+    if (!destinationMarker) {
+      const el = document.createElement('div'); el.className = 'vb-trip-destination'; el.setAttribute('role', 'img');
+      destinationMarker = new Marker({ element: el }).setLngLat([s.to.location.lng, s.to.location.lat]).addTo(map);
+    }
+    destinationMarker.getElement().setAttribute('aria-label', `Destination: ${s.to.label}`);
+    destinationMarker.setLngLat([s.to.location.lng, s.to.location.lat]);
+  } else { destinationMarker?.remove(); destinationMarker = null; }
+  if (s.route.kind === 'loading' && renderedGeneration !== s.generation) { userMovedWhileLoading = false; renderedGeneration = s.generation; }
+  if (!routeStyleReady) return;
+  if (s.navigationOpen && s.route.kind === 'done' && s.route.result.status === 'ok') {
+    const legs = s.route.result.route.option.legs;
+    drawRoute(map, legs); hubs.update(routeStations(legs)); focus.refresh();
+    if (renderedGeneration !== -s.generation - 2) {
+      renderedGeneration = -s.generation - 2;
+      const bounds = routeBounds(legs, [s.from!.location, s.to!.location]);
+      if (bounds && !userMovedWhileLoading) {
+        const container = map.getContainer().getBoundingClientRect();
+        const obstacles = [discovery.element()].map(el => el.getBoundingClientRect());
+        map.fitBounds(bounds, { padding: paddingAround(container, obstacles), pitch: 0, bearing: 0, duration: 650, maxZoom: 16 });
+      }
+    }
+  } else { clearRoute(map); hubs.update([]); }
+};
+trip.subscribe(syncTrip);
+discovery.subscribe(syncTrip);
+map.on('style.load', () => { routeStyleReady = true; renderedGeneration = -1; syncTrip(); });
+createTripRouter(trip, createApiRouteProvider());
+if (import.meta.env.DEV) Object.assign(window, { vibentaTrip: trip });
+
+// Place names stay attached to DOM pins, with collisions resolved after camera/marker updates.
+const pinLabels = createPinLabels(map.getContainer(), () => [...document.querySelectorAll('.vb-discovery, .vb-place-popup, .map-controls, .vb-route-hub, .vb-hub-label')]);
+map.on('render', pinLabels.schedule);

@@ -1,7 +1,8 @@
 /**
  * The floating "Plan your outing" panel. Renders preference state, sends every
- * change through the preferences store, and collapses to a one-line summary
- * (never disappears) while the map's destination card is open.
+ * change through the preferences store. Only the user collapses it to a
+ * one-line summary; map interactions (destination popups, the trip planner)
+ * never change it.
  *
  * The user first sets practical constraints, then moves into a dedicated
  * inspiration screen. Both screens share the existing preferences store;
@@ -27,8 +28,13 @@ import { h, icon, ICONS, uid } from './dom';
 import { createLocationField } from './locationField';
 import { createMultiSelectField } from './multiSelectField';
 import { createSelectField } from './selectField';
-import { createTimingField } from './timingField';
 import { createVibeStep } from './vibeStep';
+import { createTimingField } from './timingField';
+import {
+  createQuickTools,
+  createSavedView,
+  type SavedViewConfig,
+} from './panelViews';
 
 export interface PanelDeps {
   prefs: Store<InitialPreferences, PreferencesAction>;
@@ -38,16 +44,25 @@ export interface PanelDeps {
   now: () => Date;
   /** The map's place categories, when the panel drives what the map loads. */
   mapLayers?: readonly MapLayer[];
+  /** Quick Tools: each tool appears only if provided. */
+  search?: { root: HTMLElement; focus(): void; onOpen(): void; onClose(): void; destroy(): void };
+  saved?: Omit<SavedViewConfig, 'onBack'>;
+  onRecenter?: () => void;
+  directions?: { panel: HTMLElement; control: HTMLElement };
 }
+
+export type PanelView = 'preferences' | 'search' | 'saved';
 
 export interface Panel {
   root: HTMLElement;
   /** Close any open dropdown or search inside the panel. */
   closePopups(): void;
+  showView(view: PanelView): void;
+  setDirectionsExpanded(expanded: boolean): void;
   destroy(): void;
 }
 
-export function createPanel({ prefs, layout, provider, geolocation, now, mapLayers }: PanelDeps): Panel {
+export function createPanel({ prefs, layout, provider, geolocation, now, mapLayers, search, saved, onRecenter, directions }: PanelDeps): Panel {
   const dispatch = prefs.dispatch;
   const bodyId = uid('panel-body');
   const titleId = uid('panel-title');
@@ -119,7 +134,6 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   resetBtn.addEventListener('click', () => {
     dispatch({ type: 'reset' });
     showStep('plan');
-    activity.focus();
   });
 
   const summaryText = h('span', { class: 'vb-summary-text' });
@@ -132,10 +146,21 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     icon(ICONS.chevronDown, 20, 'vb-icon vb-summary-chevron'),
   );
 
+  // --- Quick Tools and secondary views ---------------------------------------
+  const searchView = search ?? null;
+  const savedView = saved ? createSavedView({ ...saved, onBack: () => showView('preferences', 'saved') }) : null;
+  const quickTools = createQuickTools({
+    search: searchView ? () => showView(view === 'search' ? 'preferences' : 'search', 'search') : undefined,
+    saved: savedView ? () => showView(view === 'saved' ? 'preferences' : 'saved', 'saved') : undefined,
+    recenter: onRecenter,
+  });
+  const hasTools = !!(searchView || savedView || onRecenter);
+  quickTools.setSavedCount(saved?.store.list().length ?? 0);
+  const unsubSavedCount = saved?.store.subscribe((items) => quickTools.setSavedCount(items.length));
+
   const heading = h('h2', { class: 'vb-title', id: titleId, tabindex: '-1' }, 'Plan your outing');
   const subtitle = h('p', { class: 'vb-subtitle' }, 'First, the basics. Then we’ll find the feeling.');
-
-  const planSection = h(
+  const stepSection = h(
     'section',
     { class: 'vb-step', 'data-step': 'preferences', 'aria-labelledby': titleId },
     activity.root,
@@ -146,20 +171,13 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     timing.root,
     notes,
   );
-  const vibeSection = h(
-    'section',
-    { class: 'vb-step', 'data-step': 'vibe', 'aria-labelledby': titleId, hidden: true },
-    vibeStep.root,
-  );
-
+  const vibeSection = h('section', { class: 'vb-step', 'data-step': 'vibe', 'aria-labelledby': titleId, hidden: true }, vibeStep.root);
   const continueBtn = h('button', { type: 'button', class: 'vb-primary-btn vb-continue-btn' }, 'Continue to your vibe');
   const backBtn = h('button', { type: 'button', class: 'vb-text-btn vb-back-btn' }, 'Back to details');
   const doneBtn = h('button', { type: 'button', class: 'vb-primary-btn vb-continue-btn' }, 'Save my vibe');
-
   const planActions = h('div', { class: 'vb-footer-actions' }, resetBtn, continueBtn);
   const vibeActions = h('div', { class: 'vb-footer-actions', hidden: true }, backBtn, doneBtn);
-  const footerNote = h('p', { class: 'vb-step-footnote' },
-    'Next: describe the atmosphere you have in mind. All these details stay saved.');
+  const footerNote = h('p', { class: 'vb-step-footnote' }, 'Next: describe the atmosphere you have in mind. All these details stay saved.');
   const footer = h('footer', { class: 'vb-footer vb-step-footer' }, footerNote, planActions, vibeActions);
   const body = h(
     'div',
@@ -168,47 +186,73 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
       'header',
       { class: 'vb-header' },
       h('span', { class: 'vb-handle', 'aria-hidden': 'true' }),
-      h('div', { class: 'vb-header-text' }, heading, subtitle),
+      h(
+        'div',
+        { class: 'vb-header-text' },
+        heading,
+        subtitle,
+      ),
       minimizeBtn,
     ),
-    planSection,
+    stepSection,
     vibeSection,
     footer,
   );
 
+  const expansionId = uid('tools-content');
+  const expansionInner = h('div', { class: 'vb-tools-inner' }, searchView?.root ?? null, savedView?.root ?? null);
+  const expansion = h('div', { class: 'vb-tools-expansion', id: expansionId }, expansionInner);
+  expansion.inert = true;
+  const toolsWidget = h('section', { class: 'vb-widget vb-tools-widget', 'aria-label': 'Quick Tools' }, quickTools.root, expansion);
+  const preferencesWidget = h('section', { class: 'vb-widget vb-preferences-widget', 'aria-label': 'Discovery Preferences' }, summaryBtn, body);
+  const directionsSlot = h('section', { class: 'vb-widget vb-directions-slot', 'aria-label': 'Directions', hidden: true }, directions?.panel ?? null);
+  const root = h('aside', { class: 'vb-discovery', 'aria-label': 'Plan your outing', 'data-panel-view': 'preferences', 'data-step': currentStep }, hasTools ? toolsWidget : null, preferencesWidget, directionsSlot, directions?.control ?? null);
+  function setDirectionsExpanded(expanded: boolean) {
+    preferencesWidget.hidden = expanded;
+    preferencesWidget.inert = expanded;
+    directionsSlot.hidden = !expanded;
+    directionsSlot.inert = !expanded;
+    root.classList.toggle('directions-expanded', expanded);
+  }
   function showStep(next: 'plan' | 'vibe') {
     currentStep = next;
-    planSection.hidden = next !== 'plan';
-    vibeSection.hidden = next !== 'vibe';
-    planActions.hidden = next !== 'plan';
-    vibeActions.hidden = next !== 'vibe';
+    stepSection.hidden = next !== 'plan'; vibeSection.hidden = next !== 'vibe';
+    planActions.hidden = next !== 'plan'; vibeActions.hidden = next !== 'vibe';
     root.dataset.step = next;
-    heading.textContent = next === 'plan' ? 'Plan your outing' : 'Find your vibe';
-    subtitle.textContent = next === 'plan'
-      ? 'First, the basics. Then we’ll find the feeling.'
-      : 'Use words, images, memories or music to show us what you mean.';
-    footerNote.textContent = next === 'plan'
-      ? 'Next: describe the atmosphere you have in mind. All these details stay saved.'
-      : 'Your inspiration is saved here. Visual matching and the adaptive quiz are coming next.';
-    if (next === 'vibe') {
-      closePopups();
-      // Keep the instructional placeholder visible until the user clicks the box.
-      // Focus the step heading for accessible navigation instead of the textarea.
-      heading.focus();
-    } else {
-      activity.focus();
-    }
+    heading.textContent = next === 'plan' ? 'Plan your outing' : 'What’s your vibe?';
+    subtitle.hidden = next === 'vibe';
+    subtitle.textContent = 'First, the basics. Then we’ll find the feeling.';
+    footerNote.textContent = next === 'plan' ? 'Next: describe the atmosphere you have in mind. All these details stay saved.' : 'Your inspiration stays in this browser. Photo analysis and the adaptive quiz are coming next.';
+    closePopups();
+    if (next === 'vibe') heading.focus(); else activity.focus();
   }
-
   continueBtn.addEventListener('click', () => showStep('vibe'));
   backBtn.addEventListener('click', () => showStep('plan'));
-  doneBtn.addEventListener('click', () => {
-    layout.dispatch({ type: 'collapse' });
-    summaryBtn.focus();
-  });
-
-  const root = h('aside', { class: 'vb-discovery', 'aria-label': 'Plan your outing' }, summaryBtn, body);
-  root.dataset.step = currentStep;
+  doneBtn.addEventListener('click', () => { layout.dispatch({ type: 'collapse' }); summaryBtn.focus(); });
+  let view: PanelView = 'preferences';
+  let collapseTimer: number | undefined;
+  quickTools.setExpanded('preferences', expansionId);
+  function showView(next: PanelView, from?: 'search' | 'saved') {
+    const previous = view;
+    view = next;
+    if (previous === 'search' && next !== 'search') searchView?.onClose();
+    closePopups();
+    window.clearTimeout(collapseTimer);
+    if (searchView) { if (next !== 'preferences') searchView.root.hidden = next !== 'search'; searchView.root.inert = next !== 'search'; }
+    if (savedView) { if (next !== 'preferences') savedView.root.hidden = next !== 'saved'; savedView.root.inert = next !== 'saved'; }
+    if (next === 'preferences') collapseTimer = window.setTimeout(() => {
+      if (searchView) searchView.root.hidden = true;
+      if (savedView) savedView.root.hidden = true;
+    }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 300);
+    expansion.setAttribute('aria-hidden', String(next === 'preferences'));
+    expansion.classList.toggle('is-open', next !== 'preferences');
+    expansion.inert = next === 'preferences';
+    quickTools.setExpanded(next, expansionId);
+    root.dataset.panelView = next;
+    if (next === 'search') { searchView?.onOpen(); searchView?.focus(); }
+    else if (next === 'saved') savedView?.focus();
+    else { const returnTool = from ?? (previous === 'preferences' ? undefined : previous); if (returnTool) quickTools.focus(returnTool); }
+  }
 
   // --- Layout ---------------------------------------------------------------
   const fields = [activity, cuisines, activityTypes, origin, budget, timing];
@@ -227,7 +271,6 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     const expanded = isExpanded(s);
     root.classList.toggle('is-expanded', expanded);
     root.classList.toggle('is-collapsed', !expanded);
-    root.classList.toggle('card-open', s.cardOpen);
     body.hidden = !expanded;
     summaryBtn.hidden = expanded;
     summaryBtn.setAttribute('aria-expanded', String(expanded));
@@ -299,11 +342,19 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   return {
     root,
     closePopups,
+    setDirectionsExpanded,
+    showView: (next) => {
+      if (next !== view) showView(next);
+    },
     destroy() {
+      window.clearTimeout(collapseTimer);
       unsubPrefs();
       unsubLayout();
       fields.forEach((f) => f.destroy());
       vibeStep.destroy();
+      searchView?.destroy();
+      savedView?.destroy();
+      unsubSavedCount?.();
     },
   };
 }

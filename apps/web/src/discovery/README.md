@@ -1,4 +1,4 @@
-# Discovery panel: initial preferences v1
+# Two-step discovery and Quick Tools
 
 A floating two-step discovery panel on the left of the Living Map.
 **Step 1: Plan your outing** collects practical preferences (activity with
@@ -18,38 +18,44 @@ matching against map pins. This screen is the input foundation for those feature
 
 ## Mounting
 
-`main.ts` (map-owned) mounts the panel as the primary left-hand interface. Callum's
-slide-out sidebar, its ☰ button and its Location type dropdown were removed.
+`main.ts` (map-owned) mounts the panel as the primary left-hand interface:
 
 ```ts
-mountDiscoveryPanel(document.body, {
-  placeCard: card,
-  mapLayers: {
-    available: CATEGORIES,                    // the map's own place categories
-    onChange: ({ layerIds, detail }) => showCategories(/* those categories */, detail),
-  },
+const discovery = mountDiscoveryPanel(document.body, {
+  mapLayers: { available: CATEGORIES, onChange },  // Activity → map categories
+  search: tripSearch, // injected root, focus, onOpen, onClose, destroy
+  saved: { store, onSelect },
+  directions: { panel: planner.root, control: planner.control },
+  onRecenter,
 });
 ```
 
-The panel never touches map state directly. The map keeps doing all the
-loading (tile POIs, Overpass) and drawing. The panel reads the map's DOM in
-two ways:
-
-- It watches `#place-card`'s `hidden` attribute. While a destination card is
-  open, the panel collapses to a one-line summary, and it returns to its
-  previous state when the card closes.
-- It measures `#search-form` to sit just below it.
-
-Both hooks are optional. The search bar and cards are temporary and will be
-replaced later, so nothing here depends on them being present.
-
-On phones (≤640px) the panel is a bottom sheet that starts collapsed.
+- **Quick Tools.** An independent rounded card above the entire Discovery
+  Preferences card, with Search / Saved / Recenter and an animated expansion.
+  Opening tools never hides or restructures preferences or the vibe textbox.
+  - Search receives its shared two-endpoint UI from navigation; the discovery
+    panel imports no navigation module. Destination Enter runs Nominatim only
+    on submit. Autocomplete picks preview the destination while Search stays
+    open; choosing a broader search result closes Search and opens its popup.
+  - Saved places stay in this browser (`saved.ts`, localStorage), with original
+    attribution. Selecting one opens the normal popup, then closes Saved.
+  - Recenter uses the stored discovery origin or Boston Common, without GPS.
+- **Layout.**
+  - The panel sits at the top-left. There is no separate search bar any more.
+  - It's independent of map overlays. Opening or closing a destination popup
+    never collapses or hides it. Expanded Directions temporarily replaces the
+    preferences card, leaving its DOM and state mounted; collapsing Directions
+    restores the exact step and sheet state. Only the user's minimize/expand buttons change it.
+  - On phones it's a bottom sheet.
+- **What the panel touches.** It never changes map state directly. The map
+  subscribes with `subscribe()` / `getPreferences()`, for example for the
+  starting-point marker.
 
 ## What the map loads (`mapLayers.ts`)
 
 | Panel selection | Map categories (the map's existing `CATEGORIES`) |
 |---|---|
-| No activity yet | All five, from the loaded map tiles only (no network request) |
+| No activity yet | All five: catalog food/drink with loaded tile POIs for other categories |
 | Food & drinks | Restaurants, Coffee, Bars |
 | Activities, no type chosen | Bars, Parks, Museums |
 | Museums & galleries / Outdoors & parks / Nightlife | Museums / Parks / Bars; several types load the union |
@@ -59,9 +65,12 @@ On phones (≤640px) the panel is a bottom sheet that starts collapsed.
 - Each change is reported once, about 500 ms after the last one, and only
   when the set of categories changes. Ticking cuisines, or changing budget,
   timing, starting point or vibe, never triggers a map request.
-- The map then sends **one** combined Overpass request for all chosen
-  categories (`placesNearAny` in `osm.ts`) and aborts any older request, so a
-  late response can't replace newer pins.
+- Food/drink categories use Supabase when configured and available. Other
+  categories use loaded tile POIs first and, for full discovery, one combined
+  Overpass request (`placesNearAny`). If the catalog is unavailable, full
+  discovery falls back to Overpass for food/drink too. Stale responses are
+  ignored; meaningful map moves refresh the same categories without closing
+  the popup. Refreshed catalog details also update an already-open popup.
 
 ## Public API
 
@@ -143,7 +152,7 @@ travel time.
 | Activity | Yes | OSM `amenity`/`tourism`/`leisure`/`shop`/`historic` tags. Tile places use their subclass label. |
 | Cuisines | Partly | OSM `cuisine` tag with synonyms. Untagged places count as unknown. |
 | Activity types | Mostly | Student events have no data source, so that choice is saved but not applied. |
-| Budget | No | No price data, and fares aren't integrated. Prices are shown as unknown and nothing is excluded. |
+| Budget | No | Catalog price bands are displayed with source/estimate labels, but budgets and fares do not filter pins yet. Missing prices remain unknown. |
 | Timing | No | `opening_hours` isn't parsed yet; that needs a parser such as opening_hours.js. |
 | Vibe text | No | Reserved for the Vibe Engine. |
 
@@ -159,5 +168,27 @@ npm test         # vitest run: reducer, Boston time, locations, filtering, layou
 npm run build    # tsc && vite build
 ```
 
-The unit tests run in Node with no DOM (including image validation and state retention). DOM behaviour (keyboard, focus,
-collapse/restore, mobile layout) was checked manually in Chrome.
+The tests run in Node with no DOM. DOM behaviour (keyboard, focus,
+minimize/expand, mobile layout) was checked in headless Chrome.
+
+## Integrated UI and state
+
+Quick Tools remains a compact widget above the complete Preferences widget.
+Search and device-local Saved views open inside Quick Tools. Place selection
+opens one MapLibre destination popup; only Navigate (or Get directions in Search)
+starts the dedicated planner. Navigation flattens the map north-up and restores
+the previous discovery camera on exit. Prices retain their source/estimate labels,
+deals retain source and freshness information, and catalog attribution stays visible.
+The catalog, fallback discovery, account theme and scene composer remain independent
+of the panel. Walking estimates are labeled in the itinerary and as diagrammatic
+map connectors, never as verified pedestrian paths.
+
+Step 1 contains practical fields and Continue to your vibe. Step 2 has one
+“What’s your vibe?” heading, the descriptive text field, seven examples and an
+optional photo drop zone. Files stay in memory (up to five JPG/PNG/WebP images,
+8 MB each). Nothing is uploaded or analyzed; previews use revoked-on-removal
+object URLs. Back, Continue, and Directions preserve the original File objects.
+The preference normalizer intentionally does not restore File objects from JSON.
+
+The blue header, labels, selected fields and focus rings reinforce the existing
+blue action styling. Only the user controls minimizing the discovery sheet.
