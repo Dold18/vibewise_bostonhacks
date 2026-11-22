@@ -3,11 +3,13 @@
  *
  * Each material is a *detail* texture: light/dark luminance variation stored
  * in alpha (white or black pixels, never color). It is drawn as its own
- * pattern layer directly above the palette-colored base layer, so:
+ * pattern layer directly above the palette-colored base layer (part of the
+ * base style, see withMaterialOverlays), so:
  *  - the base color still comes from the palette (and every Scene Composer
  *    scene), with its normal transitions; the texture only adds grain;
- *  - the base style (mapStyle.ts) is unchanged when textures are unavailable,
- *    disabled, or still loading (the fallback is the plain palette fill).
+ *  - when textures are unavailable, disabled or still loading, a transparent
+ *    placeholder image keeps the plain palette fill (the fallback);
+ *  - a scene sets grain strength declaratively (SceneStyle.materialStrength).
  *
  * Only four small textures load, lazily after the map is idle. Sources are the
  * repository's original scene assets (public/scene-assets), referenced by id.
@@ -128,6 +130,24 @@ async function rasterize(source: MaterialSource, manifest: () => Promise<AtlasMa
   return new ImageData(toDetail(data.data) as Uint8ClampedArray<ArrayBuffer>, 256, 256);
 }
 
+/**
+ * Insert each material's overlay right after its base layer. Used by
+ * mapStyle.buildMapStyle, so the layer list is fixed from the first frame
+ * and never changes at runtime (previews and scenes can compare styles).
+ */
+export function withMaterialOverlays(layers: LayerSpecification[], strength = 1, specs: readonly SurfaceSpec[] = BASE_MATERIALS): LayerSpecification[] {
+  const out: LayerSpecification[] = [];
+  for (const layer of layers) {
+    out.push(layer);
+    for (const spec of specs) {
+      if (!spec.over.includes(layer.id)) continue;
+      const overlay = overlayLayer(spec, layer, strength);
+      if (overlay) out.push(overlay);
+    }
+  }
+  return out;
+}
+
 export interface BaseMaterials {
   /** Show or hide every material overlay (the palette fills remain). */
   setEnabled(enabled: boolean): void;
@@ -152,32 +172,26 @@ export function mountBaseMaterials(map: MapLibreMap, options: BaseMaterialsOptio
   let enabled = options.enabled ?? true;
   let strength = options.strength ?? 1;
   const off = new Set<MaterialSurface>();
-  const images = new Map<MaterialSurface, ImageData>();
+  const loaded = new Set<MaterialSurface>();
   const errors: string[] = [];
   let destroyed = false;
   let manifestPromise: Promise<AtlasManifest> | null = null;
   const manifest = () => (manifestPromise ??= fetch(`${ROOT}/v2/manifest.json`).then((r) => r.json() as Promise<AtlasManifest>));
-
   const layerIds = () => specs.flatMap((s) => s.over.map((b) => overlayId(s.surface, b)));
+  const bySurfaceImage = new Map(specs.map((s) => [imageId(s.surface), s]));
 
-  function install(spec: SurfaceSpec) {
-    const data = images.get(spec.surface);
-    // The style object exists once loaded; isStyleLoaded() is also false while
-    // tiles stream in, which is not a reason to skip installing a layer.
-    if (!data || destroyed || !map.getStyle()?.layers) return;
-    if (!map.hasImage(imageId(spec.surface))) map.addImage(imageId(spec.surface), data, { pixelRatio: spec.source.pixelRatio });
-    const order = map.getStyle().layers.map((l) => l.id);
-    for (const baseId of spec.over) {
-      const base = map.getStyle().layers.find((l) => l.id === baseId);
-      const id = overlayId(spec.surface, baseId);
-      if (!base || map.getLayer(id)) continue;
-      const layer = overlayLayer(spec, base, strength);
-      if (!layer) continue;
-      const next = order[order.indexOf(baseId) + 1];
-      map.addLayer(layer, next && map.getLayer(next) ? next : undefined);
-    }
-    sync();
-  }
+  // The overlays are in the base style; until a texture arrives they draw a
+  // transparent placeholder (the plain palette fill shows through).
+  const placeholder = () => ({ width: 256, height: 256, data: new Uint8Array(256 * 256 * 4) });
+  const onMissing = (e: { id: string }) => {
+    const spec = bySurfaceImage.get(e.id);
+    if (spec && !map.hasImage(e.id)) map.addImage(e.id, placeholder(), { pixelRatio: spec.source.pixelRatio });
+  };
+  map.on('styleimagemissing', onMissing);
+  // Pre-register when the style is ready, so the first tiles never miss.
+  const preregister = () => specs.forEach((s) => onMissing({ id: imageId(s.surface) }));
+  if (map.isStyleLoaded()) preregister();
+  else map.once('load', preregister);
 
   function sync() {
     for (const spec of specs) {
@@ -185,7 +199,7 @@ export function mountBaseMaterials(map: MapLibreMap, options: BaseMaterialsOptio
         const id = overlayId(spec.surface, baseId);
         if (!map.getLayer(id)) continue;
         map.setLayoutProperty(id, 'visibility', enabled && !off.has(spec.surface) ? 'visible' : 'none');
-        map.setPaintProperty(id, 'fill-opacity', spec.opacity * strength);
+        if (options.strength !== undefined || strength !== 1) map.setPaintProperty(id, 'fill-opacity', spec.opacity * strength);
       }
     }
   }
@@ -194,16 +208,19 @@ export function mountBaseMaterials(map: MapLibreMap, options: BaseMaterialsOptio
     for (const spec of specs) {
       if (destroyed) return;
       try {
-        images.set(spec.surface, await rasterize(spec.source, manifest));
-        install(spec);
+        const data = await rasterize(spec.source, manifest);
+        if (destroyed) return;
+        const id = imageId(spec.surface);
+        if (map.hasImage(id)) map.updateImage(id, data);
+        else map.addImage(id, data, { pixelRatio: spec.source.pixelRatio });
+        loaded.add(spec.surface);
+        map.triggerRepaint();
       } catch (error) {
         errors.push(String(error)); // the palette fill remains: a missing texture is only less detail
       }
     }
   }
 
-  const reinstall = () => specs.forEach(install);
-  map.on('style.load', reinstall);
   const schedule =
     options.schedule ??
     ((start: () => void) => {
@@ -226,12 +243,13 @@ export function mountBaseMaterials(map: MapLibreMap, options: BaseMaterialsOptio
       else off.add(surface);
       sync();
     },
-    stats: () => ({ loaded: [...images.keys()], layers: layerIds().filter((id) => !!map.getLayer(id)), errors: [...errors], enabled, strength }),
+    stats: () => ({ loaded: [...loaded], layers: layerIds().filter((id) => !!map.getLayer(id)), errors: [...errors], enabled, strength }),
     destroy() {
       destroyed = true;
-      map.off('style.load', reinstall);
-      for (const id of layerIds()) if (map.getLayer(id)) map.removeLayer(id);
-      for (const s of specs) if (map.hasImage(imageId(s.surface))) map.removeImage(imageId(s.surface));
+      map.off('styleimagemissing', onMissing);
+      map.off('load', preregister);
+      enabled = false;
+      sync();
     },
   };
 }

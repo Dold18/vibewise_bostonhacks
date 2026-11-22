@@ -15,11 +15,6 @@ export interface SceneAccentState {
   readonly ui?: { readonly accent: string | null };
 }
 
-export interface SceneAccentSource {
-  getState(): SceneAccentState;
-  subscribe(listener: (update: { state: SceneAccentState }) => void): () => void;
-}
-
 /** A vivid, legible-on-Carbon version of a color: keep its hue, set lightness and chroma. */
 export function vivid(hex: string): string {
   const [, a, b] = hexToLab(hex);
@@ -42,13 +37,26 @@ export function sceneAccent(state: SceneAccentState): string | null {
 
 export const sceneTone = (state: SceneAccentState): 'light' | 'dark' => (hexToLab(state.palette.land)[0] < 0.5 ? 'dark' : 'light');
 
-export function connectSceneAccent(source: SceneAccentSource, root: HTMLElement = document.documentElement): () => void {
-  const apply = (state: SceneAccentState) => {
-    const accent = sceneAccent(state);
-    if (accent) root.style.setProperty('--vx-scene-accent', accent);
-    else root.style.removeProperty('--vx-scene-accent');
-    root.dataset.sceneTone = sceneTone(state);
-  };
-  apply(source.getState());
-  return source.subscribe((update) => apply(update.state));
+/** Write the accent and tone for a scene state onto the document (null = the neutral identity). */
+export function applySceneAccent(state: SceneAccentState | null, root: HTMLElement = document.documentElement): void {
+  const accent = state ? sceneAccent(state) : null;
+  if (accent) root.style.setProperty('--vx-scene-accent', accent);
+  else root.style.removeProperty('--vx-scene-accent');
+  root.dataset.sceneTone = state ? sceneTone(state) : 'light';
+}
+
+/**
+ * Wrap the map's scene theme target so the interface accent follows exactly
+ * what the map renders: same coalesced updates, no extra session listener.
+ */
+export function withSceneAccent<T extends { setScene(state: never, timing?: never): void }>(target: T, root?: HTMLElement): T {
+  return new Proxy(target, {
+    get(obj, key, receiver) {
+      if (key !== 'setScene') return Reflect.get(obj, key, receiver);
+      return (state: SceneAccentState | null, timing?: unknown) => {
+        (obj.setScene as (s: unknown, t?: unknown) => void)(state, timing);
+        applySceneAccent(state, root);
+      };
+    },
+  });
 }

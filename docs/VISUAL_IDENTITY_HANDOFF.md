@@ -1,0 +1,134 @@
+# Vibenta visual identity redesign: handoff
+
+Status as of 2026-11-22. This file is for resuming the work in a new session or account. The original brief was the "VIBENTA — COMPLETE VISUAL REDESIGN AND BASE CITY REFINEMENT" prompt (Phases 1–5).
+
+## Where the work lives
+
+- **Worktree:** `/Users/jdold/Desktop/vibenta-identity`
+- **Branch:** `design/vibenta-identity-20261122`, local only and **not pushed**. It was created from `origin/main` at `9f4689e` and has **PR #44 merged in** (`origin/fix/v2-quiz-immediate-launch-20261121`). That merge was clean, so the V2 quiz-launch fixes are preserved.
+- **Main checkout:** `/Users/jdold/Desktop/vibenta_bostonhacks`, on branch `fix/v2-quiz-immediate-launch-20261121`. It has the user's **uncommitted** quiz-media work, which I did not touch. That work edits `features/vibe/ui/quiz.css` and `liveQuiz.ts`. To avoid conflicts, the redesign styles the quiz from `design/identity/quiz.css` (scoped under `.vb-discovery`), including the upcoming `.vb-media-*` and `[data-mood]` classes.
+- **PR #51** (Carbon Studio draft) was reviewed but **not** merged or stacked on. The new identity is a separate, default implementation.
+- **Do not merge to `main` without approval.**
+
+### Commits on the branch (oldest first)
+
+1. `a680902`: merge of PR #44
+2. `f4fb1de` **Phase 1**: road widths, neutral atlas palette, OSM material tones, contact shadows, QA harness
+3. `30bd45c` **Phase 2**: identity (icons, wordmark, type, die-cut surfaces, scene accent)
+4. `2f2df52` **Phase 3**: ground material textures, facade spike evidence
+5. A **Phase 5 fixes** commit (see below): scene accent without an extra session listener, static material layers, keyboard input in the harness, and this handoff file
+
+## Running it
+
+```sh
+cd /Users/jdold/Desktop/vibenta-identity/apps/web
+npm ci                       # node_modules is already installed in this worktree
+npx vite --host 127.0.0.1 --port 5196 --strictPort    # the redesigned app
+npm test                     # vitest
+npm run build                # tsc + vite build
+node scripts/visual-identity-browser.mjs [shots.json]  # screenshots (headless Chrome, GPU)
+```
+
+- The baseline comparison worktree is a detached checkout of `a680902` at `/private/tmp/claude-503/.../scratchpad/baseline-wt`, served on port 5197. It's temporary: remove it with `git worktree remove --force <path>` when done.
+- Dev console hooks:
+  - `vibentaScene.preset('neon_city', 1)` (also `amber_refuge`, `noir_nocturne`, `neutral`, …)
+  - `vibentaScene.map`
+  - `vibentaMaterials.stats()`, `.setEnabled(false)`, `.setStrength(0.5)`, `.setSurface('water', false)`
+
+## What is done
+
+### Phase 1: base city and roads (`src/mapStyle.ts`)
+
+- **Road widths** at z14/z20:
+
+  | Road | Before | After |
+  |---|---|---|
+  | Motorway | 6 / 32 | 3.5 / 17 |
+  | Primary | 5 / 28 | 3.2 / 15 |
+  | Secondary | 4 / 24 | 2.5 / 12 |
+  | Minor | 2.5 / 18 | 1.8 / 9 |
+  | Service | 0.8 / 8 | 0.6 / 5.5 |
+
+  Casings dropped from +1/+2/+3 px to +0.5/+1.1/+2.2 px.
+- **Neutral architectural-atlas palette**: paper ground, stone/concrete/glass building tones, muted amber highways. I tuned it until the existing vibe-blend and pin-contrast tests passed again without loosening them; every vibe still restyles the map by at least 20/255 mean.
+- **Material tones**: each of the 6 height bands is split into 5 layers (30 extrusion layers in total). Tones come from OpenMapTiles' OSM-derived `colour` (`building:material`):
+  - brick/clay/wood → warm
+  - stone/concrete/plaster → stone
+  - glass/metal → cool
+  - untagged buildings → two neutral tones split by feature id
+
+  Tones are OKLab offsets of the palette band color, so scenes recolor them with transitions and no paint is data-driven. Exports: `BUILDING_MATERIALS`, `buildingLayerId`, `materialColor`, `buildingMaterialColors`. `BUILDING_3D_LAYERS` now lists all 30 layers (`main.ts` uses it for the pitch fade).
+- `SceneStyle.materialVariation?` (0–1) flattens the tones; `SceneStyle.materialStrength?` sets ground-grain strength.
+- **`building-contact-shadow`** layer: the footprint offset by 2.5/2 px in the viewport, under the flat footprints.
+- **`transport-area`** layer: OSM pier, wharf and pedestrian-plaza polygons, which weren't drawn before, in `palette.path`.
+- **Performance**: 51–58 fps after vs 55–59 before (p50 ≈ 17 ms in both) during camera rotation, in headless GPU Chrome.
+
+### Phase 2: identity (`src/design/`)
+
+- **`icons.ts`**: an original 26-icon family in a screen-print style (an off-register `vx-i-pop` color region, `vx-i-ink` marker strokes, plus `vx-i-thin`/`vx-i-dot` details). Each icon's pop color is set per meaning: cobalt = wayfinding, coral = personal/saved, lime = default. It's wired through the existing `icon()`/`ICONS` in `discovery/ui/dom.ts` (same API; raw path strings still work), `placePopup.ts`, `routeHubs.ts`, `account/ui.ts`, `vibeStep.ts`, and the map controls in `index.html` (the compass keeps `id="compass-needle"`).
+- **`wordmark.ts`**: a hand-lettered SVG wordmark (an ink pass plus an off-register print pass, with a starburst for the dot of the "i"), inserted in the Preferences header in `panel.ts`.
+- **Fonts** (SIL OFL, from Google Fonts in `index.html`): Londrina Solid for display, Bricolage Grotesque for the interface, Space Mono for labels. Noto Sans stays for pin labels. Also added `public/favicon.svg` and a theme-color meta tag.
+- **`identity/`** CSS, imported **last** in `main.ts`:
+  - `tokens.css`: Carbon ramp, accent roles, silhouette tokens, and legacy aliases (`--surface`, `--accent`, `--vb-*`)
+  - `base.css`: type roles, icon CSS, wordmark, motifs (marker squiggle, starburst, loop arrow, halftone as masks), buttons, fields, popovers, checkboxes, focus
+  - `surfaces.css`: Quick Tools, the Preferences signature silhouette, the stamped `01`/`02` step number, Search/Saved, Directions/planner, venue popup as an editorial card, account, map controls, toast, phones
+  - `quiz.css`: vibe entry, the **Start vibe quiz** focal button, quiz cards, Session B scene stage, media stage
+- **Silhouettes** use CSS `corner-shape` (bevel/notch/scoop) with offset "print" box-shadows. Nothing is clipped. Browsers without support fall back to asymmetric rounded corners.
+- The light-theme "Blue accents" block at the end of `discovery/discovery.css` was retired, and a few hardcoded colors were replaced with tokens.
+- **`sceneAccent.ts`**: `withSceneAccent(account.theme)` wraps the scene theme target in `main.ts`. Only `--vx-scene-accent` (the wordmark print pass, Quick Tools offset, and quiz loop arrow) and `data-scene-tone` follow the rendered scene. It adds no extra session listener.
+
+### Phase 3: textures (`src/features/map/baseMaterials.ts`)
+
+- Ground materials are rendered as MapLibre `fill-pattern` overlays of neutral alpha detail drawn over the palette fills:
+  - water: `v1/water-shimmer`
+  - parks and grass: `v2 nature_ground.short_grass.warm`, an atlas cell converted by `toDetail`
+  - urban ground: `v1/concrete-pores`
+  - plazas and piers: `v1/cobblestone-hatch`
+- Only those 4 assets load, lazily after the map is idle.
+- The overlay layers are **part of the base style** (`withMaterialOverlays` in `buildMapStyle`). Images start as transparent placeholders (via `styleimagemissing` and pre-registration) and get their real pixels through `map.updateImage`.
+- **Textured 3D facades are deliberately not shipped.** The `fill-extrusion-pattern` spikes showed four problems: it replaces the scene color, puts the same image on roofs and walls, tiles at a fixed screen scale, and streaks on walls at close zoom. Evidence is in `docs/qa/visual-identity/spike-*.jpg`.
+
+### Phase 4: scene coherence
+
+- Verified in the browser with real presets (`docs/qa/visual-identity/scenes-neutral-amber-noir-neon.jpg`): the identity stays constant, the city transforms fully, and only the accents adapt (amber, ice blue, violet).
+
+## Verification so far
+
+- `npm test`: **697 / 697 pass** (57 files, plus new `features/map/__tests__/baseMaterials.test.ts` and `design/__tests__/identity.test.ts`). Tests updated: `mapStyle.test.ts` (paint-only color check, material and width tests) and `vibeTheme/__tests__/apply.test.ts` (expects 5 material layers per band).
+- `npm run build`: passes. The chunk-size warning was already there.
+- **Browser regression suites, branch vs baseline (port 5197):**
+
+  | Suite | Branch | Baseline | Notes |
+  |---|---|---|---|
+  | `check-navigation-browser.mjs` | 55 pass, 1 fail | 56 pass, 0 fail | See below |
+  | `vibe-browser.mjs` | 29 pass, 1 fail* | 30 pass, 0 fail | *Fixed since, not yet re-run |
+  | `session-b-browser.mjs` | 73 pass, 4 fail | 73 pass, 4 fail | Same 4 failures on both |
+
+  - **Navigation:** the only failure is `preferences keep blue header and field accents`, which asserts the **old blue design**, so the redesign fails it intentionally. **TODO:** update that check (`scripts/check-navigation-browser.mjs` line 41) to assert the new identity. The `mobile Directions … onScreen` failure seen earlier was timing on the slide-in animation; it passed in the two latest runs.
+  - **Vibe:** it failed `scene session … listeners===1` because the old `connectSceneAccent` subscribed separately. That's fixed by `withSceneAccent`. **Re-run it to confirm.**
+  - **Session B:** the same 4 failures exist on the untouched baseline (390 px "preview leaves map unchanged", the two "Gemini failure authored B1/B2" checks, and harness `Invalid InterceptionId` errors), so they're pre-existing.
+- **Screenshots** captured: 1440×900, 1366×768, 390×844, 360×640. States: default, dropdown, vibe step, quiz, quiz launch, search, saved, venue popup, mobile sheet, mobile dropdown, keyboard focus. Road zooms: z12/z13 2D, z14/z15/z16/z17.5 tilt, z16 2D. Scratch copies are in `/private/tmp/claude-503/.../scratchpad/`; committed evidence is in `docs/qa/visual-identity/`.
+- **Keyboard:** Tab and Enter work. Focus rings are cobalt-light (`#a3b5ff`); field triggers show focus with a cobalt border and ring. Tab order still starts at the map pins (their DOM order), which is existing behavior.
+- **Reduced motion:** the harness emulates `prefers-reduced-motion: reduce` by default, and the identity's transforms and transitions are disabled under it.
+
+## Remaining work / next steps
+
+1. **Re-verify after the last refactor.** Re-run `vibe-browser.mjs` and the materials screenshots, because the static overlay layers plus `updateImage` haven't been visually re-checked since the change. Confirm `vibentaMaterials.stats().loaded` lists all 4 surfaces and the grain is visible on City Hall Plaza, the Common, and the harbor.
+2. **Update the outdated navigation check** (blue header) to the new identity's colors.
+3. **Account popover:** styled but **unverified in the browser**, because accounts are disabled without Supabase env ("Accounts unavailable"). Verify it with credentials.
+4. **Route planner and Directions** on desktop: covered by the navigation suite, but no visual review screenshot was taken yet.
+5. **Recapture the final evidence** (the road/building before-after was shot before the final brick-tone reduction), and add 1366 and 360 screenshots to `docs/qa/visual-identity/`.
+6. **Optional polish:**
+   - The `zoomOut` icon's pop smear could be calmer.
+   - The z17 brick roof tone is still slightly warm.
+   - The `v1/concrete-pores` urban grain is barely visible; raise it or drop it.
+7. Update `apps/web/src/design/README.md` with an Identity section. The `?visual=` previews are now superseded but left in place.
+8. **Push the branch and open a draft PR** against `main`, but only with the user's approval. Note in the PR that it's stacked on #44.
+
+## Known limitations
+
+- `corner-shape` silhouettes need Chromium 139+. Safari and Firefox get asymmetric rounded corners.
+- Fonts load from Google Fonts, as the existing app already did; the redesign doesn't work offline unless the fonts are self-hosted.
+- The facade textures are not implemented (renderer limitation, documented above).
+- The scene's `ui.accent` is clipped by `MAP_RENDERER_V1`, so the accent is normally derived from the scene's compiled sky color.
+- Session B quiz media classes (`.vb-media-*`) are styled ahead of time from the uncommitted local work, but couldn't be viewed on this branch.

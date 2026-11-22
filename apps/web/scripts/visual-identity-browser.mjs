@@ -94,6 +94,13 @@ for (const s of shots) {
   }
   for (const step of s.steps ?? []) {
     if (typeof step === 'number') await sleep(step);
+    else if (step.startsWith('key:')) {
+      // Real keyboard input (exercises :focus-visible and key handlers), e.g. "key:Tab".
+      const key = step.slice(4);
+      const code = key === 'Tab' ? 9 : key === 'Enter' ? 13 : key === 'Escape' ? 27 : 0;
+      for (const type of ['keyDown', 'keyUp']) await send('Input.dispatchKeyEvent', { type, key, code: key, windowsVirtualKeyCode: code });
+      await sleep(120);
+    }
     else await js(`(async()=>{await (${step});return true})()`);
   }
   await waitIdle();

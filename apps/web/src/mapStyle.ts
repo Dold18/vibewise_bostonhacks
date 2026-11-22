@@ -1,5 +1,6 @@
 import { mapPaletteForPreview } from './design/visualFoundation';
 import { hexToLab, labToHex } from './features/scene/color';
+import { withMaterialOverlays } from './features/map/baseMaterials';
 import type {
   ExpressionSpecification,
   LayerSpecification,
@@ -506,6 +507,8 @@ export interface SceneStyle {
    * touching layers; colors still come from its palette.
    */
   materialVariation?: number;
+  /** Ground texture strength, 0 (plain fills) to 1 (default); see features/map/baseMaterials. */
+  materialStrength?: number;
 }
 
 export const DEFAULT_SCENE_STYLE: Readonly<SceneStyle> = Object.freeze({
@@ -540,7 +543,7 @@ export function buildMapStyle(palette: Palette, scene: Readonly<SceneStyle> = DE
       'horizon-fog-blend': scene.horizonFogBlend,
       'fog-ground-blend': scene.fogGroundBlend,
     },
-    layers: buildLayers(palette, scene),
+    layers: withMaterialOverlays(buildLayers(palette, scene), scene.materialStrength ?? 1),
   };
 }
 
