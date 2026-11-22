@@ -133,6 +133,18 @@ The MBTA routing tables (`pattern_stops`, `line_shapes`, `transfer_hubs`) are de
 
 `price_source`, `hours` and `cuisines` are not in `Place` v0.1 yet. Adding them is a contract change (CONTRACTS.md §7).
 
+## 3b. Place photos and vibe inputs (proposed, P-013)
+Migration `supabase/migrations/20261121200000_create_place_media.sql`. Full design: `docs/superpowers/specs/2026-11-21-place-photos-vibe-sources-design.md` §7.
+
+| Table / object | Purpose | Access |
+|---|---|---|
+| `student_reviews` | As in §3 above, plus `hidden` | Everyone reads non-hidden rows; signed-in users add and delete their own |
+| `place_photos` | Ranked card photos: uploads, licensed (OSM/Wikidata/Commons/Mapillary) and website photos, with license, credit and link-back | Everyone reads non-hidden rows; signed-in users add and delete their own uploads |
+| `place_vibe_inputs` | Collected text per place and source (`website`, `wiki`, `osm_tags`, `city_licenses`, `student_reviews`) for the vibe step | Pipeline only |
+| `restaurants.media_checked_at` | When `enrich:media` last processed the place | — |
+| `restaurant_points` view | `restaurants` with plain `lat`/`lng` for the pipeline | Service role only |
+| Storage bucket `place-photos` | Student uploads under `<user_id>/…`, JPEG/PNG/WebP, 5 MB max | Public read; users write their own folder |
+
 ## 4. Offline enrichment pipeline
 Extends brief §3.1. All steps run as a batch job, never from the browser. The principles and input tiers live in [EMBEDDING_PIPELINE.md §4](EMBEDDING_PIPELINE.md); the mechanics of each step (scraping, caching, staging) are owned by the pipeline workstream.
 
@@ -175,7 +187,7 @@ search_restaurants(
 ## 6. Compliance rules this model encodes
 - **Yelp:** only `yelp_business_id` is stored. Review excerpts are fetched live by a Supabase Edge Function (API key server-side), cached at most 24 hours outside the database, shown with Yelp's required attribution, and **never** stored, embedded or used for ranking or filtering. Neither is Yelp's star rating.
 - **Google:** no Google Places content anywhere in this database (brief §11).
-- **Images:** third-party photos are analyzed offline for descriptive words only; they are not stored or displayed.
+- **Images:** photos from a place's own website may be displayed, stored and embedded (P-013, decided 2026-11-21), credited to the site's domain with a link back. Photos from third-party platforms (Google, Yelp, Tripadvisor, social media, delivery apps) are never used. Licensed photos keep their license and credit.
 - **OSM (ODbL):** attribution in the app (already shown on the map). If the database itself is ever published, share-alike applies.
 - **Foursquare OS Places (Apache 2.0):** keep its attribution notice.
 - **Honesty:** unknown hours or price are stored as `null` / `'unknown'` and shown as such. Seeded reviews are flagged `is_seed` and labeled.

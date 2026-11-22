@@ -103,6 +103,7 @@ export function fsqAddress(p: { address: string | null; locality: string | null;
 
 const OSM_TAG_KEYS = new Set([
   'outdoor_seating', 'internet_access', 'takeaway', 'delivery', 'wheelchair', 'opening_hours', 'amenity', 'cuisine',
+  'live_music', 'smoking', 'wikidata', 'wikimedia_commons', 'image',
 ]);
 
 export function pickOsmTags(tags: Record<string, string>): Record<string, string> {

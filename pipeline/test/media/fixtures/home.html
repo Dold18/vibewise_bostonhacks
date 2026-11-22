@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+  <title>Example Cafe</title>
+  <meta name="description" content="A cozy candlelit cafe in Back Bay.">
+  <meta property="og:image" content="https://example.com/og/front.jpg">
+  <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"Restaurant","name":"Example Cafe","description":"JSON-LD description","image":["/ld/one.jpg",{"url":"https://example.com/ld/two.jpg"}]}
+  </script>
+  <style>.x{color:red}</style>
+</head>
+<body>
+  <header>Header text</header>
+  <nav><a href="/menu">Menu</a> <a href="/about-us">Our Story</a> nav words</nav>
+  <main>
+    <h1>Welcome</h1>
+    <p>Exposed brick, warm lights and long tables.</p>
+    <img src="/img/room.jpg" width="1200" height="800" alt="Dining room">
+    <img src="//cdn.example.com/a.jpg" width="900" height="600">
+    <img src="http://example.com/insecure.jpg" width="1200" height="800">
+    <img src="/img/logo.png" width="800" height="800">
+    <img src="/img/a.svg" width="800" height="800">
+    <img src="data:image/png;base64,AAAA" width="800" height="800">
+    <img src="/img/small.jpg" width="200" height="200">
+    <img src="/img/nosize.jpg">
+    <img src="/img/srcset-default.jpg" srcset="/img/s-600.jpg 600w, /img/s-1200.jpg 1200w">
+    <a href="https://other.example.org/about">External about</a>
+  </main>
+  <script>var hidden = "script text";</script>
+  <noscript>noscript text</noscript>
+  <footer>Footer text</footer>
+</body>
+</html>
