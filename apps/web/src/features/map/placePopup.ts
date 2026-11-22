@@ -13,6 +13,7 @@ import { formatAddress, osmUrl, type Place } from '../../osm';
 import './map-ui.css';
 import { priceLabel } from '../../catalog';
 import { dealStatus, describeSchedule, type Deal } from '../../deals';
+import { iconForCategoryMark, vwIconHtml, type IconName } from '../../design/vibewise/icons';
 
 export interface PopupDetail {
   kind: 'address' | 'hours' | 'phone' | 'price';
@@ -73,18 +74,18 @@ export const POPUP_OFFSETS: Offset = {
   right: [-16, -26],
 };
 
-const SVG = (path: string, size = 18) =>
-  `<svg viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" focusable="false"><path d="${path}"/></svg>`;
+/** V3 icons for the popup (src/design/vibewise/icons). */
+const SVG = (name: IconName, size = 18) => vwIconHtml(name, { size });
 const ICON = {
-  price: 'M12 2v20m5-16H9a3 3 0 0 0 0 6h6a3 3 0 0 1 0 6H6',
-  address: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7m0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5',
-  hours: 'M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2M12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8m.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z',
-  phone: 'M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02z',
-  close: 'M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
-  navigate: 'M21.71 11.29l-9-9a.996.996 0 0 0-1.41 0l-9 9a.996.996 0 0 0 0 1.41l9 9c.39.39 1.02.39 1.41 0l9-9a.996.996 0 0 0 0-1.41M14 14.5V12h-4v3H8v-4c0-.55.45-1 1-1h5V7.5l3.5 3.5z',
-  save: 'M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2m0 15-5-2.18L7 18V5h10z',
-  saved: 'M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2',
-};
+  price: 'deal',
+  address: 'pin',
+  hours: 'clock',
+  phone: 'phone',
+  close: 'close',
+  navigate: 'navigate',
+  save: 'saved',
+  saved: 'saved',
+} as const satisfies Record<string, IconName>;
 
 export interface PlacePopupDeps {
   onNavigate(place: Place): void;
@@ -134,7 +135,10 @@ function renderDealRows(place: Place, list: HTMLElement, now: Date) {
   for (const deal of place.deals ?? []) {
     const li = el('li', 'deal-row');
     const head = el('div', 'deal-title');
-    head.append(el('span', 'detail-icon', deal.kind === 'student' ? '🎓' : '%'), el('span', undefined, deal.title));
+    const mark = el('span', 'detail-icon');
+    mark.setAttribute('aria-hidden', 'true');
+    mark.innerHTML = vwIconHtml(deal.kind === 'student' ? 'culture' : 'deal', { size: 18 });
+    head.append(mark, el('span', undefined, deal.title));
     li.append(head);
     const status = dealStatus(deal, now);
     const when = el('div', `deal-when${status.kind === 'active' ? ' deal-active' : ''}`);
@@ -186,6 +190,7 @@ export function createPlacePopup(map: MapLibreMap, deps: PlacePopupDeps): PlaceP
     saveBtn.setAttribute('aria-pressed', String(isSaved));
     saveBtn.innerHTML = `${SVG(isSaved ? ICON.saved : ICON.save)}<span>${isSaved ? 'Saved' : 'Save'}</span>`;
     saveBtn.title = isSaved ? 'Remove from saved places' : 'Save this place';
+    saveBtn.classList.toggle('is-saved', isSaved);
   }
 
   function build(p: Place, look: { color: string; icon?: string }): HTMLElement {
@@ -202,7 +207,8 @@ export function createPlacePopup(map: MapLibreMap, deps: PlacePopupDeps): PlaceP
     const badge = document.createElement('span');
     badge.className = 'vb-popup-badge';
     badge.setAttribute('aria-hidden', 'true');
-    badge.textContent = look.icon ?? '';
+    // V3 venue mark: the category hue with a paper glyph (hue alone is never the only cue).
+    badge.innerHTML = vwIconHtml(iconForCategoryMark(look.icon), { size: 24 });
     const titles = document.createElement('div');
     titles.className = 'vb-popup-titles';
     const h3 = document.createElement('h3');
@@ -266,6 +272,7 @@ export function createPlacePopup(map: MapLibreMap, deps: PlacePopupDeps): PlaceP
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
       a.textContent = text;
+      a.insertAdjacentHTML('beforeend', vwIconHtml('external', { size: 14 }));
       return a;
     };
     if (d.website) links.append(link('Website', d.website));
