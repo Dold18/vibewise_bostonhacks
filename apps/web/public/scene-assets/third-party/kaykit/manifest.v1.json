@@ -64,9 +64,9 @@
         "gltfParsed": true,
         "bufferUriValidated": true,
         "textureUriValidated": true,
-        "sourceVsImportedShaSpotcheck": true,
         "meshVisualInspected": false,
-        "performanceTested": false
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
       }
     },
     {
@@ -92,9 +92,9 @@
         "gltfParsed": true,
         "bufferUriValidated": true,
         "textureUriValidated": true,
-        "sourceVsImportedShaSpotcheck": false,
         "meshVisualInspected": false,
-        "performanceTested": false
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
       }
     },
     {
@@ -120,9 +120,9 @@
         "gltfParsed": true,
         "bufferUriValidated": true,
         "textureUriValidated": true,
-        "sourceVsImportedShaSpotcheck": false,
         "meshVisualInspected": false,
-        "performanceTested": false
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
       }
     },
     {
@@ -148,9 +148,9 @@
         "gltfParsed": true,
         "bufferUriValidated": true,
         "textureUriValidated": true,
-        "sourceVsImportedShaSpotcheck": false,
         "meshVisualInspected": false,
-        "performanceTested": false
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
       }
     },
     {
@@ -176,9 +176,9 @@
         "gltfParsed": true,
         "bufferUriValidated": true,
         "textureUriValidated": true,
-        "sourceVsImportedShaSpotcheck": false,
         "meshVisualInspected": false,
-        "performanceTested": false
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
       }
     },
     {
@@ -204,9 +204,9 @@
         "gltfParsed": true,
         "bufferUriValidated": true,
         "textureUriValidated": true,
-        "sourceVsImportedShaSpotcheck": false,
         "meshVisualInspected": false,
-        "performanceTested": false
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
       }
     },
     {
@@ -232,9 +232,9 @@
         "gltfParsed": true,
         "bufferUriValidated": true,
         "textureUriValidated": true,
-        "sourceVsImportedShaSpotcheck": true,
         "meshVisualInspected": false,
-        "performanceTested": false
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
       }
     },
     {
@@ -260,9 +260,9 @@
         "gltfParsed": true,
         "bufferUriValidated": true,
         "textureUriValidated": true,
-        "sourceVsImportedShaSpotcheck": false,
         "meshVisualInspected": false,
-        "performanceTested": false
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
       }
     },
     {
@@ -288,9 +288,9 @@
         "gltfParsed": true,
         "bufferUriValidated": true,
         "textureUriValidated": true,
-        "sourceVsImportedShaSpotcheck": false,
         "meshVisualInspected": false,
-        "performanceTested": false
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
       }
     },
     {
@@ -316,9 +316,9 @@
         "gltfParsed": true,
         "bufferUriValidated": true,
         "textureUriValidated": true,
-        "sourceVsImportedShaSpotcheck": false,
         "meshVisualInspected": false,
-        "performanceTested": false
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
       }
     },
     {
@@ -344,9 +344,9 @@
         "gltfParsed": true,
         "bufferUriValidated": true,
         "textureUriValidated": true,
-        "sourceVsImportedShaSpotcheck": false,
         "meshVisualInspected": false,
-        "performanceTested": false
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
       }
     },
     {
@@ -372,10 +372,19 @@
         "gltfParsed": true,
         "bufferUriValidated": true,
         "textureUriValidated": true,
-        "sourceVsImportedShaSpotcheck": false,
         "meshVisualInspected": false,
-        "performanceTested": false
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
       }
     }
-  ]
+  ],
+  "verificationSummary": {
+    "runDate": "2026-11-21",
+    "verifiedSourceVsImportGitBlobShas": 26,
+    "verifiedModelDependencyEntries": 12,
+    "verifiedTotalChecks": 38,
+    "mismatches": 0,
+    "verifiedBytesAcrossImportedModelsBuffersAndTextures": 597727,
+    "method": "GitHub source/destination blob SHA match plus each glTF buffer URI and byteLength and shared texture URI"
+  }
 }
