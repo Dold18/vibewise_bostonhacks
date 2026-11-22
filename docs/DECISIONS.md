@@ -193,6 +193,21 @@
 - **Implications:** Workstream C owns "Vibe DNA"; it may replace the account module's taste calculation, and the theme reads only `VibeProfile.tags`. `mapStyle.ts` becomes `buildMapStyle(palette)`.
 - **Revisit trigger:** The Vibe Engine defines its own profile, or the team wants taste to affect ranking.
 
+### P-015 · Proposed · Deal markers: curated + OSM + rule-based website deals, no LLM
+- **Date / owner:** 2026-11-21 · Map workstream (pins, cards), with Integration (pipeline). **Flagged for team ratification.** Spec: `docs/superpowers/specs/2026-11-21-deal-markers-design.md`.
+- **Context:** Students want to see at a glance which places have a student discount or a special running now. Nothing in the catalog records deals, and `restaurants.hours` is never filled.
+- **Decision:**
+  - **Sources, in order:** a team-confirmed curated list (`pipeline/deals.curated.json`, ships empty); OSM `happy_hours` tags; and a rule-based scan of the place's own website (at most 2 linked pages, polite fetcher, robots honored). All run in `npm run enrich:deals`.
+  - **Storage:** new table `place_deals` (migration `20261122090000_create_place_deals.sql`) plus `restaurants.deals_checked_at`. Everyone reads non-hidden rows; there are no client writes. `hidden` removes a bad row, and no run deletes a hidden row.
+  - **Timing:** each deal has `timing` of `any_time` (student only), `scheduled` (parsed schedule, Boston local time) or `unconfirmed`. `unconfirmed` is never active.
+  - **90-day freshness rule:** a deal is active only if `checked_at` is within the last 90 days. Older deals are listed as "Not recently checked", never marked active. A website is re-scanned when `deals_checked_at` is null or more than 7 days old.
+- **Why / alternatives:** Rules keep the step free, reproducible and auditable, and the public `quote` shows what each deal was read from.
+  - Ruled out: an LLM or paid API to read pages (cost and unverifiable output); third-party deal sources such as Yelp, Google, delivery apps and coupon sites (terms); guessing a schedule when the text is unclear (it becomes `unconfirmed`).
+- **Implications:**
+  - `Place` gains `deals?`, replacing `studentDiscount?`. This is a CONTRACTS.md change, proposed and not yet applied.
+  - Venue open hours are not yet considered. When hours parsing lands, add "and the venue is open, if its hours are known".
+- **Revisit trigger:** A site owner objects (hide their deals), or hours parsing lands.
+
 ## How to add a decision
 ~~~md
 ### D-007 · Accepted/Proposed/Superseded · Short title

@@ -37,7 +37,7 @@ export interface Place {
     source: "licensed" | "first_party" | "provider";
   };
   vibeTags: string[];            // initially curated; later from Vibe Engine
-  studentDiscount?: {
+  studentDiscount?: {          // to be replaced by `deals` once approved (see Proposed change below)
     description: string;
     verifiedAt: string;         // ISO datetime
     sourceUrl?: string;
@@ -48,6 +48,20 @@ export interface Place {
     verifiedAt?: string;
   };
 }
+
+**Proposed change (P-015, not applied):** replace `studentDiscount` with `deals`. Needs approval from the integration owner before merging; the running app uses `osm.ts`'s `Place`, not this type.
+
+```ts
+deals?: Array<{
+  kind: "student" | "special";
+  title: string;
+  timing: "any_time" | "scheduled" | "unconfirmed";
+  schedule: { days: number[]; start: string; end: string }[] | null; // set iff timing === "scheduled"
+  source: "curated" | "osm" | "website";
+  sourceUrl?: string;
+  checkedAt: string; // ISO datetime
+}>;
+```
 
 export interface TransitRequest {
   origin: GeoPoint;
