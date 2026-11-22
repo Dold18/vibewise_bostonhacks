@@ -10,27 +10,30 @@
 | Original v1 SVG effects/textures | 33 | Static vectors, not wired to renderer |
 | Original v2 SVG atlas variants | 192 | Twelve 4×4 atlases, not wired |
 | Original KayKit glTF models | 40 | Source byte integrity verified; visual/scale QA pending |
-| Additional converted CC0 GLB models | **160** | 160/160 byte-identical to pinned third-party source Git blobs; QA pending |
-| **Total stored 3D models** | **200** | **No 3D set pieces rendered** |
-| **Total SVG + 3D items/variations** | **425** | Not interchangeable; 192 SVGs are atlas cells |
+| Additional converted CC0 GLB models | **168** | 168/168 byte-identical to pinned third-party source Git blobs; QA pending |
+| **Total stored 3D models** | **208** | **No 3D set pieces rendered** |
+| **Total SVG + 3D items/variations** | **433** | Not interchangeable; 192 SVGs are atlas cells |
 | Completed, placement-tested thematic installations | **0** | Concept recipes exist, but not composed |
 | Further independently curated external GLB candidates | 40 | **NOT downloaded/imported**; overlaps possible |
 | Source-pack leads | 55 | Metadata only, not downloadable runtime objects |
-| Proposed context+vibe combinations | 28 | Conceptual recipes, not prebuilt geometry |
+| Proposed context+vibe combinations | 28 | Conceptual recipes, not prebuilt geometry
+| ID-validated composition ingredient recipes | 30 | Grounded in 208 imported models; NOT assembled/placed |
 
 ### New import specifics
-- `../third-party/modelibr/manifest.v1.json`: **160** CC0 GLB models from **15** self-contained source packs, totaling **8,234,864 bytes (7.85 MiB)**. Formats are already single-file binary glTF.
-- `../third-party/modelibr/gallery.html`: searchable thumbnail index for these 160 imported files. Thumbnails load externally from an upstream pinned revision; actual GLBs are stored in this repository.
+- `../third-party/modelibr/manifest.v1.json`: **168** CC0 GLB models from **15** self-contained source packs, totaling **8,407,240 bytes (8.02 MiB)**. Formats are already single-file binary glTF.
+- `../third-party/modelibr/gallery.html`: searchable thumbnail index for these 168 imported files. Thumbnails load externally from an upstream pinned revision; actual GLBs are stored in this repository.
 - Official creator categories: Kenney Food/Fantasy/Graveyard/Nature/Holiday/Arcade/Market/Furniture/Pirate/Retro/City; Quaternius Sushi/Junk Food/Cyberpunk; The Base Mesh instrumental props.
-- All 160 imported GLBs' Git blob SHAs and byte lengths match the conversion repository. Model headers were checked for GLB magic/version 2 during import.
+- All 168 imported GLBs' Git blob SHAs and byte lengths match the conversion repository. Model headers were checked for GLB magic/version 2 during import.
 - These are *publisher-derived converted models*. Compare their source creator pages and CC0 terms before production; do not claim they are original, unconverted publisher files.
 - **Remaining QA:** model dimensions, orientation, visual correctness, missing textures, triangle counts, GLB structural validation, browser rendering, memory/graphics cost, touch device profiles, licensing snapshots.
+
+- `../third-party/composites/recipes.v1.json`: **30** candidate context-hero + mood-accent combinations, all asset IDs verified against the 208 imported model IDs. **These are not 30 assembled or tested installations.**
 
 ## Stopping target before Scene Composer implementation
 
 A credible broad initial library should have:
 
-1. **250–350 distinct 3D props**, centered around **300**. With **200 now imported**, that is **50–150 more** (roughly **100 more** to hit 300). Do not count format copies, source links or thumbnails.
+1. **250–350 distinct 3D props**, centered around **300**. With **208 now imported**, that is **42–142 more** (roughly **92 more** to hit 300). Do not count format copies, source links or thumbnails.
 2. **30–50 reusable *actual composite installations*** with measured transforms, bounds, visual themes and navigation-safe behavior. Currently zero built. The previously proposed 28 compositions do not count.
 3. **250–350 SVG/material/effect variations**; currently 225 generated. Aim for better cover across lighting, road material, atmospheric effects; do not add redundant swatches solely to increase the count.
 4. Broad **cuisine** coverage: at least 20 families with several truly identifiable motif options, not only generic bowls/restaurant furniture.
@@ -53,7 +56,7 @@ A credible broad initial library should have:
 ## Per-model acceptance checklist
 
 - [ ] Actually imported, unique by semantic role, and licensed for the contemplated use (not merely sourced)
-- [x] Source bytes match the referenced Git blob **for the 200 imported assets** (separate verification for KayKit and Modelibr imports)
+- [x] Source bytes match the referenced Git blob **for the 208 imported assets** (separate verification for KayKit and Modelibr imports)
 - [ ] Actual GLB/glTF structural validation, renderability and texture/UV check
 - [ ] Approved thumbnail/preview and consistent styling
 - [ ] Measured scale, pivot, orientation, bounding box, triangle count, texture weight and draw calls
