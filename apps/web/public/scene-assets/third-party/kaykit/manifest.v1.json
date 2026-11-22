@@ -1,0 +1,381 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "asset_files_imported_but_no_scene_renderer_or_preview",
+  "assetCount": 12,
+  "modelCount": 12,
+  "origin": "KayKit / Kay Lousberg",
+  "license": "CC0-1.0",
+  "licenseFilesStored": true,
+  "sourcePacks": [
+    {
+      "id": "halloween-bits",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "originRoot": "addons/kaykit_halloween_bits/Assets/gltf",
+      "selectedModels": 6,
+      "licenseFile": "halloween-bits/LICENSE.txt",
+      "texture": "halloweenbits_texture.png"
+    },
+    {
+      "id": "restaurant-bits",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "originRoot": "addons/kaykit_restaurant_bits/Assets/gltf",
+      "selectedModels": 6,
+      "licenseFile": "restaurant-bits/LICENSE.txt",
+      "texture": "restaurantbits_texture.png"
+    }
+  ],
+  "note": "The import contains exactly 12 original glTF models, each with its matching .bin and the pack's shared PNG atlas. None have been compressed/converted to GLB, loaded by the app, or visually QA-tested; theme recipes remain design candidates.",
+  "futureRules": {
+    "aiMaySelectAssetIdOnly": true,
+    "contextAndVibeBothRequired": true,
+    "quizReveal": "final_questions",
+    "slots": [
+      "hero_installation",
+      "ambient_accent"
+    ],
+    "maxHeroInstallations": 1,
+    "maxAmbientAccents": 1,
+    "neverClaimObjectPhysicallyExists": true,
+    "doNotBlockRoutesStationsLabelsAttribution": true,
+    "hideOrSimplifyInFocusMode": true,
+    "reducedMotionSupport": true
+  },
+  "models": [
+    {
+      "id": "kaykit.halloween-bits.arch_gate",
+      "name": "arch_gate",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/arch_gate.gltf",
+      "externalBuffer": "arch_gate.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/arch_gate.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "gothic",
+        "mystery"
+      ],
+      "placementSlot": "hero_installation",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaSpotcheck": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.lantern_hanging",
+      "name": "lantern_hanging",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/lantern_hanging.gltf",
+      "externalBuffer": "lantern_hanging.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/lantern_hanging.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "warm_lighting",
+        "fantasy"
+      ],
+      "placementSlot": "either",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaSpotcheck": false,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.tree_dead_large",
+      "name": "tree_dead_large",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/tree_dead_large.gltf",
+      "externalBuffer": "tree_dead_large.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/tree_dead_large.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "autumn",
+        "gothic"
+      ],
+      "placementSlot": "hero_installation",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaSpotcheck": false,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.pumpkin_orange_jackolantern",
+      "name": "pumpkin_orange_jackolantern",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/pumpkin_orange_jackolantern.gltf",
+      "externalBuffer": "pumpkin_orange_jackolantern.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/pumpkin_orange_jackolantern.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "halloween",
+        "playful",
+        "haunted"
+      ],
+      "placementSlot": "accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaSpotcheck": false,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.shrine_candles",
+      "name": "shrine_candles",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/shrine_candles.gltf",
+      "externalBuffer": "shrine_candles.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/shrine_candles.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "fantasy",
+        "candlelight"
+      ],
+      "placementSlot": "either",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaSpotcheck": false,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.crypt",
+      "name": "crypt",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/crypt.gltf",
+      "externalBuffer": "crypt.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/crypt.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "gothic",
+        "haunted",
+        "mystery"
+      ],
+      "placementSlot": "hero_installation",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaSpotcheck": false,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.table_round_A_decorated",
+      "name": "table_round_A_decorated",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/table_round_A_decorated.gltf",
+      "externalBuffer": "table_round_A_decorated.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/table_round_A_decorated.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "dining",
+        "cozy",
+        "date_night"
+      ],
+      "placementSlot": "hero_installation",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaSpotcheck": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.chair_A",
+      "name": "chair_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/chair_A.gltf",
+      "externalBuffer": "chair_A.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/chair_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "dining",
+        "cafe",
+        "restaurant"
+      ],
+      "placementSlot": "either",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaSpotcheck": false,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_stew",
+      "name": "food_stew",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_stew.gltf",
+      "externalBuffer": "food_stew.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_stew.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "warm",
+        "comfort_food"
+      ],
+      "placementSlot": "accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaSpotcheck": false,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.menu",
+      "name": "menu",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/menu.gltf",
+      "externalBuffer": "menu.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/menu.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "dining",
+        "restaurant",
+        "cafe"
+      ],
+      "placementSlot": "accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaSpotcheck": false,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.crate_tomatoes",
+      "name": "crate_tomatoes",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/crate_tomatoes.gltf",
+      "externalBuffer": "crate_tomatoes.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/crate_tomatoes.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "market",
+        "restaurant"
+      ],
+      "placementSlot": "accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaSpotcheck": false,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_dinner",
+      "name": "food_dinner",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_dinner.gltf",
+      "externalBuffer": "food_dinner.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_dinner.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "comfort_food"
+      ],
+      "placementSlot": "accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaSpotcheck": false,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    }
+  ]
+}
