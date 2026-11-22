@@ -37,15 +37,20 @@ This is the **full product vision**, not a claim that every feature is already c
 - **Vibe workstream (later):** quiz + ranking + map themes, built on the same place model.
 
 ## Getting started
-The repository currently contains only a minimal starting README and planning documentation; the application framework and package manager have **not** been chosen yet.
+Requires Node 24 or newer (the API runs TypeScript directly) and Google Chrome only for the optional browser checks.
 
-1. Read the documentation above.
-2. Confirm pending decisions in `docs/DECISIONS.md` (framework, map, routing source).
-3. Create the minimal app scaffold and canonical TypeScript types.
-4. Work in separate feature branches; integrate into `develop` (once created/approved), not `main`.
-5. Keep the app runnable and verify each [roadmap](docs/ROADMAP.md) milestone before advancing.
+1. **Install:** `cd apps/web && npm ci`.
+2. **Server settings:** copy `.env.example` to `.env` at the repository root and fill in what you have:
+   - `GEMINI_API_KEY` and `VIBE_GEMINI_MODEL`: live quiz questions. Without a key the quiz uses its labeled local question director.
+   - `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`: catalog-wide restaurant search (`POST /api/vibe/search`). The **publishable** key only; read-only search never needs the secret/service-role key. If you leave these out, the API reuses the `VITE_SUPABASE_*` pair from `apps/web/.env`.
+   - `MBTA_API_KEY` (optional): keyless MBTA requests work but are limited to 20/min.
+3. **Browser settings:** copy `apps/web/.env.example` to `apps/web/.env` and set `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` and `VITE_CATALOG_EMBEDDING_MODEL_KEY` (the exact fingerprint in that file). Everything in this file is shipped to the browser.
+4. **Run:** `npm run dev:all` in `apps/web` (Vite on http://localhost:5173 plus the API on 8787), then describe a vibe, answer a few questions and choose **Show My Matches**.
+5. **Check:** `npm test` and `npm run build` in `apps/web`.
 
-Setup, run, lint and test commands will be added **after** the scaffold exists. No sample command in this README should be mistaken for a working command today.
+The API reads, in order, an optional `VIBENTA_ENV_FILE` (a file kept outside the repository), the root `.env`, then `apps/web/.env`; the first value wins and real environment variables beat all files. Both `.env` files are gitignored: never commit them. The first MiniLM embed downloads the pinned model (about 90 MB) into `VIBENTA_MODEL_CACHE` (default: the OS temp directory).
+
+Work in separate feature branches and open pull requests into `main`; read the documentation above before larger changes.
 
 ### Place photos and vibe inputs (pipeline)
 `npm run enrich:media --prefix pipeline -- --type restaurants` finds free photos for each place (its website, Wikimedia Commons, Mapillary) and collects free vibe inputs (website text, Wikipedia/Wikivoyage, OSM tags, Boston license data, student reviews) into Supabase. Flags: `--dry-run`, `--tiers 1,2`, `--limit N`, `--concurrency N`, `--refresh`. It needs `SUPABASE_URL` and `SUPABASE_SECRET_KEY` in `pipeline/.env` and the migration `20261121200000_create_place_media.sql` applied. `MAPILLARY_TOKEN` is optional, and an optional `pipeline/demo-places.txt` (one `place_id` per line) is processed first. Design: `docs/superpowers/specs/2026-11-21-place-photos-vibe-sources-design.md`. Then `npm run enrich:photos --prefix pipeline -- --type restaurants` stores an 800 px WebP copy of each photo in the `place-photos` bucket (`--max-mb`, default 800, caps total storage; `--dry-run`, `--limit N`, `--concurrency N`).
@@ -63,7 +68,7 @@ The web app (`apps/web`) deploys as one Vercel project: Vite builds the static s
 1. **Import the repo** in Vercel and set **Root Directory** to `apps/web`. `vercel.json` sets the framework (Vite), build command and output directory.
 2. **Environment variables** (Project → Settings → Environment Variables):
    - Public, shipped to the browser: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, and optionally `VITE_CATALOG_EMBEDDING_MODEL_KEY` (only once the catalog owner verifies it). Locally these live in `apps/web/.env`; on Vercel they come from the dashboard, which makes them available both to the build (baked into the bundle, so changing them needs a redeploy) and to the API at runtime, where the signed-in photo route uses the Supabase pair to verify users. Apply them to Production and Preview.
-   - Server only (never `VITE_`): `MBTA_API_KEY`, `GEMINI_API_KEY`, `VIBE_GEMINI_MODEL`, `VIBENTA_MODEL_CACHE=/tmp/vibenta-minilm-cache`, and `ONNXRUNTIME_NODE_INSTALL=skip` (stops `npm install` downloading CUDA binaries the function can't use).
+   - Server only (never `VITE_`): `MBTA_API_KEY`, `GEMINI_API_KEY`, `VIBE_GEMINI_MODEL`, optionally `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` (catalog search falls back to the `VITE_SUPABASE_*` pair; never a secret key), `VIBENTA_MODEL_CACHE=/tmp/vibenta-minilm-cache`, and `ONNXRUNTIME_NODE_INSTALL=skip` (stops `npm install` downloading CUDA binaries the function can't use).
    - Never set on Vercel: `VIBE_IMAGE_UNLIMITED` (a local dev switch that lifts the per-user daily photo cap) and `VIBENTA_ENV_FILE` / `TRANSIT_API_PORT` / `VITE_PORT` (local dev only).
 3. **Supabase:** apply `supabase/migrations/` to the hosted project (`supabase db push`), then add the Vercel domain under Auth → URL Configuration (Site URL and redirect allowlist; a wildcard such as `https://*-<team>.vercel.app/**` for preview deploys), since sign-up confirmation links return to `window.location.origin`.
 

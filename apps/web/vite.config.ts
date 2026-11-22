@@ -34,9 +34,12 @@ if (process.env.VIBENTA_ENV_FILE) process.loadEnvFile(process.env.VIBENTA_ENV_FI
 // apps/web/.env. Server keys stay in the root .env or VIBENTA_ENV_FILE, which the
 // API process loads itself; VITE_ values already in the environment win.
 const webEnvDir = fileURLToPath(new URL('./', import.meta.url));
+const rootEnvDir = fileURLToPath(new URL('../../', import.meta.url));
 export default defineConfig(({ mode }) => {
   const envDir = webEnvDir;
-  const env = loadEnv(mode, envDir, '');
+  // Ports may sit in either file (the API reads the root .env too), so the proxy follows the API.
+  // This merged view only sets ports; browser exposure still comes from envDir alone.
+  const env = { ...loadEnv(mode, rootEnvDir, ''), ...loadEnv(mode, envDir, '') };
   return {
     plugins: [maplibreWorker()],
     // Standalone scene galleries use import maps/CDN Three.js, outside the app scan.

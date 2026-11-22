@@ -5,8 +5,10 @@ import { parseSearchRequest, type SearchResponse } from '../src/features/vibe/se
 import { createSupabaseCatalog, rankRestaurants, type CatalogProvider } from './catalogIndex.ts';
 import { createGeminiGenerator } from './vibeGemini.ts';
 import { createMiniLM } from './miniLM.ts';
+import { loadLocalEnv } from './env.ts';
 export function createVibeRouter(deps:{generator?:GenerationProvider;embedder?:EmbeddingProvider;catalog?:CatalogProvider}={}) {
- const reload=()=>{try{process.loadEnvFile(process.env.VIBENTA_ENV_FILE??new URL('../../../.env',import.meta.url));}catch{/* Config can be supplied later without exposing its contents. */}};
+ // Re-read local files per request, so config added after startup is picked up without exposing its contents.
+ const reload=()=>loadLocalEnv();
  const router=Router(), generator=deps.generator??{generate(context,signal){reload();return createGeminiGenerator({apiKey:process.env.GEMINI_API_KEY,model:process.env.VIBE_GEMINI_MODEL}).generate(context,signal);}},embedder=deps.embedder??createMiniLM();
  // Catalog search reads the same Supabase project as the browser, with the same publishable key
  // (SUPABASE_URL / SUPABASE_PUBLISHABLE_KEY, falling back to the VITE_ names the browser uses).
@@ -14,7 +16,7 @@ export function createVibeRouter(deps:{generator?:GenerationProvider;embedder?:E
  const catalogFor=():CatalogProvider|null=>{
   if(deps.catalog)return deps.catalog;
   reload();
-  const url=process.env.SUPABASE_URL??process.env.VITE_SUPABASE_URL,key=process.env.SUPABASE_PUBLISHABLE_KEY??process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  const url=process.env.SUPABASE_URL||process.env.VITE_SUPABASE_URL,key=process.env.SUPABASE_PUBLISHABLE_KEY||process.env.VITE_SUPABASE_PUBLISHABLE_KEY; // an empty template line falls back too
   if(!url||!key)return null;
   const id=`${url}|${key}`;
   if(envCatalog?.id!==id)envCatalog={id,provider:createSupabaseCatalog({url,key})};
