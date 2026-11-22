@@ -4,9 +4,9 @@
   "status": "imported_binary_integrity_verified_visual_qa_pending",
   "source": "Papyszoo/CC0-Public-Domain-Models (Modelibr CC0 GLB conversions)",
   "licenseCaveat": "Per-pack CC0 claims checked against metadata in source repository; verify author/pack terms for production. These are converted GLBs, not necessarily original publisher binary files.",
-  "modelCount": 172,
-  "totalBytes": 8506688,
-  "verification": "172/172 source/destination Git blob SHA and GLB v2 header verified at import; render QA pending.",
+  "modelCount": 176,
+  "totalBytes": 8605872,
+  "verification": "176/176 source/destination Git blob SHA and GLB v2 header verified at import; render QA pending.",
   "packCount": 15,
   "packs": [
     {
@@ -31,7 +31,7 @@
       "sourceWebsite": "https://kenney.nl/assets/food-kit",
       "licenseClaim": "CC0",
       "sourcePackPath": "https://github.com/Papyszoo/CC0-Public-Domain-Models/tree/main/packs/kenney-food-kit",
-      "importedCount": 44
+      "importedCount": 48
     },
     {
       "id": "kenney-furniture-kit",
@@ -714,6 +714,36 @@
       }
     },
     {
+      "id": "cc0.kenney-food-kit.bread",
+      "name": "bread",
+      "pack": "kenney-food-kit",
+      "uri": "/scene-assets/third-party/modelibr/kenney-food-kit/bread.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/kenney-food-kit/models/bread/bread.glb",
+      "creator": "Kenney",
+      "originalPackWebsite": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 20184,
+      "gitBlobSHA": "82a0fde5ef50e82034a312876b8e2f1da255e112",
+      "format": "glb",
+      "tags": [
+        "food",
+        "ingredients",
+        "dining"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      },
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/bread/bread.png"
+    },
+    {
       "id": "cc0.kenney-food-kit.chopstick",
       "name": "chopstick",
       "pack": "kenney-food-kit",
@@ -896,6 +926,66 @@
       },
       "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/dim_sum/dim_sum.png"
+    },
+    {
+      "id": "cc0.kenney-food-kit.egg_cooked",
+      "name": "egg_cooked",
+      "pack": "kenney-food-kit",
+      "uri": "/scene-assets/third-party/modelibr/kenney-food-kit/egg_cooked.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/kenney-food-kit/models/egg_cooked/egg_cooked.glb",
+      "creator": "Kenney",
+      "originalPackWebsite": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 17464,
+      "gitBlobSHA": "45a137e3789fe1eb8af6a0a8de4fe1691fd48229",
+      "format": "glb",
+      "tags": [
+        "food",
+        "ingredients",
+        "dining"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      },
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/egg_cooked/egg_cooked.png"
+    },
+    {
+      "id": "cc0.kenney-food-kit.fish",
+      "name": "fish",
+      "pack": "kenney-food-kit",
+      "uri": "/scene-assets/third-party/modelibr/kenney-food-kit/fish.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/kenney-food-kit/models/fish/fish.glb",
+      "creator": "Kenney",
+      "originalPackWebsite": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 42384,
+      "gitBlobSHA": "077821fd1361c6bdf96b7b6d31fe93be27ced7b8",
+      "format": "glb",
+      "tags": [
+        "food",
+        "ingredients",
+        "dining"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      },
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/fish/fish.png"
     },
     {
       "id": "cc0.kenney-food-kit.frappe",
@@ -1286,6 +1376,36 @@
         "renderedInMap": false,
         "performanceProfiled": false
       }
+    },
+    {
+      "id": "cc0.kenney-food-kit.mushroom",
+      "name": "mushroom",
+      "pack": "kenney-food-kit",
+      "uri": "/scene-assets/third-party/modelibr/kenney-food-kit/mushroom.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/kenney-food-kit/models/mushroom/mushroom.glb",
+      "creator": "Kenney",
+      "originalPackWebsite": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 19152,
+      "gitBlobSHA": "5658ccfb1a726eead13b414f3778cd89ba630306",
+      "format": "glb",
+      "tags": [
+        "food",
+        "ingredients",
+        "dining"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      },
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/kenney-food-kit/models/mushroom/mushroom.png"
     },
     {
       "id": "cc0.kenney-food-kit.mussel_open",
