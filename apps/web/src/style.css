@@ -33,6 +33,15 @@ body {
   inset: 0;
 }
 
+/*
+ * Pins' depth z-indexes (main.ts --pin-z) only compete with each other: the
+ * markers' container is its own stacking context, so pins stay below
+ * MapLibre's controls (attribution, z-index 2) and the page's panels.
+ */
+.maplibregl-canvas-container {
+  isolation: isolate;
+}
+
 button {
   font: inherit;
   color: inherit;
@@ -40,6 +49,17 @@ button {
 }
 
 /* ---------- Pins ---------- */
+
+/*
+ * Registered so it can be transitioned on its own: the rendered size is
+ * --pin-scale (match strength, animated) x --pin-distance (perspective, set
+ * every camera frame by main.ts and never animated, or pins would lag).
+ */
+@property --pin-scale {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
 
 /*
  * Marker elements (.pin, .pin-shadow) must not set position, transform or
@@ -53,6 +73,8 @@ button {
   padding: 0;
   border: 0;
   background: transparent;
+  /* Tilted view: main.ts stacks pins by screen depth so near pins cover far ones. */
+  z-index: var(--pin-z, auto);
 }
 
 /*
@@ -64,26 +86,29 @@ button {
 .pin-deal {
   position: absolute;
   left: 50%;
-  bottom: calc(40px * var(--pin-scale, 1) + 3px);
+  bottom: calc(40px * var(--pin-scale, 1) * var(--pin-distance, 1) + 3px);
   translate: -50% 0;
   padding: 1px 6px;
   border-radius: 999px;
   outline: 1px solid rgba(0, 0, 0, 0.35);
   background: #fff;
   color: #1f1f1f;
-  font-size: calc(11px * var(--pin-scale, 1));
+  /* Shrinks with distance, but not past legibility. */
+  font-size: calc(11px * var(--pin-scale, 1) * max(0.75, var(--pin-distance, 1)));
   font-weight: 600;
   line-height: 1.3;
   white-space: nowrap;
   pointer-events: none;
   z-index: 1; /* paint above the enlarged .pin-body */
-  transition: translate 0.15s ease;
+  transition:
+    translate 0.15s ease,
+    opacity 0.2s ease;
 }
 
 /* Rise by the body's growth (0.3 x 40px) so the enlarged pin doesn't cover the chip. */
 .pin:hover .pin-deal,
 .pin.selected .pin-deal {
-  translate: -50% calc(-12px * var(--pin-scale, 1));
+  translate: -50% calc(-12px * var(--pin-scale, 1) * var(--pin-distance, 1));
 }
 
 .pin-deal[hidden] {
@@ -95,6 +120,8 @@ button {
  * applyPinLook), so a match score can later drive them:
  *   --pin-color  fill of the solid head
  *   --pin-scale  size; 1 = 28x40px. Animated, so re-ranking can grow/shrink pins.
+ * plus --pin-distance from the camera (main.ts syncPinPerspective): 1 when
+ * flat, smaller toward the horizon in the tilted view.
  * Hover/selection enlarge on top of that via `transform`.
  */
 .pin-body {
@@ -103,10 +130,30 @@ button {
   height: 100%;
   filter: none;
   transform-origin: 50% 100%;
-  scale: var(--pin-scale, 1);
+  scale: calc(var(--pin-scale, 1) * var(--pin-distance, 1));
   transition:
     transform 0.15s ease,
-    scale 0.3s ease;
+    opacity 0.2s ease,
+    --pin-scale 0.3s ease;
+}
+
+/*
+ * Culled: hidden behind a more important overlapping pin until zooming in
+ * spreads them apart (main.ts cullPins). Fades on the inner elements; the
+ * marker itself only stops taking clicks (main.ts also sets `inert`).
+ */
+.pin.culled {
+  pointer-events: none;
+}
+
+.pin.culled .pin-body,
+.pin.culled .pin-deal {
+  opacity: 0;
+}
+
+/* visibility, not an opacity transition, so shadows don't lag the pitch-driven --depth fade. */
+.pin-shadow.culled {
+  visibility: hidden;
 }
 
 .pin svg {
@@ -139,7 +186,7 @@ button {
 
 .pin:hover,
 .pin.selected {
-  z-index: 1;
+  z-index: 100000; /* above every depth-stacked pin */
 }
 
 .pin:hover .pin-body,
@@ -168,13 +215,13 @@ button {
   transform-origin: 50% 100%;
 }
 
-/* Shadows follow their pin's --pin-scale (set on the shadow element too). */
+/* Shadows follow their pin's --pin-scale and --pin-distance (set on the shadow element too). */
 .pin-shadow > * {
   opacity: var(--depth, 0);
-  scale: var(--pin-scale, 1);
+  scale: calc(var(--pin-scale, 1) * var(--pin-distance, 1));
   transition:
     transform 0.15s ease,
-    scale 0.3s ease;
+    --pin-scale 0.3s ease;
 }
 
 /* Soft dark spot right under the pin tip, so the pin reads as standing on the ground. */
@@ -206,7 +253,7 @@ button {
 }
 
 .pin-shadow.selected .pin-shadow-contact {
-  scale: calc(var(--pin-scale, 1) * 1.3);
+  scale: calc(var(--pin-scale, 1) * var(--pin-distance, 1) * 1.3);
 }
 
 /* ---------- Map controls ---------- */
