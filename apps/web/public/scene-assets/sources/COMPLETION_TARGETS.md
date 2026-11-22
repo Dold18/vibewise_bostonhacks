@@ -1,53 +1,65 @@
-# Vibenta Scene Asset Library — Completion Gate v1
+# Vibenta Scene Asset Library — Completion Gate v2
 
 **Date:** 2026-11-21  
-**Status:** planning targets, not claims that files are already production-ready
+**Status:** procurement and design targets; none of the 3D props are enabled in the map yet
 
-## Current verified inventory
-- 225 original SVG assets/visual variants (33 v1, 192 v2 atlas tiles).
-- 40 actual imported original KayKit glTF models (each with binary, shared texture and CC0 license) across five packs.
-- 40 **additional** curated GLB candidates across ten external packs, **not downloaded**.
-- 55 sourced pack references and 28 conceptual compositions, **not built set pieces**.
-- **0** completed, tested theme-specific hero+accent scene compositions and **0** map-integrated 3D objects.
+## Current verified GitHub inventory
 
-## Recommended stopping point for a broad initial product
-- **250–350 curated distinct 3D objects**, counting identifiable usable meshes only, not duplicate formats, binary dependencies, textures, or catalog links.
-- **30–50 curated ready-to-place composite installations**, distinct from raw models.
-- **250–350 SVG/material/atmospheric asset variants** in a searchable catalog (225 already authored, but visual browser QA and actual effect capability remain separate).
-- **At least 20 cuisine/dining families** with 3+ visibly recognizable prop options when appropriate; include multiple specific cuisines rather than one generic `restaurant` category.
-- **At least 15 high-value music/genre families** with 3+ relevant instrumental/stage/venue props per family where music is relevant. Reuse instruments across genres; differentiate moods by lighting, composition and styling.
-- **At least 10 mood-only treatments** (romantic, moody, haunted, nostalgic, futuristic, playful, quiet, energetic, natural, refined) so a user need not select cuisine or music to get a distinctive scene.
-- **At least 10 venue/occasion clusters**: café, fine dining, casual restaurant, bar, concert, club, park, theatre, market, celebration.
-- Each of these needs usable metadata: semantic tags, source/licensing, model dimensions/orientation/anchor, complexity, device performance, animation and possible collisions.
-
-At today's 40 imported meshes, reaching 250–350 means **210–310 more distinct 3D objects**. A practical center target is **300 total / 260 additional**. The separately curated 40 external GLB candidates reduce this shortfall **only after actual import and QA**.
-
-## Proposed 300-prop allocation (reuse allowed across axes)
-| Group | Planning quota | Current basis |
+| Asset inventory | Actual stored | Status |
 |---|---:|---|
-| Cuisine and dining-specific hero/prop objects | 100 | 14 generic restaurant models; cuisine-specific coverage still sparse |
-| Music instruments, stages, audio/visual equipment | 70 | External source packs found, no music-specific models imported yet |
-| Reusable venue furniture, buildings-as-diagrams, parks, city accents | 65 | 8 furniture + 8 city models |
-| Storytelling, fantasy, seasonal, haunted, futuristic, nonliteral objects | 65 | 6 haunted + 4 futuristic models |
-| **Total target** | **300** | **40 imported currently** |
+| Original v1 SVG effects/textures | 33 | Static vectors, not wired to renderer |
+| Original v2 SVG atlas variants | 192 | Twelve 4×4 atlases, not wired |
+| Original KayKit glTF models | 40 | Source byte integrity verified; visual/scale QA pending |
+| Additional converted CC0 GLB models | **160** | 160/160 byte-identical to pinned third-party source Git blobs; QA pending |
+| **Total stored 3D models** | **200** | **No 3D set pieces rendered** |
+| **Total SVG + 3D items/variations** | **425** | Not interchangeable; 192 SVGs are atlas cells |
+| Completed, placement-tested thematic installations | **0** | Concept recipes exist, but not composed |
+| Further independently curated external GLB candidates | 40 | **NOT downloaded/imported**; overlaps possible |
+| Source-pack leads | 55 | Metadata only, not downloadable runtime objects |
+| Proposed context+vibe combinations | 28 | Conceptual recipes, not prebuilt geometry |
 
-These quotas are allocation aids; crossing tags and reuse are expected. Do not mechanically fill with near-duplicates.
+### New import specifics
+- `../third-party/modelibr/manifest.v1.json`: **160** CC0 GLB models from **15** self-contained source packs, totaling **8,234,864 bytes (7.85 MiB)**. Formats are already single-file binary glTF.
+- `../third-party/modelibr/gallery.html`: searchable thumbnail index for these 160 imported files. Thumbnails load externally from an upstream pinned revision; actual GLBs are stored in this repository.
+- Official creator categories: Kenney Food/Fantasy/Graveyard/Nature/Holiday/Arcade/Market/Furniture/Pirate/Retro/City; Quaternius Sushi/Junk Food/Cyberpunk; The Base Mesh instrumental props.
+- All 160 imported GLBs' Git blob SHAs and byte lengths match the conversion repository. Model headers were checked for GLB magic/version 2 during import.
+- These are *publisher-derived converted models*. Compare their source creator pages and CC0 terms before production; do not claim they are original, unconverted publisher files.
+- **Remaining QA:** model dimensions, orientation, visual correctness, missing textures, triangle counts, GLB structural validation, browser rendering, memory/graphics cost, touch device profiles, licensing snapshots.
 
-## Retrieval priorities (most impactful first)
-1. **Import and visually inspect the 40 curated GLB candidates** for Japanese/Indian/Greek/Korean/French/street-food and jazz/classical/rock/DJ/lo-fi use cases; do not misrepresent sourcing as importing.
-2. **Fill cuisine hero gaps:** pasta/pizza, tacos, dim sum/tea, Korean barbecue, pho/banh mi, Thai noodles/curry, thali/naan, Ethiopian injera, Greek mezze, Middle Eastern small plates, vegetarian, seafood, brunch, bakery.
-3. **Fill music hero gaps:** guitar/bass/drums, sax/trumpet, piano/strings, DJ decks/speakers, regional percussion and acoustic instruments, retro turntable/disco fixtures, live mic/stage. No copyrighted band artwork or playback is required.
-4. **Build 30–50 actual set-piece recipes** from tested primitives: one content-dependent hero vignette and one optional mood/lighting accent.
-5. Verify consistent visual treatment and only choose the compatible subset of assets at runtime; expensive PBR and particle effects should be lazy-loaded, downsampled or skipped on mobile.
+## Stopping target before Scene Composer implementation
 
-## Asset acceptance criteria (per item)
-- [ ] Actually downloaded/committed (not just a pack link), licensable for redistribution, original URL and provenance recorded
-- [ ] Correct glTF/GLB and texture references, valid byte length/hash
-- [ ] Visually inspected with representative scene lights on light/dark map
-- [ ] Geometry dimensions, pivot, orientation, material quality and scale verified
-- [ ] File weight, triangles, draw calls and device performance within budget
-- [ ] No factual map/venue claims or fabricated street geometry
-- [ ] Supports one of two optional slots without occluding route paths, stops, destination pins, readable labels, map attribution or controls
-- [ ] Safe fallback for focus mode and reduced motion
+A credible broad initial library should have:
 
-**Completion means coverage and quality, not raw asset count.** Once each core family has multiple truly usable visual choices and 30–50 compatible composite scenes are validated, stop broad procurement and build Scene Composer v1. Nonessential niche themes can remain future expansions.
+1. **250–350 distinct 3D props**, centered around **300**. With **200 now imported**, that is **50–150 more** (roughly **100 more** to hit 300). Do not count format copies, source links or thumbnails.
+2. **30–50 reusable *actual composite installations*** with measured transforms, bounds, visual themes and navigation-safe behavior. Currently zero built. The previously proposed 28 compositions do not count.
+3. **250–350 SVG/material/effect variations**; currently 225 generated. Aim for better cover across lighting, road material, atmospheric effects; do not add redundant swatches solely to increase the count.
+4. Broad **cuisine** coverage: at least 20 families with several truly identifiable motif options, not only generic bowls/restaurant furniture.
+5. Broad **music** coverage: at least 15 high-value genres with a recognizable array of relevant instruments/venue props/stage equipment. Current music props have a piano, acoustic guitar, pan flute, drum stick, violin bow and assorted stage supports, but are **insufficient** for jazz, EDM, rock, salsa, etc. in isolation.
+6. At least 10 atmosphere-only motifs for a user's vibe when no genre/cuisine is selected (e.g. haunted, romantic, futuristic, playful, calm, moody, nostalgic).
+7. Complete provenance, verified source and license, search tags, model origin, dimensions/anchor, GPU budget, collision footprint, preview QA, fallback and reduced-motion metadata for every active asset.
+
+**Do not use 300 as an automatic trigger if the thematic coverage or QA criteria are not met.** Content breadth and selection quality outweigh raw model counts.
+
+## Highest-value remaining procurement
+
+| Priority | Gap | Suggested focus |
+|---|---|---|
+| 1 | **Music performance** | Complete guitar/drum/keyboard kits, saxophone, brass, DJ decks, mixers, microphones, regional percussion and disco installation props |
+| 2 | **Distinct cuisines** | Korean barbecue, pho, banh mi, Thai dishes, Ethiopian injera, Indian thali/naan, Middle Eastern mezze, Greek dishes; robust Italian meal set |
+| 3 | **Cultural care and specificity** | Only select cuisine/genre/holiday motifs for explicitly chosen or verified venue contexts; avoid generic cultural stereotypes |
+| 4 | **Composite installations** | Build 30–50 stylized hero+accent bundles from already acquired models, with safe placement and a coherent visual language |
+| 5 | **Visual coherence** | Make mixed Kenney, Quaternius, KayKit and The Base Mesh assets consistent via material/palette style normalization and device-appropriate LOD |
+
+## Per-model acceptance checklist
+
+- [ ] Actually imported, unique by semantic role, and licensed for the contemplated use (not merely sourced)
+- [x] Source bytes match the referenced Git blob **for the 200 imported assets** (separate verification for KayKit and Modelibr imports)
+- [ ] Actual GLB/glTF structural validation, renderability and texture/UV check
+- [ ] Approved thumbnail/preview and consistent styling
+- [ ] Measured scale, pivot, orientation, bounding box, triangle count, texture weight and draw calls
+- [ ] Mobile/laptop/Safari performance budget
+- [ ] Navigation overlays, selected venue, stations and attribution remain fully accessible
+- [ ] Safe reduced-motion and focus-mode fallback
+- [ ] No false statements about real venue features, food menus or performances
+
+Once these criteria and composition coverage are met, begin the Scene Composer. Continue the library in targeted small updates afterward if real scene tests reveal gaps.
