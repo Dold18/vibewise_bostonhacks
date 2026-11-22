@@ -4,11 +4,11 @@
 
 ## What's actually in this folder
 
-- **160 distinct imported GLB files**, stored under 15 pack directories. They total **8,234,864 bytes (~7.85 MiB)**.
+- **168 distinct imported GLB files**, stored under 15 pack directories. They total **8,407,240 bytes (~8.02 MiB)**.
 - Every GLB was transferred byte-for-byte from the public [Papyszoo/CC0-Public-Domain-Models](https://github.com/Papyszoo/CC0-Public-Domain-Models) collection. That project packages converted assets originally by Kenney, Quaternius, and The Base Mesh. Their pack metadata and licensing claims are included in [manifest.v1.json](manifest.v1.json).
-- Source revision is pinned in the manifest, and **160/160 Git blob SHAs plus file sizes match** the source. GLB magic/version headers were checked during import.
+- Source revision is pinned in the manifest, and **168/168 Git blob SHAs plus file sizes match** the source. GLB magic/version headers were checked during import.
 - The source pack pages identify these models as **CC0**; original creator websites are included per pack. Keep provenance and review license terms if using these files in production.
-- Browser thumbnails for these 160 models are available in the source repository and linked by immutable revision from the manifest. They are **not** bundled in this repository.
+- Browser thumbnails for these 168 models are available in the source repository and linked by immutable revision from the manifest. They are **not** bundled in this repository.
 
 ## Open the gallery
 
@@ -22,7 +22,7 @@ The gallery supports text search and source-pack filtering and links the actual 
 
 | Collection | Imported | Purpose |
 |---|---:|---|
-| Kenney Food | 32 | Italian, Mexican, French bakery, Chinese dim sum, North African tajine, brunch, general dining |
+| Kenney Food | 40 | Italian, Mexican, French bakery, Chinese dim sum, North African tajine, brunch, general dining |
 | Quaternius Sushi Restaurant | 24 | Japanese food, ramen, sushi, and decorative restaurant fixtures |
 | The Base Mesh | 8 | Piano, acoustic guitar, flute, instrument stands and studio supports |
 | Kenney Graveyard | 8 | Haunted and gothic installation objects |
@@ -37,9 +37,9 @@ The gallery supports text search and source-pack filtering and links the actual 
 | Kenney Pirate | 8 | Coastal, nautical, harbor and adventurous decorations |
 | Quaternius Cyberpunk | 8 | Futuristic and neon scene props |
 | Kenney City Commercial | 8 | Stylized modern city and outdoor dining accents |
-| **Total** | **160** | |
+| **Total** | **168** | |
 
-The **existing 40 KayKit models** remain separate under `../kaykit/`, giving Vibenta **200 total imported 3D props**. The prior **225 SVG assets/variants** are also separate from this count.
+The **existing 40 KayKit models** remain separate under `../kaykit/`, giving Vibenta **208 total imported 3D props**. The prior **225 SVG assets/variants** are also separate from this count.
 
 ## Usage constraints
 
