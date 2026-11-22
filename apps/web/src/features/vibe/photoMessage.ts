@@ -1,4 +1,6 @@
 export const MAX_PHOTO_DESCRIPTION = 280;
+/** Photo reads per signed-in user per day; the server enforces it and the client names it in its message. */
+export const DAILY_PHOTO_LIMIT = 5;
 export const MAX_TYPED_TEXT = 500;
 export const MAX_CORRECTION_TEXT = 800;
 export const PHOTO_LINE_PREFIX = 'Photo: ';

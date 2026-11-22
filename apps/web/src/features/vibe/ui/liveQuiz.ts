@@ -11,7 +11,7 @@ import type { Answer, OutingVibeProfile, Response } from '../profile';
 import { photoAccess } from '../photoAccess';
 import { PHOTO_MESSAGES, photoClient } from '../photoClient';
 import { prepareMessage } from '../photoSend';
-import { hasPhotoLine } from '../photoMessage';
+import { hasPhotoLine, MAX_TYPED_TEXT } from '../photoMessage';
 import { createPhotoAttachment, type PhotoAttachmentState } from './photoAttachment';
 import './quiz.css';
 /** Identify the focused control by role so it can be found again after a re-render. */
@@ -133,7 +133,7 @@ export function createLiveQuiz(onBack:()=>void) {
    }
    const neutral=h('div',{class:'vb-quiz-neutral'},button('Skip',()=>respond({kind:'skip'})),button('Neither / something else',()=>respond({kind:'neither'})));
    if(question.cultural)neutral.append(button('I don’t know these',()=>respond({kind:'unfamiliar'})));root.append(neutral);
-   const correction=h('textarea',{class:'vb-textarea vb-quiz-correction',rows:2,maxlength:500,placeholder:'Or tell us what feels right…','aria-label':'Your own answer or correction',readonly:photo.busy});
+   const correction=h('textarea',{class:'vb-textarea vb-quiz-correction',rows:2,maxlength:MAX_TYPED_TEXT,placeholder:'Or tell us what feels right…','aria-label':'Your own answer or correction',readonly:photo.busy});
    if(draft&&draftFor===question.id)correction.value=draft;
    // Always pressable, as before photos: an empty send explains what to add.
    const correct=button(reading('correction')?'Reading your photo…':'Use my words',()=>void sendOwnWords(correction.value,'correction'),'vb-text-btn vb-quiz-use-words');

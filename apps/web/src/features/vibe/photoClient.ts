@@ -1,7 +1,8 @@
 import { photoAccess, type PhotoAccessSource } from './photoAccess';
+import { DAILY_PHOTO_LIMIT } from './photoMessage';
 
 export type PhotoFailure = 'signed_out' | 'limit' | 'unreadable' | 'unavailable';
-export type PhotoResult = { ok: true; description: string; remainingToday: number | null } | { ok: false; reason: PhotoFailure; message: string };
+export type PhotoResult = { ok: true; description: string } | { ok: false; reason: PhotoFailure; message: string };
 export interface PhotoClient {
   describe(file: File, question?: string): Promise<PhotoResult>;
   cached(file: File, question?: string): string | undefined;
@@ -11,7 +12,7 @@ type Prepared = { mimeType: 'image/jpeg'; data: string };
 
 export const PHOTO_MESSAGES: Record<PhotoFailure, string> = {
   signed_out: 'Sign in to use a photo.',
-  limit: "You've used today's 5 photo reads. Remove the photo to send your words, or try again tomorrow.",
+  limit: `You've used today's ${DAILY_PHOTO_LIMIT} photo reads. Remove the photo to send your words, or try again tomorrow.`,
   unreadable: "We couldn't read that photo. Try another, or remove it to send your words.",
   unavailable: 'Photo reading is unavailable right now. Retry, or remove the photo to send your words.',
 };
@@ -40,10 +41,10 @@ export function createPhotoClient(deps: { access: Pick<PhotoAccessSource, 'getAc
         body: JSON.stringify({ mimeType: img.mimeType, data: img.data, question }),
         signal: AbortSignal.timeout(TIMEOUT_MS),
       });
-      const body = (await r.json().catch(() => ({}))) as { description?: unknown; remainingToday?: unknown; error?: unknown };
+      const body = (await r.json().catch(() => ({}))) as { description?: unknown; error?: unknown };
       if (r.ok && typeof body.description === 'string' && body.description.trim()) {
         slot(cache, file).set(key, body.description);
-        return { ok: true, description: body.description, remainingToday: typeof body.remainingToday === 'number' ? body.remainingToday : null };
+        return { ok: true, description: body.description };
       }
       if (r.status === 401) return fail('signed_out');
       if (r.status === 429) return fail(body.error === 'daily_limit' ? 'limit' : 'unavailable');
@@ -58,7 +59,7 @@ export function createPhotoClient(deps: { access: Pick<PhotoAccessSource, 'getAc
     async describe(file, question) {
       const key = question ?? '';
       const hit = cache.get(file)?.get(key);
-      if (hit !== undefined) return { ok: true, description: hit, remainingToday: null };
+      if (hit !== undefined) return { ok: true, description: hit };
       const pending = slot(inflight, file);
       const running = pending.get(key);
       if (running) return running;

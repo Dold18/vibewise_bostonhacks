@@ -1,6 +1,7 @@
 import { h } from '../../../discovery/ui/dom';
 import type { Question, Response } from '../profile';
 import { presentationOf } from '../media/presentation';
+import { MAX_TYPED_TEXT } from '../photoMessage';
 import { IMAGE_BY_ID, imageCredit, REFERENCE_BY_ID, TRACK_BY_ID, trackEmbedUrl, trackWatchUrl } from '../media/registry';
 import type { ImageAsset, Transform } from '../media/types';
 
@@ -94,7 +95,7 @@ export function renderMediaStage(question: Question, state: MediaViewState, comm
         h('p', { class: 'vb-media-credit' }, 'Official upload by ', h('a', { href: track.channelUrl, target: '_blank', rel: 'noopener noreferrer' }, track.channel), ' · ', h('a', { href: trackWatchUrl(track), target: '_blank', rel: 'noopener noreferrer' }, 'Open on YouTube'), ' · Playing is optional; only your answer counts.'),
         h('details', { class: 'vb-media-soundoff' }, h('summary', {}, 'Sound off or don’t know it?'), h('p', {}, track.sound))), optionCards(question, commit, previous));
     } else if (p.format === 'free_text') {
-      const area = h('textarea', { class: 'vb-textarea vb-media-freetext', rows: '3', maxlength: '500', placeholder: p.placeholder ?? 'Type your answer…', 'aria-label': 'Your answer in your own words' }) as HTMLTextAreaElement;
+      const area = h('textarea', { class: 'vb-textarea vb-media-freetext', rows: '3', maxlength: String(MAX_TYPED_TEXT), placeholder: p.placeholder ?? 'Type your answer…', 'aria-label': 'Your answer in your own words' }) as HTMLTextAreaElement;
       area.value = state.draft || (previous?.kind === 'text' ? previous.text : '');
       // While a photo is read the words are read-only, so what is sent is what is shown.
       area.readOnly = !!photo?.busy;

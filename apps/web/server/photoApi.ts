@@ -2,7 +2,7 @@
 import { Router } from 'express';
 import type { PhotoAuth, PhotoQuota } from './photoAuth.ts';
 import type { PhotoDescriber, PhotoInput } from './photoDescriber.ts';
-export const DAILY_PHOTO_LIMIT = 5;
+import { DAILY_PHOTO_LIMIT } from '../src/features/vibe/photoMessage.ts';
 export interface PhotoDeps { auth(): PhotoAuth | null; describer(): PhotoDescriber; unlimited(): boolean }
 const MIMES = ['image/jpeg', 'image/png', 'image/webp'], B64 = /^[A-Za-z0-9+/]+={0,2}$/;
 /** A quiz prompt is up to 500 characters (validQuestion), and the question sent is the prompt. */

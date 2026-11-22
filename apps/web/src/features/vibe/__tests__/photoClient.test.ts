@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createPhotoClient, scaledSize } from '../photoClient';
+import { createPhotoClient, PHOTO_MESSAGES, scaledSize } from '../photoClient';
+import { DAILY_PHOTO_LIMIT } from '../photoMessage';
 import { prepareMessage } from '../photoSend';
 import { fromAccountStore, photoAccess } from '../photoAccess';
 
@@ -17,7 +18,7 @@ const okRes = () => res(200, { description: 'Warm', remainingToday: 4 });
 describe('photoClient', () => {
   it('posts and returns the description', async () => {
     const { client, fetchImpl } = setup(okRes);
-    expect(await client.describe(file(), 'q')).toEqual({ ok: true, description: 'Warm', remainingToday: 4 });
+    expect(await client.describe(file(), 'q')).toEqual({ ok: true, description: 'Warm' });
     const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe('/api/vibe/describe-image');
     expect(init.method).toBe('POST');
@@ -58,6 +59,9 @@ describe('photoClient', () => {
   ])('maps %i %j to %s', async (status, body, reason) => {
     const { client } = setup(() => res(status, body));
     expect(await client.describe(file())).toMatchObject({ ok: false, reason });
+  });
+  it('names the shared daily limit in the limit message', () => {
+    expect(PHOTO_MESSAGES.limit).toContain(`today's ${DAILY_PHOTO_LIMIT} photo reads`);
   });
   it('maps network errors to unavailable', async () => {
     const { client } = setup(() => { throw new Error('net'); });
@@ -109,7 +113,7 @@ describe('photoClient', () => {
 
 describe('prepareMessage', () => {
   const client = (r: unknown) => ({ describe: vi.fn(async () => r as never) });
-  const ok = { ok: true, description: 'Warm', remainingToday: 4 };
+  const ok = { ok: true, description: 'Warm' };
   it('text only skips describe', async () => {
     const c = client(ok);
     expect(await prepareMessage({ text: ' Cozy ', photo: null, client: c })).toEqual({ ok: true, text: 'Cozy', imageCount: 0 });
