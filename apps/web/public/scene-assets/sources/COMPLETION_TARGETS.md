@@ -66,3 +66,7 @@ A credible broad initial library should have:
 - [ ] No false statements about real venue features, food menus or performances
 
 Once these criteria and composition coverage are met, begin the Scene Composer. Continue the library in targeted small updates afterward if real scene tests reveal gaps.
+
+## November 21 procurement pass
+
+The source branch has now added **80** verified 3D models beyond the earlier 40, for **120 total** across eight organized source folders. All 256 associated source files were verified byte-identical using official GitHub blob SHAs. These additions prioritize general-purpose food, venue props, gothic/seasonal, fictional city, fantasy/festival, nature and sci-fi assets. **No new music-instrument or cuisine-specific regional dish model is claimed as imported.** The next major pass should focus on those missing differentiated themes rather than importing hundreds of near-identical furniture/ingredient variants.
