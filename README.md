@@ -57,6 +57,18 @@ Ingest cache files are now per type (`osm-<type>-<date>.json`, `fsq-<type>-<rele
 
 To correct a single place's address, website, phone or hours, add an entry to `pipeline/place-overrides.json` (`place_id`, `set`, `reason`, `source_url`, `checked_on`); ingest applies it on every run, and `null` clears a field.
 
+## Deploying to Vercel
+The web app (`apps/web`) deploys as one Vercel project: Vite builds the static site, and `apps/web/api/index.ts` runs the same Express app as `npm run server` (`apps/web/server/app.ts`) as a Vercel Function. `apps/web/vercel.json` sends every `/api/*` request to it. The `pipeline/` scripts are not deployed; run them locally against the hosted Supabase project.
+
+1. **Import the repo** in Vercel and set **Root Directory** to `apps/web`. `vercel.json` sets the framework (Vite), build command and output directory.
+2. **Environment variables** (Project → Settings → Environment Variables):
+   - Public, shipped to the browser: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, and optionally `VITE_CATALOG_EMBEDDING_MODEL_KEY` (only once the catalog owner verifies it). Locally these live in `apps/web/.env`; on Vercel they come from the dashboard, which makes them available both to the build (baked into the bundle, so changing them needs a redeploy) and to the API at runtime, where the signed-in photo route uses the Supabase pair to verify users. Apply them to Production and Preview.
+   - Server only (never `VITE_`): `MBTA_API_KEY`, `GEMINI_API_KEY`, `VIBE_GEMINI_MODEL`, `VIBENTA_MODEL_CACHE=/tmp/vibenta-minilm-cache`, and `ONNXRUNTIME_NODE_INSTALL=skip` (stops `npm install` downloading CUDA binaries the function can't use).
+   - Never set on Vercel: `VIBE_IMAGE_UNLIMITED` (a local dev switch that lifts the per-user daily photo cap) and `VIBENTA_ENV_FILE` / `TRANSIT_API_PORT` / `VITE_PORT` (local dev only).
+3. **Supabase:** apply `supabase/migrations/` to the hosted project (`supabase db push`), then add the Vercel domain under Auth → URL Configuration (Site URL and redirect allowlist; a wildcard such as `https://*-<team>.vercel.app/**` for preview deploys), since sign-up confirmation links return to `window.location.origin`.
+
+Known limits: MiniLM (`/api/vibe/embed`) downloads its model into `/tmp` on every cold start, so the first embed after a cold start is slow, and the ONNX runtime is the bulk of the function size (`vercel.json` excludes the non-Linux-x64 binaries to stay under the 250 MB limit). The vibe API's rate limit is per function instance, not global (the daily photo quota is kept in Supabase, so it is global). Vercel caps request bodies at 4.5 MB, above the photo route's 2 MB limit.
+
 ## Demo integrity
 No fake venues, student demographics, discounts, live transit journeys, or private event details. Clearly distinguish live provider responses from labeled sample fixtures. Don't publish secrets or scrape protected business databases.
 
