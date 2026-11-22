@@ -117,13 +117,16 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   const vibeStep = createVibeStep(prefs);
   let quizMode = false;
   const liveQuiz = createLiveQuiz(() => toggleQuiz(false));
-  const beginQuiz = h('button', { type: 'button', class: 'vb-primary-btn vb-begin-quiz' }, 'Refine this vibe');
+  const beginQuiz = h('button', { type: 'button', class: 'vb-primary-btn vb-begin-quiz' }, 'Start vibe quiz');
   beginQuiz.addEventListener('click', () => {
     toggleQuiz(true);
     const p = prefs.getState();
     const previous = liveQuiz.session.getSnapshot();
     if (previous && previous.originalInput.text === p.vibeText.trim() && previous.originalInput.imageCount === p.vibeImages.length) liveQuiz.resume();
     else liveQuiz.start(p.vibeText, p.vibeImages.length);
+    // The quiz replaces a tall vibe form inside a scrolling panel. Move into
+    // the new content so the user sees the first question or loading state.
+    liveQuiz.focus();
   });
   let currentStep: 'plan' | 'vibe' = 'plan';
 
