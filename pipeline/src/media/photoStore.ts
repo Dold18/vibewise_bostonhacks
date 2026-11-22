@@ -4,6 +4,8 @@ import sharp, { type Metadata } from 'sharp';
 const MAX_SIDE_PX = 800;
 const MIN_SIDE_PX = 400;
 const WEBP_QUALITY = 75;
+// Raster photo formats only: SVG (logos, illustrations) and other vector or document formats are not photos.
+const PHOTO_FORMATS = new Set(['jpeg', 'png', 'webp', 'gif', 'avif', 'heif', 'tiff']);
 
 export type ProcessedImage =
   | { ok: true; webp: Uint8Array; width: number; height: number }
@@ -22,7 +24,7 @@ export async function processImage(bytes: Uint8Array): Promise<ProcessedImage> {
   } catch {
     return { ok: false, reason: 'not_image' };
   }
-  if (!meta.width || !meta.height) return { ok: false, reason: 'not_image' };
+  if (!meta.width || !meta.height || !PHOTO_FORMATS.has(meta.format ?? '')) return { ok: false, reason: 'not_image' };
   // The short side is the same before and after EXIF rotation.
   if (Math.min(meta.width, meta.height) < MIN_SIDE_PX) return { ok: false, reason: 'too_small' };
   try {

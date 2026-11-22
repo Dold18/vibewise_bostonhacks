@@ -49,3 +49,8 @@ test('metadata is stripped from the stored copy', async () => {
   const meta = await sharp(r.webp).metadata();
   assert.equal(meta.exif, undefined);
 });
+
+test('an SVG is rejected as not a photo, even when large', async () => {
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900"><rect width="1200" height="900" fill="red"/></svg>';
+  assert.deepEqual(await processImage(new Uint8Array(Buffer.from(svg))), { ok: false, reason: 'not_image' });
+});

@@ -56,7 +56,8 @@ export async function recordStoreError(client: SupabaseClient, id: number, store
 }
 
 export async function deletePhotoRow(client: SupabaseClient, id: number): Promise<void> {
-  const { error } = await client.from('place_photos').delete().eq('id', id);
+  // Never a hidden row: deleting it would erase the hide, and the photo could come back visible.
+  const { error } = await client.from('place_photos').delete().eq('id', id).eq('hidden', false);
   if (error) throw new Error(`deletePhotoRow failed for photo ${id}: ${error.message}`);
 }
 

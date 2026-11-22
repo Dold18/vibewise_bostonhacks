@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
-  fetchEnrichPlaces, fetchHiddenKeys, fetchPhotosToStore, recordStored, storedBytesTotal, uploadCopy, writePlaceMedia,
+  deletePhotoRow, fetchEnrichPlaces, fetchHiddenKeys, fetchPhotosToStore, recordStored, storedBytesTotal, uploadCopy, writePlaceMedia,
 } from '../../src/media/db.ts';
 import type { PhotoCandidate } from '../../src/media/types.ts';
 
@@ -183,4 +183,12 @@ test('uploadCopy uploads WebP with upsert to the place-photos bucket', async () 
   assert.equal(up.table, 'storage:place-photos');
   assert.equal(up.args[0], 'pipeline/7/aa.webp');
   assert.deepEqual(up.args[2], { contentType: 'image/webp', upsert: true });
+});
+
+test('deletePhotoRow never deletes a hidden row', async () => {
+  const { client, calls } = fakeClient(() => ({ error: null }));
+  await deletePhotoRow(client, 5);
+  assert.ok(calls.some((c) => c.op === 'delete'));
+  assert.ok(calls.some((c) => c.op === 'eq' && c.args[0] === 'id' && c.args[1] === 5));
+  assert.ok(calls.some((c) => c.op === 'eq' && c.args[0] === 'hidden' && c.args[1] === false));
 });
