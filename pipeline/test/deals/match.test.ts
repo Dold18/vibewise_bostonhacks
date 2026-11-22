@@ -95,3 +95,32 @@ test('opening hours are never joined onto a deal', () => {
   assert.equal(b[0]!.timing, 'unconfirmed');
   assert.equal(b[0]!.schedule, null);
 });
+
+test('F3: vague student lines are listed but unconfirmed; concrete offers stay any_time', () => {
+  for (const line of [
+    'Free Wi-Fi - a great spot for students to study',
+    'Catering discounts available for student groups',
+    'Great deals for students!',
+    'Now hiring students! Free shift meals',
+  ]) {
+    const [row] = matchDeals(plain(line), URL_, AT);
+    assert.equal(row!.kind, 'student', line);
+    assert.equal(row!.timing, 'unconfirmed', line);
+  }
+  for (const line of ['10% off with student ID', 'Free coffee with valid student ID', 'Student discount available']) {
+    assert.equal(matchDeals(plain(line), URL_, AT)[0]!.timing, 'any_time', line);
+  }
+});
+
+test('F4: definition lists and table headers do not merge text across blocks', () => {
+  const dl = '<body><dl><dt>Students welcome</dt><dd>Free parking</dd></dl></body>';
+  assert.deepEqual(matchDeals(extractLines(dl), URL_, AT), []);
+  const th = '<body><table><tr><th>Student ID</th><th>10% off</th></tr></table></body>';
+  assert.deepEqual(extractLines(th).map((l) => l.text), ['Student ID', '10% off']);
+});
+
+test('F10: quote of a joined deal is the raw source text without the separator', () => {
+  const [row] = matchDeals(plain('Happy Hour', 'Monday–Friday 3–6pm'), URL_, AT);
+  assert.equal(row!.title, 'Happy Hour · Monday–Friday 3–6pm');
+  assert.equal(row!.quote, 'Happy Hour Monday–Friday 3–6pm');
+});

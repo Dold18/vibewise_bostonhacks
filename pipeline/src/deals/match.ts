@@ -13,6 +13,10 @@ export const DISCOUNT_TERM = /\d+\s?% off|\$\d+ off|\bdiscount|\bfree\b|half[- ]
 export const SPECIAL_TERM =
   /\bhappy[\s-]?hour\b|half[- ]price|\d+\s?% off|\bbogo\b|\bbuy one,? get one\b|\b(?:sun|mon|tue(?:s)?|wed(?:nes)?|thu(?:r(?:s)?)?|fri|sat(?:ur)?)(?:day)?s?\s+specials?\b/i;
 
+/** A concrete offer; without one a student line is listed but never gets a standing (any_time) chip. */
+const CONCRETE_OFFER =
+  /\d+\s?% off|\$\d+(?:\.\d\d)? off|half[- ]price|\bfree\b[^.]*?\bwith\s+(?:a\s+)?(?:valid\s+)?(?:student|college|school)\s+id\b|\bstudent\s+(?:discount|price|pricing|rate)s?\b/i;
+
 const OPENING_HOURS = /\b(open|opens|opening|hours|kitchen|closed|dining|serving)\b/i;
 const MAX_DEALS = 5;
 const MAX_TITLE = 120;
@@ -21,6 +25,8 @@ const REMOVED = 'script, style, noscript, template, svg';
 const BLOCKS = new Set([
   'p', 'div', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'section', 'article',
   'header', 'footer', 'nav', 'td', 'tr', 'br',
+  'th', 'dt', 'dd', 'dl', 'ul', 'ol', 'table', 'thead', 'tbody', 'tfoot', 'main', 'aside',
+  'blockquote', 'figure', 'figcaption', 'form', 'address', 'pre', 'hr',
 ]);
 const LINKS = new Set(['a', 'button']);
 
@@ -89,6 +95,7 @@ export function matchDeals(lines: PageLine[], pageUrl: string, checkedAt: string
     if (!kind) continue;
 
     let text = line.text;
+    let quote = line.text;
     const next = parseSchedule(text) ? undefined : lines.slice(i + 1).find((l) => !l.link);
     if (
       next &&
@@ -97,6 +104,7 @@ export function matchDeals(lines: PageLine[], pageUrl: string, checkedAt: string
       !OPENING_HOURS.test(next.text)
     ) {
       text = `${line.text} · ${next.text}`;
+      quote = `${line.text} ${next.text}`;
     }
 
     const title = cutTitle(text);
@@ -106,10 +114,11 @@ export function matchDeals(lines: PageLine[], pageUrl: string, checkedAt: string
     let { timing, schedule } = timingFor(kind, text);
     // The next line may only downgrade any_time (spec 4.3); it never adds a schedule.
     if (timing === 'any_time' && next && hasTimingWords(next.text)) timing = 'unconfirmed';
+    if (timing === 'any_time' && !CONCRETE_OFFER.test(line.text)) timing = 'unconfirmed';
     rows.push({
       kind,
       title,
-      quote: text.slice(0, MAX_QUOTE),
+      quote: quote.slice(0, MAX_QUOTE),
       timing,
       schedule,
       source: 'website',

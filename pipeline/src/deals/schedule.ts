@@ -107,7 +107,7 @@ function resolveRange(a: string, b: string): { start: string; end: string } | nu
   if (s.meridiem && e.meridiem) {
     sm = minutesOf(s, s.meridiem);
     em = minutesOf(e, e.meridiem);
-    if (sm === em) return null;
+    if (!within12h(sm, em)) return null; // "6pm-4pm" would be a 22-hour window
   } else if (e.meridiem) {
     // The end's am/pm applies to the start only if that gives a sane window ("11-2pm" is 11:00-14:00).
     em = minutesOf(e, e.meridiem);
@@ -120,6 +120,8 @@ function resolveRange(a: string, b: string): { start: string; end: string } | nu
     if (!within12h(sm, em)) em = minutesOf(e, other(s.meridiem));
     if (!within12h(sm, em)) return null;
   } else {
+    // Bare 24-hour form needs HH:MM on both ends; "16-20 oz" is a quantity, not a time.
+    if (!/:/.test(a) || !/:/.test(b)) return null;
     if (!s.h24 && !e.h24) return null;
     sm = minutesOf(s, null);
     em = minutesOf(e, null);
@@ -130,6 +132,7 @@ function resolveRange(a: string, b: string): { start: string; end: string } | nu
 
 /** Parse day and time expressions in one piece of text. Returns null unless every part is understood. */
 export function parseSchedule(text: string): DealWindow[] | null {
+  if (DATED_RE.test(text)) return null; // a one-off date or holiday is not a weekly schedule
   const days: Found<number[]>[] = [];
   for (const m of text.matchAll(DAY_EXPR_RE)) {
     days.push({ start: m.index, end: m.index + m[0].length, value: expandDays(m[0]) });
@@ -166,16 +169,29 @@ export function parseSchedule(text: string): DealWindow[] | null {
   return windows;
 }
 
+const MONTHS = String.raw`jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sept?(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?`;
+const HOLIDAYS = String.raw`thanksgiving|christmas|xmas|new\s+year|easter|halloween|valentine|memorial\s+day|labor\s+day|independence\s+day|july\s+4|st\.?\s+patrick|black\s+friday|cyber\s+monday|super\s+bowl|marathon\s+monday`;
+/** A calendar date, year or holiday: the text describes a one-off, not a weekly pattern. */
+const DATED_RE = new RegExp(String.raw`\b(?:${MONTHS}|${HOLIDAYS})\b|\b\d{1,2}/\d{1,2}\b|\b20\d\d\b`, 'i');
+
+/** The shared "not safe to treat as standing or weekly" detector. */
 const TIMING_WORD_RES: RegExp[] = [
-  new RegExp(`\\b${DAY_WORD}`, 'i'),
-  /\b(?:weekdays?|weekends?|daily|every\s?day|nights?|lunch|dinner|brunch|hours?|week|finals|semester|until|till|am|pm)\b/i,
+  DATED_RE,
+  new RegExp(String.raw`\b${DAY_WORD}`, 'i'),
+  /\b(?:weekdays?|weekends?|week\w*|daily|every\s?day|\w*nights?|lunch\w*|dinner\w*|brunch\w*|semesters?|hour\w*|finals?|until|till|am|pm)\b/i,
+  /\b(?:evening|morning|afternoon|breakfast|late|tonight|today|after|before)\b/i,
+  /\b(?:through|thru|ends?|expires?|valid|limited|season|holiday|only)\b/i,
   /\b\d{1,2}:\d{2}\b/,
-  new RegExp(`\\b\\d{1,2}\\s*${MERIDIEM}`, 'i'),
+  new RegExp(String.raw`\b\d{1,2}\s*${MERIDIEM}`, 'i'),
   /\b(?:noon|midnight)\b/i,
 ];
 
+/** "valid student ID" is the ID requirement, not an expiry. */
+const VALID_ID_RE = /\bvalid\s+(?:(?:student|college|school)\s+)?id\b/gi;
+
 export function hasTimingWords(text: string): boolean {
-  return TIMING_WORD_RES.some((re) => re.test(text));
+  const t = text.replace(VALID_ID_RE, ' ');
+  return TIMING_WORD_RES.some((re) => re.test(t));
 }
 
 export function timingFor(

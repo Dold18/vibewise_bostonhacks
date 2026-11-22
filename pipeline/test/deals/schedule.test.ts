@@ -66,3 +66,34 @@ test('timingFor', () => {
     schedule: [w(WEEKDAYS, '16:00', '18:00')],
   });
 });
+
+test('F1: derived timing forms and date/expiry words keep student lines unconfirmed', () => {
+  for (const text of [
+    'Students get 15% off weeknights',
+    'Student discount at lunchtime: 10% off',
+    'Students: 10% off, valid weekly',
+    '10% off for students through 12/31/2024',
+    'Student special: 20% off through December',
+  ]) {
+    assert.equal(timingFor('student', text).timing, 'unconfirmed', text);
+  }
+  assert.equal(timingFor('student', '10% off with student ID').timing, 'any_time');
+  assert.equal(timingFor('student', 'Free coffee with valid student ID').timing, 'any_time');
+});
+
+test('F2: one-off dated events and holidays are not weekly schedules', () => {
+  assert.equal(parseSchedule('Saturday, Nov 29: half-price wings 5-9pm'), null);
+  assert.equal(parseSchedule('Thanksgiving Thursday 11am-3pm: 20% off'), null);
+  assert.equal(parseSchedule('Thursday 11am-3pm 2025'), null);
+  assert.equal(parseSchedule('Fri 11/28 5-9pm'), null);
+});
+
+test('F6: a range longer than 12 hours is rejected even with am/pm on both', () => {
+  assert.equal(parseSchedule('Happy hour 6pm-4pm daily'), null);
+  assert.deepEqual(parseSchedule('Daily 10am-10pm'), [w([0, 1, 2, 3, 4, 5, 6], '10:00', '22:00')]);
+});
+
+test('F8: bare quantity ranges are not 24-hour times', () => {
+  assert.equal(parseSchedule('Pitchers 16-20 oz half price Mondays'), null);
+  assert.deepEqual(parseSchedule('Daily 16:00-18:00'), [w([0, 1, 2, 3, 4, 5, 6], '16:00', '18:00')]);
+});
