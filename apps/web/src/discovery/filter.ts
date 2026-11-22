@@ -79,7 +79,7 @@ const ACTIVITY_TYPE_TAGS: Record<Exclude<ActivityTypeId, 'student_events'>, TagR
 };
 
 /** OSM `cuisine` values (lowercase, `;`-separated in the tag) mapped to our cuisine choices. */
-const CUISINE_SYNONYMS: Record<Exclude<CuisineId, 'other'>, readonly string[]> = {
+export const CUISINE_SYNONYMS: Record<Exclude<CuisineId, 'other'>, readonly string[]> = {
   italian: ['italian', 'pizza', 'pasta', 'italian_pizza'],
   japanese: ['japanese', 'sushi', 'ramen', 'izakaya', 'udon', 'teriyaki'],
   chinese: ['chinese', 'dim_sum', 'cantonese', 'sichuan', 'szechuan', 'dumpling', 'hot_pot', 'taiwanese', 'shanghainese'],
@@ -251,7 +251,7 @@ export function qualificationsFor(prefs: InitialPreferences): string[] {
     notes.push("Starting point saved. It doesn't rank places yet; travel times need the transit service.");
   }
   if (prefs.budget && prefs.budget.maxCentsPerPerson !== null) {
-    notes.push("Budget saved. Venue prices and transit fares aren't available yet, so nothing is filtered by cost.");
+    notes.push("Budget uses venue price bands. Places with unknown prices are excluded when a budget is set.");
   }
   if (prefs.timing) {
     notes.push("Timing saved. Opening hours aren't checked yet.");

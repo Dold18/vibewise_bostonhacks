@@ -122,10 +122,10 @@ export function parseVibeArgs(argv: string[]): VibeArgs {
     model: values.model?.trim() ?? null,
     limit: positiveInt('limit', values.limit, 300),
     rpm: positiveInt('rpm', values.rpm, 60),
-    concurrency: positiveInt('concurrency', values.concurrency, 1),
     chunk: positiveInt('chunk', values.chunk, 25),
     seed: values.seed === undefined ? null : positiveInt('seed', values.seed, 0),
     idsFile: values['ids-file'] ?? null,
+    concurrency: Math.min(16, positiveInt('concurrency', values.concurrency, 1)),
   };
 }
 
@@ -187,7 +187,7 @@ export interface VibeDeps<R extends { id: number; name: string } = VibeRestauran
   log?: (line: string) => void;
   /** Delays between the 3 attempts for a malformed or empty answer. */
   retryDelaysMs?: number[];
-  /** Stop the run after this many rows in a row fail on quota/overload (the key is probably exhausted). */
+  /** Stop the run after this many rows in a row fail on quota/overload (the key is probably exhausted). Default max(3, concurrency). */
   maxConsecutiveQuota?: number;
 }
 
@@ -195,7 +195,9 @@ export async function runVibeEnrichment<R extends { id: number; name: string } =
   const flavor = d.flavor ?? (RESTAURANT_FLAVOR as unknown as VibeFlavor<R>);
   const sleep = d.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
   const delays = d.retryDelaysMs ?? [2_000, 6_000];
-  const maxQuota = d.maxConsecutiveQuota ?? 3;
+  const concurrency = Math.max(1, Math.floor(d.concurrency ?? 1));
+  // Failures overlap when several rows are in flight, so the stop threshold scales with the worker count.
+  const maxQuota = d.maxConsecutiveQuota ?? Math.max(3, concurrency);
   const s: VibeSummary = {
     selected: d.rows.length, succeeded: 0, skippedAlreadyDone: 0, failed: [], withPhoto: 0, photoFailures: {},
     withDescriptive: 0, factsOnly: 0, retriedRows: 0, rejections: { sensory: 0, photo: 0, other: 0 }, samples: [], stoppedEarly: null,
@@ -204,17 +206,29 @@ export async function runVibeEnrichment<R extends { id: number; name: string } =
   const richSamples: VibeSummary['samples'] = [];
   const thinSamples: VibeSummary['samples'] = [];
 
+  // The local embedding model runs one text at a time; everything else (Gemini, photos, database) overlaps.
+  let embedChain: Promise<unknown> = Promise.resolve();
+  const embed: Embedder = (text) => {
+    const run = embedChain.then(() => d.embed(text));
+    embedChain = run.catch(() => undefined);
+    return run;
+  };
+
   // Workers take the next row until rows run out or the run stops early. JavaScript runs one callback at a
   // time, so the shared counters below need no locking; Gemini pacing is shared inside `generate`.
   let next = 0;
   let done = 0;
-  const workers = Math.max(1, Math.min(d.concurrency ?? 1, d.rows.length));
+  const workers = Math.min(concurrency, d.rows.length);
   await Promise.all(Array.from({ length: workers }, async () => {
     while (!s.stoppedEarly) {
       const i = next++;
       if (i >= d.rows.length) return;
       const row = d.rows[i]!;
-      await processRow(row);
+      try {
+        await processRow(row);
+      } catch (err) {
+        s.failed.push({ id: row.id, name: row.name, reason: `unexpected: ${(err as Error).message}` });
+      }
       done++;
       if (done % d.chunk === 0 && done < d.rows.length) {
         d.log?.(`progress ${done}/${d.rows.length}: ${s.succeeded} ok, ${s.failed.length} failed, ${s.skippedAlreadyDone} skipped (last id ${row.id})`);
@@ -226,8 +240,14 @@ export async function runVibeEnrichment<R extends { id: number; name: string } =
   return s;
 
   async function processRow(row: R): Promise<void> {
-    // Never process a row that was enriched since selection (re-run or partial-failure resume).
-    if (!(await d.isStillUnenriched(row.id))) { s.skippedAlreadyDone++; return; }
+    // Never process a row that was enriched since selection (re-run, resume, or a parallel run).
+    try {
+      if (!(await d.isStillUnenriched(row.id))) { s.skippedAlreadyDone++; return; }
+    } catch (err) {
+      // A database hiccup on one row must not stop the batch: record it and move on (a re-run picks it up).
+      s.failed.push({ id: row.id, name: row.name, reason: `db check: ${(err as Error).message}` });
+      return;
+    }
 
     let image: VibeImage | undefined;
     const photoUrl = d.photoUrls.get(row.id);
@@ -281,7 +301,7 @@ export async function runVibeEnrichment<R extends { id: number; name: string } =
     quotaStreak = 0;
 
     try {
-      const embedding = await d.embed(result.description);
+      const embedding = await embed(result.description);
       if (d.write) {
         const wrote = await d.write(row.id, { description: result.description, embedding, profile: result.profile });
         if (!wrote) { s.skippedAlreadyDone++; return; }

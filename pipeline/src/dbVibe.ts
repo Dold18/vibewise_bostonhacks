@@ -8,6 +8,24 @@ import type { PlaceType } from './placeTypes.ts';
 import type { VibeInputRow, VibePlace, VibeProfile, VibeRestaurant } from './vibe.ts';
 
 const PAGE_SIZE = 1000;
+
+/**
+ * Retry a database call on transient network failures ("fetch failed", timeouts, 5xx). The two
+ * per-row calls below are safe to repeat: the check is read-only and the write is null-guarded.
+ */
+export async function withRetry<T>(fn: () => Promise<T>, delaysMs: number[] = [1_000, 4_000, 15_000], sleep: (ms: number) => Promise<void> = (ms) => new Promise((r) => setTimeout(r, ms))): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const msg = (err as Error).message ?? '';
+      const transient = /fetch failed|ECONN|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|socket|network|timeout|5\d\d|gateway|temporarily/i.test(msg);
+      const wait = delaysMs[attempt];
+      if (!transient || wait === undefined) throw err;
+      await sleep(wait);
+    }
+  }
+}
 const ID_CHUNK = 100;
 
 /** Ids of rows with neither a description nor an embedding yet (the only rows this step may touch), in id order. */
@@ -110,10 +128,12 @@ export async function fetchPhotoUrls(client: SupabaseClient, ids: number[]): Pro
 
 /** Re-checked immediately before each Gemini call, so a re-run or resume never double-processes a row. */
 export async function isStillUnenriched(client: SupabaseClient, table: PlaceType, id: number): Promise<boolean> {
-  const { data, error } = await client
-    .from(table).select('id').eq('id', id).is('description', null).is('embedding', null).maybeSingle();
-  if (error) throw new Error(`isStillUnenriched failed for ${table} ${id}: ${error.message}`);
-  return data !== null;
+  return withRetry(async () => {
+    const { data, error } = await client
+      .from(table).select('id').eq('id', id).is('description', null).is('embedding', null).maybeSingle();
+    if (error) throw new Error(`isStillUnenriched failed for ${table} ${id}: ${error.message}`);
+    return data !== null;
+  });
 }
 
 /**
@@ -126,11 +146,13 @@ export async function writeEnrichment(
 ): Promise<boolean> {
   const row: Record<string, unknown> = { description: v.description, embedding: v.embedding as unknown as string };
   if (table === 'restaurants') row['profile'] = v.profile;
-  const { data, error } = await client
-    .from(table)
-    .update(row)
-    .eq('id', id).is('description', null).is('embedding', null)
-    .select('id');
-  if (error) throw new Error(`writeEnrichment failed for ${table} ${id}: ${error.message}`);
-  return (data?.length ?? 0) === 1;
+  return withRetry(async () => {
+    const { data, error } = await client
+      .from(table)
+      .update(row)
+      .eq('id', id).is('description', null).is('embedding', null)
+      .select('id');
+    if (error) throw new Error(`writeEnrichment failed for ${table} ${id}: ${error.message}`);
+    return (data?.length ?? 0) === 1;
+  });
 }

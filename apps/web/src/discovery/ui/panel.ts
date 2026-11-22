@@ -324,7 +324,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     origin.setValue(state.origin);
     budget.setValue(state.budget?.choice ?? null);
     budget.setHint(
-      state.budget && state.budget.maxCentsPerPerson !== null ? 'Estimated total per person, before transit fare.' : '',
+      state.budget && state.budget.maxCentsPerPerson !== null ? 'Filters map pins by estimated venue price, before transit fare.' : '',
     );
     timing.update(state);
     vibeStep.render(state);
@@ -364,7 +364,9 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
       'warning',
     );
     cuisines.setHint(
-      state.cuisines.length ? "Saved for recommendations. Cuisine doesn't filter map pins yet." : '',
+      state.cuisines.includes('other')
+        ? 'Other keeps cuisine unrestricted.'
+        : state.cuisines.length ? 'Map pins show places with a matching cuisine.' : '',
     );
   }
 

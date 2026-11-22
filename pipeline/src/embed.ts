@@ -17,6 +17,8 @@ export const EMBED_DIM = 384;
 /** Unquantized weights: the brief asks that index and query match "including quantization". */
 export const EMBED_DTYPE = 'fp32';
 export const EMBED_POOLING = { pooling: 'mean', normalize: true } as const;
+/** Same string the web server reports as MODEL_KEY: model@revision:dtype:pooling:normalization. */
+export const EMBED_KEY = `${EMBED_MODEL}@${EMBED_REVISION}:${EMBED_DTYPE}:${EMBED_POOLING.pooling}:l2`;
 
 export type Embedder = (text: string) => Promise<number[]>;
 

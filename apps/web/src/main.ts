@@ -1,4 +1,4 @@
-import { AttributionControl, Map as MapLibreMap, Marker, setWorkerUrl } from 'maplibre-gl';
+import { AttributionControl, LngLatBounds, Map as MapLibreMap, Marker, setWorkerUrl } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
 import './design/visualFoundation.css';
@@ -52,7 +52,11 @@ import { markerVisible, setMarkerVisible } from './features/map/markerVisibility
 import { createRouteHubs } from './features/map/routeHubs';
 import { paddingAround } from './features/map/routeFrame';
 import { drawRoute, clearRoute, routeBounds, routeStations } from './transitRoute';
-import { catalogPlacesNear, catalogSemanticCandidates, isCatalogCategory } from './catalog';
+import { catalogPlacesNear, catalogSemanticCandidates, getCachedDetails, isCatalogCategory } from './catalog';
+import { createFinalSearch, filtersFor, type FinalSearchState } from './features/vibe/finalSearch';
+import { matchesBrowsingFilters } from './discovery/browsingFilters';
+import type { SearchFilters } from './features/vibe/searchContract';
+import { createResultsGate } from './features/map/resultsGate';
 import { activeKinds, chipText } from './deals';
 
 const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
@@ -93,6 +97,8 @@ let shadows: Marker[] = [];
 let selectedPin: HTMLElement | null = null;
 let semanticRanking: Ranking | null = null;
 let refreshConvergence = () => {};
+// True while the quiz's final search results (or its error) own the pins: category reloads must not replace them.
+const resultsGate = createResultsGate();
 let markerPlaces: Place[] = [];
 // Whether every pin is at its flat-map size (--pin-distance 1); see syncPinPerspective.
 let pinsFlat = true;
@@ -472,6 +478,7 @@ function openSavedPlace(place: Place, categoryId?: string) {
 // ---------------------------------------------------------------------------
 
 let categoryAbort: AbortController | undefined;
+let browsingFilters: SearchFilters = {};
 /** What the category pins currently show, so they can follow the map; null while search results (or nothing) are shown. */
 let currentSelection: { categories: Category[]; detail: 'tiles' | 'full' } | null = null;
 /** Where the category pins were last loaded. */
@@ -493,6 +500,12 @@ const radiusFor = (zoom: number) => Math.min(4000, Math.max(400, 1200 * 2 ** (16
  * keeps the open card and result list as they are.
  */
 async function showCategories(categories: Category[], detail: 'tiles' | 'full', { refresh = false } = {}) {
+  // A user-driven reload (not a map move) hands the pins back to the categories; a map move must not touch final results.
+  if (!resultsGate.enterReload(refresh)) return;
+  const filters = browsingFilters;
+  const filtering = !!(filters.maxPriceBand || filters.cuisines);
+  const matches = (place: Place) => matchesBrowsingFilters(place, filters, getCachedDetails(place.tags['catalog:place_id'])?.cuisines);
+  const show = resultsGate.guard(showPlaces); // a late response can't overwrite final results
   categoryAbort?.abort();
   currentSelection = categories.length > 0 ? { categories, detail } : null;
   if (!refresh) closePopup();
@@ -518,7 +531,7 @@ async function showCategories(categories: Category[], detail: 'tiles' | 'full', 
     const merged: Place[] = [];
     for (const [category, places] of groups) {
       for (const place of places) {
-        if (categoryOf.has(place.id)) continue;
+        if (categoryOf.has(place.id) || !matches(place)) continue;
         categoryOf.set(place.id, category);
         merged.push(place);
       }
@@ -542,7 +555,7 @@ async function showCategories(categories: Category[], detail: 'tiles' | 'full', 
     if (abort.signal.aborted || haveDetailed) return;
     const quick = merge(categories.map((cat) => [cat, placesFromTiles(tilePois(cat), center, radius, perCategory)]));
     quickCount = quick.length;
-    showPlaces(quick, lookFor, iconFor);
+    show(quick, lookFor, iconFor);
     remember();
     if (quickCount > 0) hideToast();
   };
@@ -561,7 +574,7 @@ async function showCategories(categories: Category[], detail: 'tiles' | 'full', 
   // 2) Food & drink from our catalog, with details, for any detail level.
   const catalogCategories = categories.filter(isCatalogCategory);
   const fromCatalog = catalogCategories.length
-    ? await catalogPlacesNear(catalogCategories, center, radius, perCategory)
+    ? await catalogPlacesNear(catalogCategories, center, radius, perCategory, filtering ? matches : undefined)
     : null;
   if (abort.signal.aborted) return;
 
@@ -571,9 +584,11 @@ async function showCategories(categories: Category[], detail: 'tiles' | 'full', 
     const showWithTiles = () => {
       if (abort.signal.aborted) return;
       const others = otherCategories.map((cat): [Category, Place[]] => [cat, placesFromTiles(tilePois(cat), center, radius, perCategory)]);
-      showPlaces(merge([...groupsOf(fromCatalog), ...others]), lookFor, iconFor);
+      const places = merge([...groupsOf(fromCatalog), ...others]);
+      show(places, lookFor, iconFor);
       remember();
-      hideToast();
+      if (filtering && !places.length) showToast('No nearby places match your budget or cuisine filters.');
+      else hideToast();
     };
     showWithTiles();
     if (!map.loaded()) map.once('idle', showWithTiles); // tile pins for the other categories may still be streaming in
@@ -590,18 +605,20 @@ async function showCategories(categories: Category[], detail: 'tiles' | 'full', 
     const detailed = [...(fromCatalog ?? []), ...fromOverpass];
     if (detailed.length > 0) {
       haveDetailed = true;
-      showPlaces(merge(groupsOf(detailed)), lookFor, iconFor);
+      const places = merge(groupsOf(detailed));
+      show(places, lookFor, iconFor);
       remember();
-      hideToast();
+      if (filtering && !places.length) showToast('No nearby places match your budget or cuisine filters.');
+      else hideToast();
     } else if (quickCount === 0) {
-      showToast(`No ${label} found here. Try moving the map.`);
+      showToast(filtering ? 'No nearby places match your budget or cuisine filters.' : `No ${label} found here. Try moving the map.`);
     }
   } catch {
     if (abort.signal.aborted) return;
     if (fromCatalog?.length) {
       // Overpass failed for the other categories; still show what the catalog has.
       haveDetailed = true;
-      showPlaces(merge(groupsOf(fromCatalog)), lookFor, iconFor);
+      show(merge(groupsOf(fromCatalog)), lookFor, iconFor);
       remember();
       showToast('Showing food & drink only. The OSM details service is busy right now.');
       return;
@@ -909,13 +926,61 @@ const convergence = createConvergence(
   outingProfiles,
   signal => catalogSemanticCandidates(rankPlaces(shownPlaces, discovery.getPreferences()).included.map(row => row.place), signal),
   ranking => {
-    semanticRanking = ranking;
+    semanticRanking = resultsGate.active ? null : ranking; // final results are already filtered and ranked
     syncMarkerVisibility();
     if (import.meta.env.DEV) Object.assign(window, { vibentaOutingRanking: ranking });
   },
 );
 refreshConvergence = () => { void convergence.refresh(); };
 const stopConvergence = discovery.subscribe(refreshConvergence);
+
+// The quiz's final result set: one filtered /api/vibe/search call when the quiz reaches its results phase.
+// The live ranking above stays as provisional feedback while answering; it is never shown as the final answer.
+function applyFinalSearch(state: FinalSearchState) {
+  if (state.status === 'idle') {
+    hideToast();
+    if (!resultsGate.active) return;
+    resultsGate.set(false); // quiz left results: hand the pins back to the activity layers
+    if (currentSelection) void showCategories(currentSelection.categories, currentSelection.detail, { refresh: true });
+    else { clearPins(); refreshConvergence(); }
+    return;
+  }
+  if (state.status === 'loading') { showToast('Finding your matches…', true); return; }
+  resultsGate.set(true);
+  closePopup();
+  if (state.status === 'error') {
+    // Honest failure: the provisional pins are removed rather than left up looking final.
+    showPlaces([], () => ({ color: CATEGORY_COLORS.search, scale: 1 }));
+    showToast(`Couldn't load your final matches: ${state.message} Press “Show My Matches” to try again.`, true);
+    return;
+  }
+  const foodCategory = CATEGORIES.find(c => c.id === 'restaurants');
+  pinCategory.clear();
+  for (const place of state.places) if (foodCategory) pinCategory.set(place.id, foodCategory.id);
+  const color = CATEGORY_COLORS[foodCategory?.id ?? ''] ?? CATEGORY_COLORS.search;
+  showPlaces(state.places, () => ({ color, scale: 1 }), foodCategory?.icon);
+  if (state.places.length === 0) {
+    showToast('No places match your vibe and filters. Try a wider budget or fewer cuisines.', true);
+    return;
+  }
+  hideToast();
+  const bounds = new LngLatBounds();
+  for (const place of state.places) bounds.extend([place.lon, place.lat]);
+  const origin = discovery.getPreferences().origin;
+  if (origin) bounds.extend([origin.location.lng, origin.location.lat]);
+  map.fitBounds(bounds, { padding: 80, maxZoom: 15, duration: 800 });
+}
+const finalSearch = createFinalSearch({ getPrefs: () => discovery.getPreferences(), getDetails: getCachedDetails, onState: applyFinalSearch });
+const stopFinalSearch = outingProfiles.subscribe(profile => finalSearch.evaluate(profile));
+const stopFinalPrefs = discovery.subscribe(prefs => {
+  const { maxPriceBand, cuisines } = filtersFor(prefs);
+  const changed = maxPriceBand !== browsingFilters.maxPriceBand || cuisines?.join() !== browsingFilters.cuisines?.join();
+  browsingFilters = { maxPriceBand, cuisines };
+  finalSearch.evaluate(outingProfiles.getSnapshot(), true);
+  if (changed && currentSelection && outingProfiles.getSnapshot()?.phase !== 'results') {
+    void showCategories(currentSelection.categories, currentSelection.detail, { refresh: true });
+  }
+});
 if (import.meta.env.DEV) Object.assign(window, { vibentaOutingProfiles: outingProfiles });
 
 
@@ -993,6 +1058,9 @@ map.on('render', pinLabels.schedule);
 // Release the profile consumers before Vite replaces this entry module.
 if (import.meta.hot) import.meta.hot.dispose(() => {
   stopConvergence();
+  stopFinalSearch();
+  stopFinalPrefs();
+  finalSearch.destroy();
   convergence.destroy();
   discovery.destroy();
   scene.destroy();
