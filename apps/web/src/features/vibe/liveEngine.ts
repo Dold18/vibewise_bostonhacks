@@ -5,6 +5,7 @@ import { fallbackQuestion, guidanceFor } from './families.ts';
 import { localMediaQuestion } from './media/localDirector.ts';
 import { sceneIntentFor } from './media/sceneBridge.ts';
 import { createProfilePublisher } from './publisher.ts';
+import { MAX_CORRECTION_TEXT } from './photoMessage.ts';
 import { cosine, immutable, MAX_QUESTIONS, MODEL_KEY, validateVector, type Answer, type EmbeddingProvider, type GenerationContext, type GenerationProvider, type OutingVibeProfile, type Response } from './profile.ts';
 import { validateGeneration } from './validation.ts';
 
@@ -83,7 +84,8 @@ export function createLiveVibeSession(generator:GenerationProvider,embedder:Embe
   if(!state)return;const question=replaceIndex===undefined?state.question:state.history[replaceIndex]?.question;
   if(!question||replaceIndex===undefined&&(state.phase!=='question'||state.history.length>=MAX_QUESTIONS))return;
   if(response.kind==='choice'&&!question.options.some(o=>o.id===response.optionId))throw Error('Invalid option');
-  if((response.kind==='correction'||response.kind==='text')&&(!response.text.trim()||response.text.length>500))throw Error('Answer text must be 1–500 characters');
+  if(response.kind==='correction'&&(!response.text.trim()||response.text.length>MAX_CORRECTION_TEXT))throw Error('Correction must be 1–800 characters');
+  if(response.kind==='text'&&(!response.text.trim()||response.text.length>500))throw Error('Answer text must be 1–500 characters');
   if(!['choice','skip','neither','unfamiliar','correction','text'].includes(response.kind))throw Error('Invalid answer');
   const prefix=replaceIndex===undefined?state.history:state.history.slice(0,replaceIndex);
   const history:readonly Answer[]=[...prefix,{id:`answer-${serial+1}`,question,response:structuredClone(response)}];
@@ -96,7 +98,8 @@ export function createLiveVibeSession(generator:GenerationProvider,embedder:Embe
   publisher,getSnapshot:()=>state,
   start(text:string,imageCount=0,sessionId:string=crypto.randomUUID()) {
    generation?.abort();embedding?.abort();userResults=false;priorVectors=[];mapDisplay.setShowAll(false);
-   const originalInput={text:text.trim().slice(0,2000),imageCount:Math.max(0,Math.min(5,imageCount)),imageProcessing:'not_sent' as const};
+   const photos=Math.max(0,Math.min(1,imageCount));
+   const originalInput={text:text.trim().slice(0,2000),imageCount:photos,imageProcessing:photos>0?'described' as const:'not_sent' as const};
    publish({schemaVersion:'1.0.0',sessionId,version:++serial,originalInput,...replay(originalInput,[]),history:[],qualifiers:[],question:null,phase:'generating',generation:'pending',notice:null,
     embedding:{status:'idle',modelKey:MODEL_KEY,version:serial},completion:{recommended:false,reason:'refining',canContinue:true}});
    void generateCurrent();

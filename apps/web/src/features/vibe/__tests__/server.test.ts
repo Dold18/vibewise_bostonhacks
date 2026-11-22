@@ -23,6 +23,16 @@ describe('bounded server API (all external providers mocked)',()=>{
  it('rejects malformed history and excessive input before generation',async()=>{const s=await server();expect((await s.post('generate',{...c,history:Array(11).fill({})})).status).toBe(400);expect((await s.post('generate',{...c,originalInput:{...c.originalInput,text:'x'.repeat(3000)}})).status).toBe(400);expect(s.generator.generate).not.toHaveBeenCalled();});
  it('rejects mismatched embedding identity before invoking MiniLM',async()=>{const s=await server();expect((await s.post('embed',{text:'a scene',modelKey:'other-model'})).status).toBe(400);expect(s.embedder.embed).not.toHaveBeenCalled();const res=await s.post('embed',{text:'a scene',modelKey:MODEL_KEY});expect(res.status).toBe(200);expect((await res.json()).vector).toHaveLength(384);});
 });
+describe('photo input validation',()=>{
+ const oi=(o:object)=>({...c,originalInput:{...c.originalInput,...o}});
+ const corr=(n:number)=>({...c,history:[{id:'1',question:fallbackQuestion(c)!,response:{kind:'correction',text:'x'.repeat(n)}}]});
+ it('validates imageCount, imageProcessing and correction length',async()=>{const s=await server();
+  expect((await s.post('generate',oi({imageCount:1,imageProcessing:'described'}))).status).toBe(200);
+  expect((await s.post('generate',oi({imageCount:2,imageProcessing:'described'}))).status).toBe(400);
+  expect((await s.post('generate',oi({imageCount:1,imageProcessing:'raw'}))).status).toBe(400);
+  expect((await s.post('generate',corr(800))).status).toBe(200);
+  expect((await s.post('generate',corr(801))).status).toBe(400);});
+});
 describe('Gemini request and failure behavior',()=>{
  it('uses a server header, structured schema, context-aware family guidance and no tools',async()=>{
   const fetchImpl=vi.fn(async()=>new Response(JSON.stringify({candidates:[{content:{parts:[{text:JSON.stringify(output())}]}}]}),{status:200}));

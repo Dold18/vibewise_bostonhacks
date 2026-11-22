@@ -1,12 +1,13 @@
 import { canonicalSceneQuestion, sessionBQuestion } from './sessionB.ts';
 import { FAMILY_IDS, guidanceFor, TOPICS } from './families.ts';
 import { presentationSessionError, presentationShapeError } from './media/presentation.ts';
+import { MAX_CORRECTION_TEXT } from './photoMessage.ts';
 import type { GenerationContext, GenerationResult, Question } from './profile.ts';
 const obj=(v:unknown):v is Record<string,unknown>=>!!v&&typeof v==='object'&&!Array.isArray(v);
 const text=(v:unknown,max:number,min=1):v is string=>typeof v==='string'&&v.trim().length>=min&&v.length<=max;
 export function validContext(v:unknown):v is GenerationContext {
- if(!obj(v)||!text(v.sessionId,100)||!Number.isInteger(v.version)||Number(v.version)<1||!obj(v.originalInput)||!text(v.originalInput.text,2000,0)||!Number.isInteger(v.originalInput.imageCount)||Number(v.originalInput.imageCount)<0||Number(v.originalInput.imageCount)>5||v.originalInput.imageProcessing!=='not_sent'||!Array.isArray(v.history)||v.history.length>10||!text(v.vibe_so_far,6000,0)||!Array.isArray(v.evidence)||v.evidence.length>70||!Array.isArray(v.qualifiers)||v.qualifiers.length>8)return false;
- return v.history.every(a=>obj(a)&&validQuestion(a.question)&&obj(a.response)&&['choice','skip','neither','unfamiliar','correction','text'].includes(String(a.response.kind))&&(a.response.kind!=='choice'||text(a.response.optionId,80))&&(a.response.kind!=='correction'&&a.response.kind!=='text'||text(a.response.text,500)))&&v.evidence.every(e=>obj(e)&&text(e.id,100)&&text(e.text,2200)&&['want','avoid','dealbreaker'].includes(String(e.polarity)))&&v.qualifiers.every(q=>text(q,250));
+ if(!obj(v)||!text(v.sessionId,100)||!Number.isInteger(v.version)||Number(v.version)<1||!obj(v.originalInput)||!text(v.originalInput.text,2000,0)||!Number.isInteger(v.originalInput.imageCount)||Number(v.originalInput.imageCount)<0||Number(v.originalInput.imageCount)>1||!['not_sent','described'].includes(String(v.originalInput.imageProcessing))||!Array.isArray(v.history)||v.history.length>10||!text(v.vibe_so_far,6000,0)||!Array.isArray(v.evidence)||v.evidence.length>70||!Array.isArray(v.qualifiers)||v.qualifiers.length>8)return false;
+ return v.history.every(a=>obj(a)&&validQuestion(a.question)&&obj(a.response)&&['choice','skip','neither','unfamiliar','correction','text'].includes(String(a.response.kind))&&(a.response.kind!=='choice'||text(a.response.optionId,80))&&(a.response.kind!=='correction'||text(a.response.text,MAX_CORRECTION_TEXT))&&(a.response.kind!=='text'||text(a.response.text,500)))&&v.evidence.every(e=>obj(e)&&text(e.id,100)&&text(e.text,2200)&&['want','avoid','dealbreaker'].includes(String(e.polarity)))&&v.qualifiers.every(q=>text(q,250));
 }
 export function validQuestion(q:unknown):q is Question { return !questionError(q); }
 /** Why a question is invalid, phrased so the repair attempt knows what to fix. */
