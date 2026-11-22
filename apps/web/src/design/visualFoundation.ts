@@ -140,6 +140,10 @@ export function mapPaletteForPreview<T extends Record<string, string>>(
 export function activateVisualPreview(): void {
   if (!activeVisualPreview || typeof document === 'undefined') return;
   document.documentElement.dataset.visualPreview = activeVisualPreview;
+  // Opt-in CSS-only Carbon UI study. Keep ?visual=carbon as the control.
+  if (activeVisualPreview === 'carbon' && new URLSearchParams(window.location.search).get('studio') === '1') {
+    document.documentElement.dataset.carbonStudio = '1';
+  }
 
   // Load display type only for opt-in previews. The default product still uses
   // its original fonts; these are display and readable UI faces, not icon fonts.
