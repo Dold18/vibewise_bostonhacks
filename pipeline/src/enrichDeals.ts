@@ -4,7 +4,7 @@ import { parseArgs } from 'node:util';
 import { connect } from './db.ts';
 import { validateCurated, type CuratedRow } from './deals/curated.ts';
 import {
-  fetchDealPlaces, fetchHiddenDealKeys, fetchRestaurantIdsWithVisibleDeals,
+  fetchDealPlaces, fetchHiddenDealKeys, fetchPlaceRefsWithVisibleDeals,
   markDealsChecked, replaceCuratedDeals, replaceDeals, type DealPlace,
 } from './deals/db.ts';
 import { osmHappyHourDeal } from './deals/osmHappyHours.ts';
@@ -12,6 +12,7 @@ import { matchKey, websiteDecision, withoutHidden } from './deals/plan.ts';
 import type { DealRow, DealSource } from './deals/types.ts';
 import { scanWebsite } from './deals/website.ts';
 import { createPoliteFetcher } from './media/http.ts';
+import { PLACE_TYPE_CONFIG, parseTypeOption, type PlaceType } from './placeTypes.ts';
 import { loadCampuses, loadDemoIds, loadStops, tierOf } from './media/priority.ts';
 
 const CACHE_DIR = path.resolve(import.meta.dirname, '..', '.cache');
@@ -20,7 +21,7 @@ const CURATED_FILE = path.resolve(import.meta.dirname, '..', 'deals.curated.json
 const RESCAN_MS = 7 * 24 * 60 * 60 * 1000;
 const SOURCES: DealSource[] = ['curated', 'osm', 'website'];
 
-export interface DealsArgs { dryRun: boolean; refresh: boolean; limit: number | null; concurrency: number; only: DealSource | null }
+export interface DealsArgs { type: PlaceType; dryRun: boolean; refresh: boolean; limit: number | null; concurrency: number; only: DealSource | null }
 
 interface DryRow { placeId: string; name: string; source: DealSource; outcome: string; deals: DealRow[] }
 
@@ -35,6 +36,7 @@ export function parseDealsArgs(argv: string[]): DealsArgs {
   const { values } = parseArgs({
     args: argv,
     options: {
+      type: { type: 'string' },
       'dry-run': { type: 'boolean', default: false },
       refresh: { type: 'boolean', default: false },
       limit: { type: 'string' },
@@ -47,6 +49,7 @@ export function parseDealsArgs(argv: string[]): DealsArgs {
     throw new Error(`invalid --only '${values.only}' (expected curated, osm or website)`);
   }
   return {
+    type: parseTypeOption(values.type),
     dryRun: values['dry-run'],
     refresh: values.refresh,
     limit: positiveInt('limit', values.limit, null),
@@ -75,7 +78,7 @@ async function main(): Promise<void> {
   const client = connect(requireEnv('SUPABASE_URL'), requireEnv('SUPABASE_SECRET_KEY'));
   const now = new Date();
   const checkedAt = now.toISOString();
-  const places = await fetchDealPlaces(client);
+  const places = await fetchDealPlaces(client, args.type);
   const byId = new Map(places.map((p) => [p.id, p]));
   const hidden = await fetchHiddenDealKeys(client);
   const hiddenFor = (id: number, source: DealSource) => hidden.get(`${id}:${source}`) ?? new Set<string>();
@@ -87,9 +90,12 @@ async function main(): Promise<void> {
     let rows: CuratedRow[] = [];
     let errors: string[] = [];
     let unreadable = false;
+    let allPlaces: DealPlace[] = [];
     try {
       const raw: unknown = JSON.parse(await fs.readFile(CURATED_FILE, 'utf8'));
-      ({ rows, errors } = validateCurated(raw, new Map(places.map((p) => [p.placeId, p.id]))));
+      // replaceCuratedDeals deletes every visible curated row, so ids must resolve across ALL types, not just args.type.
+      allPlaces = await fetchDealPlaces(client);
+      ({ rows, errors } = validateCurated(raw, new Map(allPlaces.map((p) => [p.placeId, p.id]))));
     } catch (err) {
       unreadable = true;
       errors = [`cannot read ${CURATED_FILE}: ${message(err)}`];
@@ -99,10 +105,11 @@ async function main(): Promise<void> {
       console.log(`curated: 0 rows, ${errors.length} errors (stored rows left alone)`);
     } else {
       // Hidden rows stay hidden: a row matching a hidden one is not re-inserted.
-      const kept = rows.filter((r) => !hiddenFor(r.restaurantId, 'curated').has(matchKey(r)));
+      const allById = new Map(allPlaces.map((p) => [p.id, p]));
+      const kept = rows.filter((r) => !hiddenFor(r.placeRef, 'curated').has(matchKey(r)));
       if (args.dryRun) {
         for (const r of kept) {
-          const p = byId.get(r.restaurantId)!;
+          const p = allById.get(r.placeRef)!;
           dry.push({ placeId: p.placeId, name: p.name, source: 'curated', outcome: 'ok', deals: [r] });
         }
       } else {
@@ -113,7 +120,7 @@ async function main(): Promise<void> {
   }
 
   if (run('osm')) {
-    const withRows = await fetchRestaurantIdsWithVisibleDeals(client, 'osm');
+    const withRows = await fetchPlaceRefsWithVisibleDeals(client, 'osm');
     const candidates = places.filter((p) => withRows.has(p.id) || (p.osmTags?.happy_hours ?? '').trim() !== '');
     let withRow = 0, failed = 0;
     for (const p of candidates) {
@@ -138,7 +145,7 @@ async function main(): Promise<void> {
     console.log(`osm: ${candidates.length} places (${withRow} with a row${failed > 0 ? `, ${failed} failed` : ''})`);
   }
 
-  if (run('website')) {
+  if (run('website') && PLACE_TYPE_CONFIG[args.type].dealsWebsiteScan) {
     const [demo, stops, campuses] = await Promise.all([loadDemoIds(DEMO_FILE), loadStops(), loadCampuses()]);
     const due = places.filter((p) => needsWebsiteScan(p, now, args.refresh))
       .map((p) => ({ p, tier: tierOf(p, { demo, stops, campuses }) }))
@@ -159,7 +166,7 @@ async function main(): Promise<void> {
             dry.push({ placeId: p.placeId, name: p.name, source: 'website', outcome: scan.outcome, deals: decision.rows ?? [] });
           } else if (decision.rows !== null) {
             await replaceDeals(client, p.id, 'website', decision.rows);
-            if (decision.markChecked) await markDealsChecked(client, p.id, checkedAt);
+            if (decision.markChecked) await markDealsChecked(client, args.type, p.id, checkedAt);
           }
         } catch (err) {
           counts.failed++;
