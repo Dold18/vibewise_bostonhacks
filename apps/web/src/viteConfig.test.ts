@@ -17,8 +17,8 @@ describe('integrated development configuration', () => {
     vi.stubEnv('VITE_PORT', '5510');
     vi.stubEnv('TRANSIT_API_PORT', '8810');
     const c = await config();
-    if (typeof c.envDir !== 'string') throw Error('Expected a root environment directory');
-    expect(resolve(c.envDir)).toBe(resolve('../..'));
+    if (typeof c.envDir !== 'string') throw Error('Expected an environment directory');
+    expect(resolve(c.envDir)).toBe(resolve('.')); // browser VITE_* settings live in apps/web/.env
     expect(c.optimizeDeps?.entries).toEqual(['index.html']);
     expect(c.server?.port).toBe(5510);
     expect(c.server?.proxy?.['/api']).toBe('http://127.0.0.1:8810');
@@ -36,7 +36,8 @@ describe('integrated development configuration', () => {
     vi.stubEnv('TRANSIT_API_PORT', undefined);
     vi.stubEnv('GEMINI_API_KEY', undefined);
     const c = await config();
-    expect(c.envDir).toBe(folder);
+    // The external file feeds the process environment; browser settings still come from apps/web.
+    expect(resolve(String(c.envDir))).toBe(resolve('.'));
     expect(c.server?.port).toBe(5511);
     expect(c.server?.proxy?.['/api']).toBe('http://127.0.0.1:8811');
     expect(process.env.GEMINI_API_KEY).toBe('TEST_FIXTURE_ONLY');
