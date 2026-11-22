@@ -1,6 +1,8 @@
 import { AttributionControl, Map as MapLibreMap, Marker, setWorkerUrl } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
+import './design/visualFoundation.css';
+import { activateVisualPreview } from './design/visualFoundation';
 import { BUILDING_3D_LAYERS, BUILDING_3D_OPACITY, mapStyle } from './mapStyle';
 import { PIN_COLORS } from './pinColors';
 import { mountAccount } from './features/account';
@@ -27,6 +29,9 @@ const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
 const TILTED = { pitch: 60, bearing: -20 };
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+// The opt-in visual preview changes paint and CSS only; no layout or map camera changes.
+activateVisualPreview();
 
 // Served untouched by the `maplibre-worker` plugin in vite.config.ts.
 setWorkerUrl(`${import.meta.env.BASE_URL}maplibre-gl-worker.mjs`);
