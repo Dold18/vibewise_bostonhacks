@@ -78,9 +78,33 @@ interface IndexRow {
   location: unknown;
 }
 
-/** True when the catalog can back this map category. */
+/** Place types with at least one pin, once the index has loaded; undefined before that. */
+let loadedTypes: Set<string> | undefined;
+
+/** Record which place types the loaded index holds. */
+export function noteIndex(pins: CatalogPin[]): void {
+  loadedTypes = new Set(pins.map((p) => p.placeType));
+}
+
+/** Test hook: forget the loaded index. */
+export function resetIndexForTests(): void {
+  loadedTypes = undefined;
+}
+
+/** Requested catalog categories whose place type has no pins in `pins`. */
+export function emptyCategories(pins: CatalogPin[], categories: Category[]): Category[] {
+  const types = new Set(pins.map((p) => p.placeType));
+  return categories.filter((c) => !types.has(CATALOG_LAYERS[c.id]?.placeType));
+}
+
+/**
+ * True when the catalog can back this map category. Once the index has loaded,
+ * a layer whose place type has no rows is not catalog-backed, so callers send it
+ * to map tiles / Overpass exactly as before the catalog held that type.
+ */
 export function isCatalogCategory(category: Category): boolean {
-  return category.id in CATALOG_LAYERS;
+  const layer = CATALOG_LAYERS[category.id];
+  return !!layer && (!loadedTypes || loadedTypes.has(layer.placeType));
 }
 
 /** A point from hex EWKB or GeoJSON; null for anything else, including (0,0). */
@@ -292,6 +316,10 @@ export async function catalogPlacesNear(
     indexPromise = undefined; // maybe loaded later; ask again next time
     return null;
   }
+  noteIndex(pins);
+  // First call only: the caller partitioned before the index was known. If a requested
+  // type has no rows, decline so every layer takes the tiles/Overpass path this once.
+  if (emptyCategories(pins, categories).length) return null;
   const near = nearestByCategory(pins, categories, center, radiusMeters, limit);
   try {
     await fetchDetails(supabase, near.map((n) => n.pin));

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Deal } from './deals';
 import { CATEGORIES, type Category } from './osm';
-import { DEALS_EMBED, fetchDetailsForPins, fetchDetailsWith, isCatalogCategory, getCachedDetails, nearestByCategory, resetDealsEmbedForTests, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
+import { DEALS_EMBED, emptyCategories, noteIndex, resetIndexForTests, fetchDetailsForPins, fetchDetailsWith, isCatalogCategory, getCachedDetails, nearestByCategory, resetDealsEmbedForTests, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
 
 const cat = (id: string) => CATEGORIES.find((c) => c.id === id) as Category;
 const CENTER = { lat: 42.3555, lon: -71.0636 };
@@ -260,5 +260,26 @@ describe('non-food places', () => {
       pin({ placeId: 'r:2', placeType: 'restaurants' }),
     ]);
     expect(calls).toEqual(['restaurants:place_id:r:1|r:2', 'parks:place_id:p:1']);
+  });
+});
+
+describe('per-type fallback', () => {
+  beforeEach(resetIndexForTests);
+  const food = pin({ placeId: 'r:1', placeType: 'restaurants' });
+  const museumPin = pin({ placeId: 'm:1', placeType: 'museums', kind: 'museum' });
+
+  it('hands a type with no pins back to the non-catalog path once the index is known', () => {
+    expect(isCatalogCategory(cat('museums'))).toBe(true); // index not loaded yet
+    noteIndex([food]);
+    expect(isCatalogCategory(cat('museums'))).toBe(false);
+    expect(isCatalogCategory(cat('parks'))).toBe(false);
+    expect(isCatalogCategory(cat('coffee'))).toBe(true);
+    expect(emptyCategories([food], [cat('coffee'), cat('museums')]).map((c) => c.id)).toEqual(['museums']);
+  });
+
+  it('serves a type from the catalog when the index has pins for it', () => {
+    noteIndex([food, museumPin]);
+    expect(isCatalogCategory(cat('museums'))).toBe(true);
+    expect(emptyCategories([food, museumPin], [cat('coffee'), cat('museums')])).toEqual([]);
   });
 });
