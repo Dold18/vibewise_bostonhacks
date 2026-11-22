@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { assertUniqueKeys, dedupeWithin, findFsqSubVenues, freshness, matchSources, mergePlaces } from '../src/merge.ts';
 import { ATTRIBUTION_FSQ, ATTRIBUTION_MERGED, ATTRIBUTION_OSM } from '../src/config.ts';
-import { PLACE_TYPE_CONFIG } from '../src/placeTypes.ts';
+import { boundsAreaHa, PLACE_TYPE_CONFIG } from '../src/placeTypes.ts';
 import { fsqRow, osmRow } from '../src/sources.ts';
 import type { FsqPlace, OsmPlace } from '../src/types.ts';
 
@@ -215,7 +215,9 @@ const room = (id: string, name: string, lat: number, lng: number) =>
 
 test('findFsqSubVenues: a Foursquare place inside an OSM area is reported with the containing place_id', () => {
   const found = findFsqSubVenues([museum('way/7', 'Museum of Fine Arts', BOX)], [room('r1', 'Rotunda', LAT + 0.0005, LNG)], 'museums');
-  assert.deepEqual([...found.values()], [{ fsqId: 'r1', name: 'Rotunda', insideOf: 'osm:way/7', insideName: 'Museum of Fine Arts' }]);
+  assert.deepEqual([...found.values()], [
+    { fsqId: 'r1', name: 'Rotunda', insideOf: 'osm:way/7', insideName: 'Museum of Fine Arts', outcome: 'dropped' },
+  ]);
 });
 
 test('findFsqSubVenues: a Foursquare place outside every OSM area is kept', () => {
@@ -256,4 +258,154 @@ test('mergePlaces: restaurants keep Foursquare-only rows inside an OSM area', ()
   const r = mergePlaces([o], [fsq('k1', 'Noodle Stall', LAT + 0.0005, LNG)], { runStart, today, cfg });
   assert.deepEqual(r.rows.map((x) => x.place_id), ['osm:way/9', 'fsq:k1']);
   assert.deepEqual(r.subVenuesDropped, []);
+});
+
+// ~444 m x ~329 m (~14.6 ha) and ~666 m x ~493 m (~33 ha) boxes around (LAT, LNG).
+const BOX_15HA = { minlat: LAT - 0.002, minlon: LNG - 0.002, maxlat: LAT + 0.002, maxlon: LNG + 0.002 };
+const BOX_33HA = { minlat: LAT - 0.003, minlon: LNG - 0.003, maxlat: LAT + 0.003, maxlon: LNG + 0.003 };
+
+test('findFsqSubVenues: an OSM area over 20 ha is not a container', () => {
+  assert.ok(boundsAreaHa(BOX_33HA) > 20 && boundsAreaHa(BOX_15HA) <= 20);
+  const found = findFsqSubVenues([museum('relation/1', 'Museum Campus', BOX_33HA)], [room('r5', 'Room 5', LAT, LNG)], 'museums');
+  assert.equal(found.size, 0);
+});
+
+test('findFsqSubVenues: an OSM route is not a container', () => {
+  const trail: OsmPlace = { ...museum('relation/976514', 'Freedom Trail', BOX), tags: { name: 'Freedom Trail', type: 'route', route: 'foot' } };
+  const found = findFsqSubVenues([trail], [room('r6', 'Old Corner Bookstore', LAT, LNG)], 'museums');
+  assert.equal(found.size, 0);
+});
+
+test('findFsqSubVenues: an area of 20 ha or less still drops a dissimilar Foursquare place', () => {
+  const found = findFsqSubVenues([museum('way/3', 'Museum of Fine Arts', BOX_15HA)], [room('r7', 'Art of Asia Gallery', LAT + 0.0015, LNG)], 'museums');
+  assert.equal(found.get('r7')?.outcome, 'dropped');
+  assert.equal(found.get('r7')?.insideOf, 'osm:way/3');
+});
+
+const FILLED = { website: 'https://mfa.example', tel: '617-267-9300', address: '465 Huntington Ave', locality: 'Boston', postcode: '02115' };
+const ART = { categoryLabels: ['Arts and Entertainment > Museum > Art Museum'] };
+
+test('mergePlaces: a similar-named Foursquare place inside an unmatched OSM area is merged into it', () => {
+  const museums = PLACE_TYPE_CONFIG.museums;
+  const o = museum('relation/7', 'Museum of Fine Arts', BOX);
+  // ~89 m from the OSM point: too far for matchSources, but inside the OSM bounds.
+  const f = fsq('mfa', 'Museum of Fine Arts Boston', LAT + 0.0008, LNG, { ...FILLED, ...ART });
+  assert.equal(matchSources([o], [f]).length, 0);
+  const r = mergePlaces([o], [f], { runStart, today, cfg: museums });
+  assert.deepEqual(r.rows.map((x) => x.place_id), ['osm:relation/7']);
+  const row = r.rows[0]!;
+  assert.equal(row.website, 'https://mfa.example');
+  assert.equal(row.phone, '617-267-9300');
+  assert.equal(row.address, '465 Huntington Ave, Boston 02115');
+  assert.equal(row.fsq_place_id, 'mfa');
+  assert.equal(row.attribution, ATTRIBUTION_MERGED);
+  assert.ok('kind' in row && row.kind === 'museum');
+  assert.deepEqual(r.subVenuesMerged, [
+    { fsqId: 'mfa', name: 'Museum of Fine Arts Boston', insideOf: 'osm:relation/7', insideName: 'Museum of Fine Arts', outcome: 'merged' },
+  ]);
+  assert.deepEqual(r.subVenuesDropped, []);
+  assert.deepEqual(r.matches, []);
+  assertUniqueKeys(r.rows);
+});
+
+test('mergePlaces: merge-on-contain keeps OSM values and accepts a name whose tokens are a subset', () => {
+  const museums = PLACE_TYPE_CONFIG.museums;
+  const o: OsmPlace = { ...museum('way/8', 'Isabella Stewart Gardner Museum', BOX),
+    tags: { name: 'Isabella Stewart Gardner Museum', tourism: 'museum', website: 'https://gardner.example' } };
+  const f = fsq('g1', 'Gardner', LAT + 0.0008, LNG, { ...FILLED, categoryLabels: ['Arts and Entertainment > Museum'] });
+  const r = mergePlaces([o], [f], { runStart, today, cfg: museums });
+  assert.equal(r.rows.length, 1);
+  assert.equal(r.rows[0]!.website, 'https://gardner.example');
+  assert.equal(r.rows[0]!.phone, '617-267-9300');
+  assert.equal(r.rows[0]!.fsq_place_id, 'g1');
+  assert.equal(r.subVenuesMerged.length, 1);
+});
+
+test('mergePlaces: a similar-named Foursquare place inside an already matched OSM area is dropped', () => {
+  const museums = PLACE_TYPE_CONFIG.museums;
+  const o = museum('relation/7', 'Museum of Fine Arts', BOX);
+  const matched = room('m0', 'Museum of Fine Arts', LAT, LNG);
+  const twin = fsq('mfa', 'Museum of Fine Arts Boston', LAT + 0.0008, LNG, { ...FILLED, ...ART });
+  const r = mergePlaces([o], [matched, twin], { runStart, today, cfg: museums });
+  assert.deepEqual(r.rows.map((x) => x.place_id), ['osm:relation/7']);
+  assert.equal(r.rows[0]!.fsq_place_id, 'm0');
+  assert.equal(r.rows[0]!.website, null);
+  assert.deepEqual(r.subVenuesMerged, []);
+  assert.deepEqual(r.subVenuesDropped.map((d) => [d.fsqId, d.insideOf, d.outcome]), [['mfa', 'osm:relation/7', 'dropped']]);
+});
+
+test('mergePlaces: a Foursquare place inside two similar-named OSM areas merges into only one (the smallest)', () => {
+  const museums = PLACE_TYPE_CONFIG.museums;
+  const wing = museum('way/2', 'Museum of Fine Arts', BOX);
+  const campus: OsmPlace = { ...museum('relation/1', 'Museum of Fine Arts Campus', BOX_15HA), lat: LAT + 0.0015 };
+  const f = fsq('mfa', 'Museum of Fine Arts Boston', LAT + 0.0008, LNG, { ...FILLED, ...ART });
+  const r = mergePlaces([campus, wing], [f], { runStart, today, cfg: museums });
+  assert.equal(r.rows.length, 2);
+  assert.deepEqual(r.rows.filter((x) => x.fsq_place_id !== null).map((x) => x.place_id), ['osm:way/2']);
+  assert.equal(r.subVenuesMerged.length, 1);
+  assertUniqueKeys(r.rows);
+});
+
+test('mergePlaces: an OSM area gains at most one Foursquare place by containment (the nearest)', () => {
+  const museums = PLACE_TYPE_CONFIG.museums;
+  const o = museum('relation/7', 'Museum of Fine Arts', BOX);
+  const far = fsq('a-far', 'Museum of Fine Arts Boston', LAT + 0.0009, LNG, { ...ART, website: 'https://far.example' });
+  const near = fsq('b-near', 'MFA Museum of Fine Arts', LAT - 0.0006, LNG, { ...ART, website: 'https://near.example' });
+  const r = mergePlaces([o], [far, near], { runStart, today, cfg: museums });
+  assert.deepEqual(r.rows.map((x) => x.place_id), ['osm:relation/7']);
+  assert.equal(r.rows[0]!.fsq_place_id, 'b-near');
+  assert.equal(r.rows[0]!.website, 'https://near.example');
+  assert.deepEqual(r.subVenuesMerged.map((d) => d.fsqId), ['b-near']);
+  assert.deepEqual(r.subVenuesDropped.map((d) => [d.fsqId, d.outcome]), [['a-far', 'dropped']]);
+  assertUniqueKeys(r.rows);
+});
+
+const parks = PLACE_TYPE_CONFIG.parks;
+function park(id: string, name: string, lat: number, lng: number, bounds: OsmPlace['bounds'] = null): OsmPlace {
+  return { osmId: id, name, lat, lng, bounds, tags: { name, leisure: 'park' } };
+}
+const fsqPark = (id: string, name: string, lat: number, lng: number, extra: Partial<FsqPlace> = {}) =>
+  fsq(id, name, lat, lng, { categoryLabels: ['Landmarks and Outdoors > Park'], ...extra });
+
+test('mergePlaces: a matched Foursquare park fills the OSM park address', () => {
+  const r = mergePlaces([park('way/1', 'Boston Common', LAT, LNG)],
+    [fsqPark('p1', 'Boston Common', LAT + D30, LNG, { address: '139 Tremont St', locality: 'Boston', website: 'https://common.example' })],
+    { runStart, today, cfg: parks });
+  assert.equal(r.rows.length, 1);
+  assert.equal(r.rows[0]!.address, '139 Tremont St, Boston');
+  assert.equal(r.rows[0]!.website, 'https://common.example');
+  assert.equal(r.rows[0]!.fsq_place_id, 'p1');
+  assert.equal(r.rows[0]!.attribution, ATTRIBUTION_MERGED);
+  assert.ok('kind' in r.rows[0]! && r.rows[0]!.kind === 'park');
+  assert.equal(r.unmatchedFsqDropped, 0);
+});
+
+test('mergePlaces: an unmatched Foursquare park is dropped and counted', () => {
+  const r = mergePlaces([park('way/1', 'Boston Common', LAT, LNG)],
+    [fsqPark('p2', 'Pocket Park', LAT + 0.01, LNG, { address: '1 Main St' })],
+    { runStart, today, cfg: parks });
+  assert.deepEqual(r.rows.map((x) => x.place_id), ['osm:way/1']);
+  assert.equal(r.unmatchedFsqDropped, 1);
+  assert.equal(r.rows[0]!.fsq_place_id, null);
+});
+
+test('mergePlaces: an unmatched Foursquare park can still merge into a containing similar-named OSM park', () => {
+  const r = mergePlaces([park('way/1', 'Public Garden', LAT, LNG, BOX)],
+    [fsqPark('p3', 'Boston Public Garden', LAT + 0.0008, LNG, { address: '4 Charles St' })],
+    { runStart, today, cfg: parks });
+  assert.deepEqual(r.rows.map((x) => x.place_id), ['osm:way/1']);
+  assert.equal(r.rows[0]!.address, '4 Charles St');
+  assert.equal(r.rows[0]!.fsq_place_id, 'p3');
+  assert.equal(r.unmatchedFsqDropped, 0);
+  assert.equal(r.subVenuesMerged.length, 1);
+});
+
+test('mergePlaces: other non-food types and restaurants keep unmatched Foursquare places', () => {
+  const r = mergePlaces([museum('node/1', 'Museum A', null)], [room('x1', 'Gallery B', LAT + 0.01, LNG)], { runStart, today, cfg: PLACE_TYPE_CONFIG.museums });
+  assert.deepEqual(r.rows.map((x) => x.place_id), ['osm:node/1', 'fsq:x1']);
+  assert.equal(r.unmatchedFsqDropped, 0);
+  const food = mergePlaces([osm('node/1', 'A', LAT, LNG)], [fsq('k1', 'B', LAT + 0.01, LNG)], { runStart, today, cfg });
+  assert.deepEqual(food.rows.map((x) => x.place_id), ['osm:node/1', 'fsq:k1']);
+  assert.equal(food.unmatchedFsqDropped, 0);
+  assert.deepEqual(food.subVenuesMerged, []);
 });

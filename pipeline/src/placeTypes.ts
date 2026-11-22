@@ -18,7 +18,8 @@ export interface PlaceTypeConfig {
   fsqTopLevels: string[];
   fsqKind(primaryLabel: string): string | null;
   keepOsm(tags: Record<string, string>, bounds: OsmBounds | null): boolean;
-  keepFsq: boolean;
+  /** false: a Foursquare place that neither matches nor merges into an OSM place is dropped (it only fills fields). */
+  keepUnmatchedFsq: boolean;
   osmTagKeys: ReadonlySet<string>;
   genericNameWords: ReadonlySet<string>;
   dealsWebsiteScan: boolean;
@@ -90,6 +91,26 @@ export function boundsAreaHa(b: OsmBounds): number {
 
 const MIN_PARK_HA = 0.5;
 
+/** OSM routes (trails, race courses, bus lines) are lines across a city, never a place to visit. */
+export function isOsmRoute(tags: Tags): boolean {
+  return tags.type === 'route' || 'route' in tags;
+}
+
+/** One label per kind across sources: OSM and Foursquare spell some kinds differently. */
+const KIND_ALIASES: Readonly<Record<string, string>> = {
+  theater: 'theatre',
+  indie_theater: 'theatre',
+  night_club: 'nightclub',
+  movie_theater: 'cinema',
+  indie_movie_theater: 'cinema',
+  art_gallery: 'gallery',
+  yes: 'historic_site',   // OSM historic=yes
+};
+
+export function normalizeKind(kind: string): string {
+  return Object.hasOwn(KIND_ALIASES, kind) ? KIND_ALIASES[kind]! : kind;
+}
+
 function nonFood(
   type: PlaceType,
   osmRules: OsmRule[],
@@ -97,7 +118,7 @@ function nonFood(
   fsqRules: FsqRule[],
   extra: Partial<PlaceTypeConfig> = {},
 ): PlaceTypeConfig {
-  return {
+  const cfg: PlaceTypeConfig = {
     type,
     overpassFilters: osmRules.map(filterOf),
     overpassOut: 'bb',
@@ -108,12 +129,27 @@ function nonFood(
       const m = matchRules(tags, osmRules);
       return m !== null && notDisused(tags, m.key);
     },
-    keepFsq: true,
+    keepUnmatchedFsq: true,
     osmTagKeys: NON_FOOD_TAG_KEYS,
     genericNameWords: NON_FOOD_GENERIC_WORDS,
     dealsWebsiteScan: true,
     priceEstimates: false,
     ...extra,
+  };
+  // Applied after `extra` so every non-food type rejects routes and shares one kind vocabulary.
+  const { osmKind, fsqKind, keepOsm } = cfg;
+  return {
+    ...cfg,
+    osmKind: (tags) => {
+      if (isOsmRoute(tags)) return null;
+      const kind = osmKind(tags);
+      return kind === null ? null : normalizeKind(kind);
+    },
+    fsqKind: (label) => {
+      const kind = fsqKind(label);
+      return kind === null ? null : normalizeKind(kind);
+    },
+    keepOsm: (tags, bounds) => !isOsmRoute(tags) && keepOsm(tags, bounds),
   };
 }
 
@@ -125,7 +161,7 @@ const RESTAURANTS: PlaceTypeConfig = {
   fsqTopLevels: ['Dining and Drinking'],
   fsqKind: (label) => fsqCategory(label),
   keepOsm: (tags) => !('disused:amenity' in tags) && !('was:amenity' in tags),
-  keepFsq: true,
+  keepUnmatchedFsq: true,
   osmTagKeys: OSM_TAG_KEYS,
   genericNameWords: new Set(),
   dealsWebsiteScan: true,
@@ -205,7 +241,7 @@ const PARKS = nonFood(
       if (tags.wikidata || tags.wikipedia) return true;
       return bounds !== null && boundsAreaHa(bounds) >= MIN_PARK_HA;
     },
-    keepFsq: false,
+    keepUnmatchedFsq: false,
   },
 );
 

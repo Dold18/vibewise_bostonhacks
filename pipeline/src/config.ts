@@ -8,6 +8,10 @@ export const MATCH_SAME_NAME_METERS = 50;
 export const MATCH_SIMILAR_NAME_METERS = 25;
 export const MATCH_SIMILARITY_THRESHOLD = 0.6;
 export const DEDUPE_WITHIN_METERS = 50;
+// Non-food Foursquare sub-venues: only OSM areas up to this size contain other places (a city-wide route or
+// district would swallow real places); a contained Foursquare place this similar to its container is the same place.
+export const SUB_VENUE_CONTAINER_MAX_HA = 20;
+export const SUB_VENUE_MERGE_SIMILARITY = 0.5;
 
 export const FSQ_MAX_AGE_DAYS = 730;
 export const UPSERT_BATCH_SIZE = 500;
