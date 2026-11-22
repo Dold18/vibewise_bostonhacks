@@ -1,0 +1,402 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "imported_asset_to_layout_mapping_authored_pending_browser_qa",
+  "modelCount": 312,
+  "layoutCount": 40,
+  "activationRules": [
+    "Apply a cuisine-specific or genre-specific layout only for explicit user interest or independently verified venue context.",
+    "If a category is atmosphere_only, do not invent identity-specific motifs; use general palette/lighting with no claimed cuisine props.",
+    "Do not claim a restaurant serves an item or hosts an instrument/performance based on a decoration.",
+    "Scene layouts stay disabled in navigation/focus modes when covering route labels or transit data.",
+    "Do not treat generic-compatible motifs as evidence for cuisine/genre classification."
+  ],
+  "dimensions": {
+    "cuisine": [
+      {
+        "id": "italian",
+        "label": "Italian",
+        "coverageLevel": "specific",
+        "layoutIds": [
+          "italian_romantic",
+          "italian_retro"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Object-level cue exists; venue facts and visual QA are still required."
+      },
+      {
+        "id": "japanese",
+        "label": "Japanese",
+        "coverageLevel": "specific",
+        "layoutIds": [
+          "japanese_ramen_noir",
+          "japanese_sushi_spring",
+          "noodle_counter_cozy"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Object-level cue exists; venue facts and visual QA are still required."
+      },
+      {
+        "id": "chinese",
+        "label": "Chinese",
+        "coverageLevel": "partial",
+        "layoutIds": [
+          "chinese_dim_sum_cozy"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Object-level cue exists; venue facts and visual QA are still required."
+      },
+      {
+        "id": "korean",
+        "label": "Korean",
+        "coverageLevel": "atmosphere_only",
+        "layoutIds": [],
+        "contextHeroSupported": false,
+        "notes": "Do not generate culturally/genre-specific objects from unrelated props. Use lighting/color only until real assets are verified."
+      },
+      {
+        "id": "mexican",
+        "label": "Mexican",
+        "coverageLevel": "specific",
+        "layoutIds": [
+          "mexican_taco_market"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Object-level cue exists; venue facts and visual QA are still required."
+      },
+      {
+        "id": "indian",
+        "label": "Indian",
+        "coverageLevel": "atmosphere_only",
+        "layoutIds": [],
+        "contextHeroSupported": false,
+        "notes": "Do not generate culturally/genre-specific objects from unrelated props. Use lighting/color only until real assets are verified."
+      },
+      {
+        "id": "thai",
+        "label": "Thai",
+        "coverageLevel": "atmosphere_only",
+        "layoutIds": [],
+        "contextHeroSupported": false,
+        "notes": "Do not generate culturally/genre-specific objects from unrelated props. Use lighting/color only until real assets are verified."
+      },
+      {
+        "id": "vietnamese",
+        "label": "Vietnamese",
+        "coverageLevel": "atmosphere_only",
+        "layoutIds": [],
+        "contextHeroSupported": false,
+        "notes": "Do not generate culturally/genre-specific objects from unrelated props. Use lighting/color only until real assets are verified."
+      },
+      {
+        "id": "middle_eastern",
+        "label": "Middle Eastern",
+        "coverageLevel": "atmosphere_only",
+        "layoutIds": [],
+        "contextHeroSupported": false,
+        "notes": "Do not generate culturally/genre-specific objects from unrelated props. Use lighting/color only until real assets are verified."
+      },
+      {
+        "id": "mediterranean",
+        "label": "Mediterranean",
+        "coverageLevel": "generic_compatible",
+        "layoutIds": [
+          "vegetarian_picnic",
+          "seafood_coastal"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Props fit broad venue mood, not a reliable marker of this particular cuisine or genre."
+      },
+      {
+        "id": "greek",
+        "label": "Greek",
+        "coverageLevel": "atmosphere_only",
+        "layoutIds": [],
+        "contextHeroSupported": false,
+        "notes": "Do not generate culturally/genre-specific objects from unrelated props. Use lighting/color only until real assets are verified."
+      },
+      {
+        "id": "french",
+        "label": "French",
+        "coverageLevel": "specific",
+        "layoutIds": [
+          "french_bakery_romance"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Object-level cue exists; venue facts and visual QA are still required."
+      },
+      {
+        "id": "american",
+        "label": "American",
+        "coverageLevel": "specific",
+        "layoutIds": [
+          "retro_diner"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Object-level cue exists; venue facts and visual QA are still required."
+      },
+      {
+        "id": "seafood",
+        "label": "Seafood",
+        "coverageLevel": "specific",
+        "layoutIds": [
+          "seafood_coastal"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Object-level cue exists; venue facts and visual QA are still required."
+      },
+      {
+        "id": "vegetarian_vegan",
+        "label": "Vegetarian / Vegan",
+        "coverageLevel": "generic_compatible",
+        "layoutIds": [
+          "vegetarian_picnic"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Props fit broad venue mood, not a reliable marker of this particular cuisine or genre."
+      },
+      {
+        "id": "bakery_dessert",
+        "label": "Bakery / Desserts",
+        "coverageLevel": "specific",
+        "layoutIds": [
+          "french_bakery_romance",
+          "brunch_counter"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Object-level cue exists; venue facts and visual QA are still required."
+      },
+      {
+        "id": "coffee_tea",
+        "label": "Coffee / Tea",
+        "coverageLevel": "generic_compatible",
+        "layoutIds": [
+          "lounge_listening",
+          "folk_acoustic_cafe"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Props fit broad venue mood, not a reliable marker of this particular cuisine or genre."
+      },
+      {
+        "id": "street_food",
+        "label": "Street Food / Food Trucks",
+        "coverageLevel": "generic_compatible",
+        "layoutIds": [
+          "evening_food_market"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Props fit broad venue mood, not a reliable marker of this particular cuisine or genre."
+      },
+      {
+        "id": "brunch",
+        "label": "Brunch",
+        "coverageLevel": "specific",
+        "layoutIds": [
+          "brunch_garden",
+          "brunch_counter"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Object-level cue exists; venue facts and visual QA are still required."
+      },
+      {
+        "id": "ethiopian",
+        "label": "Ethiopian",
+        "coverageLevel": "atmosphere_only",
+        "layoutIds": [],
+        "contextHeroSupported": false,
+        "notes": "Do not generate culturally/genre-specific objects from unrelated props. Use lighting/color only until real assets are verified."
+      }
+    ],
+    "musicGenre": [
+      {
+        "id": "jazz",
+        "label": "Jazz",
+        "coverageLevel": "partial",
+        "layoutIds": [
+          "jazz_piano_club"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Object-level cue exists; venue facts and visual QA are still required."
+      },
+      {
+        "id": "blues",
+        "label": "Blues",
+        "coverageLevel": "generic_compatible",
+        "layoutIds": [
+          "folk_acoustic_cafe",
+          "rock_listening_corner"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Props fit broad venue mood, not a reliable marker of this particular cuisine or genre."
+      },
+      {
+        "id": "classical",
+        "label": "Classical / Orchestra",
+        "coverageLevel": "partial",
+        "layoutIds": [
+          "classical_parlor",
+          "piano_romantic"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Object-level cue exists; venue facts and visual QA are still required."
+      },
+      {
+        "id": "rock",
+        "label": "Rock",
+        "coverageLevel": "generic_compatible",
+        "layoutIds": [
+          "rock_listening_corner"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Props fit broad venue mood, not a reliable marker of this particular cuisine or genre."
+      },
+      {
+        "id": "indie_alternative",
+        "label": "Indie / Alternative",
+        "coverageLevel": "partial",
+        "layoutIds": [
+          "indie_stage"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Object-level cue exists; venue facts and visual QA are still required."
+      },
+      {
+        "id": "punk_metal",
+        "label": "Punk / Metal",
+        "coverageLevel": "generic_compatible",
+        "layoutIds": [
+          "rock_listening_corner"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Props fit broad venue mood, not a reliable marker of this particular cuisine or genre."
+      },
+      {
+        "id": "electronic_edm",
+        "label": "Electronic / EDM",
+        "coverageLevel": "generic_compatible",
+        "layoutIds": [
+          "electronic_listening_room"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Props fit broad venue mood, not a reliable marker of this particular cuisine or genre."
+      },
+      {
+        "id": "house_techno",
+        "label": "House / Techno",
+        "coverageLevel": "generic_compatible",
+        "layoutIds": [
+          "electronic_listening_room"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Props fit broad venue mood, not a reliable marker of this particular cuisine or genre."
+      },
+      {
+        "id": "hip_hop",
+        "label": "Hip-hop",
+        "coverageLevel": "atmosphere_only",
+        "layoutIds": [],
+        "contextHeroSupported": false,
+        "notes": "Do not generate culturally/genre-specific objects from unrelated props. Use lighting/color only until real assets are verified."
+      },
+      {
+        "id": "rnb_soul",
+        "label": "R&B / Soul",
+        "coverageLevel": "generic_compatible",
+        "layoutIds": [
+          "piano_romantic"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Props fit broad venue mood, not a reliable marker of this particular cuisine or genre."
+      },
+      {
+        "id": "country",
+        "label": "Country",
+        "coverageLevel": "generic_compatible",
+        "layoutIds": [
+          "folk_acoustic_cafe"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Props fit broad venue mood, not a reliable marker of this particular cuisine or genre."
+      },
+      {
+        "id": "folk_acoustic",
+        "label": "Folk / Acoustic",
+        "coverageLevel": "partial",
+        "layoutIds": [
+          "folk_acoustic_cafe",
+          "indie_stage"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Object-level cue exists; venue facts and visual QA are still required."
+      },
+      {
+        "id": "latin_dance",
+        "label": "Latin Dance / Salsa",
+        "coverageLevel": "atmosphere_only",
+        "layoutIds": [],
+        "contextHeroSupported": false,
+        "notes": "Do not generate culturally/genre-specific objects from unrelated props. Use lighting/color only until real assets are verified."
+      },
+      {
+        "id": "reggaeton",
+        "label": "Reggaeton",
+        "coverageLevel": "atmosphere_only",
+        "layoutIds": [],
+        "contextHeroSupported": false,
+        "notes": "Do not generate culturally/genre-specific objects from unrelated props. Use lighting/color only until real assets are verified."
+      },
+      {
+        "id": "reggae",
+        "label": "Reggae",
+        "coverageLevel": "atmosphere_only",
+        "layoutIds": [],
+        "contextHeroSupported": false,
+        "notes": "Do not generate culturally/genre-specific objects from unrelated props. Use lighting/color only until real assets are verified."
+      },
+      {
+        "id": "disco_funk",
+        "label": "Disco / Funk",
+        "coverageLevel": "generic_compatible",
+        "layoutIds": [
+          "electronic_listening_room"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Props fit broad venue mood, not a reliable marker of this particular cuisine or genre."
+      },
+      {
+        "id": "pop",
+        "label": "Pop",
+        "coverageLevel": "generic_compatible",
+        "layoutIds": [
+          "electronic_listening_room"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Props fit broad venue mood, not a reliable marker of this particular cuisine or genre."
+      },
+      {
+        "id": "k_pop",
+        "label": "K-pop",
+        "coverageLevel": "atmosphere_only",
+        "layoutIds": [],
+        "contextHeroSupported": false,
+        "notes": "Do not generate culturally/genre-specific objects from unrelated props. Use lighting/color only until real assets are verified."
+      },
+      {
+        "id": "ambient_lofi",
+        "label": "Ambient / Lo-fi",
+        "coverageLevel": "generic_compatible",
+        "layoutIds": [
+          "lounge_listening"
+        ],
+        "contextHeroSupported": true,
+        "notes": "Props fit broad venue mood, not a reliable marker of this particular cuisine or genre."
+      }
+    ]
+  },
+  "remainingHighValueSourceLeads": [
+    "https://3dassets.dev/packs/orchestra-and-band-instruments",
+    "https://3dassets.dev/packs/nightclub-and-dj-booth",
+    "https://3dassets.dev/packs/music-recording-studio-and-instruments",
+    "https://3dassets.dev/packs/restaurant-kitchen-tools"
+  ],
+  "note": "These source pack links are procurement leads, not imported models. Their actual model licensing, dimensions, GLB integrity and visual style require separate QA."
+}

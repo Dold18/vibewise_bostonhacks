@@ -1,0 +1,525 @@
+{
+  "schemaVersion": "1.0.0",
+  "title": "Vibenta thematic coverage plan: food x music x vibe",
+  "status": "curation_plan_not_renderable_inventory",
+  "established": "2026-11-21",
+  "notes": [
+    "These are semantic categories, NOT individual 3D assets. 'strong_candidates' means identified source packs with plausible matching assets; it does not mean items have been downloaded or inspected.",
+    "The 12 already imported KayKit models are generic dining and haunted props. No newly sourced packs in this plan have been downloaded.",
+    "Food, music genre, aesthetic mood, venue type and occasion are independent; combinations should be resolved at object level without inferring unverifiable venue conditions.",
+    "Separate licensed scene assets from venue facts. Don't claim decorative objects, music performances or food dishes exist at a real location."
+  ],
+  "coverageVocabulary": {
+    "strong_candidates": "specific likely relevant source pack(s), model-level selection still pending",
+    "partial": "some props/source packs identified but key motifs missing",
+    "generic_only": "general props, no verified cuisine-specific hero objects"
+  },
+  "dimensions": {
+    "cuisine": [
+      {
+        "id": "italian",
+        "label": "Italian",
+        "desiredMotifs": "pasta, pizza, trattoria tabletop props, herbs and ceramic tableware",
+        "sourcePacks": [
+          "kenney-food",
+          "3dassets-food-trucks",
+          "quaternius-food"
+        ],
+        "coverage": "partial",
+        "gap": "Exact pasta dish / oven / trattoria set-piece models still require selection"
+      },
+      {
+        "id": "japanese",
+        "label": "Japanese",
+        "desiredMotifs": "sushi, ramen, noodle counter, bento and lanterns",
+        "sourcePacks": [
+          "quaternius-sushi",
+          "3dassets-ramen-alley"
+        ],
+        "coverage": "strong_candidates",
+        "gap": "Select specific ramen/sushi/restaurant assets and avoid conflating distinct Japanese food contexts"
+      },
+      {
+        "id": "chinese",
+        "label": "Chinese",
+        "desiredMotifs": "dim sum baskets, tea service, noodles, hot pot",
+        "sourcePacks": [
+          "3dassets-restaurant-kitchen",
+          "kenney-food"
+        ],
+        "coverage": "generic_only",
+        "gap": "Need verified dim sum, hot-pot, tea-service props"
+      },
+      {
+        "id": "korean",
+        "label": "Korean",
+        "desiredMotifs": "table grill, banchan, Korean barbecue seating",
+        "sourcePacks": [
+          "3dassets-restaurant-kitchen",
+          "kenney-furniture"
+        ],
+        "coverage": "generic_only",
+        "gap": "Need verified tabletop grill and banchan props"
+      },
+      {
+        "id": "mexican",
+        "label": "Mexican",
+        "desiredMotifs": "tacos, salsa bowls, tortilleria or market stall",
+        "sourcePacks": [
+          "3dassets-food-trucks",
+          "kenney-food"
+        ],
+        "coverage": "partial",
+        "gap": "Need verified cuisine-specific taco/tortilla equipment models"
+      },
+      {
+        "id": "indian",
+        "label": "Indian",
+        "desiredMotifs": "thali, curry bowls, naan, spice market service",
+        "sourcePacks": [
+          "3dassets-indian-bazaar",
+          "kenney-food"
+        ],
+        "coverage": "partial",
+        "gap": "Bazaar architecture is not a substitute for Indian food; procure thali and dish models"
+      },
+      {
+        "id": "thai",
+        "label": "Thai",
+        "desiredMotifs": "noodles, curry, street-wok setup",
+        "sourcePacks": [
+          "3dassets-food-trucks",
+          "kenney-food"
+        ],
+        "coverage": "generic_only",
+        "gap": "Need verified pad thai, curry and street-cooking models"
+      },
+      {
+        "id": "vietnamese",
+        "label": "Vietnamese",
+        "desiredMotifs": "pho bowl, banh mi, tea/coffee props",
+        "sourcePacks": [
+          "3dassets-cafe-bakery",
+          "kenney-food"
+        ],
+        "coverage": "generic_only",
+        "gap": "Need pho/banh mi specific models"
+      },
+      {
+        "id": "middle_eastern",
+        "label": "Middle Eastern",
+        "desiredMotifs": "mezze, flatbread, kebab and cafe table",
+        "sourcePacks": [
+          "kenney-food",
+          "3dassets-food-trucks"
+        ],
+        "coverage": "generic_only",
+        "gap": "Cuisine region spans distinct traditions; rely on identified food and venue, not generic cultural symbols"
+      },
+      {
+        "id": "mediterranean",
+        "label": "Mediterranean",
+        "desiredMotifs": "vegetable/seafood table, herbs, fruit and shaded dining",
+        "sourcePacks": [
+          "3dassets-fresh-produce",
+          "kenney-nature",
+          "kenney-furniture"
+        ],
+        "coverage": "partial",
+        "gap": "Need dishes for distinct cuisines rather than implying one uniform Mediterranean tradition"
+      },
+      {
+        "id": "greek",
+        "label": "Greek",
+        "desiredMotifs": "gyros, mezze, olives and outdoor taverna props",
+        "sourcePacks": [
+          "3dassets-fresh-produce",
+          "kenney-furniture"
+        ],
+        "coverage": "generic_only",
+        "gap": "Need gyros/mezze models"
+      },
+      {
+        "id": "french",
+        "label": "French",
+        "desiredMotifs": "pastries, coffee service and bistro table",
+        "sourcePacks": [
+          "3dassets-cafe-bakery",
+          "kenney-furniture"
+        ],
+        "coverage": "strong_candidates",
+        "gap": "Verify croissant/pastry thumbnails from bakery pack"
+      },
+      {
+        "id": "american",
+        "label": "American",
+        "desiredMotifs": "burger, fries, diner or barbecue food service",
+        "sourcePacks": [
+          "kenney-food",
+          "3dassets-junk-food",
+          "quaternius-junk-food"
+        ],
+        "coverage": "strong_candidates",
+        "gap": "Differentiate diner, barbecue and fine dining rather than applying one template"
+      },
+      {
+        "id": "seafood",
+        "label": "Seafood",
+        "desiredMotifs": "fish, shellfish, oyster platter and coastal accents",
+        "sourcePacks": [
+          "quaternius-food",
+          "kenney-pirate"
+        ],
+        "coverage": "partial",
+        "gap": "Need dish-specific seafood props; do not substitute marine wildlife"
+      },
+      {
+        "id": "vegetarian_vegan",
+        "label": "Vegetarian / Vegan",
+        "desiredMotifs": "vegetable dishes, plants, farm-to-table market",
+        "sourcePacks": [
+          "3dassets-fresh-produce",
+          "kenney-nature"
+        ],
+        "coverage": "partial",
+        "gap": "Avoid assuming garden atmosphere is necessary; source appealing prepared dishes"
+      },
+      {
+        "id": "bakery_dessert",
+        "label": "Bakery / Desserts",
+        "desiredMotifs": "pastry display, cake, coffee, counter",
+        "sourcePacks": [
+          "3dassets-cafe-bakery",
+          "kenney-food"
+        ],
+        "coverage": "strong_candidates",
+        "gap": "Confirm actual pastry models and scale"
+      },
+      {
+        "id": "coffee_tea",
+        "label": "Coffee / Tea",
+        "desiredMotifs": "espresso station, tea service, cups and café seating",
+        "sourcePacks": [
+          "3dassets-cafe-bakery",
+          "kenney-furniture"
+        ],
+        "coverage": "strong_candidates",
+        "gap": "Tea cultures differ; choose specific tea accessories when venue context supports them"
+      },
+      {
+        "id": "street_food",
+        "label": "Street Food / Food Trucks",
+        "desiredMotifs": "food stall, serving counter, modular truck and food props",
+        "sourcePacks": [
+          "3dassets-food-trucks",
+          "quaternius-food"
+        ],
+        "coverage": "strong_candidates",
+        "gap": "Select cuisine-specific dishes separately from generic stall asset"
+      },
+      {
+        "id": "brunch",
+        "label": "Brunch",
+        "desiredMotifs": "breakfast foods, table setting and warm daytime accent",
+        "sourcePacks": [
+          "kenney-food",
+          "3dassets-cafe-bakery"
+        ],
+        "coverage": "partial",
+        "gap": "Needs verified pancakes, eggs, breakfast foods"
+      },
+      {
+        "id": "ethiopian",
+        "label": "Ethiopian",
+        "desiredMotifs": "injera, shared platter and coffee ceremony items",
+        "sourcePacks": [
+          "kenney-food"
+        ],
+        "coverage": "generic_only",
+        "gap": "No culturally specific models sourced; important sourcing gap"
+      }
+    ],
+    "musicGenre": [
+      {
+        "id": "jazz",
+        "label": "Jazz",
+        "desiredMotifs": "sax, trumpet, double bass, compact stage",
+        "sourcePacks": [
+          "3dassets-orchestra"
+        ],
+        "coverage": "strong_candidates",
+        "gap": "No music/audio playback; visual instruments only"
+      },
+      {
+        "id": "blues",
+        "label": "Blues",
+        "desiredMotifs": "guitar, harmonica, microphone, small club set",
+        "sourcePacks": [
+          "3dassets-orchestra",
+          "sam-meese-instruments",
+          "3dassets-live-stage"
+        ],
+        "coverage": "partial",
+        "gap": "Verify guitar model and stage style"
+      },
+      {
+        "id": "classical",
+        "label": "Classical / Orchestra",
+        "desiredMotifs": "violin, cello, stands, orchestra stage",
+        "sourcePacks": [
+          "3dassets-orchestra"
+        ],
+        "coverage": "strong_candidates",
+        "gap": "Lighting and composition distinguish from jazz with overlapping instruments"
+      },
+      {
+        "id": "rock",
+        "label": "Rock",
+        "desiredMotifs": "guitars, amp stacks, drum kit, stage risers",
+        "sourcePacks": [
+          "3dassets-live-stage",
+          "sam-meese-instruments"
+        ],
+        "coverage": "strong_candidates",
+        "gap": "Verify specific guitars and amps"
+      },
+      {
+        "id": "indie_alternative",
+        "label": "Indie / Alternative",
+        "desiredMotifs": "smaller guitar venue, posters, warm stage lighting",
+        "sourcePacks": [
+          "3dassets-live-stage",
+          "sam-meese-instruments"
+        ],
+        "coverage": "partial",
+        "gap": "Use original poster graphics with no third-party band logos"
+      },
+      {
+        "id": "punk_metal",
+        "label": "Punk / Metal",
+        "desiredMotifs": "guitar gear, drums, dense stage lighting",
+        "sourcePacks": [
+          "3dassets-live-stage",
+          "sam-meese-instruments"
+        ],
+        "coverage": "partial",
+        "gap": "No hazardous/violent imagery or trademark use"
+      },
+      {
+        "id": "electronic_edm",
+        "label": "Electronic / EDM",
+        "desiredMotifs": "DJ decks, mixer, truss, geometric lights",
+        "sourcePacks": [
+          "3dassets-nightclub-dj"
+        ],
+        "coverage": "strong_candidates",
+        "gap": "No musical playback; visual lighting only"
+      },
+      {
+        "id": "house_techno",
+        "label": "House / Techno",
+        "desiredMotifs": "minimal booth, structured light bars, haze",
+        "sourcePacks": [
+          "3dassets-nightclub-dj"
+        ],
+        "coverage": "strong_candidates",
+        "gap": "Distinguish restrained house vs industrial techno through colors and composition"
+      },
+      {
+        "id": "hip_hop",
+        "label": "Hip-hop",
+        "desiredMotifs": "microphone, DJ decks, stage monitor, waveform graphic",
+        "sourcePacks": [
+          "3dassets-nightclub-dj",
+          "3dassets-live-stage"
+        ],
+        "coverage": "strong_candidates",
+        "gap": "No automatic graffiti/cultural stereotypes"
+      },
+      {
+        "id": "rnb_soul",
+        "label": "R&B / Soul",
+        "desiredMotifs": "microphone, keyboard or brass, intimate lighting",
+        "sourcePacks": [
+          "3dassets-orchestra",
+          "3dassets-live-stage"
+        ],
+        "coverage": "partial",
+        "gap": "Verify keyboard model; prioritize romantic/intimate lighting when requested"
+      },
+      {
+        "id": "country",
+        "label": "Country",
+        "desiredMotifs": "banjo, acoustic instruments, wooden stage",
+        "sourcePacks": [
+          "3dassets-orchestra",
+          "sam-meese-instruments"
+        ],
+        "coverage": "strong_candidates",
+        "gap": "Rural scenery should depend on vibe, not genre alone"
+      },
+      {
+        "id": "folk_acoustic",
+        "label": "Folk / Acoustic",
+        "desiredMotifs": "mandolin, violin, acoustic guitar, small seating",
+        "sourcePacks": [
+          "3dassets-orchestra",
+          "sam-meese-instruments"
+        ],
+        "coverage": "strong_candidates",
+        "gap": "Quiet group stage works across acoustic genres"
+      },
+      {
+        "id": "latin_dance",
+        "label": "Latin Dance / Salsa",
+        "desiredMotifs": "bongos, maracas, accordion and warm stage",
+        "sourcePacks": [
+          "3dassets-orchestra",
+          "3dassets-live-stage"
+        ],
+        "coverage": "partial",
+        "gap": "Do not generalize all Latin music to the same instruments or colors"
+      },
+      {
+        "id": "reggaeton",
+        "label": "Reggaeton",
+        "desiredMotifs": "DJ booth, stage and rhythmic lighting",
+        "sourcePacks": [
+          "3dassets-nightclub-dj"
+        ],
+        "coverage": "partial",
+        "gap": "Needs genre-specific installation research; don't equate with all Latin genres"
+      },
+      {
+        "id": "reggae",
+        "label": "Reggae",
+        "desiredMotifs": "band stage with guitar/bass/percussion",
+        "sourcePacks": [
+          "3dassets-live-stage",
+          "sam-meese-instruments"
+        ],
+        "coverage": "partial",
+        "gap": "Need more genre-relevant gear; avoid symbols without user intent"
+      },
+      {
+        "id": "disco_funk",
+        "label": "Disco / Funk",
+        "desiredMotifs": "dance floor, band equipment, reflective sphere",
+        "sourcePacks": [
+          "3dassets-nightclub-dj",
+          "3dassets-live-stage"
+        ],
+        "coverage": "partial",
+        "gap": "Disco-ball model and original colorful pattern assets needed"
+      },
+      {
+        "id": "pop",
+        "label": "Pop",
+        "desiredMotifs": "concert stage, microphones, colored abstract lights",
+        "sourcePacks": [
+          "3dassets-live-stage",
+          "3dassets-nightclub-dj"
+        ],
+        "coverage": "strong_candidates",
+        "gap": "No artist identity, logos or album art without rights"
+      },
+      {
+        "id": "k_pop",
+        "label": "K-pop",
+        "desiredMotifs": "stage screens, choreography floor and pastel/neon lighting",
+        "sourcePacks": [
+          "3dassets-live-stage",
+          "3dassets-nightclub-dj"
+        ],
+        "coverage": "partial",
+        "gap": "Do not use real artist likeness/branding without authorization"
+      },
+      {
+        "id": "ambient_lofi",
+        "label": "Ambient / Lo-fi",
+        "desiredMotifs": "minimal music desk, headphones, softly lit room",
+        "sourcePacks": [
+          "3dassets-nightclub-dj",
+          "kenney-furniture"
+        ],
+        "coverage": "partial",
+        "gap": "More intimate props needed; visual theme should remain understated"
+      }
+    ],
+    "vibe": [
+      "romantic",
+      "cozy",
+      "moody",
+      "haunted",
+      "cinematic",
+      "futuristic",
+      "neon",
+      "upscale",
+      "nostalgic",
+      "retro",
+      "playful",
+      "high_energy",
+      "serene",
+      "natural",
+      "minimal",
+      "dreamy",
+      "industrial",
+      "festive"
+    ],
+    "venueType": [
+      "restaurant",
+      "cafe",
+      "bar",
+      "club",
+      "concert_venue",
+      "museum",
+      "park",
+      "market",
+      "theatre",
+      "outdoor",
+      "other"
+    ],
+    "occasion": [
+      "date",
+      "friends",
+      "solo",
+      "celebration",
+      "family",
+      "exploration",
+      "late_night",
+      "casual"
+    ]
+  },
+  "compositionRules": {
+    "twoOptionalSlots": [
+      "hero_context_installation",
+      "ambient_accent"
+    ],
+    "decisionInputs": [
+      "verified_venue_category",
+      "explicit_user_cuisine",
+      "explicit_user_music",
+      "current_quiz_vibe",
+      "occasion",
+      "screen_space",
+      "focus_navigation_state"
+    ],
+    "selection": "Choose hero for highest-confidence cuisine/genre-specific motifs; choose accent for compatible mood. If no specific motifs are verified, prefer generic tasteful decoration over incorrect cultural signals.",
+    "genreActivation": "Only use music-genre objects when user requests that genre or verified venue context supports it; do not imply an event or performance is occurring.",
+    "cuisineActivation": "Only use cuisine-specific motifs when user explicitly chooses it or verified venue data labels it; do not infer food availability from a vibe descriptor.",
+    "moodActivation": "Use mood broadly for color/lighting and ambient accents; don't force a food/music genre from mood.",
+    "safety": [
+      "max one hero plus one accent",
+      "positions never cover paths, transit stations, selected pins, road labels or attribution",
+      "focus mode may suppress all nonessential set pieces",
+      "respect reduced motion",
+      "never fabricate building geometry or venue facts"
+    ]
+  },
+  "priorityGaps": [
+    "Explicit prepared-food 3D for Chinese, Korean, Thai, Vietnamese, Greek and Ethiopian cuisines",
+    "Verified pasta, tacos, thali, mezze, pho, dim sum and Korean barbecue tabletop objects",
+    "Original disco ball/record player, low-fi room props and genre-appropriate music performance accents",
+    "Unified low-poly visual treatment, GLB conversion and perf budgets for sourced mixed-style packs"
+  ]
+}

@@ -1,0 +1,3622 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "asset_files_imported_but_no_scene_renderer_or_preview",
+  "assetCount": 120,
+  "modelCount": 120,
+  "origin": "KayKit / Kay Lousberg",
+  "license": "CC0-1.0",
+  "licenseFilesStored": true,
+  "sourcePacks": [
+    {
+      "id": "halloween-bits",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "originRoot": "addons/kaykit_halloween_bits/Assets/gltf",
+      "selectedModels": 16,
+      "licenseFile": "halloween-bits/LICENSE.txt",
+      "texture": "halloweenbits_texture.png"
+    },
+    {
+      "id": "restaurant-bits",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "originRoot": "addons/kaykit_restaurant_bits/Assets/gltf",
+      "selectedModels": 29,
+      "licenseFile": "restaurant-bits/LICENSE.txt",
+      "texture": "restaurantbits_texture.png"
+    },
+    {
+      "id": "furniture-bits",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "originRoot": "addons/kaykit_furniture_bits/Assets/gltf",
+      "selectedModels": 18,
+      "licenseFile": "furniture-bits/LICENSE.txt",
+      "texture": "furniturebits_texture.png"
+    },
+    {
+      "id": "city-builder-bits",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "originRoot": "addons/kaykit_city_builder_bits/Assets/gltf",
+      "selectedModels": 18,
+      "licenseFile": "city-builder-bits/LICENSE.txt",
+      "texture": "citybits_texture.png"
+    },
+    {
+      "id": "space-base-bits",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Space-Base-Bits-1.0",
+      "originRoot": "addons/kaykit_space_base_bits/Assets/gltf",
+      "selectedModels": 9,
+      "licenseFile": "space-base-bits/LICENSE.txt",
+      "texture": "spacebits_texture.png"
+    },
+    {
+      "id": "medieval-props",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "originRoot": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props",
+      "selectedModels": 14,
+      "licenseFile": "medieval-props/LICENSE.txt",
+      "texture": "hexagons_medieval.png"
+    },
+    {
+      "id": "medieval-nature",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "originRoot": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature",
+      "selectedModels": 12,
+      "licenseFile": "medieval-nature/LICENSE.txt",
+      "texture": "hexagons_medieval.png"
+    },
+    {
+      "id": "medieval-buildings",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "originRoot": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/neutral",
+      "selectedModels": 4,
+      "licenseFile": "medieval-buildings/LICENSE.txt",
+      "texture": "hexagons_medieval.png"
+    }
+  ],
+  "note": "120 distinct CC0 3D glTF models in eight folders sourced from six official KayKit pack repositories. All 256 original files are Git-blob identical, no visual/runtime QA or conversion to optimized GLB performed. External sourced leads not included.",
+  "futureRules": {
+    "aiMaySelectAssetIdOnly": true,
+    "contextAndVibeBothRequired": true,
+    "quizReveal": "final_questions",
+    "slots": [
+      "hero_installation",
+      "ambient_accent"
+    ],
+    "maxHeroInstallations": 1,
+    "maxAmbientAccents": 1,
+    "neverClaimObjectPhysicallyExists": true,
+    "doNotBlockRoutesStationsLabelsAttribution": true,
+    "hideOrSimplifyInFocusMode": true,
+    "reducedMotionSupport": true
+  },
+  "models": [
+    {
+      "id": "kaykit.city-builder-bits.bench",
+      "name": "bench",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/bench.gltf",
+      "externalBuffer": "bench.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/bench.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "urban",
+        "retro",
+        "street",
+        "nightlife"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.building_A",
+      "name": "building_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/building_A.gltf",
+      "externalBuffer": "building_A.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/building_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "city",
+        "retro",
+        "urban",
+        "nightlife",
+        "fictional_diorama_architecture"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.building_B",
+      "name": "building_B",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/building_B.gltf",
+      "externalBuffer": "building_B.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/building_B.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "city",
+        "retro",
+        "urban",
+        "nightlife",
+        "fictional_diorama_architecture"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.building_C",
+      "name": "building_C",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/building_C.gltf",
+      "externalBuffer": "building_C.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/building_C.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "city",
+        "retro",
+        "urban",
+        "nightlife",
+        "fictional_diorama_architecture"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.building_D",
+      "name": "building_D",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/building_D.gltf",
+      "externalBuffer": "building_D.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/building_D.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "city",
+        "retro",
+        "urban",
+        "nightlife",
+        "fictional_diorama_architecture"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.building_F",
+      "name": "building_F",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/building_F.gltf",
+      "externalBuffer": "building_F.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/building_F.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "city",
+        "retro",
+        "urban",
+        "nightlife",
+        "fictional_diorama_architecture"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.building_G",
+      "name": "building_G",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/building_G.gltf",
+      "externalBuffer": "building_G.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/building_G.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "city",
+        "retro",
+        "urban",
+        "nightlife",
+        "fictional_diorama_architecture"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.building_H",
+      "name": "building_H",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/building_H.gltf",
+      "externalBuffer": "building_H.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/building_H.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "city",
+        "retro",
+        "urban",
+        "nightlife",
+        "fictional_diorama_architecture"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.bush",
+      "name": "bush",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/bush.gltf",
+      "externalBuffer": "bush.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/bush.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "urban",
+        "retro",
+        "street",
+        "nightlife"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.car_hatchback",
+      "name": "car_hatchback",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/car_hatchback.gltf",
+      "externalBuffer": "car_hatchback.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/car_hatchback.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "city",
+        "retro",
+        "urban",
+        "nightlife"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.car_sedan",
+      "name": "car_sedan",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/car_sedan.gltf",
+      "externalBuffer": "car_sedan.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/car_sedan.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "city",
+        "retro",
+        "urban",
+        "nightlife"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.car_stationwagon",
+      "name": "car_stationwagon",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/car_stationwagon.gltf",
+      "externalBuffer": "car_stationwagon.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/car_stationwagon.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "city",
+        "retro",
+        "urban",
+        "nightlife"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.car_taxi",
+      "name": "car_taxi",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/car_taxi.gltf",
+      "externalBuffer": "car_taxi.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/car_taxi.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "urban",
+        "retro",
+        "street",
+        "nightlife",
+        "urban_streetscape"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.dumpster",
+      "name": "dumpster",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/dumpster.gltf",
+      "externalBuffer": "dumpster.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/dumpster.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "urban",
+        "retro",
+        "street",
+        "nightlife"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.firehydrant",
+      "name": "firehydrant",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/firehydrant.gltf",
+      "externalBuffer": "firehydrant.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/firehydrant.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "urban",
+        "retro",
+        "street",
+        "nightlife"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.streetlight",
+      "name": "streetlight",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/streetlight.gltf",
+      "externalBuffer": "streetlight.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/streetlight.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "urban",
+        "retro",
+        "street",
+        "nightlife"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.trafficlight_A",
+      "name": "trafficlight_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/trafficlight_A.gltf",
+      "externalBuffer": "trafficlight_A.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/trafficlight_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "urban",
+        "retro",
+        "street",
+        "nightlife",
+        "urban_streetscape"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.city-builder-bits.watertower",
+      "name": "watertower",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/city-builder-bits/watertower.gltf",
+      "externalBuffer": "watertower.bin",
+      "sharedTexture": "citybits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0",
+      "sourcePath": "addons/kaykit_city_builder_bits/Assets/gltf/watertower.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/city-builder-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "urban",
+        "retro",
+        "street",
+        "nightlife"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.armchair_pillows",
+      "name": "armchair_pillows",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/armchair_pillows.gltf",
+      "externalBuffer": "armchair_pillows.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/armchair_pillows.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "music_venue_lounge"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.book_set",
+      "name": "book_set",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/book_set.gltf",
+      "externalBuffer": "book_set.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/book_set.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "music_venue_lounge"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.cactus_medium_A",
+      "name": "cactus_medium_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/cactus_medium_A.gltf",
+      "externalBuffer": "cactus_medium_A.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/cactus_medium_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "interior",
+        "nature"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.cactus_small_A",
+      "name": "cactus_small_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/cactus_small_A.gltf",
+      "externalBuffer": "cactus_small_A.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/cactus_small_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "music_venue_lounge"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.chair_A_wood",
+      "name": "chair_A_wood",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/chair_A_wood.gltf",
+      "externalBuffer": "chair_A_wood.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/chair_A_wood.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "interior"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.chair_B_wood",
+      "name": "chair_B_wood",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/chair_B_wood.gltf",
+      "externalBuffer": "chair_B_wood.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/chair_B_wood.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "interior"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.chair_stool_wood",
+      "name": "chair_stool_wood",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/chair_stool_wood.gltf",
+      "externalBuffer": "chair_stool_wood.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/chair_stool_wood.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "interior"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.couch",
+      "name": "couch",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/couch.gltf",
+      "externalBuffer": "couch.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/couch.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "interior"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.couch_pillows",
+      "name": "couch_pillows",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/couch_pillows.gltf",
+      "externalBuffer": "couch_pillows.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/couch_pillows.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "music_venue_lounge"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.lamp_standing",
+      "name": "lamp_standing",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/lamp_standing.gltf",
+      "externalBuffer": "lamp_standing.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/lamp_standing.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "music_venue_lounge",
+        "warm_ambience"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.lamp_table",
+      "name": "lamp_table",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/lamp_table.gltf",
+      "externalBuffer": "lamp_table.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/lamp_table.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "music_venue_lounge",
+        "warm_ambience"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.pictureframe_standing_A",
+      "name": "pictureframe_standing_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/pictureframe_standing_A.gltf",
+      "externalBuffer": "pictureframe_standing_A.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/pictureframe_standing_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "interior"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.rug_oval_A",
+      "name": "rug_oval_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/rug_oval_A.gltf",
+      "externalBuffer": "rug_oval_A.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/rug_oval_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "interior"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.rug_rectangle_B",
+      "name": "rug_rectangle_B",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/rug_rectangle_B.gltf",
+      "externalBuffer": "rug_rectangle_B.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/rug_rectangle_B.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "interior"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.shelf_B_large_decorated",
+      "name": "shelf_B_large_decorated",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/shelf_B_large_decorated.gltf",
+      "externalBuffer": "shelf_B_large_decorated.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/shelf_B_large_decorated.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "music_venue_lounge"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.table_low",
+      "name": "table_low",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/table_low.gltf",
+      "externalBuffer": "table_low.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/table_low.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "music_venue_lounge"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.table_medium",
+      "name": "table_medium",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/table_medium.gltf",
+      "externalBuffer": "table_medium.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/table_medium.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "interior"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.furniture-bits.table_small",
+      "name": "table_small",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/furniture-bits/table_small.gltf",
+      "externalBuffer": "table_small.bin",
+      "sharedTexture": "furniturebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+      "sourcePath": "addons/kaykit_furniture_bits/Assets/gltf/table_small.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/furniture-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "cafe",
+        "cozy",
+        "lounge",
+        "interior"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.arch_gate",
+      "name": "arch_gate",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/arch_gate.gltf",
+      "externalBuffer": "arch_gate.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/arch_gate.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "gothic",
+        "mystery"
+      ],
+      "placementSlot": "hero_installation",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "meshVisualInspected": false,
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.candle_triple",
+      "name": "candle_triple",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/candle_triple.gltf",
+      "externalBuffer": "candle_triple.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/candle_triple.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "gothic",
+        "autumn",
+        "mystery",
+        "warm_lighting"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.coffin_decorated",
+      "name": "coffin_decorated",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/coffin_decorated.gltf",
+      "externalBuffer": "coffin_decorated.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/coffin_decorated.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "gothic",
+        "autumn",
+        "mystery"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.crypt",
+      "name": "crypt",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/crypt.gltf",
+      "externalBuffer": "crypt.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/crypt.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "gothic",
+        "haunted",
+        "mystery"
+      ],
+      "placementSlot": "hero_installation",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "meshVisualInspected": false,
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.fence_gate",
+      "name": "fence_gate",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/fence_gate.gltf",
+      "externalBuffer": "fence_gate.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/fence_gate.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "gothic",
+        "autumn",
+        "mystery"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.gravestone",
+      "name": "gravestone",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/gravestone.gltf",
+      "externalBuffer": "gravestone.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/gravestone.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "gothic",
+        "autumn",
+        "mystery"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.lantern_hanging",
+      "name": "lantern_hanging",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/lantern_hanging.gltf",
+      "externalBuffer": "lantern_hanging.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/lantern_hanging.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "warm_lighting",
+        "fantasy"
+      ],
+      "placementSlot": "either",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "meshVisualInspected": false,
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.plaque_candles",
+      "name": "plaque_candles",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/plaque_candles.gltf",
+      "externalBuffer": "plaque_candles.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/plaque_candles.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "gothic",
+        "autumn",
+        "mystery",
+        "warm_lighting"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.post_skull",
+      "name": "post_skull",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/post_skull.gltf",
+      "externalBuffer": "post_skull.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/post_skull.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "gothic",
+        "autumn",
+        "mystery"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.pumpkin_orange_jackolantern",
+      "name": "pumpkin_orange_jackolantern",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/pumpkin_orange_jackolantern.gltf",
+      "externalBuffer": "pumpkin_orange_jackolantern.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/pumpkin_orange_jackolantern.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "halloween",
+        "playful",
+        "haunted"
+      ],
+      "placementSlot": "accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "meshVisualInspected": false,
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.pumpkin_yellow_jackolantern",
+      "name": "pumpkin_yellow_jackolantern",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/pumpkin_yellow_jackolantern.gltf",
+      "externalBuffer": "pumpkin_yellow_jackolantern.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/pumpkin_yellow_jackolantern.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "gothic",
+        "autumn",
+        "mystery"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.shrine_candles",
+      "name": "shrine_candles",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/shrine_candles.gltf",
+      "externalBuffer": "shrine_candles.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/shrine_candles.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "fantasy",
+        "candlelight"
+      ],
+      "placementSlot": "either",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "meshVisualInspected": false,
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.skull",
+      "name": "skull",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/skull.gltf",
+      "externalBuffer": "skull.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/skull.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "gothic",
+        "autumn",
+        "mystery"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.tree_dead_large",
+      "name": "tree_dead_large",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/tree_dead_large.gltf",
+      "externalBuffer": "tree_dead_large.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/tree_dead_large.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "autumn",
+        "gothic"
+      ],
+      "placementSlot": "hero_installation",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "meshVisualInspected": false,
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.tree_dead_medium",
+      "name": "tree_dead_medium",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/tree_dead_medium.gltf",
+      "externalBuffer": "tree_dead_medium.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/tree_dead_medium.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "gothic",
+        "autumn",
+        "mystery",
+        "nature"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.halloween-bits.tree_pine_orange_large",
+      "name": "tree_pine_orange_large",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/halloween-bits/tree_pine_orange_large.gltf",
+      "externalBuffer": "tree_pine_orange_large.bin",
+      "sharedTexture": "halloweenbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0",
+      "sourcePath": "addons/kaykit_halloween_bits/Assets/gltf/tree_pine_orange_large.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/halloween-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "haunted",
+        "gothic",
+        "autumn",
+        "mystery",
+        "nature"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-buildings.building_stage_A",
+      "name": "building_stage_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-buildings/building_stage_A.gltf",
+      "externalBuffer": "building_stage_A.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/neutral/building_stage_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-buildings/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "stage",
+        "market",
+        "festival",
+        "storybook",
+        "fictional_diorama_only",
+        "performance"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-buildings.building_stage_B",
+      "name": "building_stage_B",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-buildings/building_stage_B.gltf",
+      "externalBuffer": "building_stage_B.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/neutral/building_stage_B.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-buildings/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "stage",
+        "market",
+        "festival",
+        "storybook",
+        "fictional_diorama_only",
+        "performance"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-buildings.building_stage_C",
+      "name": "building_stage_C",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-buildings/building_stage_C.gltf",
+      "externalBuffer": "building_stage_C.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/neutral/building_stage_C.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-buildings/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "stage",
+        "market",
+        "festival",
+        "storybook",
+        "fictional_diorama_only",
+        "performance"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-buildings.fence_wood_straight_gate",
+      "name": "fence_wood_straight_gate",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-buildings/fence_wood_straight_gate.gltf",
+      "externalBuffer": "fence_wood_straight_gate.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/neutral/fence_wood_straight_gate.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-buildings/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "stage",
+        "market",
+        "festival",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.cloud_big",
+      "name": "cloud_big",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/cloud_big.gltf",
+      "externalBuffer": "cloud_big.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/cloud_big.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.cloud_small",
+      "name": "cloud_small",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/cloud_small.gltf",
+      "externalBuffer": "cloud_small.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/cloud_small.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.hill_single_A",
+      "name": "hill_single_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/hill_single_A.gltf",
+      "externalBuffer": "hill_single_A.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/hill_single_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.hills_A_trees",
+      "name": "hills_A_trees",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/hills_A_trees.gltf",
+      "externalBuffer": "hills_A_trees.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/hills_A_trees.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.mountain_A_grass",
+      "name": "mountain_A_grass",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/mountain_A_grass.gltf",
+      "externalBuffer": "mountain_A_grass.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/mountain_A_grass.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors",
+        "landscape"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.mountain_B_grass",
+      "name": "mountain_B_grass",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/mountain_B_grass.gltf",
+      "externalBuffer": "mountain_B_grass.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/mountain_B_grass.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors",
+        "landscape"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.rock_single_A",
+      "name": "rock_single_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/rock_single_A.gltf",
+      "externalBuffer": "rock_single_A.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/rock_single_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.rock_single_B",
+      "name": "rock_single_B",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/rock_single_B.gltf",
+      "externalBuffer": "rock_single_B.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/rock_single_B.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.rock_single_C",
+      "name": "rock_single_C",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/rock_single_C.gltf",
+      "externalBuffer": "rock_single_C.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/rock_single_C.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.tree_single_A",
+      "name": "tree_single_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/tree_single_A.gltf",
+      "externalBuffer": "tree_single_A.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/tree_single_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors",
+        "landscape"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.tree_single_A_cut",
+      "name": "tree_single_A_cut",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/tree_single_A_cut.gltf",
+      "externalBuffer": "tree_single_A_cut.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/tree_single_A_cut.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors",
+        "landscape"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-nature.tree_single_B",
+      "name": "tree_single_B",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-nature/tree_single_B.gltf",
+      "externalBuffer": "tree_single_B.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/nature/tree_single_B.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-nature/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "nature",
+        "fantasy",
+        "storybook",
+        "outdoors",
+        "landscape"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.barrel",
+      "name": "barrel",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/barrel.gltf",
+      "externalBuffer": "barrel.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/barrel.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.bucket_empty",
+      "name": "bucket_empty",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/bucket_empty.gltf",
+      "externalBuffer": "bucket_empty.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/bucket_empty.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.bucket_water",
+      "name": "bucket_water",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/bucket_water.gltf",
+      "externalBuffer": "bucket_water.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/bucket_water.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.crate_A_big",
+      "name": "crate_A_big",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/crate_A_big.gltf",
+      "externalBuffer": "crate_A_big.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/crate_A_big.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.crate_B_small",
+      "name": "crate_B_small",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/crate_B_small.gltf",
+      "externalBuffer": "crate_B_small.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/crate_B_small.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.crate_open",
+      "name": "crate_open",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/crate_open.gltf",
+      "externalBuffer": "crate_open.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/crate_open.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.ladder",
+      "name": "ladder",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/ladder.gltf",
+      "externalBuffer": "ladder.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/ladder.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.pallet",
+      "name": "pallet",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/pallet.gltf",
+      "externalBuffer": "pallet.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/pallet.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.resource_lumber",
+      "name": "resource_lumber",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/resource_lumber.gltf",
+      "externalBuffer": "resource_lumber.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/resource_lumber.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.resource_stone",
+      "name": "resource_stone",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/resource_stone.gltf",
+      "externalBuffer": "resource_stone.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/resource_stone.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.sack",
+      "name": "sack",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/sack.gltf",
+      "externalBuffer": "sack.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/sack.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.target",
+      "name": "target",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/target.gltf",
+      "externalBuffer": "target.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/target.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.tent",
+      "name": "tent",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/tent.gltf",
+      "externalBuffer": "tent.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/tent.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.medieval-props.wheelbarrow",
+      "name": "wheelbarrow",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/medieval-props/wheelbarrow.gltf",
+      "externalBuffer": "wheelbarrow.bin",
+      "sharedTexture": "hexagons_medieval.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0",
+      "sourcePath": "addons/kaykit_medieval_hexagon_pack/Assets/gltf/decoration/props/wheelbarrow.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/medieval-props/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "market",
+        "festival",
+        "rustic",
+        "storybook"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.chair_A",
+      "name": "chair_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/chair_A.gltf",
+      "externalBuffer": "chair_A.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/chair_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "dining",
+        "cafe",
+        "restaurant"
+      ],
+      "placementSlot": "either",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "meshVisualInspected": false,
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.crate_buns",
+      "name": "crate_buns",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/crate_buns.gltf",
+      "externalBuffer": "crate_buns.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/crate_buns.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "restaurant",
+        "cafe",
+        "culinary_prop"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.crate_carrots",
+      "name": "crate_carrots",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/crate_carrots.gltf",
+      "externalBuffer": "crate_carrots.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/crate_carrots.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "restaurant",
+        "dining",
+        "food",
+        "cafe",
+        "produce"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.crate_cheese",
+      "name": "crate_cheese",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/crate_cheese.gltf",
+      "externalBuffer": "crate_cheese.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/crate_cheese.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "restaurant",
+        "dining",
+        "food",
+        "cafe",
+        "produce"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.crate_lettuce",
+      "name": "crate_lettuce",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/crate_lettuce.gltf",
+      "externalBuffer": "crate_lettuce.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/crate_lettuce.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "restaurant",
+        "cafe",
+        "culinary_prop"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.crate_onions",
+      "name": "crate_onions",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/crate_onions.gltf",
+      "externalBuffer": "crate_onions.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/crate_onions.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "restaurant",
+        "cafe",
+        "culinary_prop"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.crate_potatoes",
+      "name": "crate_potatoes",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/crate_potatoes.gltf",
+      "externalBuffer": "crate_potatoes.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/crate_potatoes.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "restaurant",
+        "cafe",
+        "culinary_prop"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.crate_tomatoes",
+      "name": "crate_tomatoes",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/crate_tomatoes.gltf",
+      "externalBuffer": "crate_tomatoes.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/crate_tomatoes.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "market",
+        "restaurant"
+      ],
+      "placementSlot": "accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "meshVisualInspected": false,
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_burger",
+      "name": "food_burger",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_burger.gltf",
+      "externalBuffer": "food_burger.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_burger.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "restaurant",
+        "dining",
+        "food",
+        "cafe",
+        "food_prop",
+        "american"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_dinner",
+      "name": "food_dinner",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_dinner.gltf",
+      "externalBuffer": "food_dinner.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_dinner.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "comfort_food"
+      ],
+      "placementSlot": "accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "meshVisualInspected": false,
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_ingredient_bun",
+      "name": "food_ingredient_bun",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_ingredient_bun.gltf",
+      "externalBuffer": "food_ingredient_bun.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_ingredient_bun.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "restaurant",
+        "cafe",
+        "culinary_prop"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_ingredient_carrot",
+      "name": "food_ingredient_carrot",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_ingredient_carrot.gltf",
+      "externalBuffer": "food_ingredient_carrot.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_ingredient_carrot.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "restaurant",
+        "cafe",
+        "culinary_prop"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_ingredient_cheese",
+      "name": "food_ingredient_cheese",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_ingredient_cheese.gltf",
+      "externalBuffer": "food_ingredient_cheese.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_ingredient_cheese.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "restaurant",
+        "cafe",
+        "culinary_prop"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_ingredient_ham",
+      "name": "food_ingredient_ham",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_ingredient_ham.gltf",
+      "externalBuffer": "food_ingredient_ham.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_ingredient_ham.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "restaurant",
+        "cafe",
+        "culinary_prop"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_ingredient_lettuce",
+      "name": "food_ingredient_lettuce",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_ingredient_lettuce.gltf",
+      "externalBuffer": "food_ingredient_lettuce.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_ingredient_lettuce.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "restaurant",
+        "cafe",
+        "culinary_prop"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_ingredient_onion",
+      "name": "food_ingredient_onion",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_ingredient_onion.gltf",
+      "externalBuffer": "food_ingredient_onion.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_ingredient_onion.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "restaurant",
+        "cafe",
+        "culinary_prop"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_ingredient_potato",
+      "name": "food_ingredient_potato",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_ingredient_potato.gltf",
+      "externalBuffer": "food_ingredient_potato.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_ingredient_potato.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "restaurant",
+        "cafe",
+        "culinary_prop"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_ingredient_potato_mashed",
+      "name": "food_ingredient_potato_mashed",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_ingredient_potato_mashed.gltf",
+      "externalBuffer": "food_ingredient_potato_mashed.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_ingredient_potato_mashed.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "restaurant",
+        "dining",
+        "food",
+        "cafe",
+        "food_prop"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_ingredient_steak",
+      "name": "food_ingredient_steak",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_ingredient_steak.gltf",
+      "externalBuffer": "food_ingredient_steak.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_ingredient_steak.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "restaurant",
+        "cafe",
+        "culinary_prop"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_ingredient_tomato",
+      "name": "food_ingredient_tomato",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_ingredient_tomato.gltf",
+      "externalBuffer": "food_ingredient_tomato.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_ingredient_tomato.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "restaurant",
+        "cafe",
+        "culinary_prop"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_ingredient_vegetableburger_cooked",
+      "name": "food_ingredient_vegetableburger_cooked",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_ingredient_vegetableburger_cooked.gltf",
+      "externalBuffer": "food_ingredient_vegetableburger_cooked.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_ingredient_vegetableburger_cooked.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "restaurant",
+        "cafe",
+        "culinary_prop"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_stew",
+      "name": "food_stew",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_stew.gltf",
+      "externalBuffer": "food_stew.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_stew.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "warm",
+        "comfort_food"
+      ],
+      "placementSlot": "accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "meshVisualInspected": false,
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.food_vegetableburger",
+      "name": "food_vegetableburger",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/food_vegetableburger.gltf",
+      "externalBuffer": "food_vegetableburger.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/food_vegetableburger.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "restaurant",
+        "dining",
+        "food",
+        "cafe",
+        "food_prop",
+        "vegetarian_vegan",
+        "american"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.menu",
+      "name": "menu",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/menu.gltf",
+      "externalBuffer": "menu.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/menu.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "dining",
+        "restaurant",
+        "cafe"
+      ],
+      "placementSlot": "accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "meshVisualInspected": false,
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.oven",
+      "name": "oven",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/oven.gltf",
+      "externalBuffer": "oven.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/oven.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "restaurant",
+        "dining",
+        "food",
+        "cafe"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.pot_A_stew",
+      "name": "pot_A_stew",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/pot_A_stew.gltf",
+      "externalBuffer": "pot_A_stew.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/pot_A_stew.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "restaurant",
+        "dining",
+        "food",
+        "cafe"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.pot_B_stew",
+      "name": "pot_B_stew",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/pot_B_stew.gltf",
+      "externalBuffer": "pot_B_stew.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/pot_B_stew.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "food",
+        "dining",
+        "restaurant",
+        "cafe",
+        "culinary_prop"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.table_round_A_decorated",
+      "name": "table_round_A_decorated",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/table_round_A_decorated.gltf",
+      "externalBuffer": "table_round_A_decorated.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/table_round_A_decorated.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "dining",
+        "cozy",
+        "date_night"
+      ],
+      "placementSlot": "hero_installation",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "meshVisualInspected": false,
+        "performanceTested": false,
+        "sourceVsImportedShaVerified": true
+      }
+    },
+    {
+      "id": "kaykit.restaurant-bits.table_round_B",
+      "name": "table_round_B",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/restaurant-bits/table_round_B.gltf",
+      "externalBuffer": "table_round_B.bin",
+      "sharedTexture": "restaurantbits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0",
+      "sourcePath": "addons/kaykit_restaurant_bits/Assets/gltf/table_round_B.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/restaurant-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "restaurant",
+        "dining",
+        "food",
+        "cafe",
+        "warm_ambience"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.space-base-bits.drill_structure",
+      "name": "drill_structure",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/space-base-bits/drill_structure.gltf",
+      "externalBuffer": "drill_structure.bin",
+      "sharedTexture": "spacebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Space-Base-Bits-1.0",
+      "sourcePath": "addons/kaykit_space_base_bits/Assets/gltf/drill_structure.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/space-base-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "futuristic",
+        "sci_fi",
+        "space",
+        "cyberpunk_adjacent"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.space-base-bits.lander_A",
+      "name": "lander_A",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/space-base-bits/lander_A.gltf",
+      "externalBuffer": "lander_A.bin",
+      "sharedTexture": "spacebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Space-Base-Bits-1.0",
+      "sourcePath": "addons/kaykit_space_base_bits/Assets/gltf/lander_A.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/space-base-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "futuristic",
+        "sci_fi",
+        "space",
+        "cyberpunk_adjacent",
+        "scifi_setpiece"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.space-base-bits.landingpad_small",
+      "name": "landingpad_small",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/space-base-bits/landingpad_small.gltf",
+      "externalBuffer": "landingpad_small.bin",
+      "sharedTexture": "spacebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Space-Base-Bits-1.0",
+      "sourcePath": "addons/kaykit_space_base_bits/Assets/gltf/landingpad_small.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/space-base-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "sci_fi",
+        "futuristic",
+        "space",
+        "playful"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.space-base-bits.lights",
+      "name": "lights",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/space-base-bits/lights.gltf",
+      "externalBuffer": "lights.bin",
+      "sharedTexture": "spacebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Space-Base-Bits-1.0",
+      "sourcePath": "addons/kaykit_space_base_bits/Assets/gltf/lights.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/space-base-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "futuristic",
+        "sci_fi",
+        "space",
+        "cyberpunk_adjacent"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.space-base-bits.roofmodule_solarpanels",
+      "name": "roofmodule_solarpanels",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/space-base-bits/roofmodule_solarpanels.gltf",
+      "externalBuffer": "roofmodule_solarpanels.bin",
+      "sharedTexture": "spacebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Space-Base-Bits-1.0",
+      "sourcePath": "addons/kaykit_space_base_bits/Assets/gltf/roofmodule_solarpanels.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/space-base-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "sci_fi",
+        "futuristic",
+        "space",
+        "playful"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.space-base-bits.solarpanel",
+      "name": "solarpanel",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/space-base-bits/solarpanel.gltf",
+      "externalBuffer": "solarpanel.bin",
+      "sharedTexture": "spacebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Space-Base-Bits-1.0",
+      "sourcePath": "addons/kaykit_space_base_bits/Assets/gltf/solarpanel.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/space-base-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "futuristic",
+        "sci_fi",
+        "space",
+        "cyberpunk_adjacent",
+        "scifi_setpiece"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": true,
+        "bufferUriValidated": true,
+        "textureUriValidated": true,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.space-base-bits.spacetruck",
+      "name": "spacetruck",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/space-base-bits/spacetruck.gltf",
+      "externalBuffer": "spacetruck.bin",
+      "sharedTexture": "spacebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Space-Base-Bits-1.0",
+      "sourcePath": "addons/kaykit_space_base_bits/Assets/gltf/spacetruck.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/space-base-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "sci_fi",
+        "futuristic",
+        "space",
+        "playful"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.space-base-bits.structure_tall",
+      "name": "structure_tall",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/space-base-bits/structure_tall.gltf",
+      "externalBuffer": "structure_tall.bin",
+      "sharedTexture": "spacebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Space-Base-Bits-1.0",
+      "sourcePath": "addons/kaykit_space_base_bits/Assets/gltf/structure_tall.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/space-base-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "sci_fi",
+        "futuristic",
+        "space",
+        "playful"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    },
+    {
+      "id": "kaykit.space-base-bits.windturbine_low",
+      "name": "windturbine_low",
+      "assetClass": "mesh",
+      "format": "gltf_2.0",
+      "uri": "/scene-assets/third-party/kaykit/space-base-bits/windturbine_low.gltf",
+      "externalBuffer": "windturbine_low.bin",
+      "sharedTexture": "spacebits_texture.png",
+      "sourceRepo": "https://github.com/KayKit-Game-Assets/KayKit-Space-Base-Bits-1.0",
+      "sourcePath": "addons/kaykit_space_base_bits/Assets/gltf/windturbine_low.gltf",
+      "sourceLicensePath": "/scene-assets/third-party/kaykit/space-base-bits/LICENSE.txt",
+      "license": "CC0-1.0",
+      "tags": [
+        "sci_fi",
+        "futuristic",
+        "space",
+        "playful"
+      ],
+      "placementSlot": "hero_or_accent",
+      "status": "imported_not_rendered",
+      "qa": {
+        "gltfParsed": false,
+        "bufferUriValidated": false,
+        "textureUriValidated": false,
+        "sourceVsImportedShaVerified": true,
+        "meshVisualInspected": false,
+        "performanceTested": false
+      }
+    }
+  ],
+  "verificationSummary": {
+    "runDate": "2026-11-21",
+    "verifiedSourceVsImportGitBlobShas": 256,
+    "mismatches": 0,
+    "verifiedModelDependencyEntries": 40,
+    "notYetIndividuallyDependencyChecked": 80,
+    "method": "SHA identity of all 120 glTF, 120 matching BIN, 8 shared texture PNGs and 8 original license files against official publisher GitHub repos. Individual dependency validation was performed during import for 40 initial models; 80 newer models require separate automated JSON validation."
+  }
+}
