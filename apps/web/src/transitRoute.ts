@@ -22,7 +22,16 @@ interface LastTrainBack {
   catchable: boolean;
 }
 export type RouteResponse =
-  | { status: 'ok'; option: { durationSec: number; transfers: number; legs: Leg[] }; lastTrainBack: LastTrainBack | null; lastTrainBackNote?: string }
+  | {
+      status: 'ok';
+      option: { durationSec: number; transfers: number; legs: Leg[] };
+      /** Tier-2 only: scheduled wait at the boarding platform; already included in option.durationSec. */
+      transferWaitSeconds?: number;
+      /** Scheduled wait for the first train if leaving now; NOT included in option.durationSec. */
+      firstTrainWaitSeconds?: number;
+      lastTrainBack: LastTrainBack | null;
+      lastTrainBackNote?: string;
+    }
   | { status: 'no_tier1_route'; reason?: string }
   | { status: 'no_service'; message: string; nextScheduledDepartureAt?: string }
   | { status: 'error'; message: string };
@@ -88,13 +97,39 @@ export function renderRouteState(box: HTMLElement, state: RouteState, retry: () 
   } else {
     const r = state.result;
     if (r.status === 'ok') {
-      const mins = Math.max(1, Math.round(r.option.durationSec / 60));
+      const firstWait = r.firstTrainWaitSeconds ?? 0;
+      const mins = Math.max(1, Math.round((r.option.durationSec + firstWait) / 60));
       const t = r.option.transfers;
       title(`About ${mins} min · ${t === 0 ? 'no transfers' : `${t} transfer${t === 1 ? '' : 's'}`}`);
-      line('Walk and ride time; excludes waiting for the train. Walks are straight-line estimates.', 'route-note');
+      const waitSec = r.transferWaitSeconds ?? 0;
+      line(
+        r.firstTrainWaitSeconds === undefined
+          ? 'Walk and ride time; excludes waiting for the train. Walks are straight-line estimates.'
+          : 'Assumes you leave now. Walks are straight-line estimates; waits and rides use the MBTA schedule, so real trains may differ.',
+        'route-note',
+      );
       const ul = document.createElement('ul');
       ul.className = 'route-legs';
+      let transitSeen = 0;
       for (const leg of r.option.legs) {
+        // First-train wait sits right before the first ride (after the walk to the station).
+        if (leg.mode !== 'walk' && transitSeen === 0 && firstWait > 0) {
+          const f = document.createElement('li');
+          const fm = Math.max(1, Math.round(firstWait / 60));
+          f.textContent = `Wait at ${leg.fromStopName ?? 'station'} · ~${fm} min, next scheduled ${leg.routeShortName ?? ''} train`.replace('  ', ' ');
+          f.style.setProperty('--leg-color', '#9ca3af');
+          f.className = 'leg-wait';
+          ul.append(f);
+        }
+        // The transfer wait sits right before the second ride (after any transfer walk).
+        if (leg.mode !== 'walk' && ++transitSeen === 2 && waitSec > 0) {
+          const w = document.createElement('li');
+          const wm = Math.max(1, Math.round(waitSec / 60));
+          w.textContent = `Wait at ${leg.fromStopName ?? 'transfer'} · ~${wm} min, next scheduled train`;
+          w.style.setProperty('--leg-color', '#9ca3af');
+          w.className = 'leg-wait';
+          ul.append(w);
+        }
         const li = document.createElement('li');
         const m = Math.max(1, Math.round(leg.durationSec / 60));
         const what =
