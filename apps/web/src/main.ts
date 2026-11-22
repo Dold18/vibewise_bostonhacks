@@ -4,6 +4,7 @@ import './style.css';
 import { BUILDING_3D_LAYER, BUILDING_3D_OPACITY, mapStyle } from './mapStyle';
 import { PIN_COLORS } from './pinColors';
 import { mountAccount } from './features/account';
+import { mountScene, sceneDevHook } from './features/scene';
 import {
   CATEGORIES,
   formatAddress,
@@ -330,6 +331,7 @@ let routeBox: HTMLElement | null = null;
 let routeSeq = 0; // id of the current selection's request; anything older is stale
 let routeAbort: AbortController | undefined;
 let routePlace: Place | null = null;
+let scene: ReturnType<typeof mountScene> | undefined; // assigned once accounts mount, at the bottom
 let discovery: DiscoveryPanelHandle | undefined; // assigned when the panel mounts, at the bottom
 
 const currentOrigin = (): LatLng | null => discovery?.getPreferences().origin?.location ?? null;
@@ -339,12 +341,15 @@ function cancelRoute() {
   routeSeq++;
   routeAbort?.abort();
   routePlace = null;
+  scene?.setNavigation(false);
   clearRoute(map);
 }
 
 async function showRouteTo(place: Place) {
   cancelRoute();
   routePlace = place;
+  // Coalesced with the cancel above: switching destinations stays in navigation.
+  scene?.setNavigation(true);
   const box = routeBox; // this selection's own box; a newer card replaces routeBox
   if (!box) return;
   const seq = routeSeq;
@@ -694,7 +699,17 @@ discovery = mountDiscoveryPanel(document.body, {
 });
 
 // Accounts: sign-in in the top right; the map theme follows the user's vibes.
-mountAccount(document.body, { map });
+const account = mountAccount(document.body, { map });
+
+// Scene Composer: the session owns the map's look (account taste until an
+// outing scene exists). Navigation keeps the palette and drops decorations.
+scene = mountScene({
+  theme: account.theme,
+  account: account.store,
+  reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)'),
+  onError: (error) => console.error('[scene]', error),
+});
+if (import.meta.env.DEV) Object.assign(window, { vibentaScene: sceneDevHook(scene) });
 
 // A different starting point makes the shown route wrong: re-plan for the open card's place.
 let lastOrigin = currentOrigin();
