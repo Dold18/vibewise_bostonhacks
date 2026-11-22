@@ -1,5 +1,5 @@
 /** Browser-local image selection for the vibe step. This module NEVER uploads a file. */
-export const MAX_VIBE_IMAGES = 5;
+export const MAX_VIBE_IMAGES = 1;
 export const MAX_VIBE_IMAGE_BYTES = 8 * 1024 * 1024;
 export const ACCEPTED_VIBE_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
 
@@ -18,7 +18,7 @@ export interface VibeImageSelection {
   errors: string[];
 }
 
-/** Accepts as many valid distinct images as fit; reports reasons for skipped files. */
+/** Accepts valid distinct images up to MAX_VIBE_IMAGES (one); reports reasons for skipped files. */
 export function appendVibeImages(current: readonly File[], incoming: readonly File[]): VibeImageSelection {
   const files = [...current].filter(supportedVibeImage).slice(0, MAX_VIBE_IMAGES);
   const seen = new Set(files.map(imageKey));
@@ -32,7 +32,7 @@ export function appendVibeImages(current: readonly File[], incoming: readonly Fi
     } else if (seen.has(imageKey(file))) {
       errors.push(`${file.name}: already added.`);
     } else if (files.length >= MAX_VIBE_IMAGES) {
-      errors.push(`Maximum ${MAX_VIBE_IMAGES} images. Remove one to add another.`);
+      errors.push('Maximum 1 image. Remove it to add another.');
       break;
     } else {
       files.push(file);

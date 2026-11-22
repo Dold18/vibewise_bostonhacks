@@ -86,3 +86,15 @@
 .vb-quiz-reading { padding:10px; border-radius:8px; background:var(--vb-tint,#eaf1f5); font-size:12px; line-height:1.5; }.vb-quiz-reading p { margin:0 0 4px; }
 @media (max-width:420px) { .vb-media-grid { grid-template-columns:1fr; } }
 @media (prefers-reduced-motion:reduce) { .vb-media-reveal img,.vb-live-quiz { transition:none; } }
+
+/* Shared one-photo attachment (vibe screen and own-words answers). */
+.vb-photo-attachment { display:flex; flex-direction:column; align-items:stretch; gap:8px; min-width:0; }
+.vb-photo-attachment:empty { display:none; }
+.vb-photo-add,.vb-photo-signin { align-self:flex-start; display:inline-flex; align-items:center; gap:6px; white-space:normal; text-align:left; }
+.vb-photo-add > svg { fill:currentColor; }
+.vb-photo-attached { display:flex; align-items:flex-start; gap:12px; min-width:0; }
+.vb-photo-thumb { flex:none; width:88px; grid-template-rows:minmax(0,1fr); }
+.vb-photo-description { flex:1; min-width:0; margin:0; font-size:12px; line-height:1.5; color:var(--vb-text,#202124); overflow-wrap:anywhere; }
+.vb-photo-quota { margin:0; font-size:11px; line-height:1.4; color:var(--vb-muted,#5f6368); }
+.vb-photo-quota[hidden] { display:none; }
+.vb-image-remove:disabled { opacity:.5; cursor:default; }

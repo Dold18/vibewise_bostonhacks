@@ -29,6 +29,9 @@ import { createLocationField } from './locationField';
 import { createMultiSelectField } from './multiSelectField';
 import { createSelectField } from './selectField';
 import { createLiveQuiz } from '../../features/vibe/ui/liveQuiz';
+import { photoAccess } from '../../features/vibe/photoAccess';
+import { photoClient } from '../../features/vibe/photoClient';
+import { prepareMessage, type PreparedMessage } from '../../features/vibe/photoSend';
 import { createVibeStep } from './vibeStep';
 import { createTimingField } from './timingField';
 import {
@@ -118,12 +121,44 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   let quizMode = false;
   const liveQuiz = createLiveQuiz(() => toggleQuiz(false));
   const beginQuiz = h('button', { type: 'button', class: 'vb-primary-btn vb-begin-quiz' }, 'Start vibe quiz');
-  beginQuiz.addEventListener('click', () => {
-    toggleQuiz(true);
+  let startingQuiz = false;
+  beginQuiz.addEventListener('click', async () => {
+    if (startingQuiz) return;
     const p = prefs.getState();
+    // A photo kept from before signing out is not sent until the user signs in again.
+    const photo = photoAccess.status() === 'signed_in' ? p.vibeImages[0] ?? null : null;
+    const reading = !!photo && photoClient.cached(photo) === undefined;
+    startingQuiz = true;
+    if (reading) {
+      beginQuiz.disabled = true;
+      beginQuiz.textContent = 'Reading your photo…';
+      vibeStep.setPhoto({ busy: true, status: null });
+    }
+    let result: PreparedMessage;
+    try {
+      // Editing the draft or pressing Clear all while the photo is read cancels this start.
+      const isCurrent = () => prefs.getState().vibeText === p.vibeText && prefs.getState().vibeImages[0] === p.vibeImages[0];
+      result = await prepareMessage({ text: p.vibeText, photo, client: photoClient, isCurrent });
+    } finally {
+      startingQuiz = false;
+      beginQuiz.disabled = false;
+      beginQuiz.textContent = 'Start vibe quiz';
+    }
+    if (!result.ok && result.reason === 'stale') {
+      const current = prefs.getState().vibeImages[0];
+      vibeStep.setPhoto({ description: current ? photoClient.cached(current) ?? null : null, busy: false });
+      return;
+    }
+    if (!result.ok) {
+      // Stay on the vibe screen with the draft and the reason.
+      vibeStep.setPhoto({ status: { text: result.message, kind: 'error' }, busy: false });
+      return;
+    }
+    vibeStep.setPhoto(photo ? { description: photoClient.cached(photo) ?? null, status: null, busy: false } : { status: null });
     const previous = liveQuiz.session.getSnapshot();
-    if (previous && previous.originalInput.text === p.vibeText.trim() && previous.originalInput.imageCount === p.vibeImages.length) liveQuiz.resume();
-    else liveQuiz.start(p.vibeText, p.vibeImages.length);
+    toggleQuiz(true);
+    if (previous && previous.originalInput.text === result.text && previous.originalInput.imageCount === result.imageCount) liveQuiz.resume();
+    else liveQuiz.start(result.text, result.imageCount);
     // The quiz replaces a tall vibe form inside a scrolling panel. Move into
     // the new content so the user sees the first question or loading state.
     liveQuiz.focus();

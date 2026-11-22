@@ -11,13 +11,12 @@ const file = (name: string, type = 'image/jpeg', size = 1000, lastModified = 1):
   ({ name, type, size, lastModified } as File);
 
 describe('vibe photo selection', () => {
-  it('adds distinct JPG/PNG/WebP files in order', () => {
-    const first = file('cozy.jpg');
-    const second = file('cinema.png', 'image/png');
-    const third = file('music.webp', 'image/webp');
-    const selected = appendVibeImages([], [first, second, third]);
-    expect(selected.files).toEqual([first, second, third]);
-    expect(selected.errors).toEqual([]);
+  it('accepts JPG, PNG and WebP files, each added into an empty selection', () => {
+    for (const picked of [file('cozy.jpg'), file('cinema.png', 'image/png'), file('music.webp', 'image/webp')]) {
+      const selected = appendVibeImages([], [picked]);
+      expect(selected.files).toEqual([picked]);
+      expect(selected.errors).toEqual([]);
+    }
   });
 
   it('does not allow duplicate selection after revisiting a step', () => {
@@ -38,14 +37,22 @@ describe('vibe photo selection', () => {
     expect(selected.errors).toHaveLength(2);
   });
 
-  it('caps selections at five images while retaining existing files', () => {
-    const current = Array.from({ length: MAX_VIBE_IMAGES - 1 }, (_, i) => file(`existing-${i}.jpg`));
-    const selected = appendVibeImages(current, [
-      file('new-one.jpg'), file('new-two.jpg'),
-    ]);
-    expect(selected.files).toHaveLength(MAX_VIBE_IMAGES);
-    expect(selected.files.at(-1)?.name).toBe('new-one.jpg');
-    expect(selected.errors.some((message) => message.includes('Maximum'))).toBe(true);
+  it('holds at most one photo', () => {
+    expect(MAX_VIBE_IMAGES).toBe(1);
+  });
+
+  it('keeps the first of two files and explains how to swap', () => {
+    const first = file('first.jpg');
+    const selected = appendVibeImages([], [first, file('second.jpg')]);
+    expect(selected.files).toEqual([first]);
+    expect(selected.errors).toEqual(['Maximum 1 image. Remove it to add another.']);
+  });
+
+  it('refuses a second photo while one is attached', () => {
+    const current = file('current.jpg');
+    const selected = appendVibeImages([current], [file('another.png', 'image/png')]);
+    expect(selected.files).toEqual([current]);
+    expect(selected.errors).toEqual(['Maximum 1 image. Remove it to add another.']);
   });
 });
 
@@ -59,6 +66,12 @@ describe('vibe images in preferences state', () => {
     const withActivity = preferencesReducer(withVibe, { type: 'setActivity', activity: 'food_drinks' });
     expect(withActivity.vibeText).toBe('dim lighting and jazz');
     expect(withActivity.vibeImages).toEqual([picture]);
+  });
+
+  it('keeps only one photo when two are dispatched', () => {
+    const first = file('one.jpg');
+    const state = preferencesReducer(initialPreferences(), { type: 'setVibeImages', files: [first, file('two.jpg')] });
+    expect(state.vibeImages).toEqual([first]);
   });
 
   it('clear all removes the browser-local File references', () => {
