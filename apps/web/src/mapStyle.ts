@@ -370,8 +370,37 @@ const buildLayers = (palette: Palette): LayerSpecification[] => [
   },
 ];
 
-/** The full map style in the given colors. Only colors depend on the palette. */
-export function buildMapStyle(palette: Palette): StyleSpecification {
+/**
+ * Light, sky/fog and transition parameters a scene may set (Scene Composer,
+ * approved interface). The defaults are today's values, so
+ * `buildMapStyle(palette)` is unchanged.
+ */
+export interface SceneStyle {
+  /** MapLibre light intensity, 0–1. */
+  lightIntensity: number;
+  /** MapLibre light position [radial, azimuthal°, polar°], viewport-anchored. */
+  lightPosition: [number, number, number];
+  /** Fog color; null = follow `palette.land` (today's behavior). */
+  fogColor: string | null;
+  skyHorizonBlend: number;
+  horizonFogBlend: number;
+  fogGroundBlend: number;
+  /** Duration of the style-wide transition (used once, when the map is created). */
+  transitionMs: number;
+}
+
+export const DEFAULT_SCENE_STYLE: Readonly<SceneStyle> = Object.freeze({
+  lightIntensity: 0.35,
+  lightPosition: [1.4, 295, 40] as [number, number, number],
+  fogColor: null,
+  skyHorizonBlend: 0.6,
+  horizonFogBlend: 0.7,
+  fogGroundBlend: 0.85,
+  transitionMs: THEME_TRANSITION_MS,
+});
+
+/** The full map style in the given colors and scene parameters. */
+export function buildMapStyle(palette: Palette, scene: Readonly<SceneStyle> = DEFAULT_SCENE_STYLE): StyleSpecification {
   return {
     version: 8,
     name: 'Vibenta Maps Draft',
@@ -379,20 +408,24 @@ export function buildMapStyle(palette: Palette): StyleSpecification {
     sources: {
       [SOURCE]: { type: 'vector', url: 'https://tiles.openfreemap.org/planet' },
     },
-    transition: { duration: THEME_TRANSITION_MS, delay: 0 },
-    // Light from the screen's left (azimuth 295°); pin shadows in style.css fall
-    // the opposite way (115°) so the two stay consistent.
-    light: { anchor: 'viewport', color: palette.light, intensity: 0.35, position: [1.4, 295, 40] },
+    transition: { duration: scene.transitionMs, delay: 0 },
+    // Light from the screen's left by default (azimuth 295°). Pin shadows in
+    // style.css fall the opposite way via --light-azimuth (lightShadowAngle),
+    // so the two stay consistent when a scene moves the light.
+    light: { anchor: 'viewport', color: palette.light, intensity: scene.lightIntensity, position: [...scene.lightPosition] },
     sky: {
       'sky-color': palette.sky,
       'horizon-color': palette.horizon,
-      'fog-color': palette.land,
-      'sky-horizon-blend': 0.6,
-      'horizon-fog-blend': 0.7,
-      'fog-ground-blend': 0.85,
+      'fog-color': scene.fogColor ?? palette.land,
+      'sky-horizon-blend': scene.skyHorizonBlend,
+      'horizon-fog-blend': scene.horizonFogBlend,
+      'fog-ground-blend': scene.fogGroundBlend,
     },
     layers: buildLayers(palette),
   };
 }
 
 export const mapStyle: StyleSpecification = buildMapStyle(basePalette);
+
+/** Screen angle (deg) pin shadows fall at for a light azimuth: directly opposite the light. */
+export const lightShadowAngle = (azimuth: number) => (((azimuth + 180) % 360) + 360) % 360;

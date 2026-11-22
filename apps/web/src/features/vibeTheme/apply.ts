@@ -6,7 +6,7 @@
  * value and is never touched.
  */
 import type { LightSpecification, SkySpecification, StyleSpecification } from '@maplibre/maplibre-gl-style-spec';
-import { buildMapStyle, type Palette } from '../../mapStyle';
+import { basePalette, buildMapStyle, DEFAULT_SCENE_STYLE, type Palette, type SceneStyle } from '../../mapStyle';
 
 export interface PaintChange {
   layerId: string;
@@ -40,12 +40,45 @@ export function diffPaint(from: StyleSpecification, to: StyleSpecification): Pai
 }
 
 export function applyPalette(map: PaintTarget, from: Palette, to: Palette): void {
-  const a = buildMapStyle(from);
-  const b = buildMapStyle(to);
+  applyStyle(map, { palette: from }, { palette: to });
+}
+
+/** What the live style is built from: colors plus optional scene light/sky parameters. */
+export interface StyleInputs {
+  palette: Palette;
+  scene?: Readonly<SceneStyle>;
+}
+
+/**
+ * Move the live map between two sets of style inputs: only changed paint
+ * values, then sky and light if they differ. Never `setStyle`.
+ */
+export function applyStyle(map: PaintTarget, from: StyleInputs, to: StyleInputs): void {
+  const a = buildMapStyle(from.palette, from.scene ?? DEFAULT_SCENE_STYLE);
+  const b = buildMapStyle(to.palette, to.scene ?? DEFAULT_SCENE_STYLE);
   for (const { layerId, property, value } of diffPaint(a, b)) {
     if (NEVER_SET.has(property) || !map.getLayer(layerId)) continue;
     map.setPaintProperty(layerId, property, value);
   }
   if (b.sky && !same(a.sky, b.sky)) map.setSky(b.sky);
   if (b.light && !same(a.light, b.light)) map.setLight(b.light);
+}
+
+/** Every color paint property of the base style, as [layerId, property]. */
+export const COLOR_PAINT: readonly (readonly [string, string])[] = buildMapStyle(basePalette).layers.flatMap((l) =>
+  Object.keys(('paint' in l && l.paint) || {})
+    .filter((p) => p.endsWith('-color'))
+    .map((p) => [l.id, p] as const),
+);
+
+/**
+ * Set how long color changes take, per paint property (`<prop>-transition`,
+ * part of the public style API), so a scene can fade faster under reduced
+ * motion or slower for a cinematic change without rebuilding the style.
+ */
+export function setColorTransition(map: PaintTarget, durationMs: number): void {
+  const transition = { duration: Math.max(0, Math.round(durationMs)), delay: 0 };
+  for (const [layerId, property] of COLOR_PAINT) {
+    if (map.getLayer(layerId)) map.setPaintProperty(layerId, `${property}-transition`, transition);
+  }
 }
