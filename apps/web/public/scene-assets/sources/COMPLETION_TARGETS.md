@@ -1,78 +1,70 @@
-# Vibenta Scene Asset Library — Completion Gate v2
+# Vibenta Scene Asset Library — Current Completion Gate
 
-**Date:** 2026-11-21  
-**Status:** procurement and design targets; none of the 3D props are enabled in the map yet
+**Last verified:** November 21, 2026  
+**Branch:** `assets/scene-procedural-pack-v1` (PR #33, draft)  
+**Scope:** asset procurement, static layouts, standalone QA tools. **Not the Scene Composer.**
 
-## Current verified GitHub inventory
+## GitHub-resident inventory
 
-| Asset inventory | Actual stored | Status |
-|---|---:|---|
-| Original v1 SVG effects/textures | 33 | Static vectors, not wired to renderer |
-| Original v2 SVG atlas variants | 192 | Twelve 4×4 atlases, not wired |
-| Original KayKit glTF models | 40 | Source byte integrity verified; visual/scale QA pending |
-| Additional converted CC0 GLB models | **168** | 168/168 byte-identical to pinned third-party source Git blobs; QA pending |
-| **Total stored 3D models** | **208** | **No 3D set pieces rendered** |
-| **Total SVG + 3D items/variations** | **433** | Not interchangeable; 192 SVGs are atlas cells |
-| Completed, placement-tested thematic installations | **0** | Concept recipes exist, but not composed |
-| Further independently curated external GLB candidates | 40 | **NOT downloaded/imported**; overlaps possible |
-| Source-pack leads | 55 | Metadata only, not downloadable runtime objects |
-| Proposed context+vibe combinations | 28 | Conceptual recipes, not prebuilt geometry
-| ID-validated composition ingredient recipes | 30 | Grounded in 208 imported models; NOT assembled/placed |
+| Asset class | Stored on branch | Evidence / restrictions |
+| --- | ---: | --- |
+| Original SVG v1 effects and textures | 33 | Procedural vector only; not renderer-connected |
+| Original SVG v2 atlas cells | 224 | 14 four-by-four atlases, including 16 food and 16 music motifs |
+| KayKit CC0 glTF models | 120 | Original glTF, BIN, texture and license files |
+| Modelibr converted CC0 GLB models | 192 | Source SHA / import byte integrity checked; author and license caveats recorded |
+| **3D model files** | **312** | 120 + 192 distinct model entries, no duplicate-format inflation |
+| **2D plus 3D items / variants** | **569** | Heterogeneous items, not 569 independently renderable world assets |
+| Authored two-slot compositions | **40** | 30 existing recipes plus 10 new recipes, 147 placed references |
+| Unique model IDs referenced by compositions | **91** | All ID references resolve to imported files |
 
-### New import specifics
-- `../third-party/modelibr/manifest.v1.json`: **168** CC0 GLB models from **15** self-contained source packs, totaling **8,407,240 bytes (8.02 MiB)**. Formats are already single-file binary glTF.
-- `../third-party/modelibr/gallery.html`: searchable thumbnail index for these 168 imported files. Thumbnails load externally from an upstream pinned revision; actual GLBs are stored in this repository.
-- Official creator categories: Kenney Food/Fantasy/Graveyard/Nature/Holiday/Arcade/Market/Furniture/Pirate/Retro/City; Quaternius Sushi/Junk Food/Cyberpunk; The Base Mesh instrumental props.
-- All 168 imported GLBs' Git blob SHAs and byte lengths match the conversion repository. Model headers were checked for GLB magic/version 2 during import.
-- These are *publisher-derived converted models*. Compare their source creator pages and CC0 terms before production; do not claim they are original, unconverted publisher files.
-- **Remaining QA:** model dimensions, orientation, visual correctness, missing textures, triangle counts, GLB structural validation, browser rendering, memory/graphics cost, touch device profiles, licensing snapshots.
+A full PR branch Git tree pass checked **312/312** model paths, GLB file byte sizes and Git blob IDs where declared, **zero mismatches**; all **40/40** compositions reference imported models. This is a source/integrity audit **not** browser rendering QA.
 
-- `../third-party/composites/recipes.v1.json`: **30** candidate context-hero + mood-accent combinations, all asset IDs verified against the 208 imported model IDs. **These are not 30 assembled or tested installations.**
+## Library feature coverage
 
-## Stopping target before Scene Composer implementation
+- 20 dining/cuisine families and 19 music genres have explicit readiness records in `coverage-readiness.v1.json`.
+- Cuisine: 8 specific, 1 partial, 4 generic-compatible, **7 atmosphere-only**.
+- Music: 4 partial, 10 generic-compatible, **5 atmosphere-only**; no genre should be described as visually complete purely because an instrument-related asset exists.
+- New motifs add illustrated piano keys, sax, trumpet, turntable, microphone, headphones, sushi, noodle bowls, grill, dumpling and other food/music **2D decorations**. These are original illustrations, not 3D instrument models.
+- Higher-quality Korean BBQ, Indian, Thai, Vietnamese, Ethiopian, Greek and Middle Eastern cuisine props, as well as brass instruments / drum kits / DJ rigs, remain procurement leads. These must not be fabricated or treated as already imported.
 
-A credible broad initial library should have:
+## Two-slot composition contract
 
-1. **250–350 distinct 3D props**, centered around **300**. With **208 now imported**, that is **42–142 more** (roughly **92 more** to hit 300). Do not count format copies, source links or thumbnails.
-2. **30–50 reusable *actual composite installations*** with measured transforms, bounds, visual themes and navigation-safe behavior. Currently zero built. The previously proposed 28 compositions do not count.
-3. **250–350 SVG/material/effect variations**; currently 225 generated. Aim for better cover across lighting, road material, atmospheric effects; do not add redundant swatches solely to increase the count.
-4. Broad **cuisine** coverage: at least 20 families with several truly identifiable motif options, not only generic bowls/restaurant furniture.
-5. Broad **music** coverage: at least 15 high-value genres with a recognizable array of relevant instruments/venue props/stage equipment. Current music props have a piano, acoustic guitar, pan flute, drum stick, violin bow and assorted stage supports, but are **insufficient** for jazz, EDM, rock, salsa, etc. in isolation.
-6. At least 10 atmosphere-only motifs for a user's vibe when no genre/cuisine is selected (e.g. haunted, romantic, futuristic, playful, calm, moody, nostalgic).
-7. Complete provenance, verified source and license, search tags, model origin, dimensions/anchor, GPU budget, collision footprint, preview QA, fallback and reduced-motion metadata for every active asset.
+`third-party/composites/layouts.v1.json` now defines:
 
-**Do not use 300 as an automatic trigger if the thematic coverage or QA criteria are not met.** Content breadth and selection quality outweigh raw model counts.
+- `hero_installation`: one primary context display.
+- `ambient_accent`: one optional complementary vibe display.
+- Explicit model IDs, local preview transforms, yaw, per-prop normalized span, center, slot radius, palette and activation policy.
+- Fictional decorations only. Do not claim these structures, dishes, instruments or performances are features of real Boston venues.
+- Explicit/user-verified contexts for cuisine or music and special opt-in for observances.
+- Hide both slots if they cover pins, walking/MBTA routes, stops, map labels, attributions or interaction areas; always hide in navigation/focus mode.
+- No audio autoplay. Respect reduced motion. Lazy-load selected assets only.
 
-## Highest-value remaining procurement
+The two display slots are **not yet anchored in actual MapLibre world coordinates**. Their positions in the JSON and gallery are authored *preview units* and must be reconciled with map interaction and camera policies during the Scene Composer phase.
 
-| Priority | Gap | Suggested focus |
-|---|---|---|
-| 1 | **Music performance** | Complete guitar/drum/keyboard kits, saxophone, brass, DJ decks, mixers, microphones, regional percussion and disco installation props |
-| 2 | **Distinct cuisines** | Korean barbecue, pho, banh mi, Thai dishes, Ethiopian injera, Indian thali/naan, Middle Eastern mezze, Greek dishes; robust Italian meal set |
-| 3 | **Cultural care and specificity** | Only select cuisine/genre/holiday motifs for explicitly chosen or verified venue contexts; avoid generic cultural stereotypes |
-| 4 | **Composite installations** | Build 30–50 stylized hero+accent bundles from already acquired models, with safe placement and a coherent visual language |
-| 5 | **Visual coherence** | Make mixed Kenney, Quaternius, KayKit and The Base Mesh assets consistent via material/palette style normalization and device-appropriate LOD |
+## Local acceptance run
 
-## Per-model acceptance checklist
+From the repository root:
 
-- [ ] Actually imported, unique by semantic role, and licensed for the contemplated use (not merely sourced)
-- [x] Source bytes match the referenced Git blob **for the 208 imported assets** (separate verification for KayKit and Modelibr imports)
-- [ ] Actual GLB/glTF structural validation, renderability and texture/UV check
-- [ ] Approved thumbnail/preview and consistent styling
-- [ ] Measured scale, pivot, orientation, bounding box, triangle count, texture weight and draw calls
-- [ ] Mobile/laptop/Safari performance budget
-- [ ] Navigation overlays, selected venue, stations and attribution remain fully accessible
-- [ ] Safe reduced-motion and focus-mode fallback
-- [ ] No false statements about real venue features, food menus or performances
+```bash
+node scripts/validate-scene-assets.mjs
+node scripts/validate-scene-layouts.mjs
+cd apps/web && npm install && npm run dev
+```
 
-Once these criteria and composition coverage are met, begin the Scene Composer. Continue the library in targeted small updates afterward if real scene tests reveal gaps.
+Open in the Vite browser:
 
-## November 21 procurement pass
+- `/scene-assets/third-party/modelibr/gallery.html` — source-thumbnail inventory.
+- `/scene-assets/third-party/composites/gallery.html` — actual GLB/glTF two-slot 3D layout preview, with orbit controls and a browser-local visual-inspection export.
+- `/scene-assets/v2/gallery.html` — 2D atlas visual preview.
 
-The source branch has now added **80** verified 3D models beyond the earlier 40, for **120 total** across eight organized source folders. All 256 associated source files were verified byte-identical using official GitHub blob SHAs. These additions prioritize general-purpose food, venue props, gothic/seasonal, fictional city, fantasy/festival, nature and sci-fi assets. **No new music-instrument or cuisine-specific regional dish model is claimed as imported.** The next major pass should focus on those missing differentiated themes rather than importing hundreds of near-identical furniture/ingredient variants.
+The 3D composition preview imports pinned Three.js dependencies over the internet; it is standalone QA tooling and is **not connected to the production map or the quiz**. Approve individual arrangements only after visually checking them. The export is a review record, not proof of mobile GPU behavior.
 
-## Reconciled inventory after parallel import (2026-11-21)
+## Handoff status
 
-The separate `modelibr/manifest.v1.json` lists 168 converted GLB model files from 15 source packs. A direct Git tree inspection confirms **168 .glb files**; the updated KayKit manifest and Git tree confirm **120 .gltf models**. Together these are **288 imported 3D model files**, plus the 225 existing SVG variants. This supersedes the older 120-only planning baseline above wherever inconsistent.
+**Procurement target met** (312 3D files, 257 2D variants, 40 authored layouts). **Not yet fully production-approved:** source verification has been completed, but no local end-to-end build, runtime 3D visual inspection, texture/UV validation, ground-contact/occlusion QA, Safari/mobile profiling or 40-scene human signoff has been performed in this tooling environment.
 
-**Stop rule:** Do not source 12 arbitrary duplicates just to hit 300. First verify mesh appearance, packaging, licensing/provenance, cuisine and music semantic coverage, and that a 3D vignette can actually be assembled without obstructing map navigation. The 30 current recipes are **unbuilt ingredient lists**; 30–50 tested composites are still required.
+The Scene Composer architecture can proceed using stable IDs, strict capability gating and the 40 authored layouts. **Do not enable arbitrary automatic 3D installations on the live map until the standalone previews and visibility checks pass.** When niche cuisine or music props are missing, prefer atmosphere-only changes rather than unsupported cultural motifs.
+
+## Historical note
+
+Earlier sections of this file tracked 208 or 288 models, 225 SVG variants and 30 unassembled recipes. Those numbers are superseded by the current inventory above. Missing visual QA is **not** superseded.
