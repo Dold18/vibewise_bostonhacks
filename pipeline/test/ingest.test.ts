@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assertWritable, parseCliArgs, summarize } from '../src/ingest.ts';
-import type { RekeyAction, RestaurantRow } from '../src/types.ts';
+import { assignIds, assertWritable, parseCliArgs, summarize } from '../src/ingest.ts';
+import type { KindRow, PlaceRow, RekeyAction, RestaurantRow } from '../src/types.ts';
 
 function row(n: number, extra: Partial<RestaurantRow> = {}): RestaurantRow {
   return {
@@ -14,16 +14,26 @@ function row(n: number, extra: Partial<RestaurantRow> = {}): RestaurantRow {
 
 const baseInput = {
   osm: 3, fsq: 2, matches: 1, dropped: 0, staleFsqDropped: 0,
-  existingKeys: new Set<string>(), rows: [] as RestaurantRow[], actions: [] as RekeyAction[], notSeen: 0 as number | null,
+  existingKeys: new Set<string>(), rows: [] as PlaceRow[], actions: [] as RekeyAction[], notSeen: 0 as number | null,
+  type: 'restaurants' as const, crossTypeSkipped: 0 as number | null, conflictsSkipped: 0 as number | null,
 };
 
 test('parseCliArgs defaults and flags', () => {
-  assert.deepEqual(parseCliArgs([]), { dryRun: false, sources: 'all', refresh: false });
-  assert.deepEqual(parseCliArgs(['--dry-run', '--sources=osm', '--refresh']), { dryRun: true, sources: 'osm', refresh: true });
+  assert.deepEqual(parseCliArgs(['--type', 'restaurants']), { type: 'restaurants', dryRun: false, sources: 'all', refresh: false });
+  assert.deepEqual(
+    parseCliArgs(['--type=parks', '--dry-run', '--sources=osm', '--refresh']),
+    { type: 'parks', dryRun: true, sources: 'osm', refresh: true },
+  );
+});
+
+test('parseCliArgs requires a known --type', () => {
+  assert.equal(parseCliArgs(['--type', 'museums', '--dry-run']).type, 'museums');
+  assert.throws(() => parseCliArgs([]), /^Error: missing --type \(expected one of restaurants, museums, entertainment, parks, landmarks\)$/);
+  assert.throws(() => parseCliArgs(['--type', 'zoos']), /invalid --type 'zoos'/);
 });
 
 test('parseCliArgs rejects an unknown source', () => {
-  assert.throws(() => parseCliArgs(['--sources=yelp']), /sources/);
+  assert.throws(() => parseCliArgs(['--type=parks', '--sources=yelp']), /sources/);
 });
 
 test('summarize counts inserted vs updated from existing keys and lists collapsed ids', () => {
@@ -56,8 +66,8 @@ test('summarize in dry run reports not seen as n/a', () => {
 });
 
 test('parseCliArgs accepts --allow-partial', () => {
-  assert.equal(parseCliArgs(['--allow-partial']).allowPartial, true);
-  assert.equal(parseCliArgs([]).allowPartial, undefined);
+  assert.equal(parseCliArgs(['--type=parks', '--allow-partial']).allowPartial, true);
+  assert.equal(parseCliArgs(['--type=parks']).allowPartial, undefined);
 });
 
 test('assertWritable refuses single-source writes unless allowed', () => {
@@ -67,4 +77,40 @@ test('assertWritable refuses single-source writes unless allowed', () => {
   assert.throws(() => assertWritable({ osmLoaded: false, fsqLoaded: false, allowPartial: false }), /--allow-partial/);
   assert.match(assertWritable({ osmLoaded: true, fsqLoaded: false, allowPartial: true })!, /link will be cleared/);
   assert.match(assertWritable({ osmLoaded: false, fsqLoaded: true, allowPartial: true })!, /duplicate pins/);
+});
+
+function kindRow(n: number, extra: Partial<KindRow> = {}): KindRow {
+  return {
+    place_id: `osm:way/${n}`, source: 'osm', source_id: `way/${n}`, name: `Park ${n}`,
+    location: 'SRID=4326;POINT(-71.06 42.35)', address: null, website: null, phone: null, hours_raw: null,
+    osm_tags: {}, fsq_place_id: null, attribution: 'x', last_seen_at: '2026-11-21T12:00:00.000Z', kind: 'park', ...extra,
+  };
+}
+
+test('assignIds gives existing rows their key id and new rows their registry id', () => {
+  const out = assignIds([kindRow(1), kindRow(2)], new Map([['osm:way/1', 11]]), new Map([['osm:way/2', 22]]));
+  assert.deepEqual(out.map((r) => r.id), [11, 22]);
+  assert.ok(out.every((r) => typeof r.id === 'number'));
+  assert.equal(out[1]!.name, 'Park 2');
+});
+
+test('assignIds throws naming the place_id of a row with no id', () => {
+  assert.throws(() => assignIds([kindRow(1), kindRow(3)], new Map([['osm:way/1', 11]]), new Map()), /osm:way\/3/);
+});
+
+test('summarize lists skipped cross-type duplicates and type conflicts', () => {
+  const lines = summarize({ ...baseInput, crossTypeSkipped: 2, conflictsSkipped: 1 }).split('\n');
+  assert.ok(lines.includes('Cross-type duplicates skipped: 2'));
+  assert.ok(lines.includes('Type conflicts skipped: 1'));
+  const dry = summarize({ ...baseInput, notSeen: null, crossTypeSkipped: null, conflictsSkipped: null }).split('\n');
+  assert.ok(dry.includes('Cross-type duplicates skipped: n/a (dry run)'));
+  assert.ok(dry.includes('Type conflicts skipped: n/a (dry run)'));
+});
+
+test('summarize prints missing cuisine only for restaurants', () => {
+  const parks = summarize({ ...baseInput, type: 'parks', rows: [kindRow(1)] }).split('\n');
+  assert.equal(parks.some((l) => l.startsWith('Rows missing cuisine')), false);
+  assert.ok(parks.includes('Rows missing address: 1'));
+  const food = summarize({ ...baseInput, rows: [row(1, { source_cuisines: [] })] }).split('\n');
+  assert.ok(food.includes('Rows missing cuisine: 1'));
 });

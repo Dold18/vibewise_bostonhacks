@@ -1,9 +1,13 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { UPSERT_BATCH_SIZE } from './config.ts';
+import type { OtherPlace } from './crossType.ts';
+import { parseEwkbPoint } from './geo.ts';
+import type { PlaceType } from './placeTypes.ts';
 import { PRICE_BANDS, candidateFilter, type PriceCandidate, type WritePlan } from './price.ts';
-import type { ExistingRow, RekeyAction, RestaurantRow } from './types.ts';
+import type { ExistingRow, PlaceRow, RekeyAction } from './types.ts';
 
 const PAGE_SIZE = 1000; // PostgREST max_rows
+const ID_CHUNK = 200; // ids per filter, keeps the request URL short
 
 export function connect(url: string, secretKey: string): SupabaseClient {
   // Accept the REST URL the dashboard also shows (…/rest/v1/); supabase-js adds that path itself.
@@ -11,11 +15,11 @@ export function connect(url: string, secretKey: string): SupabaseClient {
   return createClient(projectUrl, secretKey, { auth: { persistSession: false } });
 }
 
-export async function fetchExisting(client: SupabaseClient): Promise<ExistingRow[]> {
+export async function fetchExisting(client: SupabaseClient, table: PlaceType): Promise<ExistingRow[]> {
   const out: ExistingRow[] = [];
   for (let from = 0; ; from += PAGE_SIZE) {
     const { data, error } = await client
-      .from('restaurants')
+      .from(table)
       .select('id, source, source_id, fsq_place_id')
       .order('id', { ascending: true })
       .range(from, from + PAGE_SIZE - 1);
@@ -25,38 +29,93 @@ export async function fetchExisting(client: SupabaseClient): Promise<ExistingRow
   }
 }
 
-export async function applyRekey(client: SupabaseClient, actions: RekeyAction[]): Promise<void> {
+/**
+ * clear_fsq and promote update the type row (a place_id change is copied to the registry by trigger).
+ * collapse deletes the registry row, which cascades to the type row and the shared rows hanging off it.
+ */
+export async function applyRekey(client: SupabaseClient, table: PlaceType, actions: RekeyAction[]): Promise<void> {
   for (const a of actions) {
-    const table = client.from('restaurants');
     const { error } =
       a.kind === 'clear_fsq'
-        ? await table.update({ fsq_place_id: null }).eq('id', a.id)
+        ? await client.from(table).update({ fsq_place_id: null }).eq('id', a.id)
         : a.kind === 'promote'
-          ? await table.update({ source: 'osm', source_id: a.sourceId, place_id: a.placeId }).eq('id', a.id)
-          : await table.delete().eq('id', a.id);
+          ? await client.from(table).update({ source: 'osm', source_id: a.sourceId, place_id: a.placeId }).eq('id', a.id)
+          : await client.from('places').delete().eq('id', a.id);
     if (error) throw new Error(`rekey ${a.kind} failed for id ${a.id}: ${error.message}`);
   }
 }
 
+/** Every place of the other types with a usable location (for the cross-type duplicate check). */
+export async function fetchOtherTypePlaces(client: SupabaseClient, type: PlaceType): Promise<OtherPlace[]> {
+  const out: OtherPlace[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await client
+      .from('catalog_places')
+      .select('place_id, place_type, name, location')
+      .neq('place_type', type)
+      .order('id', { ascending: true })
+      .range(from, from + PAGE_SIZE - 1);
+    if (error) throw new Error(`fetchOtherTypePlaces failed at offset ${from}: ${error.message}`);
+    const page = data as Array<{ place_id: string; place_type: PlaceType; name: string; location: string | null }>;
+    for (const r of page) {
+      const point = typeof r.location === 'string' ? parseEwkbPoint(r.location) : null;
+      if (point !== null) out.push({ placeId: r.place_id, placeType: r.place_type, name: r.name, ...point });
+    }
+    if (page.length < PAGE_SIZE) return out;
+  }
+}
+
+/** The registered type of each given place_id that is in the registry. */
+export async function fetchRegisteredTypes(client: SupabaseClient, placeIds: string[]): Promise<Map<string, PlaceType>> {
+  const out = new Map<string, PlaceType>();
+  for (let i = 0; i < placeIds.length; i += ID_CHUNK) {
+    const chunk = placeIds.slice(i, i + ID_CHUNK);
+    const { data, error } = await client.from('places').select('place_id, place_type').in('place_id', chunk);
+    if (error) throw new Error(`fetchRegisteredTypes failed: ${error.message}`);
+    for (const r of data as Array<{ place_id: string; place_type: PlaceType }>) out.set(r.place_id, r.place_type);
+  }
+  return out;
+}
+
+/** Creates registry rows for new places of `type`; returns place_id -> registry id. */
+export async function registerPlaces(
+  client: SupabaseClient, type: PlaceType, placeIds: string[], batchSize = UPSERT_BATCH_SIZE,
+): Promise<Map<string, number>> {
+  const out = new Map<string, number>();
+  for (let i = 0, batch = 0; i < placeIds.length; i += batchSize, batch++) {
+    const { data, error } = await client
+      .from('places')
+      .insert(placeIds.slice(i, i + batchSize).map((placeId) => ({ place_id: placeId, place_type: type })))
+      .select('id, place_id');
+    if (error) throw new Error(`registerPlaces failed for batch ${batch}: ${error.message}`);
+    for (const r of data as Array<{ id: number; place_id: string }>) out.set(r.place_id, r.id);
+  }
+  const missing = placeIds.filter((p) => !out.has(p));
+  if (missing.length > 0) throw new Error(`registerPlaces returned no id for ${missing.slice(0, 5).join(', ')}`);
+  return out;
+}
+
+/** Every row carries its registry id: a missing id would null the type row's id on conflict, or fail the insert. */
 export async function upsertRows(
   client: SupabaseClient,
-  rows: RestaurantRow[],
+  table: PlaceType,
+  rows: Array<PlaceRow & { id: number }>,
   batchSize = UPSERT_BATCH_SIZE,
 ): Promise<void> {
   for (let i = 0, batch = 0; i < rows.length; i += batchSize, batch++) {
     const { error } = await client
-      .from('restaurants')
+      .from(table)
       .upsert(rows.slice(i, i + batchSize), { onConflict: 'source,source_id' });
     if (error) throw new Error(`upsert failed for batch ${batch}: ${error.message}`);
   }
 }
 
 /** place_ids of rows not refreshed by this run (spec 6.7): counted and listed, never deleted. */
-export async function listNotSeen(client: SupabaseClient, runStart: string): Promise<string[]> {
+export async function listNotSeen(client: SupabaseClient, table: PlaceType, runStart: string): Promise<string[]> {
   const out: string[] = [];
   for (let from = 0; ; from += PAGE_SIZE) {
     const { data, error } = await client
-      .from('restaurants')
+      .from(table)
       .select('place_id')
       .or(`last_seen_at.lt.${runStart},last_seen_at.is.null`)
       .order('id', { ascending: true })
@@ -85,8 +144,6 @@ export async function fetchPriceCandidates(
   }
   return limit === null ? out : out.slice(0, limit);
 }
-
-const ID_CHUNK = 200; // ids per update, keeps the request URL short
 
 /** Write one batch's bands. Only price columns; a row that gained a menu price meanwhile is never touched. */
 export async function writePriceBands(client: SupabaseClient, plan: WritePlan): Promise<number> {
