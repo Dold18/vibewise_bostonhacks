@@ -172,7 +172,8 @@ button {
 
 /*
  * Deal chip above the pin's head. All positioning lives on this inner span
- * (the marker's offset parent is MapLibre's wrapper), never on .pin itself.
+ * (.pin is the element MapLibre positions absolutely, so .pin is the chip's
+ * containing block), never on .pin itself.
  * Colors are fixed so it stays legible on every vibe theme.
  */
 .pin-deal {

@@ -181,7 +181,7 @@ Migration `supabase/migrations/20261122090000_create_place_deals.sql`. Full desi
 | `restaurants.deals_checked_at` | When `enrich:deals` last scanned the place's website | — |
 | `restaurant_points` view | Gains `deals_checked_at` and `last_seen_at` | Service role only |
 
-Checks: `any_time` only for `kind = 'student'`; `schedule` is non-null if and only if `timing = 'scheduled'`; `title` ≤ 120 and `quote` ≤ 200 characters. A deal is active only when `checked_at` is within 90 days and it is `any_time`, or `scheduled` and now falls in a window.
+Checks: `any_time` only for `kind = 'student'`; `schedule` is non-null if and only if `timing = 'scheduled'`; `title` ≤ 120 and `quote` ≤ 200 characters. A deal is active only when `checked_at` is within 90 days **and** either `any_time` or (`scheduled` and now in a window).
 
 ## 5. Offline enrichment pipeline
 Extends brief §3.1. All steps run as a batch job, never from the browser.
