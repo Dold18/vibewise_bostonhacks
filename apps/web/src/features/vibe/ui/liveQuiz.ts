@@ -8,6 +8,11 @@ import { apiEmbeddingProvider, apiGenerationProvider } from '../providers';
 import { mapDisplay } from '../convergence';
 import { outingProfiles } from '../publisher';
 import type { Answer, OutingVibeProfile, Response } from '../profile';
+import { photoAccess } from '../photoAccess';
+import { photoClient } from '../photoClient';
+import { prepareMessage } from '../photoSend';
+import { hasPhotoLine } from '../photoMessage';
+import { createPhotoAttachment, type PhotoAttachmentState } from './photoAttachment';
 import './quiz.css';
 /** Identify the focused control by role so it can be found again after a re-render. */
 function focusKeyIn(root:HTMLElement):string|null {
@@ -15,6 +20,9 @@ function focusKeyIn(root:HTMLElement):string|null {
  if(el.classList.contains('vb-quiz-prompt'))return 'prompt';
  if(el.classList.contains('vb-quiz-correction'))return 'correction';
  if(el.classList.contains('vb-media-freetext'))return 'freetext';
+ // Its label changes while a photo is read, so find it by class, not text.
+ if(el.classList.contains('vb-quiz-use-words'))return 'use-words';
+ if(el.closest('.vb-photo-attachment'))return 'photo';
  if(el instanceof HTMLButtonElement){const same=[...root.querySelectorAll('button')].filter(b=>b.textContent===el.textContent);return `button:${el.textContent}:${same.indexOf(el)}`;}
  return null;
 }
@@ -24,6 +32,9 @@ function restoreFocus(root:HTMLElement,key:string|null) {
  if(key==='prompt')target=root.querySelector<HTMLElement>('.vb-quiz-prompt[tabindex]');
  else if(key==='correction')target=root.querySelector<HTMLElement>('.vb-quiz-correction');
  else if(key==='freetext')target=root.querySelector<HTMLElement>('.vb-media-freetext');
+ else if(key==='use-words')target=root.querySelector<HTMLElement>('.vb-quiz-use-words');
+ // Picking or removing a photo swaps Add photo for Remove (or back): land on whichever is there now.
+ else if(key==='photo')target=root.querySelector<HTMLElement>('.vb-photo-attachment button:not(:disabled)')??root.querySelector<HTMLElement>('.vb-quiz-use-words');
  else {const [,text,index]=key.match(/^button:(.*):(\d+)$/s)??[];target=[...root.querySelectorAll('button')].filter(b=>b.textContent===text)[Number(index)];}
  (target??root).focus({preventScroll:true});
 }
@@ -33,7 +44,14 @@ export function createLiveQuiz(onBack:()=>void) {
  let editing:number|null=null;let active=false;let lastQuestion='';let lastSignature='';
  const previews=new Map<string,ScenePreviewState>();
  const mediaViews=new Map<string,MediaViewState>();
+ // The own-words photo draft lives here, not in the DOM, so it survives the
+ // re-renders snapshots cause. Keyed like `previews`; a new key starts empty.
+ let photoDraft:{key:string;state:PhotoAttachmentState}|null=null;let attachment:{root:HTMLElement;destroy():void}|null=null;
+ /** Key of the question on screen (null when none is shown): same session, question and edit slot. */
+ const questionKey=(p:OutingVibeProfile|null)=>{const q=!p?null:editing===null?(p.phase==='question'?p.question:null):p.history[editing]?.question;return p&&q?`${p.sessionId}:${q.id}:${editing??'current'}`:null;};
  const button=(text:string,run:()=>void,className='vb-text-btn')=>{const b=h('button',{type:'button',class:className},text);b.addEventListener('click',run);return b;};
+ // Photo-draft changes leave the profile untouched, so they must skip the unchanged-signature shortcut.
+ const refresh=()=>{lastSignature='';render(session.getSnapshot());};
  const respond=(response:Response)=>{const index=editing;editing=null;if(index===null)session.answer(response);else session.revise(index,response);};
  const statusText=(p:OutingVibeProfile)=>p.embedding.status==='ready'?'Semantic profile updated.':p.embedding.status==='pending'?'Updating the semantic profile…':p.embedding.status==='unavailable'?'Semantic matching is temporarily unavailable. Your answers are safe.':'Your text and answers are saved in this session.';
  function render(p:OutingVibeProfile|null) {
@@ -46,7 +64,10 @@ export function createLiveQuiz(onBack:()=>void) {
   // Snapshots re-render this view (e.g. embedding status updates). Keep the
   // user's place: focused control and any half-typed correction survive.
   const focusKey=focusKeyIn(root),draft=root.querySelector<HTMLTextAreaElement>('.vb-quiz-correction')?.value??'',draftFor=lastQuestion;
-  root.replaceChildren();root.removeAttribute('aria-busy');if(!p)return;
+  // Destroy the replaced attachment only after its successor exists, so the shared thumbnail URL is kept, not revoked and re-made.
+  const replaced=attachment;attachment=null;
+  const key=questionKey(p);if(photoDraft?.key!==key)photoDraft=key?{key,state:{file:null,description:null,status:null,busy:false}}:null;
+  root.replaceChildren();root.removeAttribute('aria-busy');if(!p){replaced?.destroy();return;}
   // The quiz palette mirrors the latest interpretation (presentation only; the map follows the publisher).
   const moodSource=[p.question,...[...p.history].reverse().map(a=>a.question)].find(q=>q&&presentationOf(q));
   const mood=moodSource?presentationOf(moodSource)!.mood:undefined;if(mood)root.dataset.mood=mood;else delete root.dataset.mood;
@@ -57,17 +78,15 @@ export function createLiveQuiz(onBack:()=>void) {
   if(p.notice)root.append(h('p',{class:'vb-quiz-notice',role:'status'},p.notice),button('Try AI again',()=>session.retry()));
   if(p.phase==='generating'){root.setAttribute('aria-busy','true');root.append(h('p',{class:'vb-quiz-loading',role:'status','aria-live':'polite'},h('span',{class:'vb-quiz-spinner','aria-hidden':'true'}),p.history.length===0?'Writing your first question…':'Finding the next detail in your scene…'));}
   const question=editing===null?p.question:p.history[editing]?.question;
-  if((p.phase==='question'||editing!==null)&&question) {
+  if((p.phase==='question'||editing!==null)&&question&&key&&photoDraft) {
    const title=h('h3',{class:'vb-quiz-prompt',tabindex:'-1'},question.prompt);root.append(title);
    const presentation=scenePresentation(question);
    const media=presentationOf(question);
    if(media) {
-    const key=`${p.sessionId}:${question.id}:${editing??'current'}`;
     if(!mediaViews.has(key))mediaViews.set(key,emptyMediaView());
     const stage=renderMediaStage(question,mediaViews.get(key)!,respond,editing===null?undefined:p.history[editing]?.response);
     if(stage)root.append(stage);
    } else if(presentation) {
-    const key=`${p.sessionId}:${question.id}:${editing??'current'}`;
     if(!previews.has(key))previews.set(key,emptyScenePreview());
     const previous=editing===null?undefined:p.history[editing]?.response;
     const stage=renderSceneStage(question,previews.get(key)!,optionId=>{
@@ -85,9 +104,28 @@ export function createLiveQuiz(onBack:()=>void) {
    }
    const neutral=h('div',{class:'vb-quiz-neutral'},button('Skip',()=>respond({kind:'skip'})),button('Neither / something else',()=>respond({kind:'neither'})));
    if(question.cultural)neutral.append(button('I don’t know these',()=>respond({kind:'unfamiliar'})));root.append(neutral);
-   const correction=h('textarea',{class:'vb-textarea vb-quiz-correction',rows:2,maxlength:500,placeholder:'Or tell us what feels right…','aria-label':'Your own answer or correction'});
+   // Own words: text, a photo, or both. The words are read-only while the photo is read, so what is sent is what is shown.
+   const photo=photoDraft.state,draftKey=key;
+   const correction=h('textarea',{class:'vb-textarea vb-quiz-correction',rows:2,maxlength:500,placeholder:'Or tell us what feels right…','aria-label':'Your own answer or correction',readonly:photo.busy});
    if(draft&&draftFor===question.id)correction.value=draft;
-   const correct=button('Use my words',()=>{if(correction.value.trim())respond({kind:'correction',text:correction.value.trim()});});root.append(correction,correct);
+   const hasAnswer=()=>!!correction.value.trim()||!!photo.file;
+   const useMyWords=async()=>{
+    if(photo.busy)return;
+    // A photo kept from before signing out is not sent until the user signs in again.
+    const text=correction.value,file=photoAccess.status()==='signed_in'?photo.file:null;
+    photo.busy=true;photo.status=null;if(file)refresh();
+    const isCurrent=()=>photoDraft?.state===photo&&questionKey(session.getSnapshot())===draftKey;
+    const result=await prepareMessage({text,photo:file,question:question.prompt,client:photoClient,isCurrent});
+    if(!isCurrent())return; // Stale: the question changed and its own view has rendered.
+    if(result.ok){photoDraft=null;const box=root.querySelector<HTMLTextAreaElement>('.vb-quiz-correction');if(box)box.value='';respond({kind:'correction',text:result.text});return;}
+    // Keep the draft (words and photo) with the reason: retry, or remove the photo and send the words.
+    photo.busy=false;photo.status={text:result.message,kind:result.reason==='empty'?'info':'error'};refresh();
+   };
+   const correct=button(photo.busy&&photo.file?'Reading your photo…':'Use my words',()=>void useMyWords(),'vb-text-btn vb-quiz-use-words');
+   correct.disabled=!hasAnswer();if(photo.busy)correct.setAttribute('aria-disabled','true');
+   correction.addEventListener('input',()=>{correct.disabled=!hasAnswer();});
+   attachment=createPhotoAttachment({state:photo,access:photoAccess,signInLabel:'Sign in to answer with a photo',onFile:file=>{photo.file=file;photo.description=file?photoClient.cached(file,question.prompt)??null:null;refresh();}});
+   root.append(correction,attachment.root,correct);
    // A new question takes focus. Query at run time: a later render in the same tick may have replaced this title.
    if(active&&lastQuestion!==question.id){lastQuestion=question.id;queueMicrotask(()=>{if(active&&!root.hidden&&root.offsetParent!==null)root.querySelector<HTMLElement>('.vb-quiz-prompt[tabindex]')?.focus();});}
   }
@@ -120,10 +158,10 @@ export function createLiveQuiz(onBack:()=>void) {
   root.append(button('Start over',()=>{editing=null;previews.clear();mediaViews.clear();session.start(p.originalInput.text,p.originalInput.imageCount);}));
   const matches=button('Show My Matches',()=>{editing=null;session.showMatches();},'vb-primary-btn vb-quiz-matches');root.append(matches);
   if(editing!==null)root.append(button('Cancel edit',()=>{editing=null;render(session.getSnapshot());}));
-  if(p.originalInput.imageCount)root.append(h('p',{class:'vb-quiz-photo-note'},'Your photos stay in this browser. This quiz uses your text; photos are not uploaded or analyzed.'));
-  restoreFocus(root,focusKey);
+  if(p.originalInput.imageCount>0||p.history.some(a=>a.response.kind==='correction'&&hasPhotoLine(a.response.text)))root.append(h('p',{class:'vb-quiz-photo-note'},"Photos are sent to Google Gemini to get a short text description. Vibenta doesn't store them; the description is part of what this quiz uses."));
+  replaced?.destroy();restoreFocus(root,focusKey);
  }
  const off=outingProfiles.subscribe(render);
  const offDisplay=mapDisplay.subscribe(()=>render(session.getSnapshot()));
- return {root,session:session as LiveVibeSession,start(text:string,imageCount:number){active=true;editing=null;previews.clear();mediaViews.clear();session.start(text,imageCount);},resume(){active=true;render(session.getSnapshot());},focus(){const target=root.querySelector<HTMLElement>('.vb-quiz-prompt[tabindex]')??root;target.focus();target.scrollIntoView?.({block:'nearest'});},destroy(){active=false;off();offDisplay();session.clear();session.destroy();}};
+ return {root,session:session as LiveVibeSession,start(text:string,imageCount:number){active=true;editing=null;previews.clear();mediaViews.clear();session.start(text,imageCount);},resume(){active=true;render(session.getSnapshot());},focus(){const target=root.querySelector<HTMLElement>('.vb-quiz-prompt[tabindex]')??root;target.focus();target.scrollIntoView?.({block:'nearest'});},destroy(){active=false;off();offDisplay();attachment?.destroy();attachment=null;photoDraft=null;session.clear();session.destroy();}};
 }

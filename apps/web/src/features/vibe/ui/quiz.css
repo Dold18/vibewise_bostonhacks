@@ -98,3 +98,5 @@
 .vb-photo-quota { margin:0; font-size:11px; line-height:1.4; color:var(--vb-muted,#5f6368); }
 .vb-photo-quota[hidden] { display:none; }
 .vb-image-remove:disabled { opacity:.5; cursor:default; }
+/* "Use my words" stays focusable while a photo is read; it just ignores clicks. */
+.vb-quiz-use-words[aria-disabled="true"] { opacity:.6; cursor:progress; }
