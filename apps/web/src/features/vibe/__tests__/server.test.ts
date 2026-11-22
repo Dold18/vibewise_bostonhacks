@@ -32,6 +32,10 @@ describe('photo input validation',()=>{
   expect((await s.post('generate',oi({imageCount:1,imageProcessing:'raw'}))).status).toBe(400);
   expect((await s.post('generate',corr(800))).status).toBe(200);
   expect((await s.post('generate',corr(801))).status).toBe(400);});
+ it('caps free-text answers at the correction limit',async()=>{const s=await server();
+  const answer=(n:number)=>({...c,history:[{id:'1',question:fallbackQuestion(c)!,response:{kind:'text',text:'x'.repeat(n)}}]});
+  expect((await s.post('generate',answer(800))).status).toBe(200);
+  expect((await s.post('generate',answer(801))).status).toBe(400);});
 });
 describe('Gemini request and failure behavior',()=>{
  it('uses a server header, structured schema, context-aware family guidance and no tools',async()=>{

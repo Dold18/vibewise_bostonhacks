@@ -29,6 +29,7 @@ describe('canonical adaptive session with no venues',()=>{
  });
  it('no photo means not_sent',async()=>{const calls:GenerationContext[]=[];const s=createLiveVibeSession({generate:async c=>{calls.push(c);return result(c);}},embedder);s.start('A',0,'f');await ready(s);expect(calls[0].originalInput.imageProcessing).toBe('not_sent');});
  it('accepts 800-char corrections and rejects 801',async()=>{const s=createLiveVibeSession(generator,embedder);s.start('A scene',0,'f');await ready(s);expect(()=>s.answer({kind:'correction',text:'x'.repeat(801)})).toThrow(/1–800/);s.answer({kind:'correction',text:'x'.repeat(800)});await ready(s);expect(s.getSnapshot()!.history).toHaveLength(1);});
+ it('accepts 800-char free-text answers (words plus a photo line) and rejects 801',async()=>{const s=createLiveVibeSession(generator,embedder);s.start('A scene',0,'f');await ready(s);expect(()=>s.answer({kind:'text',text:'x'.repeat(801)})).toThrow(/1–800/);s.answer({kind:'text',text:'x'.repeat(800)});await ready(s);expect(s.getSnapshot()!.history).toHaveLength(1);});
  it('opposite answers produce different semantic descriptions without inventing venue rankings',async()=>{
   const a=createLiveVibeSession(generator,embedder),b=createLiveVibeSession(generator,embedder);a.start('A new scene',0,'same');b.start('A new scene',0,'same');await ready(a);await ready(b);
   a.answer({kind:'choice',optionId:'a'});b.answer({kind:'choice',optionId:'b'});await ready(a);await ready(b);

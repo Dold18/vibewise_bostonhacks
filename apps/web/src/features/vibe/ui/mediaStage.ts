@@ -43,8 +43,14 @@ function optionCards(question: Question, commit: (r: Response) => void, previous
   return cards;
 }
 
+/**
+ * Optional photo for a free_text answer. The caller owns the attachment and the send, because a
+ * photo is read (described) before the answer is committed and a failed read keeps the draft.
+ */
+export interface FreeTextPhoto { attachment: HTMLElement; busy: boolean; reading: boolean; hasPhoto: () => boolean; send: (text: string) => void }
+
 /** Renders a vibenta-media/1 question. Returns null when the question has no presentation. */
-export function renderMediaStage(question: Question, state: MediaViewState, commit: (r: Response) => void, previous?: Response): HTMLElement | null {
+export function renderMediaStage(question: Question, state: MediaViewState, commit: (r: Response) => void, previous?: Response, photo?: FreeTextPhoto): HTMLElement | null {
   const p = presentationOf(question);
   if (!p) return null;
   const root = h('section', { class: 'vb-media-stage', 'data-format': p.format, 'data-voice': p.voice, 'aria-label': 'Question media' });
@@ -90,10 +96,16 @@ export function renderMediaStage(question: Question, state: MediaViewState, comm
     } else if (p.format === 'free_text') {
       const area = h('textarea', { class: 'vb-textarea vb-media-freetext', rows: '3', maxlength: '500', placeholder: p.placeholder ?? 'Type your answer…', 'aria-label': 'Your answer in your own words' }) as HTMLTextAreaElement;
       area.value = state.draft || (previous?.kind === 'text' ? previous.text : '');
+      // While a photo is read the words are read-only, so what is sent is what is shown.
+      area.readOnly = !!photo?.busy;
       area.addEventListener('input', () => { state.draft = area.value; });
-      const send = h('button', { type: 'button', class: 'vb-primary-btn vb-media-send' }, 'Send my answer');
-      send.addEventListener('click', () => { const text = area.value.trim(); if (text) commit({ kind: 'text', text }); else area.focus(); });
-      root.append(area, send, h('p', { class: 'vb-media-kind' }, 'Or pick one of these:'), optionCards(question, commit, previous));
+      const send = h('button', { type: 'button', class: 'vb-primary-btn vb-media-send' }, photo?.reading ? 'Reading your photo…' : 'Send my answer');
+      if (photo?.busy) send.setAttribute('aria-disabled', 'true');
+      send.addEventListener('click', () => {
+        if (photo) { if (area.value.trim() || photo.hasPhoto()) photo.send(area.value); else area.focus(); return; }
+        const text = area.value.trim(); if (text) commit({ kind: 'text', text }); else area.focus();
+      });
+      root.append(area, ...(photo ? [photo.attachment] : []), send, h('p', { class: 'vb-media-kind' }, 'Or pick one of these:'), optionCards(question, commit, previous));
     } else root.append(optionCards(question, commit, previous));
     if (p.referenceNote || refs.length) root.append(h('aside', { class: 'vb-media-reference' }, ...(p.referenceNote ? [h('p', {}, p.referenceNote)] : []), ...refs.map((r) => h('p', { class: 'vb-media-ref' }, h('a', { href: r!.source, target: '_blank', rel: 'noopener noreferrer' }, `${r!.title} (${r!.year})`), ` · ${r!.creator}`))));
     root.append(h('details', { class: 'vb-media-why' }, h('summary', {}, 'Why this question?'),

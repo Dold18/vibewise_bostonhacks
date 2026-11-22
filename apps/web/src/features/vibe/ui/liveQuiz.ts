@@ -22,6 +22,7 @@ function focusKeyIn(root:HTMLElement):string|null {
  if(el.classList.contains('vb-media-freetext'))return 'freetext';
  // Its label changes while a photo is read, so find it by class, not text.
  if(el.classList.contains('vb-quiz-use-words'))return 'use-words';
+ if(el.classList.contains('vb-media-send'))return 'media-send';
  if(el.closest('.vb-photo-attachment'))return 'photo';
  if(el instanceof HTMLButtonElement){const same=[...root.querySelectorAll('button')].filter(b=>b.textContent===el.textContent);return `button:${el.textContent}:${same.indexOf(el)}`;}
  return null;
@@ -33,6 +34,7 @@ function restoreFocus(root:HTMLElement,key:string|null) {
  else if(key==='correction')target=root.querySelector<HTMLElement>('.vb-quiz-correction');
  else if(key==='freetext')target=root.querySelector<HTMLElement>('.vb-media-freetext');
  else if(key==='use-words')target=root.querySelector<HTMLElement>('.vb-quiz-use-words');
+ else if(key==='media-send')target=root.querySelector<HTMLElement>('.vb-media-send');
  // Picking or removing a photo swaps Add photo for Remove (or back): land on whichever is there now.
  else if(key==='photo')target=root.querySelector<HTMLElement>('.vb-photo-attachment button:not(:disabled)')??root.querySelector<HTMLElement>('.vb-quiz-use-words');
  else {const [,text,index]=key.match(/^button:(.*):(\d+)$/s)??[];target=[...root.querySelectorAll('button')].filter(b=>b.textContent===text)[Number(index)];}
@@ -46,7 +48,7 @@ export function createLiveQuiz(onBack:()=>void) {
  const mediaViews=new Map<string,MediaViewState>();
  // The own-words photo draft lives here, not in the DOM, so it survives the
  // re-renders snapshots cause. Keyed like `previews`; a new key starts empty.
- let photoDraft:{key:string;state:PhotoAttachmentState}|null=null;let attachment:{root:HTMLElement;destroy():void}|null=null;
+ let photoDraft:{key:string;state:PhotoAttachmentState;via?:'correction'|'text'}|null=null;let attachment:{root:HTMLElement;destroy():void}|null=null;
  /** Key of the question on screen (null when none is shown): same session, question and edit slot. */
  const questionKey=(p:OutingVibeProfile|null)=>{const q=!p?null:editing===null?(p.phase==='question'?p.question:null):p.history[editing]?.question;return p&&q?`${p.sessionId}:${q.id}:${editing??'current'}`:null;};
  const button=(text:string,run:()=>void,className='vb-text-btn')=>{const b=h('button',{type:'button',class:className},text);b.addEventListener('click',run);return b;};
@@ -82,9 +84,36 @@ export function createLiveQuiz(onBack:()=>void) {
    const title=h('h3',{class:'vb-quiz-prompt',tabindex:'-1'},question.prompt);root.append(title);
    const presentation=scenePresentation(question);
    const media=presentationOf(question);
+   // Own words: text, a photo, or both, from the own-words box or a free-text question's box. Both
+   // share one photo draft. The words are read-only while the photo is read, so what is sent is what is shown.
+   const draftState=photoDraft,photo=draftState.state,draftKey=key;
+   const sendOwnWords=async(text:string,kind:'correction'|'text')=>{
+    if(photo.busy)return;
+    // A photo kept from before signing out is not sent until the user signs in again.
+    const file=photoAccess.status()==='signed_in'?photo.file:null;
+    // Signed out with only a photo: nothing can be sent, so say why rather than ask for words or a photo.
+    if(!file&&photo.file&&!text.trim()){photo.status={text:PHOTO_MESSAGES.signed_out,kind:'error'};refresh();return;}
+    photo.busy=true;photo.status=null;draftState.via=kind;if(file)refresh();
+    const isCurrent=()=>photoDraft?.state===photo&&questionKey(session.getSnapshot())===draftKey;
+    const result=await prepareMessage({text,photo:file,question:question.prompt,client:photoClient,isCurrent});
+    if(!isCurrent())return; // Stale: the question changed and its own view has rendered.
+    if(result.ok){
+     photoDraft=null;
+     if(kind==='correction'){const box=root.querySelector<HTMLTextAreaElement>('.vb-quiz-correction');if(box)box.value='';}
+     else{const view=mediaViews.get(draftKey);if(view)view.draft='';}
+     respond({kind,text:result.text});return;
+    }
+    // Keep the draft (words and photo) with the reason: retry, or remove the photo and send the words.
+    photo.busy=false;photo.status={text:result.message,kind:result.reason==='empty'?'info':'error'};refresh();
+   };
+   const reading=(kind:'correction'|'text')=>photo.busy&&!!photo.file&&draftState.via===kind;
+   attachment=createPhotoAttachment({state:photo,access:photoAccess,signInLabel:'Sign in to answer with a photo',onFile:file=>{photo.file=file;photo.description=file?photoClient.cached(file,question.prompt)??null:null;refresh();}});
+   // A free-text question's own box is the natural place for the photo; otherwise it sits with the own-words box.
+   const photoInStage=media?.format==='free_text';
    if(media) {
     if(!mediaViews.has(key))mediaViews.set(key,emptyMediaView());
-    const stage=renderMediaStage(question,mediaViews.get(key)!,respond,editing===null?undefined:p.history[editing]?.response);
+    const freeText=photoInStage?{attachment:attachment.root,busy:photo.busy,reading:reading('text'),hasPhoto:()=>!!photo.file,send:(text:string)=>void sendOwnWords(text,'text')}:undefined;
+    const stage=renderMediaStage(question,mediaViews.get(key)!,respond,editing===null?undefined:p.history[editing]?.response,freeText);
     if(stage)root.append(stage);
    } else if(presentation) {
     if(!previews.has(key))previews.set(key,emptyScenePreview());
@@ -104,30 +133,12 @@ export function createLiveQuiz(onBack:()=>void) {
    }
    const neutral=h('div',{class:'vb-quiz-neutral'},button('Skip',()=>respond({kind:'skip'})),button('Neither / something else',()=>respond({kind:'neither'})));
    if(question.cultural)neutral.append(button('I don’t know these',()=>respond({kind:'unfamiliar'})));root.append(neutral);
-   // Own words: text, a photo, or both. The words are read-only while the photo is read, so what is sent is what is shown.
-   const photo=photoDraft.state,draftKey=key;
    const correction=h('textarea',{class:'vb-textarea vb-quiz-correction',rows:2,maxlength:500,placeholder:'Or tell us what feels right…','aria-label':'Your own answer or correction',readonly:photo.busy});
    if(draft&&draftFor===question.id)correction.value=draft;
-   const hasAnswer=()=>!!correction.value.trim()||!!photo.file;
-   const useMyWords=async()=>{
-    if(photo.busy)return;
-    // A photo kept from before signing out is not sent until the user signs in again.
-    const text=correction.value,file=photoAccess.status()==='signed_in'?photo.file:null;
-    // Signed out with only a photo: nothing can be sent, so say why rather than ask for words or a photo.
-    if(!file&&photo.file&&!text.trim()){photo.status={text:PHOTO_MESSAGES.signed_out,kind:'error'};refresh();return;}
-    photo.busy=true;photo.status=null;if(file)refresh();
-    const isCurrent=()=>photoDraft?.state===photo&&questionKey(session.getSnapshot())===draftKey;
-    const result=await prepareMessage({text,photo:file,question:question.prompt,client:photoClient,isCurrent});
-    if(!isCurrent())return; // Stale: the question changed and its own view has rendered.
-    if(result.ok){photoDraft=null;const box=root.querySelector<HTMLTextAreaElement>('.vb-quiz-correction');if(box)box.value='';respond({kind:'correction',text:result.text});return;}
-    // Keep the draft (words and photo) with the reason: retry, or remove the photo and send the words.
-    photo.busy=false;photo.status={text:result.message,kind:result.reason==='empty'?'info':'error'};refresh();
-   };
-   const correct=button(photo.busy&&photo.file?'Reading your photo…':'Use my words',()=>void useMyWords(),'vb-text-btn vb-quiz-use-words');
-   correct.disabled=!hasAnswer();if(photo.busy)correct.setAttribute('aria-disabled','true');
-   correction.addEventListener('input',()=>{correct.disabled=!hasAnswer();});
-   attachment=createPhotoAttachment({state:photo,access:photoAccess,signInLabel:'Sign in to answer with a photo',onFile:file=>{photo.file=file;photo.description=file?photoClient.cached(file,question.prompt)??null:null;refresh();}});
-   root.append(correction,attachment.root,correct);
+   // Always pressable, as before photos: an empty send explains what to add.
+   const correct=button(reading('correction')?'Reading your photo…':'Use my words',()=>void sendOwnWords(correction.value,'correction'),'vb-text-btn vb-quiz-use-words');
+   if(photo.busy)correct.setAttribute('aria-disabled','true');
+   root.append(correction,...(photoInStage?[]:[attachment.root]),correct);
    // A new question takes focus. Query at run time: a later render in the same tick may have replaced this title.
    if(active&&lastQuestion!==question.id){lastQuestion=question.id;queueMicrotask(()=>{if(active&&!root.hidden&&root.offsetParent!==null)root.querySelector<HTMLElement>('.vb-quiz-prompt[tabindex]')?.focus();});}
   }
@@ -160,7 +171,7 @@ export function createLiveQuiz(onBack:()=>void) {
   root.append(button('Start over',()=>{editing=null;previews.clear();mediaViews.clear();session.start(p.originalInput.text,p.originalInput.imageCount);}));
   const matches=button('Show My Matches',()=>{editing=null;session.showMatches();},'vb-primary-btn vb-quiz-matches');root.append(matches);
   if(editing!==null)root.append(button('Cancel edit',()=>{editing=null;render(session.getSnapshot());}));
-  if(p.originalInput.imageCount>0||p.history.some(a=>a.response.kind==='correction'&&hasPhotoLine(a.response.text)))root.append(h('p',{class:'vb-quiz-photo-note'},"Photos are sent to Google Gemini to get a short text description. Vibenta doesn't store them; the description is part of what this quiz uses."));
+  if(p.originalInput.imageCount>0||p.history.some(a=>(a.response.kind==='correction'||a.response.kind==='text')&&hasPhotoLine(a.response.text)))root.append(h('p',{class:'vb-quiz-photo-note'},"Photos are sent to Google Gemini to get a short text description. Vibenta doesn't store them; the description is part of what this quiz uses."));
   replaced?.destroy();restoreFocus(root,focusKey);
  }
  const off=outingProfiles.subscribe(render);

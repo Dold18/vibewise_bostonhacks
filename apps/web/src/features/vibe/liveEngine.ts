@@ -84,8 +84,8 @@ export function createLiveVibeSession(generator:GenerationProvider,embedder:Embe
   if(!state)return;const question=replaceIndex===undefined?state.question:state.history[replaceIndex]?.question;
   if(!question||replaceIndex===undefined&&(state.phase!=='question'||state.history.length>=MAX_QUESTIONS))return;
   if(response.kind==='choice'&&!question.options.some(o=>o.id===response.optionId))throw Error('Invalid option');
-  if(response.kind==='correction'&&(!response.text.trim()||response.text.length>MAX_CORRECTION_TEXT))throw Error('Correction must be 1–800 characters');
-  if(response.kind==='text'&&(!response.text.trim()||response.text.length>500))throw Error('Answer text must be 1–500 characters');
+  // Own words may carry a Photo: line, so both text kinds share the correction cap; typed input stays at 500.
+  if((response.kind==='correction'||response.kind==='text')&&(!response.text.trim()||response.text.length>MAX_CORRECTION_TEXT))throw Error(`Answer text must be 1–${MAX_CORRECTION_TEXT} characters`);
   if(!['choice','skip','neither','unfamiliar','correction','text'].includes(response.kind))throw Error('Invalid answer');
   const prefix=replaceIndex===undefined?state.history:state.history.slice(0,replaceIndex);
   const history:readonly Answer[]=[...prefix,{id:`answer-${serial+1}`,question,response:structuredClone(response)}];
