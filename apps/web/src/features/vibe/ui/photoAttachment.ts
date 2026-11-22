@@ -98,6 +98,8 @@ export function createPhotoAttachment(o: { state: PhotoAttachmentState; onFile: 
     if (thumbFile && (rendered !== 'signed_in' || state.file !== thumbFile)) { releaseThumbnail(thumbFile); thumbFile = null; }
     // While sign-in status loads, show no controls; a pending message still shows.
     if (rendered === 'loading') { root.replaceChildren(...(state.status ? [statusLine()] : [])); return; }
+    // Accounts are down: signing in can't help, so say so plainly (no control to press).
+    if (rendered === 'unavailable') { root.replaceChildren(h('p', { class: 'vb-photo-unavailable' }, "Photo input isn't available right now."), statusLine()); return; }
     if (rendered !== 'signed_in') {
       const signIn = h('button', { type: 'button', class: 'vb-text-btn vb-photo-signin' }, o.signInLabel);
       signIn.addEventListener('click', () => access.requestSignIn());

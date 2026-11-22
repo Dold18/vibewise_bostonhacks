@@ -1,4 +1,4 @@
-import { photoAccess, type PhotoAccessSource } from './photoAccess';
+import { photoAccess, type PhotoAccessSource, type PhotoAccessStatus } from './photoAccess';
 import { DAILY_PHOTO_LIMIT } from './photoMessage';
 
 export type PhotoFailure = 'signed_out' | 'limit' | 'unreadable' | 'unavailable';
@@ -16,6 +16,8 @@ export const PHOTO_MESSAGES: Record<PhotoFailure, string> = {
   unreadable: "We couldn't read that photo. Try another, or remove it to send your words.",
   unavailable: 'Photo reading is unavailable right now. Retry, or remove the photo to send your words.',
 };
+/** Why a photo can't be sent while not signed in: accounts being down is an outage, not a sign-in prompt. */
+export const noPhotoAccessMessage = (status: PhotoAccessStatus): string => status === 'unavailable' ? PHOTO_MESSAGES.unavailable : PHOTO_MESSAGES.signed_out;
 const DESCRIBE_URL = '/api/vibe/describe-image';
 const QUOTA_URL = '/api/vibe/photo-quota';
 const TIMEOUT_MS = 30_000;

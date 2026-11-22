@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createPhotoClient, PHOTO_MESSAGES, scaledSize } from '../photoClient';
+import { createPhotoClient, noPhotoAccessMessage, PHOTO_MESSAGES, scaledSize } from '../photoClient';
 import { DAILY_PHOTO_LIMIT } from '../photoMessage';
 import { prepareMessage } from '../photoSend';
 import { fromAccountStore, photoAccess } from '../photoAccess';
@@ -62,6 +62,11 @@ describe('photoClient', () => {
   });
   it('names the shared daily limit in the limit message', () => {
     expect(PHOTO_MESSAGES.limit).toContain(`today's ${DAILY_PHOTO_LIMIT} photo reads`);
+  });
+  it('explains a photo that cannot be sent: accounts down is unavailable, otherwise sign in', () => {
+    expect(noPhotoAccessMessage('unavailable')).toBe(PHOTO_MESSAGES.unavailable);
+    expect(noPhotoAccessMessage('signed_out')).toBe(PHOTO_MESSAGES.signed_out);
+    expect(noPhotoAccessMessage('loading')).toBe(PHOTO_MESSAGES.signed_out);
   });
   it('maps network errors to unavailable', async () => {
     const { client } = setup(() => { throw new Error('net'); });

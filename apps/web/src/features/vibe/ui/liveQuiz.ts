@@ -9,7 +9,7 @@ import { mapDisplay } from '../convergence';
 import { outingProfiles } from '../publisher';
 import type { Answer, OutingVibeProfile, Response } from '../profile';
 import { photoAccess } from '../photoAccess';
-import { PHOTO_MESSAGES, photoClient } from '../photoClient';
+import { noPhotoAccessMessage, photoClient } from '../photoClient';
 import { prepareMessage } from '../photoSend';
 import { hasPhotoLine, MAX_TYPED_TEXT } from '../photoMessage';
 import { createPhotoAttachment, type PhotoAttachmentState } from './photoAttachment';
@@ -91,8 +91,8 @@ export function createLiveQuiz(onBack:()=>void) {
     if(photo.busy)return;
     // A photo kept from before signing out is not sent until the user signs in again.
     const file=photoAccess.status()==='signed_in'?photo.file:null;
-    // Signed out with only a photo: nothing can be sent, so say why rather than ask for words or a photo.
-    if(!file&&photo.file&&!text.trim()){photo.status={text:PHOTO_MESSAGES.signed_out,kind:'error'};refresh();return;}
+    // Not signed in with only a photo: nothing can be sent, so say why rather than ask for words or a photo.
+    if(!file&&photo.file&&!text.trim()){photo.status={text:noPhotoAccessMessage(photoAccess.status()),kind:'error'};refresh();return;}
     photo.busy=true;photo.status=null;draftState.via=kind;if(file)refresh();
     const isCurrent=()=>photoDraft?.state===photo&&questionKey(session.getSnapshot())===draftKey;
     const result=await prepareMessage({text,photo:file,question:question.prompt,client:photoClient,isCurrent});
