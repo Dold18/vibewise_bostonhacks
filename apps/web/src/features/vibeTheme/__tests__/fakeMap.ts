@@ -86,12 +86,16 @@ export function fakeMap({ loaded = true } = {}) {
           expect(got[prop], `${l.id} ${prop}`).toEqual(value);
         }
       }
-      expect(light).toEqual(want.light);
-      expect(sky).toEqual(want.sky);
+      expect(withoutTransitions(light)).toEqual(want.light);
+      expect(withoutTransitions(sky)).toEqual(want.sky);
       for (const [id, p] of Object.entries(ROUTE_LAYERS)) expect(paint.get(id), id).toEqual(p);
     },
   };
 }
+
+/** Light/sky as set, minus the `*-transition` timing keys (checked separately). */
+export const withoutTransitions = (spec: object) =>
+  Object.fromEntries(Object.entries(spec).filter(([k]) => !k.endsWith('-transition')));
 
 export function fakeEffects() {
   const renders: Array<{ layers: EffectLayer[]; darkMode: boolean }> = [];

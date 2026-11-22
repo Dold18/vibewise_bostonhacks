@@ -49,20 +49,50 @@ export interface StyleInputs {
   scene?: Readonly<SceneStyle>;
 }
 
+export interface ApplyOptions {
+  /**
+   * Light and sky ease over this many ms (per-property `*-transition` keys).
+   * Without it they use the style-wide transition fixed at map creation, which
+   * would leave them out of step with scene colors (e.g. under reduced motion).
+   */
+  transitionMs?: number;
+}
+
 /**
  * Move the live map between two sets of style inputs: only changed paint
  * values, then sky and light if they differ. Never `setStyle`.
  */
-export function applyStyle(map: PaintTarget, from: StyleInputs, to: StyleInputs): void {
+export function applyStyle(map: PaintTarget, from: StyleInputs, to: StyleInputs, options: ApplyOptions = {}): void {
   const a = buildMapStyle(from.palette, from.scene ?? DEFAULT_SCENE_STYLE);
   const b = buildMapStyle(to.palette, to.scene ?? DEFAULT_SCENE_STYLE);
   for (const { layerId, property, value } of diffPaint(a, b)) {
     if (NEVER_SET.has(property) || !map.getLayer(layerId)) continue;
     map.setPaintProperty(layerId, property, value);
   }
-  if (b.sky && !same(a.sky, b.sky)) map.setSky(b.sky);
-  if (b.light && !same(a.light, b.light)) map.setLight(b.light);
+  const t = options.transitionMs;
+  if (b.sky && !same(a.sky, b.sky)) map.setSky(t === undefined ? b.sky : withTransitions(b.sky, t));
+  if (b.light && !same(a.light, b.light)) map.setLight(t === undefined ? b.light : withTransitions(b.light, t));
 }
+
+/** Add a `<key>-transition` for every animatable key of a light or sky spec. */
+function withTransitions<T extends object>(spec: T, durationMs: number): T {
+  const transition = { duration: Math.max(0, Math.round(durationMs)), delay: 0 };
+  const out: Record<string, unknown> = { ...(spec as Record<string, unknown>) };
+  for (const key of Object.keys(spec)) if (key !== 'anchor') out[`${key}-transition`] = transition;
+  return out as T;
+}
+
+/**
+ * Color paint that depends on feature data. MapLibre applies such changes
+ * instantly (no transition) and re-lays-out the source's tiles in its workers,
+ * so theme colors must never be data-driven; a test keeps this list empty.
+ * (3D buildings use constant-color height bands for this reason; mapStyle.ts.)
+ */
+export const DATA_DRIVEN_PAINT: readonly (readonly [string, string])[] = buildMapStyle(basePalette).layers.flatMap((l) =>
+  Object.entries(('paint' in l && l.paint) || {})
+    .filter(([p, v]) => /-color$/.test(p) && /\["(get|has|feature-state|properties|id|geometry-type)"/.test(JSON.stringify(v)))
+    .map(([p]) => [l.id, p] as const),
+);
 
 /** Every color paint property of the base style, as [layerId, property]. */
 export const COLOR_PAINT: readonly (readonly [string, string])[] = buildMapStyle(basePalette).layers.flatMap((l) =>

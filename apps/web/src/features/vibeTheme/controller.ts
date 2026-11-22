@@ -92,7 +92,6 @@ export function startThemeController(map: ThemeMap, store: AccountStore, options
   let transitionMs = THEME_TRANSITION_MS;
   let shadowAngle = lightShadowAngle(DEFAULT_SCENE_STYLE.lightPosition[1]);
   let ready = false;
-
   const setTransition = (ms: number) => {
     if (ms === transitionMs) return;
     setColorTransition(map, ms);
@@ -109,9 +108,10 @@ export function startThemeController(map: ThemeMap, store: AccountStore, options
   function render() {
     if (!ready) return;
     if (scene) {
-      setTransition(sceneTransition ?? scene.motion.transitionMs);
+      const ms = sceneTransition ?? scene.motion.transitionMs;
+      setTransition(ms);
       const next: StyleInputs = { palette: scene.palette, scene: sceneStyleOf(scene) };
-      applyStyle(map, current, next);
+      applyStyle(map, current, next, { transitionMs: ms });
       current = next;
       setShadow(scene.lighting.position[1]);
       effects.render([], scene.darkMode); // scene overlays have their own (later) renderer
@@ -121,7 +121,7 @@ export function startThemeController(map: ThemeMap, store: AccountStore, options
     setShadow(DEFAULT_SCENE_STYLE.lightPosition[1]);
     const blend = target ? blendPalette(basePalette, target.tags, target.strength) : null;
     const next: StyleInputs = { palette: blend?.palette ?? basePalette };
-    applyStyle(map, current, next);
+    applyStyle(map, current, next, { transitionMs: THEME_TRANSITION_MS });
     current = next;
     // Effects follow the taste itself, not the contrast-limited palette
     // strength, so a vibe can show before it's strong enough to recolor.

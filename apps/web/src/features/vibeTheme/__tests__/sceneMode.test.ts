@@ -1,6 +1,6 @@
 /** vibeTheme scene mode: buildMapStyle scene parameters, applyStyle, transitions and setScene. */
 import { describe, expect, it } from 'vitest';
-import { basePalette, buildMapStyle, DEFAULT_SCENE_STYLE, lightShadowAngle, mapStyle, type SceneStyle } from '../../../mapStyle';
+import { basePalette, BUILDING_3D_BANDS, buildingColorAt, buildMapStyle, DEFAULT_SCENE_STYLE, lightShadowAngle, mapStyle, type SceneStyle } from '../../../mapStyle';
 import type { AccountState, AccountStore } from '../../account/session';
 import { applyStyle, COLOR_PAINT, setColorTransition } from '../apply';
 import { sceneStyleOf, startThemeController, type SceneRender } from '../controller';
@@ -156,5 +156,49 @@ describe('ThemeController.setScene', () => {
     theme.setScene(render());
     theme.preview({ cozy: 1 }, 1);
     expect(f.paint.get('background')!['background-color']).toBe(night.land);
+  });
+});
+
+describe('transition fixes from browser QA', () => {
+  it('no color paint is data-driven: MapLibre would snap it and re-lay-out tiles on every change', async () => {
+    const { DATA_DRIVEN_PAINT } = await import('../apply');
+    expect(DATA_DRIVEN_PAINT).toEqual([]);
+  });
+
+  it('3D building bands cover every height exactly once, all with constant colors', () => {
+    expect(BUILDING_3D_BANDS[0]).toMatchObject({ id: 'building-3d', min: 0 });
+    expect(BUILDING_3D_BANDS.at(-1)!.max).toBe(Infinity);
+    BUILDING_3D_BANDS.forEach((b, i) => {
+      if (i > 0) expect(b.min).toBe(BUILDING_3D_BANDS[i - 1].max);
+      expect(b.sampleHeight).toBeGreaterThanOrEqual(b.min);
+    });
+    const style = buildMapStyle(night);
+    for (const b of BUILDING_3D_BANDS) {
+      const layer = style.layers.find((l) => l.id === b.id) as { paint: Record<string, unknown> };
+      expect(typeof layer.paint['fill-extrusion-color']).toBe('string');
+      expect(layer.paint['fill-extrusion-color']).toBe(buildingColorAt(night, b.sampleHeight));
+    }
+  });
+
+  it('band colors follow the former height gradient (0 → building3d, 60 → mid, 200 → high)', () => {
+    expect(buildingColorAt(night, 0)).toBe(night.building3d);
+    expect(buildingColorAt(night, 60)).toBe(night.building3dMid);
+    expect(buildingColorAt(night, 250)).toBe(night.building3dHigh);
+  });
+
+  it('building colors change as plain paint values, so they ease natively with everything else', () => {
+    const f = fakeMap();
+    const theme = startThemeController(f.map, store(), { effects: fakeEffects() });
+    theme.setScene(render(), { transitionMs: 450 });
+    for (const b of BUILDING_3D_BANDS) expect(f.paint.get(b.id)!['fill-extrusion-color']).toBe(buildingColorAt(night, b.sampleHeight));
+    for (const b of BUILDING_3D_BANDS) expect(f.paint.get(b.id)!['fill-extrusion-color-transition']).toEqual({ duration: 450, delay: 0 });
+  });
+
+  it('light and sky ease on the scene clock, not the style-wide 800 ms', () => {
+    const f = fakeMap();
+    const theme = startThemeController(f.map, store(), { effects: fakeEffects() });
+    theme.setScene(render(), { transitionMs: 150 });
+    expect(f.light()).toMatchObject({ 'intensity-transition': { duration: 150, delay: 0 }, 'position-transition': { duration: 150, delay: 0 } });
+    expect(f.sky()).toMatchObject({ 'sky-color-transition': { duration: 150, delay: 0 }, 'fog-color-transition': { duration: 150, delay: 0 } });
   });
 });
