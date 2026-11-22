@@ -253,7 +253,9 @@
  *
  * Opt-in via ?visual=carbon&studio=1. Identical basemap, DOM, event handlers,
  * map camera, overlays and question engine to the existing Carbon preview.
- * Visual inspiration: independent music flyers, art-book typography, eclectic\n * gig posters and contemporary youth culture. Avoid faux-industrial dashboards.\n * Every change below is presentational. No global marker geometry changes.
+ * Visual inspiration: independent music flyers, art-book typography, eclectic
+ * gig posters and contemporary youth culture. Avoid faux-industrial dashboards.
+ * Every change below is presentational. No global marker geometry changes.
  * ========================================================================== */
 
 :root[data-carbon-studio] {
