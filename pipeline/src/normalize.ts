@@ -101,7 +101,7 @@ export function fsqAddress(p: { address: string | null; locality: string | null;
   return joinAddress(clean(p.address), words(p.locality, p.postcode));
 }
 
-const OSM_TAG_KEYS = new Set([
+export const OSM_TAG_KEYS: ReadonlySet<string> = new Set([
   'outdoor_seating', 'internet_access', 'takeaway', 'delivery', 'wheelchair', 'opening_hours', 'amenity', 'cuisine',
   'live_music', 'smoking', 'wikidata', 'wikimedia_commons', 'image', 'happy_hours',
 ]);
