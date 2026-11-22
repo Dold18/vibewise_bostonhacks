@@ -190,6 +190,14 @@ button {
   line-height: 1.3;
   white-space: nowrap;
   pointer-events: none;
+  z-index: 1; /* paint above the enlarged .pin-body */
+  transition: translate 0.15s ease;
+}
+
+/* Rise by the body's growth (0.3 x 40px) so the enlarged pin doesn't cover the chip. */
+.pin:hover .pin-deal,
+.pin.selected .pin-deal {
+  translate: -50% calc(-12px * var(--pin-scale, 1));
 }
 
 .pin-deal[hidden] {
