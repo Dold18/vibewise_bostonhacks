@@ -9,8 +9,8 @@ test('Disallow: / under * blocks every path', () => {
   assert.equal(allowed('/'), false);
 });
 
-test('a vibenta-ingest group overrides the * group', () => {
-  const allowed = parseRobots('User-agent: *\nDisallow: /\n\nUser-agent: vibenta-ingest\nAllow: /\n', USER_AGENT);
+test('a vibewise-ingest group overrides the * group', () => {
+  const allowed = parseRobots('User-agent: *\nDisallow: /\n\nUser-agent: vibewise-ingest\nAllow: /\n', USER_AGENT);
   assert.equal(allowed('/about'), true);
 });
 

@@ -4,7 +4,7 @@
 
 ## Intent
 
-Vibenta is for Boston college students, and saving money is one of the main things they look for. PRODUCT.md promises "verified discounts" and ROADMAP M8 lists "verified inexpensive places/discount descriptions with timestamps". This feature puts a small marker on a pin **when you can get a discount there right now**. The place card lists the venue's deals with where each one came from and when it was checked.
+VibeWise is for Boston college students, and saving money is one of the main things they look for. PRODUCT.md promises "verified discounts" and ROADMAP M8 lists "verified inexpensive places/discount descriptions with timestamps". This feature puts a small marker on a pin **when you can get a discount there right now**. The place card lists the venue's deals with where each one came from and when it was checked.
 
 The marker means one thing only: *active now*. A marker for an expired, stale or unconfirmed deal is worse than no marker.
 

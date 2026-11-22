@@ -1,4 +1,4 @@
-# Claude Code — Vibenta
+# Claude Code — VibeWise
 
 Read and follow [AGENTS.md](AGENTS.md) first. The canonical documentation is shared across Codex, Claude Code and human teammates; this file intentionally does not restate separate rules.
 

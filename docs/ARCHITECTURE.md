@@ -1,4 +1,4 @@
-# Architecture — Vibenta
+# Architecture — VibeWise
 > **Status:** Proposed architecture v0.1. Concrete framework choices and directory layout are pending team confirmation.
 
 ## First principle

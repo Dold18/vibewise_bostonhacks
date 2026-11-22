@@ -23,7 +23,7 @@ import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const OUT = fileURLToPath(new URL('../src/discovery/data/bostonLocations.generated.ts', import.meta.url));
-const USER_AGENT = 'vibenta-dataset-build/0.1 (BostonHacks dev script)';
+const USER_AGENT = 'vibewise-dataset-build/0.1 (BostonHacks dev script)';
 const MBTA = 'https://api-v3.mbta.com';
 const OVERPASS = 'https://overpass-api.de/api/interpreter';
 

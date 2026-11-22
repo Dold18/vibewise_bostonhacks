@@ -170,7 +170,7 @@ create index vibe_events_user_time_idx on vibe_events (user_id, created_at desc)
 ### 6.5 Wiring
 
 - `main.ts` gets one call: `mountAccount(document.body, { map })`. That mounts the button and starts the theme controller. No other map logic changes.
-- In dev builds only: `window.vibentaAccount = { recordVibe, previewTaste }`.
+- In dev builds only: `window.vibewiseAccount = { recordVibe, previewTaste }`.
   - `recordVibe(..., source 'dev')` writes real rows for the signed-in user.
   - `previewTaste({ cozy: 0.9 }, strength)` themes the map without writing anything, which is useful when not signed in.
 

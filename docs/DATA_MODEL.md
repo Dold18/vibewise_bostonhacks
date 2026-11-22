@@ -1,4 +1,4 @@
-# Data Model — Vibenta
+# Data Model — VibeWise
 > **Status:** **Proposed v0.2.** Extends the schema sketch in [PROJECT_BRIEF.md §7](../PROJECT_BRIEF.md) and the types in [CONTRACTS.md](CONTRACTS.md). The embedding and vibe design is accepted: see [EMBEDDING_PIPELINE.md](EMBEDDING_PIPELINE.md) and [VIBE_QUIZ_DESIGN.md](VIBE_QUIZ_DESIGN.md). Other rationale lives in [DECISIONS.md](DECISIONS.md) entries P-007 to P-009.
 
 ## 1. Goals

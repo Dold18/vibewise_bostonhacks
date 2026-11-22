@@ -146,7 +146,7 @@ export type VibeSource = 'website' | 'wiki' | 'osm_tags' | 'city_licenses' | 'st
 export interface VibeInput { source: VibeSource; content: string; sourceUrl: string | null }
 export interface FetchDeps { fetchImpl?: typeof fetch; sleep?: (ms: number) => Promise<void>; now?: () => number }
 ```
-- Produces (`robots.ts`): `parseRobots(txt: string, userAgent: string): (path: string) => boolean`. Groups match on the product token `vibenta-ingest` or on `*`. A specific group beats `*`. The longest matching `Allow`/`Disallow` prefix wins, and a tie goes to `Allow`. An empty or missing file allows everything.
+- Produces (`robots.ts`): `parseRobots(txt: string, userAgent: string): (path: string) => boolean`. Groups match on the product token `vibewise-ingest` or on `*`. A specific group beats `*`. The longest matching `Allow`/`Disallow` prefix wins, and a tie goes to `Allow`. An empty or missing file allows everything.
 - Produces (`http.ts`):
   - `createPoliteFetcher(deps?: FetchDeps & { minIntervalMs?: number; timeoutMs?: number }): PoliteFetcher`
   - `interface PoliteFetcher { getText(url: string, opts?: { checkRobots?: boolean }): Promise<FetchResult>; getJson<T>(url: string): Promise<T> }`
@@ -158,7 +158,7 @@ export interface FetchDeps { fetchImpl?: typeof fetch; sleep?: (ms: number) => P
 
 - [ ] **Step 1: Write failing robots tests:**
   - `Disallow: /` under `User-agent: *` blocks `/about`.
-  - `User-agent: vibenta-ingest` + `Allow: /` overrides a `*` disallow.
+  - `User-agent: vibewise-ingest` + `Allow: /` overrides a `*` disallow.
   - `Disallow: /private` + `Allow: /private/menu` allows `/private/menu` and blocks `/private/x`.
   - An empty file allows everything.
 - [ ] **Step 2: Write failing http tests** with a harness like `test/osm.test.ts`:

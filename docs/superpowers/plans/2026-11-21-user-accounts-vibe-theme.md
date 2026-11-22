@@ -27,7 +27,7 @@
 - The vibe vocabulary is exactly DATA_MODEL.md §3, in this order: `cozy, lively, upscale, divey, aesthetic, quiet, date_night, group_friendly, late_night, outdoor`. `vocab_version` is `1`.
 - Scores are numbers in [0, 1].
 - Browser env is only `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. No new secrets. Never print their values.
-- The account Supabase client uses `auth: { persistSession: true, detectSessionInUrl: true, storageKey: 'vibenta-auth' }`. Do not change `src/catalog.ts`.
+- The account Supabase client uses `auth: { persistSession: true, detectSessionInUrl: true, storageKey: 'vibewise-auth' }`. Do not change `src/catalog.ts`.
 - Constants (named, exported from the module that owns them):
   - `HALF_LIFE_DAYS = 14`
   - `FULL_STRENGTH_WEIGHT = 5`
@@ -423,7 +423,7 @@ Behavior:
       - `preview` overrides the store target until the next store change.
   - `index.ts`: `mountAccount(container: HTMLElement, opts: { map: MapLibreMap }): { store: AccountStore; destroy(): void }`
     - Creates the client, backend and store with `includeDev: import.meta.env.DEV`. Calls `start()`, mounts the UI and starts the controller.
-    - In DEV only, assigns `window.vibentaAccount = { recordVibe: (scores: unknown) => store.recordVibe({ scores, source: 'dev' }), previewTaste: controller.preview }`.
+    - In DEV only, assigns `window.vibewiseAccount = { recordVibe: (scores: unknown) => store.recordVibe({ scores, source: 'dev' }), previewTaste: controller.preview }`.
     - Re-exports `recordVibe` access for the Vibe Engine via the returned `store`.
   - `ui.ts`:
     - `mountAccountUi(container: HTMLElement, store: AccountStore): () => void`
@@ -442,7 +442,7 @@ Behavior:
 - [ ] **Step 5: Check in the browser without the schema** (works before Task 9). Start the dev server (`preview_start`), then check that:
   - the button renders top right and doesn't overlap search at desktop or 375px width
   - the sign-in popover opens and closes with Escape, an outside click and focus return
-  - `window.vibentaAccount.previewTaste({ cozy: 0.9 }, 1)` visibly re-tints the map with a smooth transition, then `previewTaste({ late_night: 1 }, 1)`, then `previewTaste({}, 0)` returns it to base
+  - `window.vibewiseAccount.previewTaste({ cozy: 0.9 }, 1)` visibly re-tints the map with a smooth transition, then `previewTaste({ late_night: 1 }, 1)`, then `previewTaste({}, 0)` returns it to base
   - effects don't block a map drag or a pin click
   - a drawn route survives a theme change
   - the console has no errors
@@ -471,7 +471,7 @@ npx supabase@3.2.0 link --project-ref <their project ref>
   1. Sign up account A: signed in straight away (confirmations off), and the empty-state copy shows.
   2. Reload: still signed in.
   3. Sign out, then sign in with a wrong password: an inline error.
-  4. Sign in, then run `vibentaAccount.recordVibe({ cozy: 0.9, quiet: 0.6 })` ×3. The map tints, the chips show Cozy and Quiet, and the "Includes sample vibes" badge shows.
+  4. Sign in, then run `vibewiseAccount.recordVibe({ cozy: 0.9, quiet: 0.6 })` ×3. The map tints, the chips show Cozy and Quiet, and the "Includes sample vibes" badge shows.
   5. Toggle "Map effects" off: the base map returns. Reload: it stays off. Toggle it back on.
   6. Draw a route, then record another vibe: the route stays.
   7. Sign up account B: base map, no chips. In devtools, run `await (await import('/src/features/account/client.ts')).createAccountClient().from('vibe_events').select('*')` → `[]` (RLS).

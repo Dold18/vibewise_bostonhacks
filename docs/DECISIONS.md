@@ -1,4 +1,4 @@
-# Decision Log — Vibenta
+# Decision Log — VibeWise
 > **Status:** v0.1. Use this document to distinguish genuine team decisions from assistant proposals.  
 > Format: ID · status · decision · rationale · implications · date/owner.
 
@@ -31,11 +31,14 @@
 - **Decision:** Don't develop directly on `main`; add substantial tested changes after separate integration work.
 - **Why:** Avoid shipping fragmented code from multiple AI agents.
 
+### D-009 · Accepted · Product name is VibeWise
+- **Decision:** The product brand is **VibeWise**. Use it in the UI, docs, package names and outbound identifiers (for example the `vibewise-ingest` User-Agent).
+- **Kept as is:** The repository name `vibenta_bostonhacks`, its GitHub URL, and the Supabase `project_id`. Renaming those would break links and the local Supabase stack.
+- **Supersedes:** P-001.
+
 ## Proposed decisions (not yet ratified)
-### P-001 · Proposed · Project name
-- **Proposal:** Use “Vibenta” as repository/codename; product brand can change.
-- **Reason:** Repository is named `vibenta_bostonhacks`, but naming discussion was ongoing.
-- **Action:** Confirm public-facing name before demo assets and branding are finalized.
+### P-001 · Superseded by D-009 · Project name
+- **Was:** Use “Vibenta” as the repository/codename while the public brand was undecided.
 
 ### P-002 · Proposed · Frontend and map stack *(resolved-by-P-007, pending team ratification)*
 - **Options:** React/Next.js or other frontend framework; MapLibre or Mapbox; compatible legally usable tile provider.

@@ -1,4 +1,4 @@
-# AI Coding Agent Instructions — Vibenta
+# AI Coding Agent Instructions — VibeWise
 This file applies to Codex, Claude Code and any other automated coding assistant working in this repository. Read these instructions **before** making edits.
 
 ## 1. Start every task with context

@@ -1,4 +1,4 @@
-# Roadmap — Vibenta
+# Roadmap — VibeWise
 > **Status:** Proposed v0.1, ordered from smallest functional app to full product.  
 > **Strategy:** Every milestone must leave the repository demonstrably working. Full vision remains in [PRODUCT.md](PRODUCT.md).
 

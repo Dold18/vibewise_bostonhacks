@@ -374,7 +374,7 @@ const buildLayers = (palette: Palette): LayerSpecification[] => [
 export function buildMapStyle(palette: Palette): StyleSpecification {
   return {
     version: 8,
-    name: 'Vibenta Maps Draft',
+    name: 'VibeWise Maps Draft',
     glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
     sources: {
       [SOURCE]: { type: 'vector', url: 'https://tiles.openfreemap.org/planet' },

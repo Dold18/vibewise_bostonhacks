@@ -41,7 +41,7 @@ export function createAccountClient(): SupabaseClient | null {
   const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
   if (!url || !key) return null;
   return createClient(url, key, {
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'vibenta-auth' },
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'vibewise-auth' },
   });
 }
 

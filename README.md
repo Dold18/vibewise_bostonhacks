@@ -1,10 +1,10 @@
-# Vibenta — BostonHacks 2026
+# VibeWise — BostonHacks 2026
 
-**Working product name:** Vibenta (branding may change)  
+**Product name:** VibeWise (formerly the working name Vibenta; the repository is still `vibenta_bostonhacks`)  
 **Track:** Bos(tons) of Eats and Streets  
 **Status:** Early planning and parallel implementation setup
 
-> **Find places by how you want to feel.** Vibenta learns a student's desired aesthetic from images, text, music, movies and a generative vibe quiz. A Living Map of Boston converges on real recommendations, then shows how to reach them on the MBTA. The full vision includes group planning, Recreate Mode, student-friendly places and authorized campus events.
+> **Find places by how you want to feel.** VibeWise learns a student's desired aesthetic from images, text, music, movies and a generative vibe quiz. A Living Map of Boston converges on real recommendations, then shows how to reach them on the MBTA. The full vision includes group planning, Recreate Mode, student-friendly places and authorized campus events.
 
 ## What we are building
 - **Living Map:** Boston basemap, real venue pins and cards, dynamic filters and map atmosphere reacting to preference changes.

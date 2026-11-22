@@ -118,6 +118,6 @@ export function mountDiscoveryPanel(container: HTMLElement, options: DiscoveryPa
       panel.root.remove();
     },
   };
-  if (import.meta.env.DEV) Object.assign(window, { vibentaDiscovery: handle }); // for poking at from devtools
+  if (import.meta.env.DEV) Object.assign(window, { vibewiseDiscovery: handle }); // for poking at from devtools
   return handle;
 }

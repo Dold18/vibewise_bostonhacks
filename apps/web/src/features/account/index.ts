@@ -23,7 +23,7 @@ export function mountAccount(container: HTMLElement, opts: { map: MapLibreMap })
     // Dev only: sample vibes, so the theme can be seen before the Vibe Engine ships.
     // recordVibe writes real `dev` rows for the signed-in user; previewTaste saves nothing.
     Object.assign(window, {
-      vibentaAccount: {
+      vibewiseAccount: {
         store,
         recordVibe: (scores: unknown) => store.recordVibe({ scores, source: 'dev' }),
         previewTaste: theme.preview,

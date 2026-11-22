@@ -1,4 +1,4 @@
-# Workstreams and Collaboration Rules — Vibenta
+# Workstreams and Collaboration Rules — VibeWise
 > **Status:** Proposed v0.1. Owners are roles until teammates claim them. Designed for people using separate Codex / Claude Code agents.
 
 ## Ownership right now

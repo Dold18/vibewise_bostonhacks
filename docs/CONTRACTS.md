@@ -1,4 +1,4 @@
-# Shared Contracts — Vibenta
+# Shared Contracts — VibeWise
 > **Status:** **Proposed v0.1 integration contract** for map/cards and transit. Review and accept together **before** independent implementation.
 > Purpose: prevent different teammate/AI-agent implementations from inventing incompatible place IDs, coordinates, routes or callback payloads.
 

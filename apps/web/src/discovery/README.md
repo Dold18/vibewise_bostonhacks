@@ -75,7 +75,7 @@ import { rankPlaces } from './discovery';
 rankPlaces(places, prefs);     // { included, excluded }, each with per-filter status and notes
 ```
 
-In dev builds the handle is also available as `window.vibentaDiscovery`.
+In dev builds the handle is also available as `window.vibewiseDiscovery`.
 
 ## State (`preferences.ts`)
 
