@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Deal } from './deals';
 import { CATEGORIES, type Category } from './osm';
-import { DEALS_EMBED, emptyCategories, noteIndex, resetIndexForTests, fetchDetailsForPins, fetchDetailsWith, isCatalogCategory, getCachedDetails, nearestByCategory, resetDealsEmbedForTests, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
+import { DEALS_EMBED, dealsByPlace, emptyCategories, noteIndex, resetIndexForTests, fetchDetailsForPins, fetchDetailsWith, isCatalogCategory, getCachedDetails, nearestByCategory, resetDealsEmbedForTests, parsePoint, pinToPlace, toPin, type CatalogDetails, type CatalogPin, priceLabel } from './catalog';
 
 const cat = (id: string) => CATEGORIES.find((c) => c.id === id) as Category;
 const CENTER = { lat: 42.3555, lon: -71.0636 };
@@ -139,6 +139,34 @@ describe('nearestByCategory', () => {
   it('matches the layer place type as well as the kind', () => {
     const other = pin({ placeId: 'osm:node/5', name: 'Other', placeType: 'entertainment', kind: 'cafe' });
     expect(nearestByCategory([other, near], [cat('coffee')], CENTER, 1000, 10).map((r) => r.pin.name)).toEqual(['Near']);
+  });
+  it('gives priority places the capped slots first, then lists the kept pins nearest first', () => {
+    const mid = pin({ placeId: 'osm:node/6', name: 'Mid', lat: 42.358 });
+    const priority = (p: CatalogPin) => p.name === 'Far';
+    expect(nearestByCategory([far, mid, near], [cat('coffee')], CENTER, 1000, 2, priority).map((r) => r.pin.name)).toEqual(['Near', 'Far']);
+  });
+  it('never pulls a priority place in from outside the radius', () => {
+    const priority = (p: CatalogPin) => p.name === 'Outside';
+    expect(nearestByCategory([outside, near], [cat('coffee')], CENTER, 1000, 10, priority).map((r) => r.pin.name)).toEqual(['Near']);
+  });
+});
+
+describe('dealsByPlace', () => {
+  const row = (placeId: string | null, title: string) => ({
+    kind: 'student', title, timing: 'any_time', schedule: null, source: 'website',
+    source_url: 'https://example.com', checked_at: '2026-11-21T00:00:00Z', places: placeId ? { place_id: placeId } : null,
+  });
+  it('groups valid deal rows by catalog place id', () => {
+    const map = dealsByPlace([row('osm:node/1', 'A'), row('osm:node/1', 'B'), row('fsq:x', 'C')]);
+    expect(map.get('osm:node/1')?.map((d) => d.title)).toEqual(['A', 'B']);
+    expect(map.get('fsq:x')?.map((d) => d.title)).toEqual(['C']);
+  });
+  it('drops rows without a place and rows that fail validation', () => {
+    const map = dealsByPlace([row(null, 'No place'), { ...row('osm:node/1', 'Bad'), kind: 'coupon' }, 'junk']);
+    expect(map.size).toBe(0);
+  });
+  it('returns an empty map for non-array input', () => {
+    expect(dealsByPlace(null).size).toBe(0);
   });
 });
 
