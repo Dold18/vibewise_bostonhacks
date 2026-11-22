@@ -48,6 +48,12 @@ scene.connectProfiles(outingProfiles);        // once the adaptive vibe engine i
 ### Navigation policy (ratified)
 While a route or focused destination is shown, the scene **keeps its palette** and a safe version of its lighting (`dim` light becomes `subtle`). All atmosphere and cinematic overlays are removed except a soft edge vignette (≤ 0.35), ambient motion and pin pulses stop, and decorations and 3D set pieces are hidden. Navigation never turns the theme off.
 
+## Known limitations (browser QA, 2026-11-21)
+
+- **Account atmosphere effects are paused.** Before Phase 3, signed-in users with vibe history saw one or two CSS effects above the map (`vibeTheme/effects.css`): cozy lamplight vignette, lively drifting sparkles, upscale gold frame, divey grain, aesthetic pastel wash, quiet edge fog, date-night rose glow, group-friendly top warmth, late-night navy edges with stars, outdoor daylight bloom. While the Scene Composer owns the look, the controller renders no such effects: those overlays sit above the canvas and tint routes, and the scene has its own atmosphere vocabulary. Account taste still drives the **colors** through the scene (`source: 'account'`). The effects return as catalog overlays (vignette, sparkle, grain, fog, starfield) with the Phase 4 atmosphere renderer, under the ratified navigation policy. `setScene(null)` restores the old account mode, effects included.
+- **Highways keep their yellow.** No road swatch moves `highway`/`highwayCasing`, so the Mass Pike and expressways stay a bright cream-yellow band in dark scenes (noir, neon). Legible, but the brightest element in those scenes; a candidate for a road-swatch extension.
+- **3D building colors are banded.** Six constant-color height bands sample the old height gradient (pixel diff vs. the single-layer gradient: mean ΔE 0.2–0.35, p99 ≤ 2.6), so scene changes animate natively instead of snapping and re-laying-out tiles.
+
 ## Pipeline
 
 `sanitize → source (outing > account > neutral) → weigh presets → overrides → lock protected groups → constraint rules → clip to renderer capabilities → performance budget → realize → contrast guard → assets → hash`
