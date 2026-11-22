@@ -4,7 +4,7 @@ import './style.css';
 import { BUILDING_3D_LAYER, BUILDING_3D_OPACITY, mapStyle } from './mapStyle';
 import { PIN_COLORS } from './pinColors';
 import { outingProfiles } from './features/vibe/publisher';
-import { subscribeScene } from './features/vibe/adapters';
+import { safePinAppearance, subscribeScene } from './features/vibe/adapters';
 import { createConvergence, mapDisplay } from './features/vibe/convergence';
 import { rankPlaces } from './discovery/filter';
 import { VIBE_KEYS } from './features/account/vibes';
@@ -632,12 +632,11 @@ const convergence=createConvergence(outingProfiles,signal=>catalogSemanticCandid
   const mode=document.body.dataset.focus==='navigation'||routePlace?'navigation':document.body.dataset.focus==='search'||currentSelection===null?'search':'discovery';
   candidatePlaces.forEach((place,i)=>{
     const pin=markers[i]?.getElement();if(!pin)return;
-    const row=mode==='discovery'&&ranking?.status==='ready'?ranking.all.find(r=>r.id===place.id):undefined;
-    const hidden=!!row?.weak&&!mapDisplay.showAll&&mode==='discovery'&&!pin.classList.contains('selected');
+    const appearance=safePinAppearance(ranking,place.id,pin.classList.contains('selected')?'search':mode,mapDisplay.showAll);
     // Shadows follow their pin; neither may leave a floating visual after convergence.
     for(const element of [pin,shadows[i]?.getElement()]) {
-      element?.style.setProperty('--pin-scale',String(row?.scale??1));
-      element?.classList.toggle('vb-vibe-weak',hidden);
+      element?.style.setProperty('--pin-scale',String(appearance.scale));
+      element?.classList.toggle('vb-vibe-weak',appearance.hidden);
     }
   });
   if(import.meta.env.DEV)Object.assign(window,{vibentaOutingRanking:ranking});

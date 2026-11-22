@@ -31,7 +31,8 @@ export function createLiveQuiz(onBack:()=>void) {
    if(active&&lastQuestion!==question.id){lastQuestion=question.id;queueMicrotask(()=>{if(active&&!root.hidden&&root.offsetParent!==null)title.focus();});}
   }
   if(p.phase==='results'&&editing===null) {
-   root.append(button('Show all places',()=>mapDisplay.setShowAll(true)));
+   const toggle=button(mapDisplay.showAll?'Show ranked places':'Show all places',()=>mapDisplay.setShowAll(!mapDisplay.showAll));
+   toggle.setAttribute('aria-pressed',String(mapDisplay.showAll));root.append(toggle);
    root.append(h('h3',{class:'vb-quiz-prompt'},p.completion.reason==='maximum'?'Your scene, in ten answers.':'Your outing, coming into focus.'),h('p',{class:'vb-quiz-results-note'},'You can explore the map now. Personalized venue matches will appear when compatible venue descriptions are available.'));
    if(p.completion.canContinue&&p.history.length<10)root.append(button('Continue Refining',()=>session.continueRefining(),'vb-primary-btn'));
   }
@@ -52,5 +53,6 @@ export function createLiveQuiz(onBack:()=>void) {
   if(p.originalInput.imageCount)root.append(h('p',{class:'vb-quiz-photo-note'},'Your photos stay in this browser. This quiz uses your text; photos are not uploaded or analyzed.'));
  }
  const off=outingProfiles.subscribe(render);
- return {root,session:session as LiveVibeSession,start(text:string,imageCount:number){active=true;editing=null;session.start(text,imageCount);},resume(){active=true;render(session.getSnapshot());},destroy(){active=false;off();session.destroy();}};
+ const offDisplay=mapDisplay.subscribe(()=>render(session.getSnapshot()));
+ return {root,session:session as LiveVibeSession,start(text:string,imageCount:number){active=true;editing=null;session.start(text,imageCount);},resume(){active=true;render(session.getSnapshot());},destroy(){active=false;off();offDisplay();session.destroy();}};
 }

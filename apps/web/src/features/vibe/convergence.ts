@@ -1,6 +1,10 @@
 import type { ProfilePublisher } from './publisher';
 import { rankCandidates,safePinAppearance,type Ranking,type SemanticCandidate } from './adapters';
-export const mapDisplay={showAll:false,setShowAll(value:boolean){this.showAll=value;for(const f of displaySubscribers)f();}};
+export const mapDisplay={
+ showAll:false,
+ setShowAll(value:boolean){if(this.showAll===value)return;this.showAll=value;for(const f of [...displaySubscribers])f();},
+ subscribe(f:()=>void){displaySubscribers.add(f);return ()=>{displaySubscribers.delete(f);};},
+};
 const displaySubscribers=new Set<()=>void>();
 export function createConvergence(publisher:ProfilePublisher,load:(signal:AbortSignal)=>Promise<readonly SemanticCandidate[]>,apply:(r:Ranking|null)=>void) {
  let latest:Ranking|null=null;let abort:AbortController|null=null;let revision=0;

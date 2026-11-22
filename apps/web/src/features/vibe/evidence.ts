@@ -22,3 +22,19 @@ export function constraintsText(evidence:readonly Evidence[]) {
  const avoid=evidence.filter(e=>e.polarity!=='want').map(e=>e.text);
  return avoid.length?`Explicit exclusions (keep these): ${avoid.join('; ')}.`:'';
 }
+
+/** Explicit evidence is authoritative; the preserved AI summary supplies context only.
+ * Keep exclusions first, then the newest corrections/preferences, before prose that
+ * the model tokenizer may truncate. Deduplicate without dropping constraint clauses.
+ */
+export function embeddingText(summary:string,evidence:readonly Evidence[]) {
+ const key=(s:string)=>s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim();
+ const seen=new Set<string>();
+ const unique=(s:string)=>{const k=key(s);if(!k||seen.has(k))return false;seen.add(k);return true;};
+ const ordered=[...evidence.filter(e=>e.polarity!=='want'),...evidence.filter(e=>e.polarity==='want').reverse()];
+ const lines=ordered.filter(e=>unique(e.text)).map(e=>`${e.polarity==='dealbreaker'?'Dealbreaker':e.polarity==='avoid'?'Exclude':e.source==='correction'?'Correction':'Want'}: ${e.text}`);
+ // Avoid repeating verbatim evidence already present in the summary. Never invent
+ // a replacement summary: these are only exact clauses from the retained text.
+ const context=summary.split('Explicit exclusions (keep these):')[0].split(/[,.;\n]|\bbut\b/i).map(s=>s.trim()).filter(s=>unique(s)&&!evidence.some(e=>key(e.text).includes(key(s)))).join(' ');
+ return [...lines,context?`Earlier summary (current explicit evidence takes precedence): ${context}`:''].filter(Boolean).join('\n');
+}

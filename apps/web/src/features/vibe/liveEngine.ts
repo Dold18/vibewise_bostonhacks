@@ -1,4 +1,5 @@
-import { constraintsText, evidenceFrom } from './evidence.ts';
+import { constraintsText, embeddingText, evidenceFrom } from './evidence.ts';
+import { mapDisplay } from './convergence.ts';
 import { fallbackQuestion, guidanceFor } from './families.ts';
 import { createProfilePublisher } from './publisher.ts';
 import { cosine, immutable, MAX_QUESTIONS, MODEL_KEY, validateVector, type Answer, type EmbeddingProvider, type GenerationContext, type GenerationProvider, type OutingVibeProfile, type Response } from './profile.ts';
@@ -27,13 +28,12 @@ export function createLiveVibeSession(generator:GenerationProvider,embedder:Embe
  const publish=(p:OutingVibeProfile)=>{state=immutable(p);publisher.publish(state);};
  const bump=(patch:Partial<OutingVibeProfile>)=>{if(!state)return;generation?.abort();embedding?.abort();publish({...state,...patch,version:++serial,embedding:{status:'idle',modelKey:MODEL_KEY,version:serial}});};
  async function embedCurrent() {
-  if(!state||!state.vibe_so_far.trim())return;
+  if(!state)return;
+  const text=embeddingText(state.vibe_so_far,state.evidence);if(!text.trim())return;
   embedding?.abort();const abort=new AbortController();embedding=abort;
   const p=state,id=p.sessionId,v=p.version;
   publish({...state,embedding:{status:'pending',modelKey:MODEL_KEY,version:v}});
   try {
-   // Constraints lead so token truncation cannot silently push exclusions out of the input.
-   const text=[constraintsText(p.evidence),p.vibe_so_far].filter(Boolean).join(' ');
    const result=await embedder.embed(text,abort.signal); const vector=validateVector(result.vector,result.modelKey);
    if(!own(id,v)||abort.signal.aborted)return;
    priorVectors=[...priorVectors,vector].slice(-3) as readonly number[][];
@@ -64,7 +64,8 @@ export function createLiveVibeSession(generator:GenerationProvider,embedder:Embe
    if(!own(id,v)||abort.signal.aborted)return;
    const question=fallbackQuestion(c), completion=completionFor(state!,'refine');
    publish({...state!,question,phase:userResults||!question?'results':'question',generation:'fallback',completion:userResults?{...completion,recommended:true,reason:'user_request'}:completion,
-    notice:'Using a local question while the AI is unavailable. Your last AI summary is unchanged; new answers are kept for recovery.'});
+    notice:'Using a local question while the AI is unavailable. Your last AI summary is unchanged; new answers still update semantic matching.'});
+   void embedCurrent();
   }
  }
  function accept(response:Response,replaceIndex?:number) {
@@ -83,7 +84,7 @@ export function createLiveVibeSession(generator:GenerationProvider,embedder:Embe
  return {
   publisher,getSnapshot:()=>state,
   start(text:string,imageCount=0,sessionId:string=crypto.randomUUID()) {
-   generation?.abort();embedding?.abort();userResults=false;priorVectors=[];
+   generation?.abort();embedding?.abort();userResults=false;priorVectors=[];mapDisplay.setShowAll(false);
    const originalInput={text:text.trim().slice(0,2000),imageCount:Math.max(0,Math.min(5,imageCount)),imageProcessing:'not_sent' as const};
    publish({schemaVersion:'1.0.0',sessionId,version:++serial,originalInput,...replay(originalInput,[]),history:[],qualifiers:[],question:null,phase:'generating',generation:'pending',notice:null,
     embedding:{status:'idle',modelKey:MODEL_KEY,version:serial},completion:{recommended:false,reason:'refining',canContinue:true}});
@@ -95,7 +96,7 @@ export function createLiveVibeSession(generator:GenerationProvider,embedder:Embe
   continueRefining(){if(!state||state.history.length>=10||!state.completion.canContinue)return;userResults=false;if(state.question)publish({...state,phase:'question',completion:{...state.completion,recommended:false,reason:'refining'}});else{bump({phase:'generating',generation:'pending'});void generateCurrent();}},
   retry(){if(!state)return;bump({phase:userResults?'results':'generating',generation:'pending'});void generateCurrent();},
   retryEmbedding:embedCurrent,
-  clear(){generation?.abort();embedding?.abort();state=null;serial++;publisher.publish(null);},
+  clear(){generation?.abort();embedding?.abort();state=null;serial++;mapDisplay.setShowAll(false);publisher.publish(null);},
   destroy(){generation?.abort();embedding?.abort();},
  };
 }

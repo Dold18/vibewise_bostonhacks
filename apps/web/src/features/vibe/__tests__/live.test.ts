@@ -1,4 +1,5 @@
-import { createConvergence } from '../convergence';
+import { embeddingText, evidenceFrom } from '../evidence';
+import { createConvergence, mapDisplay } from '../convergence';
 import { describe,it,expect,vi } from 'vitest';
 import { createLiveVibeSession,replay } from '../liveEngine';
 import { guidanceFor,FAMILIES,fallbackQuestion } from '../families';
@@ -137,5 +138,100 @@ describe('replay checkpoints and convergence lifecycle',()=>{
   const places=[0,1].map(i=>({id:`TEST FIXTURE ${i}`,location:{lat:42.35+i/100,lng:-71.06},eligible:true,embedding:vector(i),modelKey:MODEL_KEY,provenance:'fixture' as const}));
   const first=rankCandidates(p,places),second=rankCandidates({...p,embedding:{...p.embedding,vector:vector(1)}},places);
   expect(first.all[0].id).not.toBe(second.all[0].id);expect(first.all.find(c=>c.id===places[1].id)!.weak).toBe(true);expect(second.all.find(c=>c.id===places[1].id)!.weak).toBe(false);expect(second.all).toHaveLength(2);expect(second.all[0].location).toEqual(places[1].location);
+ });
+});
+
+
+describe('fallback semantic evidence regressions',()=>{
+ it('embeds each new explicit fallback answer while preserving the Gemini summary',async()=>{
+  let offline=false;const texts:string[]=[];
+  const s=createLiveVibeSession({generate:async c=>{if(offline)throw Error('TEST FIXTURE offline');return result(c);}}, {embed:async text=>{texts.push(text);return {modelKey:MODEL_KEY,vector:vector()};}});
+  s.start('An intriguing evening, never crowded',0,'fallback-evidence');await ready(s);
+  const summary=s.getSnapshot()!.vibe_so_far;offline=true;
+  s.answer({kind:'choice',optionId:'a'});await ready(s);
+  expect(texts.at(-1)).toContain('Warm lamplight');expect(texts.at(-1)).not.toContain('Cool sea air');
+  expect(texts.at(-1)).toContain('Dealbreaker: never crowded');
+  const next=s.getSnapshot()!.question!,option=next.options[0];const count=texts.length;
+  s.answer({kind:'choice',optionId:option.id});await ready(s);
+  expect(texts.length).toBeGreaterThan(count);expect(texts.at(-1)).toContain(option.description);
+  expect(s.getSnapshot()!.vibe_so_far).toBe(summary);
+  expect(s.getSnapshot()!.embedding.version).toBe(s.getSnapshot()!.version);
+  s.answer({kind:'correction',text:'Actually quiet acoustic music, no fluorescent lighting'});await ready(s);
+  expect(texts.at(-1)).toContain('Correction: Actually quiet acoustic music');expect(texts.at(-1)).toContain('Exclude: no fluorescent lighting');
+  expect(texts.at(-1)!.indexOf('no fluorescent lighting')).toBeLessThan(texts.at(-1)!.indexOf('Earlier summary'));
+  s.destroy();
+ });
+ it('updates from original text without inventing a summary when Gemini never works',async()=>{
+  const texts:string[]=[];const s=createLiveVibeSession({generate:async()=>{throw Error('TEST FIXTURE offline');}}, {embed:async text=>{texts.push(text);return {modelKey:MODEL_KEY,vector:vector()};}});
+  s.start('A quiet garden, no crowds',0,'always-offline');await ready(s);
+  const q=s.getSnapshot()!.question!;s.answer({kind:'choice',optionId:q.options[0].id});await ready(s);
+  expect(texts.at(-1)).toContain(q.options[0].description);expect(s.getSnapshot()!.vibe_so_far).toBe('A quiet garden, no crowds');
+  const before=texts.at(-1);s.answer({kind:'neither'});await ready(s);expect(texts.at(-1)).toBe(before);s.destroy();
+ });
+ it('deduplicates exact evidence and keeps every exclusion ahead of long summary prose',()=>{
+  const evidence=evidenceFrom('No crowds, no loud music, warm lamps',[]);
+  const text=embeddingText('Warm lamps. '+ 'Long scenic context. '.repeat(200),[...evidence,...evidence]);
+  expect(text.match(/No crowds/g)).toHaveLength(1);expect(text.match(/no loud music/g)).toHaveLength(1);
+  expect(text.indexOf('no loud music')).toBeLessThan(text.indexOf('Long scenic context'));
+  expect(text.toLowerCase().match(/warm lamps/g)).toHaveLength(1);
+  const original='Quiet garden, no crowds';expect(embeddingText(original,evidenceFrom(original,[])).match(/no crowds/g)).toHaveLength(1);
+  expect(embeddingText('静かな庭',evidenceFrom('静かな庭',[]))).toContain('Want: 静かな庭');
+ });
+ it('drops obsolete fallback inference after correction and after starting over, even when abort is ignored',async()=>{
+  const pending:((r:{modelKey:string;vector:number[]})=>void)[]=[];
+  const s=createLiveVibeSession({generate:async()=>{throw Error('TEST FIXTURE offline');}}, {embed:async()=>new Promise(r=>pending.push(r))});
+  s.start('An old evening',0,'old');await ready(s);
+  s.answer({kind:'correction',text:'A bright garden with acoustic music'});await ready(s);
+  pending[1]({modelKey:MODEL_KEY,vector:vector(2)});await vi.waitFor(()=>expect(s.getSnapshot()!.embedding.status).toBe('ready'));
+  pending[0]({modelKey:MODEL_KEY,vector:vector(1)});await new Promise(r=>setTimeout(r,5));expect(s.getSnapshot()!.embedding.vector![2]).toBe(1);
+  s.start('A new evening',0,'new');await ready(s);s.clear();pending[2]({modelKey:MODEL_KEY,vector:vector(3)});await new Promise(r=>setTimeout(r,5));expect(s.getSnapshot()).toBeNull();s.destroy();
+ });
+});
+
+describe('outing display lifecycle',()=>{
+ it('toggles weaker pins and returns to ranked pins without moving candidates; preserves search/navigation',async()=>{
+  const p=createProfilePublisher();const places=[0,1].map(i=>({id:`TEST FIXTURE ${i}`,location:{lat:42.35+i/100,lng:-71.06},eligible:true,embedding:vector(i),modelKey:MODEL_KEY,provenance:'fixture' as const}));
+  const renders:unknown[]=[];const c=createConvergence(p,async()=>places,r=>renders.push(r));const s=createLiveVibeSession(generator,embedder,p);
+  s.start('A scene',0,'display');await ready(s);await vi.waitFor(()=>expect(c.appearance(places[1].id,'discovery').hidden).toBe(true));
+  const last=renders.at(-1);mapDisplay.setShowAll(true);expect(c.appearance(places[1].id,'discovery').hidden).toBe(false);
+  mapDisplay.setShowAll(false);expect(c.appearance(places[1].id,'discovery').hidden).toBe(true);expect(renders.at(-1)).toBe(last);
+  expect(c.appearance(places[1].id,'navigation')).toEqual({scale:1,hidden:false});expect(c.appearance(places[1].id,'search')).toEqual({scale:1,hidden:false});
+  expect((last as ReturnType<typeof rankCandidates>).all.map(r=>r.location)).toEqual(places.map(r=>r.location));
+  mapDisplay.setShowAll(true);s.start('Another scene',0,'display-next');expect(mapDisplay.showAll).toBe(false);await ready(s);
+  mapDisplay.setShowAll(true);s.clear();expect(mapDisplay.showAll).toBe(false);
+  mapDisplay.setShowAll(true);s.start('A fresh session',0,'fresh');expect(mapDisplay.showAll).toBe(false);s.clear();c.destroy();
+ });
+});
+
+describe('multi-turn fallback variety',()=>{
+ const vibes=['Cinematic neon nightlife','Quiet romantic evening','Playful outdoor afternoon','Nostalgic, slightly eerie atmosphere','High-energy music-focused outing','A scene like a memory I cannot quite name'];
+ for(const input of vibes)it(`uses distinct mechanics and new topics for ten turns: ${input}`,()=>{
+  let c:GenerationContext={...context(),originalInput:{...context().originalInput,text:input},evidence:evidenceFrom(input,[])};
+  const prompts=new Set<string>(),families=new Set<string>(),topics=new Set<string>();
+  for(let i=0;i<10;i++){
+   const q=fallbackQuestion(c)!;expect(q).not.toBeNull();expect(q.prompt).toContain(input);
+   expect(()=>validateGeneration({vibe_so_far:'TEST FIXTURE retained outing description',nextQuestion:q,qualifiers:[],continuation:'refine',reason:'TEST FIXTURE'},c)).not.toThrow();
+   expect(prompts.has(q.prompt)).toBe(false);expect(families.has(q.family)).toBe(false);expect(topics.has(q.topic)).toBe(false);
+   expect(q.prompt).not.toContain('Which detail belongs in the scene');expect(q.options.every(o=>o.description.length>=20)).toBe(true);
+   prompts.add(q.prompt);families.add(q.family);topics.add(q.topic);
+   const history=[...c.history,{id:`test-${i}`,question:q,response:{kind:'choice' as const,optionId:q.options[0].id}}];
+   c={...c,version:c.version+1,history,evidence:evidenceFrom(input,history)};
+  }
+  expect(fallbackQuestion(c)).toBeNull();expect(families.size).toBe(10);
+ });
+ it('adapts the first mechanic to the starting vibe and carries the selected detail forward',()=>{
+  const first=vibes.map(input=>fallbackQuestion({...context(),originalInput:{...context().originalInput,text:input},evidence:evidenceFrom(input,[])})!);
+  expect(new Set(first.map(q=>q.family)).size).toBeGreaterThanOrEqual(5);
+  const c=context(),q=fallbackQuestion(c)!;c.history=[{id:'1',question:q,response:{kind:'choice',optionId:q.options[0].id}}];c.evidence=evidenceFrom('',c.history);c.version++;
+  expect(fallbackQuestion(c)!.prompt).toContain(q.options[0].label.slice(0,65));
+ });
+ it('offers descriptive, valid presentations for all sixteen families, including neutral unfamiliar follow-ups',()=>{
+  const seen=new Set<string>();
+  for(let i=0;i<250;i++){
+   const c={...context(),version:i+1,originalInput:{...context().originalInput,text:`Explore a new detail ${i}`}};const q=fallbackQuestion(c)!;seen.add(q.family);
+   expect(()=>validateGeneration({vibe_so_far:'TEST FIXTURE current outing atmosphere',nextQuestion:q,qualifiers:[],continuation:'refine',reason:'TEST FIXTURE'},c)).not.toThrow();
+   expect(q.cultural).toBe(false);
+  }
+  expect(seen.size).toBe(16);
  });
 });

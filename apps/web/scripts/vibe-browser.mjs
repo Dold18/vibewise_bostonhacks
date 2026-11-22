@@ -19,7 +19,7 @@ const click=sel=>js(`document.querySelector(${JSON.stringify(sel)}).click()`);
 const shot=async name=>{let timer;try{const capture=await Promise.race([send('Page.captureScreenshot',{format:'png'}),new Promise((_,reject)=>timer=setTimeout(()=>reject(Error('Screenshot timed out: '+name)),20000))]);writeFileSync(`${OUT}/${name}.png`,Buffer.from(capture.data,'base64'));}finally{clearTimeout(timer)}};
 const waitFor=async expression=>{for(let i=0;i<80;i++){if(await js(expression))return;await sleep(250);}throw Error('Timed out: '+expression);};
 
-let generationFailure=false,embeddingFailure=false,genCount=0;
+let generationFailure=false,embeddingFailure=false,genCount=0;const embeddingTexts=[];
 handlers.set('Fetch.requestPaused',async p=>{
  let data,code=200;
  if(p.request.url.includes('/api/vibe/generate')){
@@ -27,8 +27,9 @@ handlers.set('Fetch.requestPaused',async p=>{
   if(generationFailure){code=503;data={message:'TEST FIXTURE provider failure'};}
   else {const q=fallbackQuestion(c); if(q&&c.history.length===0)q.cultural=true;
    const choice=c.history.at(-1);const desc=choice?.response.kind==='choice'?choice.question.options.find(o=>o.id===choice.response.optionId)?.description:choice?.response.kind==='correction'?choice.response.text:'';
-   data={vibe_so_far:'TEST FIXTURE: A cinematic evening with playful discoveries, expressive color and enough space to linger together. '+(desc??''),nextQuestion:q,qualifiers:[],continuation:c.history.length>=3?'finish':'refine',reason:'TEST FIXTURE qualitative continuation'};}
+   data={vibe_so_far:'TEST FIXTURE: A cinematic evening with playful discoveries, expressive color and enough space to linger together. '+(desc??'')+' TEST FIXTURE summary revision '+genCount,nextQuestion:q,qualifiers:[],continuation:c.history.length>=3?'finish':'refine',reason:'TEST FIXTURE qualitative continuation'};}
  }else if(p.request.url.includes('/api/vibe/embed')){
+  embeddingTexts.push(JSON.parse(p.request.postData).text);
   await sleep(200);code=embeddingFailure?503:200;data=embeddingFailure?{message:'TEST FIXTURE inference failure'}:{modelKey:MODEL_KEY,vector:Array.from({length:384},(_,i)=>i===genCount%6?1:0)};
  }else if(p.request.url.includes('nominatim'))data=[];
  else data={elements:[]};
@@ -37,7 +38,7 @@ handlers.set('Fetch.requestPaused',async p=>{
 const profile=()=>js('vibentaOutingProfiles.getSnapshot()');
 const btn=label=>js(`(()=>{const b=[...document.querySelectorAll('.vb-live-quiz button')].find(b=>b.textContent===${JSON.stringify(label)});if(!b)throw Error('Missing button');b.click()})()`);
 const snap=()=>js(`JSON.stringify({...vibentaDiscovery.getPreferences(),vibeImages:vibentaDiscovery.getPreferences().vibeImages.map(f=>({name:f.name,size:f.size}))})`);
-async function openQuiz(){await click('.vb-continue-btn');await js(`const t=document.querySelector('.vb-vibe-story');t.value='Cinematic neon and playful discoveries, but absolutely not crowded';t.dispatchEvent(new Event('input',{bubbles:true}));const d=new DataTransfer();d.items.add(new File([Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9WQAAAAASUVORK5CYII='),c=>c.charCodeAt(0))],'TEST-FIXTURE.png',{type:'image/png'}));const f=document.querySelector('input[type=file]');f.files=d.files;f.dispatchEvent(new Event('change',{bubbles:true}));`);await click('.vb-begin-quiz');}
+async function openQuiz(){await click('.vb-continue-btn');await js(`{const t=document.querySelector('.vb-vibe-story');t.value='Cinematic neon and playful discoveries, but absolutely not crowded';t.dispatchEvent(new Event('input',{bubbles:true}));const d=new DataTransfer();d.items.add(new File([Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9WQAAAAASUVORK5CYII='),c=>c.charCodeAt(0))],'TEST-FIXTURE.png',{type:'image/png'}));const f=document.querySelector('input[type=file]');f.files=d.files;f.dispatchEvent(new Event('change',{bubbles:true}));}`);await click('.vb-begin-quiz');}
 try{
  await send('Runtime.enable');await send('Page.enable');await send('Network.enable');await send('Emulation.setFocusEmulationEnabled',{enabled:true});await send('Page.bringToFront');
  await send('Fetch.enable',{patterns:[{urlPattern:'*/api/vibe/*'},{urlPattern:'*overpass*'},{urlPattern:'*nominatim*'}]});
@@ -51,9 +52,14 @@ try{
  await click('.vb-quiz-answer');await waitFor("vibentaOutingProfiles.getSnapshot()?.history.length===2&&vibentaOutingProfiles.getSnapshot()?.phase==='question'");
  await click('.vb-quiz-answer');await waitFor("vibentaOutingProfiles.getSnapshot()?.history.length===3&&vibentaOutingProfiles.getSnapshot()?.phase==='results'");
  check('early completion at three with durable crowd exclusion',(await profile()).evidence.some(e=>e.polarity!=='want'&&e.text.includes('crowded')));await shot('desktop-results');
+ await btn('Show all places');check('Show All toggles back to ranked places',await js("[...document.querySelectorAll('.vb-live-quiz button')].some(b=>b.textContent==='Show ranked places'&&b.getAttribute('aria-pressed')==='true')"));
+ await btn('Show ranked places');check('ranked display can reveal weaker places again',await js("[...document.querySelectorAll('.vb-live-quiz button')].some(b=>b.textContent==='Show all places'&&b.getAttribute('aria-pressed')==='false')"));
  check('no catalog does not fabricate rankings',await js("vibentaOutingRanking.status==='unavailable'"));
  await btn('Continue Refining');check('continue refinement returns one question',(await profile()).phase==='question');
  const before=(await profile()).vibe_so_far;generationFailure=true;await click('.vb-quiz-answer');await waitFor("vibentaOutingProfiles.getSnapshot()?.generation==='fallback'");
+ await waitFor("vibentaOutingProfiles.getSnapshot()?.embedding.status==='ready'");
+ const fallbackAnswer=(await profile()).history.at(-1);const fallbackDescription=fallbackAnswer.question.options.find(o=>o.id===fallbackAnswer.response.optionId).description;
+ check('fallback answer reaches MiniLM with explicit exclusion',embeddingTexts.at(-1).includes(fallbackDescription)&&embeddingTexts.at(-1).includes('not crowded'));
  check('failure preserves summary and keeps new answer',(await profile()).vibe_so_far===before&&(await profile()).history.length===4);
  generationFailure=false;embeddingFailure=true;await btn('Try AI again');await waitFor("vibentaOutingProfiles.getSnapshot()?.embedding.status==='unavailable'");
  check('AI recovery includes pending history; unavailable embedding honest',(await profile()).history.length===4&&(await profile()).generation==='gemini');
@@ -62,7 +68,9 @@ try{
  await btn('Back to vibe description');check('back preserves all practical fields, text and photo',await snap()===original&&await js("!document.querySelector('.vb-begin-quiz').hidden"));
  await click('.vb-begin-quiz');check('resume retains revised history',(await profile()).history.length===1);
  await btn('Show My Matches');check('user-requested result reason',(await profile()).completion.reason==='user_request');
- await btn('Back to vibe description');await click('.vb-back-btn');await js("[...document.querySelectorAll('.vb-step-footer button')].find(b=>b.textContent==='Clear all').click()");check('Clear all removes provisional profile',await profile()===null);
+ await btn('Show all places');await btn('Start over');await waitFor("vibentaOutingProfiles.getSnapshot()?.phase==='question'");await btn('Show My Matches');check('Start over resets Show All',await js("[...document.querySelectorAll('.vb-live-quiz button')].some(b=>b.textContent==='Show all places')"));
+ await btn('Show all places');await btn('Back to vibe description');await click('.vb-back-btn');await js("[...document.querySelectorAll('.vb-step-footer button')].find(b=>b.textContent==='Clear all').click()");check('Clear all removes provisional profile',await profile()===null);
+ await openQuiz();await waitFor("vibentaOutingProfiles.getSnapshot()?.phase==='question'");await btn('Show My Matches');check('new outing after Clear all defaults to ranked places',await js("[...document.querySelectorAll('.vb-live-quiz button')].some(b=>b.textContent==='Show all places')"));
  await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await send('Page.navigate',{url:process.env.VIBENTA_QA_URL??'http://localhost:5174/'});await waitFor('!!window.vibentaDiscovery&&!!window.vibentaOutingProfiles');await click('.vb-summary-btn');await openQuiz();await waitFor("vibentaOutingProfiles.getSnapshot()?.phase==='question'");
  check('mobile cards fit panel width',await js("(()=>{const p=document.querySelector('.vb-discovery').getBoundingClientRect();return p.left>=0&&p.right<=innerWidth+1&&[...document.querySelectorAll('.vb-quiz-answer')].every(b=>b.getBoundingClientRect().right<=innerWidth+1)})()"));await shot('mobile-question');
  await btn('I don’t know these');await waitFor("vibentaOutingProfiles.getSnapshot()?.history.length===1&&vibentaOutingProfiles.getSnapshot()?.phase==='question'");check('unfamiliarity neutral with non-cultural follow-up',(await profile()).history[0].response.kind==='unfamiliar'&&!(await profile()).question.cultural);
