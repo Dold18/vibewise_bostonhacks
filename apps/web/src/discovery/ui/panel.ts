@@ -30,7 +30,7 @@ import { createMultiSelectField } from './multiSelectField';
 import { createSelectField } from './selectField';
 import { createLiveQuiz } from '../../features/vibe/ui/liveQuiz';
 import { photoAccess } from '../../features/vibe/photoAccess';
-import { photoClient } from '../../features/vibe/photoClient';
+import { PHOTO_MESSAGES, photoClient } from '../../features/vibe/photoClient';
 import { prepareMessage, type PreparedMessage } from '../../features/vibe/photoSend';
 import { createVibeStep } from './vibeStep';
 import { createTimingField } from './timingField';
@@ -127,6 +127,11 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     const p = prefs.getState();
     // A photo kept from before signing out is not sent until the user signs in again.
     const photo = photoAccess.status() === 'signed_in' ? p.vibeImages[0] ?? null : null;
+    // Signed out with only a photo: nothing can be sent, so say why rather than ask for words or a photo.
+    if (!photo && p.vibeImages[0] && !p.vibeText.trim()) {
+      vibeStep.setPhoto({ status: { text: PHOTO_MESSAGES.signed_out, kind: 'error' } });
+      return;
+    }
     const reading = !!photo && photoClient.cached(photo) === undefined;
     startingQuiz = true;
     if (reading) {
