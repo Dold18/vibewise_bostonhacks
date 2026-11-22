@@ -1,4 +1,7 @@
-/** Browser-local image selection for the vibe step. This module NEVER uploads a file. */
+/**
+ * Validation for the one browser-local vibe photo. This module only validates and
+ * NEVER uploads; the photo client sends the photo when the user refines (panel.ts).
+ */
 export const MAX_VIBE_IMAGES = 1;
 export const MAX_VIBE_IMAGE_BYTES = 8 * 1024 * 1024;
 export const ACCEPTED_VIBE_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;

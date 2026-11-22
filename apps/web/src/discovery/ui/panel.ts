@@ -289,7 +289,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     heading.textContent = next === 'plan' ? 'Plan your outing' : 'What’s your vibe?';
     subtitle.hidden = next === 'vibe';
     subtitle.textContent = 'First, the basics. Then we’ll find the feeling.';
-    footerNote.textContent = next === 'plan' ? 'Next: describe the atmosphere you have in mind. All these details stay saved.' : 'Refine with imaginative questions. Your text and answers go to the vibe service; photos stay local.';
+    footerNote.textContent = next === 'plan' ? 'Next: describe the atmosphere you have in mind. All these details stay saved.' : "Photos are sent to Google Gemini for a short text description when you refine your vibe. Vibenta doesn't store them.";
     closePopups();
     if (next === 'vibe') heading.focus(); else activity.focus();
   }

@@ -5,20 +5,26 @@ A floating two-step discovery panel on the left of the Living Map.
 cuisine or activity-type multiselect, starting point, budget, and time).
 **Continue to your vibe** switches to Step 2 without losing these values.
 **Step 2: Find your vibe** provides a guided free-text field with selectable
-examples and an accessible multi-photo drop zone with previews.
+examples and an accessible one-photo attachment (drop zone, thumbnail, remove).
+Adding a photo requires signing in; a line shows how many of today's 5 photo
+reads are left.
 
-Photos are held as browser-local `File` objects only (maximum five JPG/PNG/WebP
-files, each up to 8 MB). They are **not uploaded or analyzed yet**. Moving back
-to Step 1 and forward again preserves both text and photos during the session.
-Clear all removes them; refresh does not retain photos. `Save my vibe` collapses
+The photo is held as a browser-local `File` object (one JPG/PNG/WebP file, up to
+8 MB) until the user refines. Moving back to Step 1 and forward again preserves
+both text and photo during the session.
+Clear all removes them; refresh does not retain the photo. `Save my vibe` collapses
 the panel with a clear summary.
 
 **Refine this vibe** starts the adaptive questionnaire within Step 2. Text and
-answers go to the server's Gemini integration; photos stay local. Back/resume,
+answers go to the server's Gemini integration. If a photo is attached and the
+user is signed in, the photo client first sends it to `/api/vibe/describe-image`,
+which asks Google Gemini for a short text description. Vibenta doesn't store the
+photo. The description joins the vibe text as a `Photo:` line. While it is read the button shows "Reading your photo…"; on
+failure the user stays on Step 2 with their draft and the error. Back/resume,
 answer revision and Clear all preserve or reset the same in-memory session.
 The versioned publisher feeds the existing Scene Composer and compatible catalog
 recommendations. Missing Gemini uses labeled local questions; missing or
-incompatible embeddings leave pins unranked. Image interpretation is not included.
+incompatible embeddings leave pins unranked.
 
 ## Mounting
 
@@ -189,9 +195,10 @@ map connectors, never as verified pedestrian paths.
 
 Step 1 contains practical fields and Continue to your vibe. Step 2 has one
 “What’s your vibe?” heading, the descriptive text field, seven examples and an
-optional photo drop zone. Files stay in memory (up to five JPG/PNG/WebP images,
-8 MB each). Photos are not uploaded or analyzed; previews use revoked-on-removal
-object URLs. Back, Continue, and Directions preserve the original File objects.
+optional one-photo attachment. The file stays in memory (one JPG/PNG/WebP image,
+up to 8 MB) and is sent for a text description only on Refine; `vibeImages.ts`
+only validates and never uploads. Thumbnails use object URLs revoked once no
+attachment shows the file. Back, Continue, and Directions preserve the original File objects.
 The preference normalizer intentionally does not restore File objects from JSON.
 
 The blue header, labels, selected fields and focus rings reinforce the existing
