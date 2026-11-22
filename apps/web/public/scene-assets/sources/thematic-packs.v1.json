@@ -1,0 +1,1631 @@
+{
+  "schemaVersion": "1.0.0",
+  "title": "Vibenta contextual/thematic asset source registry",
+  "collectedOn": "2026-11-21",
+  "status": "source_pages_verified_assets_NOT_downloaded_or_imported",
+  "note": "Pack-level inventory only. Cuisine, music, aesthetic, venue and occasion are orthogonal dimensions; model-level selection must verify exact props, licensing, visual style and navigation-safe placement. Sourcing is not importing.",
+  "reusePolicy": {
+    "requiredLicense": "CC0-1.0",
+    "retainProvenance": true,
+    "inspectDownloadedLicense": true,
+    "doNotCommitRawPacks": true,
+    "convert3dToGlb": true,
+    "lazyLoadPerTheme": true,
+    "protectRoutesLabelsAndProviderAttribution": true
+  },
+  "sources": [
+    {
+      "id": "kenney-food",
+      "publisher": "Kenney",
+      "name": "Food Kit",
+      "sourceUrl": "https://kenney.nl/assets/food-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 200,
+      "assetClass": "3d",
+      "tags": [
+        "food",
+        "italian",
+        "date_night",
+        "casual_dining"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-graveyard",
+      "publisher": "Kenney",
+      "name": "Graveyard Kit",
+      "sourceUrl": "https://kenney.nl/assets/graveyard-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 90,
+      "assetClass": "3d",
+      "tags": [
+        "haunted",
+        "halloween",
+        "gothic",
+        "mystery"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-nature",
+      "publisher": "Kenney",
+      "name": "Nature Kit",
+      "sourceUrl": "https://kenney.nl/assets/nature-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 330,
+      "assetClass": "3d",
+      "tags": [
+        "outdoor",
+        "nature",
+        "romantic",
+        "calm"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-fantasy-town",
+      "publisher": "Kenney",
+      "name": "Fantasy Town Kit",
+      "sourceUrl": "https://kenney.nl/assets/fantasy-town-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 160,
+      "assetClass": "3d",
+      "tags": [
+        "storybook",
+        "historic",
+        "fantasy",
+        "romantic"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-city-commercial",
+      "publisher": "Kenney",
+      "name": "City Kit (Commercial)",
+      "sourceUrl": "https://kenney.nl/assets/city-kit-commercial",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 50,
+      "assetClass": "3d",
+      "tags": [
+        "urban",
+        "nightlife",
+        "modern",
+        "architecture"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-city-suburban",
+      "publisher": "Kenney",
+      "name": "City Kit (Suburban)",
+      "sourceUrl": "https://kenney.nl/assets/city-kit-suburban",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 40,
+      "assetClass": "3d",
+      "tags": [
+        "cozy",
+        "neighborhood",
+        "relaxed",
+        "residential"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-furniture",
+      "publisher": "Kenney",
+      "name": "Furniture Kit",
+      "sourceUrl": "https://kenney.nl/assets/furniture-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 140,
+      "assetClass": "3d",
+      "tags": [
+        "dining",
+        "cafe",
+        "romantic",
+        "interior"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-holiday",
+      "publisher": "Kenney",
+      "name": "Holiday Kit",
+      "sourceUrl": "https://kenney.nl/assets/holiday-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 100,
+      "assetClass": "3d",
+      "tags": [
+        "winter",
+        "holiday",
+        "festive",
+        "cozy"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-retro-urban",
+      "publisher": "Kenney",
+      "name": "Retro Urban Kit",
+      "sourceUrl": "https://kenney.nl/assets/retro-urban-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 120,
+      "assetClass": "3d",
+      "tags": [
+        "retro",
+        "urban",
+        "nostalgic",
+        "indie"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-mini-market",
+      "publisher": "Kenney",
+      "name": "Mini Market",
+      "sourceUrl": "https://kenney.nl/assets/mini-market",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 20,
+      "assetClass": "3d",
+      "tags": [
+        "market",
+        "food",
+        "shopping",
+        "neighborhood"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-mini-arcade",
+      "publisher": "Kenney",
+      "name": "Mini Arcade",
+      "sourceUrl": "https://kenney.nl/assets/mini-arcade",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 20,
+      "assetClass": "3d",
+      "tags": [
+        "arcade",
+        "playful",
+        "nightlife",
+        "retro"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-pirate",
+      "publisher": "Kenney",
+      "name": "Pirate Kit",
+      "sourceUrl": "https://kenney.nl/assets/pirate-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 70,
+      "assetClass": "3d",
+      "tags": [
+        "nautical",
+        "adventure",
+        "coastal",
+        "fantasy"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-space",
+      "publisher": "Kenney",
+      "name": "Space Kit",
+      "sourceUrl": "https://kenney.nl/assets/space-kit",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 150,
+      "assetClass": "3d",
+      "tags": [
+        "futuristic",
+        "scifi",
+        "space",
+        "playful"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-generic-items",
+      "publisher": "Kenney",
+      "name": "Generic Items",
+      "sourceUrl": "https://kenney.nl/assets/generic-items",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 160,
+      "assetClass": "2d",
+      "tags": [
+        "miscellaneous",
+        "symbols",
+        "playful"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "2D sprite source; not 3D models."
+    },
+    {
+      "id": "kenney-light-masks",
+      "publisher": "Kenney",
+      "name": "Light Masks",
+      "sourceUrl": "https://kenney.nl/assets/light-masks",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 150,
+      "assetClass": "2d_vfx",
+      "tags": [
+        "spotlight",
+        "lanterns",
+        "romantic",
+        "noir",
+        "nightlife"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-particles",
+      "publisher": "Kenney",
+      "name": "Particle Pack",
+      "sourceUrl": "https://kenney.nl/assets/particle-pack",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 80,
+      "assetClass": "2d_vfx",
+      "tags": [
+        "sparkles",
+        "magic",
+        "weather",
+        "ambient"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-smoke",
+      "publisher": "Kenney",
+      "name": "Smoke Particles",
+      "sourceUrl": "https://kenney.nl/assets/smoke-particles",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 70,
+      "assetClass": "2d_vfx",
+      "tags": [
+        "haunted",
+        "fog",
+        "noir",
+        "industrial"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-foliage",
+      "publisher": "Kenney",
+      "name": "Foliage Pack",
+      "sourceUrl": "https://kenney.nl/assets/foliage-pack",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 100,
+      "assetClass": "2d_vfx",
+      "tags": [
+        "nature",
+        "autumn",
+        "spring",
+        "romantic"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-skyboxes",
+      "publisher": "Kenney",
+      "name": "Skyboxes",
+      "sourceUrl": "https://kenney.nl/assets/skyboxes",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 5,
+      "assetClass": "background",
+      "tags": [
+        "sky",
+        "atmosphere",
+        "futuristic"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kenney-roads",
+      "publisher": "Kenney",
+      "name": "City Kit (Roads)",
+      "sourceUrl": "https://kenney.nl/assets/city-kit-roads",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 90,
+      "assetClass": "3d",
+      "tags": [
+        "urban",
+        "street",
+        "decorative_only"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "For illustration-only street-scene dioramas; never replace factual road geometry."
+    },
+    {
+      "id": "kaykit-restaurant",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "Restaurant Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/restaurant-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 140,
+      "assetClass": "3d",
+      "tags": [
+        "food",
+        "restaurant",
+        "italian",
+        "dining",
+        "kitchen"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Free tier 140+ models; pizza/ice-cream EXTRAs are paid, do not assume included."
+    },
+    {
+      "id": "kaykit-halloween",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "Halloween Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/halloween-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 60,
+      "assetClass": "3d",
+      "tags": [
+        "haunted",
+        "halloween",
+        "spooky",
+        "autumn"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Free tier 60+ models, additional spooky objects in paid EXTRA."
+    },
+    {
+      "id": "kaykit-furniture",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "Furniture Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/furniture-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 50,
+      "assetClass": "3d",
+      "tags": [
+        "cafe",
+        "lounge",
+        "romantic",
+        "interior"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kaykit-city-builder",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "City Builder Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/city-builder-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 32,
+      "assetClass": "3d",
+      "tags": [
+        "city",
+        "park",
+        "modern",
+        "urban"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kaykit-space-base",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "Space Base Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/space-base-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 48,
+      "assetClass": "3d",
+      "tags": [
+        "space",
+        "futuristic",
+        "scifi"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kaykit-holiday",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "Holiday Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/holiday-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 55,
+      "assetClass": "3d",
+      "tags": [
+        "winter",
+        "festive",
+        "holiday",
+        "food"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "Free tier 55+ models, gingerbread expansion in paid EXTRA."
+    },
+    {
+      "id": "kaykit-resources",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "Resource Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/resource-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 75,
+      "assetClass": "3d",
+      "tags": [
+        "nature",
+        "minerals",
+        "outdoors",
+        "fantasy"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kaykit-rpg-tools",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "RPG Tools Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/rpg-tools-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 45,
+      "assetClass": "3d",
+      "tags": [
+        "fantasy",
+        "craft",
+        "adventure",
+        "historic"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "kaykit-boardgame",
+      "publisher": "KayKit (Kay Lousberg)",
+      "name": "Board Game Bits",
+      "sourceUrl": "https://kaylousberg.itch.io/board-game-bits",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "minimum_free_tier_count",
+      "advertisedCount": 75,
+      "assetClass": "3d",
+      "tags": [
+        "playful",
+        "games",
+        "date_night",
+        "group"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "quaternius-downtown",
+      "publisher": "Quaternius",
+      "name": "Downtown City MegaKit",
+      "sourceUrl": "https://quaternius.com/packs/downtowncitymegakit.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "full_pack_count_free_subset_only",
+      "advertisedCount": 315,
+      "assetClass": "3d",
+      "tags": [
+        "boston",
+        "city",
+        "urban",
+        "architectural_accents"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "315 total in full kit, not free-tier count. Creator says the basic download includes approximately 60–70% of the pack."
+    },
+    {
+      "id": "quaternius-fantasy-props",
+      "publisher": "Quaternius",
+      "name": "Fantasy Props MegaKit",
+      "sourceUrl": "https://quaternius.com/packs/fantasypropsmegakit.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "full_pack_count_free_subset_only",
+      "advertisedCount": 211,
+      "assetClass": "3d",
+      "tags": [
+        "storybook",
+        "market",
+        "fantasy",
+        "historic",
+        "gothic"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "211 total in full kit, not free-tier count. Creator says the basic download includes approximately 60–70% of the pack."
+    },
+    {
+      "id": "quaternius-medieval-village",
+      "publisher": "Quaternius",
+      "name": "Medieval Village MegaKit",
+      "sourceUrl": "https://quaternius.com/packs/medievalvillagemegakit.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "full_pack_count_free_subset_only",
+      "advertisedCount": 304,
+      "assetClass": "3d",
+      "tags": [
+        "historical",
+        "fantasy",
+        "storybook",
+        "romantic"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "304 total in full kit, not free-tier count. Creator says the basic download includes approximately 60–70% of the pack."
+    },
+    {
+      "id": "quaternius-stylized-nature",
+      "publisher": "Quaternius",
+      "name": "Stylized Nature MegaKit",
+      "sourceUrl": "https://quaternius.com/packs/stylizednaturemegakit.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_subset",
+      "advertisedCountNote": "full_pack_count_free_subset_only",
+      "advertisedCount": 116,
+      "assetClass": "3d",
+      "tags": [
+        "nature",
+        "dreamy",
+        "romantic",
+        "outdoor"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "116 total in full kit, not free-tier count. Creator says the basic download includes approximately 60–70% of the pack."
+    },
+    {
+      "id": "quaternius-cyberpunk",
+      "publisher": "Quaternius",
+      "name": "Cyberpunk Game Kit",
+      "sourceUrl": "https://quaternius.com/packs/cyberpunkgamekit.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 71,
+      "assetClass": "3d",
+      "tags": [
+        "cyberpunk",
+        "neon",
+        "nightlife",
+        "futuristic"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "quaternius-sushi",
+      "publisher": "Quaternius",
+      "name": "Sushi Restaurant Kit",
+      "sourceUrl": "https://quaternius.com/packs/sushirestaurantkit.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 108,
+      "assetClass": "3d",
+      "tags": [
+        "japanese_food",
+        "restaurant",
+        "food",
+        "playful"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "quaternius-food",
+      "publisher": "Quaternius",
+      "name": "Ultimate Food Pack",
+      "sourceUrl": "https://quaternius.com/packs/ultimatefood.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 103,
+      "assetClass": "3d",
+      "tags": [
+        "food",
+        "italian",
+        "dining",
+        "street_food"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "Primary page lists FBX, OBJ and Blend; glTF conversion is required."
+    },
+    {
+      "id": "quaternius-monsters",
+      "publisher": "Quaternius",
+      "name": "Ultimate Monsters",
+      "sourceUrl": "https://quaternius.com/packs/ultimatemonsters.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 50,
+      "assetClass": "animated_3d",
+      "tags": [
+        "haunted",
+        "fantasy",
+        "playful",
+        "spooky"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "quaternius-ruins",
+      "publisher": "Quaternius",
+      "name": "Ultimate Modular Ruins Pack",
+      "sourceUrl": "https://quaternius.com/packs/ultimatemodularruins.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 90,
+      "assetClass": "3d",
+      "tags": [
+        "haunted",
+        "gothic",
+        "historic",
+        "fantasy"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "Primary page lists FBX, OBJ and Blend; glTF conversion is required."
+    },
+    {
+      "id": "quaternius-pirate",
+      "publisher": "Quaternius",
+      "name": "Pirate Kit",
+      "sourceUrl": "https://quaternius.com/packs/piratekit.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 71,
+      "assetClass": "3d",
+      "tags": [
+        "nautical",
+        "adventure",
+        "coastal",
+        "fantasy"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded"
+    },
+    {
+      "id": "quaternius-stylized-trees",
+      "publisher": "Quaternius",
+      "name": "Stylized Tree Pack",
+      "sourceUrl": "https://quaternius.com/packs/stylizedtree.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 45,
+      "assetClass": "3d",
+      "tags": [
+        "nature",
+        "romantic",
+        "colorful",
+        "outdoors"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "Primary page lists FBX, OBJ and Blend; glTF conversion is required."
+    },
+    {
+      "id": "sam-meese-instruments",
+      "publisher": "Sam Meese",
+      "name": "Sam's Simple Instruments",
+      "sourceUrl": "https://sammeese.itch.io/simple-instruments-assets",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "creator_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 8,
+      "assetClass": "3d",
+      "tags": [
+        "music",
+        "acoustic",
+        "orchestral",
+        "live_performance",
+        "romantic"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "8 named musical instrument/prop items; GLB and OBJ provided, initial set does not establish a saxophone model."
+    },
+    {
+      "id": "3dassets-orchestra",
+      "publisher": "3DAssets.dev",
+      "name": "Orchestra and Band Instruments",
+      "sourceUrl": "https://3dassets.dev/packs/orchestra-and-band-instruments",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "creator_primary_page",
+      "access": "free_full",
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "advertisedCount": 47,
+      "assetClass": "3d",
+      "tags": [
+        "jazz",
+        "music",
+        "classical",
+        "live_performance",
+        "nightlife",
+        "romantic"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "47 separate low-poly GLBs, claimed 6.2 MB total, saxophone/trumpet/stands/stage; visually inspect and independently validate downloaded files."
+    },
+    {
+      "id": "3dassets-ramen-alley",
+      "publisher": "3DAssets.dev",
+      "name": "Izakaya Alley and Ramen Shop",
+      "sourceUrl": "https://3dassets.dev/packs/izakaya-alley-and-ramen-shop",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 65,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "japanese",
+        "ramen",
+        "izakaya",
+        "street_food",
+        "noir"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "3dassets-food-trucks",
+      "publisher": "3DAssets.dev",
+      "name": "Street Food Market and Food Trucks",
+      "sourceUrl": "https://3dassets.dev/packs/street-food-market-and-food-trucks",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 49,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "street_food",
+        "mexican",
+        "italian",
+        "american",
+        "market",
+        "casual"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "3dassets-cafe-bakery",
+      "publisher": "3DAssets.dev",
+      "name": "Cafe, Bakery and Coffee Bar",
+      "sourceUrl": "https://3dassets.dev/packs/bakery-and-cafe",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 112,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "coffee",
+        "bakery",
+        "brunch",
+        "french",
+        "cozy"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "3dassets-nightclub-dj",
+      "publisher": "3DAssets.dev",
+      "name": "Nightclub and DJ Booth",
+      "sourceUrl": "https://3dassets.dev/packs/nightclub-and-dj-booth",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 56,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "edm",
+        "electronic",
+        "house",
+        "techno",
+        "hip_hop",
+        "nightlife"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "3dassets-live-stage",
+      "publisher": "3DAssets.dev",
+      "name": "Live Music Venue and Festival Stage",
+      "sourceUrl": "https://3dassets.dev/packs/live-music-venue-and-festival-stage",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 55,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "rock",
+        "pop",
+        "indie",
+        "metal",
+        "punk",
+        "live_music"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "3dassets-fresh-produce",
+      "publisher": "3DAssets.dev",
+      "name": "Food, Fresh Produce and Groceries",
+      "sourceUrl": "https://3dassets.dev/packs/fresh-produce-and-groceries",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 149,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "fresh_food",
+        "vegetarian",
+        "market",
+        "farm_to_table",
+        "food_general"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "3dassets-indian-bazaar",
+      "publisher": "3DAssets.dev",
+      "name": "Indian Bazaar Street and Temple",
+      "sourceUrl": "https://3dassets.dev/packs/indian-bazaar-street-and-temple",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 62,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "indian",
+        "bazaar",
+        "street_food",
+        "market"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "3dassets-restaurant-kitchen",
+      "publisher": "3DAssets.dev",
+      "name": "Restaurant Kitchen and Dining Room",
+      "sourceUrl": "https://3dassets.dev/packs/restaurant-kitchen-and-dining",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": null,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "restaurant",
+        "dining",
+        "food_general",
+        "fine_dining"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "3dassets-junk-food",
+      "publisher": "3DAssets.dev",
+      "name": "Fast Food Counter and Drive-Thru",
+      "sourceUrl": "https://3dassets.dev/packs/fast-food-and-drive-thru",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 128,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "american",
+        "fast_food",
+        "casual_dining"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "quaternius-junk-food",
+      "publisher": "Quaternius",
+      "name": "Junk Food Pack",
+      "sourceUrl": "https://quaternius.com/packs/junkfood.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": null,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "american",
+        "pizza",
+        "fast_food",
+        "street_food"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "Check model-level files, usable formats, license text and content before importing."
+    },
+    {
+      "id": "3dassets-greek-island",
+      "publisher": "3DAssets.dev",
+      "name": "Greek Island Village and Harbour",
+      "sourceUrl": "https://3dassets.dev/packs/greek-island-village-and-harbour",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 61,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "greek",
+        "mediterranean",
+        "romantic",
+        "taverna",
+        "coastal"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Includes Greek taverna front, serving counter and grape pergola; scene must not be treated as real Boston architecture."
+    },
+    {
+      "id": "3dassets-korean-hanok",
+      "publisher": "3DAssets.dev",
+      "name": "Korean Hanok Village and Street",
+      "sourceUrl": "https://3dassets.dev/packs/korean-hanok-village-and-street",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 62,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "korean",
+        "traditional",
+        "market",
+        "street_food"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Low table, paper lantern and market props; contains no verified Korean BBQ meal props."
+    },
+    {
+      "id": "3dassets-music-studio",
+      "publisher": "3DAssets.dev",
+      "name": "Music Recording Studio and Instruments",
+      "sourceUrl": "https://3dassets.dev/packs/music-recording-studio-and-instruments",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 48,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "music",
+        "recording",
+        "lofi",
+        "hip_hop",
+        "pop",
+        "rnb_soul"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Studio equipment includes vocal mic, synthesizer and mixing console; no audio playback is included."
+    }
+  ],
+  "recipes": [
+    {
+      "id": "italian_romantic",
+      "context": [
+        "italian_food",
+        "romantic"
+      ],
+      "hero": "stylized trattoria vignette: dining table, warm lantern and arch/vine cluster",
+      "accent": "food display or terracotta planters",
+      "sourceIds": [
+        "kenney-food",
+        "kaykit-restaurant",
+        "kenney-furniture",
+        "kenney-fantasy-town",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "italian_haunted",
+      "context": [
+        "italian_food",
+        "haunted"
+      ],
+      "hero": "gothic trattoria facade vignette with muted warm lamps",
+      "accent": "ghostly smoke and autumn foliage",
+      "sourceIds": [
+        "kenney-food",
+        "kenney-graveyard",
+        "quaternius-ruins",
+        "kenney-smoke"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "haunted_mystery",
+      "context": [
+        "haunted",
+        "mysterious"
+      ],
+      "hero": "compact graveyard gate, crooked tree and lantern cluster",
+      "accent": "subtle spectral wisps",
+      "sourceIds": [
+        "kenney-graveyard",
+        "kaykit-halloween",
+        "quaternius-ruins",
+        "kenney-smoke"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "neon_nightlife",
+      "context": [
+        "nightlife",
+        "cyberpunk"
+      ],
+      "hero": "neon sci-fi facade vignette with abstract light panels",
+      "accent": "holographic-style ambient light",
+      "sourceIds": [
+        "quaternius-cyberpunk",
+        "quaternius-downtown",
+        "kenney-light-masks",
+        "kenney-particles"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "romantic_garden",
+      "context": [
+        "date_night",
+        "outdoor",
+        "soft"
+      ],
+      "hero": "small garden arbor and flower/lantern vignette",
+      "accent": "petals, foliage, warm pools of light",
+      "sourceIds": [
+        "quaternius-stylized-nature",
+        "kenney-nature",
+        "kenney-foliage",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "cozy_cafe",
+      "context": [
+        "coffee",
+        "cozy"
+      ],
+      "hero": "cafe table and decorative storefront vignette",
+      "accent": "planters or warm light",
+      "sourceIds": [
+        "kenney-furniture",
+        "kaykit-furniture",
+        "quaternius-downtown",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "sushi_playful",
+      "context": [
+        "japanese_food",
+        "playful"
+      ],
+      "hero": "stylized sushi and restaurant counter diorama",
+      "accent": "food-object arrangement and soft glowing accent",
+      "sourceIds": [
+        "quaternius-sushi",
+        "kenney-food",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "winter_festive",
+      "context": [
+        "holiday",
+        "cozy",
+        "winter"
+      ],
+      "hero": "decorated small tree and market-stall vignette",
+      "accent": "low-intensity snow or particles",
+      "sourceIds": [
+        "kenney-holiday",
+        "kaykit-holiday",
+        "kenney-particles"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "fantasy_storybook",
+      "context": [
+        "storybook",
+        "fantasy"
+      ],
+      "hero": "storybook arch, market props and warm lanterns",
+      "accent": "subtle sparkles and flowers",
+      "sourceIds": [
+        "kenney-fantasy-town",
+        "quaternius-fantasy-props",
+        "kenney-particles"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "outdoor_adventure",
+      "context": [
+        "hiking",
+        "outdoors",
+        "adventure"
+      ],
+      "hero": "rocks, trees and small camping vignette",
+      "accent": "foliage or nature particles",
+      "sourceIds": [
+        "kenney-nature",
+        "quaternius-stylized-nature",
+        "kenney-foliage"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "arcade_retro",
+      "context": [
+        "games",
+        "playful",
+        "retro"
+      ],
+      "hero": "mini arcade cabinet cluster",
+      "accent": "abstract retro neon or pixel particles",
+      "sourceIds": [
+        "kenney-mini-arcade",
+        "kenney-retro-urban",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "harbor_adventure",
+      "context": [
+        "coastal",
+        "nautical"
+      ],
+      "hero": "dock-themed diorama with maritime props",
+      "accent": "subtle blue-toned environmental sparkle",
+      "sourceIds": [
+        "kenney-pirate",
+        "quaternius-pirate",
+        "kenney-particles"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "jazz_noir",
+      "context": [
+        "jazz",
+        "noir",
+        "intimate"
+      ],
+      "hero": "compact bandstand vignette with saxophone, trumpet, chair and warm spotlights",
+      "accent": "subtle lighting beams and drifting atmosphere",
+      "sourceIds": [
+        "3dassets-orchestra",
+        "kenney-light-masks",
+        "kenney-smoke"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "acoustic_romantic",
+      "context": [
+        "live_music",
+        "romantic",
+        "cozy"
+      ],
+      "hero": "instrument stand with violin/cello and warm lanterns",
+      "accent": "petal/soft-light accent",
+      "sourceIds": [
+        "sam-meese-instruments",
+        "kenney-light-masks",
+        "kenney-foliage"
+      ],
+      "requiresCuration": true
+    },
+    {
+      "id": "rock_concert",
+      "context": [
+        "rock",
+        "energetic"
+      ],
+      "hero": "Stage riser, drums, amplifiers and guitar silhouettes",
+      "accent": "Moving abstract light beams",
+      "sourceIds": [
+        "3dassets-live-stage",
+        "3dassets-nightclub-dj",
+        "3dassets-orchestra"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "edm_neon",
+      "context": [
+        "electronic",
+        "high_energy"
+      ],
+      "hero": "DJ decks, mixer, truss and colored light objects",
+      "accent": "Geometric pulses and haze",
+      "sourceIds": [
+        "3dassets-nightclub-dj",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "classical_serene",
+      "context": [
+        "classical",
+        "serene"
+      ],
+      "hero": "String instruments, piano/stand and small performance platform",
+      "accent": "Soft amber light",
+      "sourceIds": [
+        "3dassets-orchestra",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "latin_dance",
+      "context": [
+        "latin",
+        "festive"
+      ],
+      "hero": "Bongos, maracas and compact performance corner",
+      "accent": "Warm rhythmic light patterns",
+      "sourceIds": [
+        "3dassets-orchestra",
+        "3dassets-live-stage",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "country_acoustic",
+      "context": [
+        "country",
+        "rustic"
+      ],
+      "hero": "Banjo, acoustic music corner, wood decor",
+      "accent": "Low warm lantern light",
+      "sourceIds": [
+        "3dassets-orchestra",
+        "kenney-furniture"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "hiphop_urban",
+      "context": [
+        "hip_hop",
+        "urban"
+      ],
+      "hero": "DJ mixer, stage monitor and abstract waveform sculpture",
+      "accent": "Rhythmic accent lighting",
+      "sourceIds": [
+        "3dassets-nightclub-dj",
+        "3dassets-live-stage"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "japanese_neon_ramen",
+      "context": [
+        "japanese",
+        "neon"
+      ],
+      "hero": "Ramen-counter vignette, vending machine and small lanterns",
+      "accent": "Night glow with restrained mist",
+      "sourceIds": [
+        "3dassets-ramen-alley",
+        "quaternius-sushi",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "mexican_lively_streetfood",
+      "context": [
+        "mexican",
+        "lively"
+      ],
+      "hero": "Generic street stall with verified taco/food props when available",
+      "accent": "Warm string lights",
+      "sourceIds": [
+        "3dassets-food-trucks",
+        "kenney-food"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "indian_evening_market",
+      "context": [
+        "indian",
+        "warm"
+      ],
+      "hero": "Food market vignette using actual stalls and food-service objects",
+      "accent": "Warm decorative lights",
+      "sourceIds": [
+        "3dassets-indian-bazaar",
+        "3dassets-food-trucks"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "french_cafe_romantic",
+      "context": [
+        "french",
+        "romantic"
+      ],
+      "hero": "Bakery table, pastry display and chairs",
+      "accent": "Soft warm window and lantern lighting",
+      "sourceIds": [
+        "3dassets-cafe-bakery",
+        "kenney-furniture",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "american_retro_diner",
+      "context": [
+        "american",
+        "retro"
+      ],
+      "hero": "Counter, food props and optional stylized diner sign",
+      "accent": "Retro geometric lighting",
+      "sourceIds": [
+        "3dassets-junk-food",
+        "kenney-retro-urban",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "korean_bbq_night",
+      "context": [
+        "korean",
+        "energetic"
+      ],
+      "hero": "Dining table and grill props once model-level verified",
+      "accent": "Neon and warm table lighting",
+      "sourceIds": [
+        "3dassets-restaurant-kitchen",
+        "kenney-furniture"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "chinese_dim_sum",
+      "context": [
+        "chinese",
+        "cozy"
+      ],
+      "hero": "Dim sum baskets and tea set once sourced; current restaurant props only as base",
+      "accent": "Warm restaurant lighting",
+      "sourceIds": [
+        "kenney-food",
+        "3dassets-restaurant-kitchen"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "mediterranean_garden",
+      "context": [
+        "mediterranean",
+        "relaxed"
+      ],
+      "hero": "Outdoor table, produce and olive/greenery vignette",
+      "accent": "Sun-washed light and breeze",
+      "sourceIds": [
+        "3dassets-fresh-produce",
+        "kenney-nature",
+        "kenney-furniture"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    }
+  ],
+  "openGaps": [
+    "Specific cuisine hero objects (pasta plates, pizza oven, ramen lanterns, taco stand) require per-model inspection; source theme tags do not prove inclusion.",
+    "Art/museum/science installations and sports-specific accents need dedicated sourcing.",
+    "Download, hash, license-file archiving, GLB conversion, compression, scale normalization and browser performance validation are still pending.",
+    "Jazz sources now identified, but no musical props have been imported or browser-QA tested.",
+    "Custom set-piece compositions must be authored from licensed primitives; none of the proposed recipes are prebuilt."
+  ],
+  "acceptanceForImport": [
+    "Select concrete models by verified filename/thumbnail, not inferred pack title.",
+    "Record author, original URL, license snapshot, source file, SHA-256, converted file and texture dependencies.",
+    "Validate transforms, orientation, pivots, GLB materials, triangle count, draw calls, compressed file size, and available LOD.",
+    "Tag every selected model with themes, semantic context, size class, anchor type, interaction-safe bounding footprint and accessibility fallback.",
+    "Never render an invented physical object as factual local venue data; maintain navigational paths, station icons, labels, attribution, and interaction hit targets."
+  ],
+  "sourcingGuidance": {
+    "semanticAxes": [
+      "cuisine",
+      "music_genre",
+      "mood",
+      "venue_type",
+      "occasion",
+      "visual_style",
+      "intensity"
+    ],
+    "noAssumptions": "Never infer actual venue cuisine, music programming or cultural detail from the visual theme alone. Only mix genres explicitly supplied by user or supported by venue data.",
+    "qualityPriority": "Prefer fewer recognizable, versatile, visually coherent hero/ambient props over high generic asset counts.",
+    "licenseRestriction": "Do not import free-for-use packs with 'do not redistribute' terms into public GitHub; permit explicit authorized embedding only after legal review.",
+    "countRule": "Advertised model counts and conceptual recipes are not imported or renderer-ready assets.",
+    "curatedGLBFile": "apps/web/public/scene-assets/sources/curated-3dassets.v1.json",
+    "curatedDownloader": "scripts/import-3dassets-curated.mjs",
+    "curatedStatus": "40 exact-named models selected from ten packs; not yet downloaded or rendered"
+  }
+}

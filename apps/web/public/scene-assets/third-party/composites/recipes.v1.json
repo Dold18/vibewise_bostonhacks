@@ -1,0 +1,452 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "composition_ingredients_verified_not_built_or_rendered",
+  "recipeCount": 30,
+  "sourceAssetCount": 208,
+  "notes": [
+    "All asset ID references were checked against the two GitHub manifests at authoring.",
+    "No geometry layouts, transforms, camera behavior, overlays or runtime installer have been created.",
+    "Compositions describe two optional areas: a context-hero vignette and a mood/ambient accent.",
+    "Use food/music/holiday motifs only when selected by user or verified via venue metadata; never invent actual menu items or live music.",
+    "Hide decorative props if they impair stations, routes, destination pin, labels, attribution or map interaction."
+  ],
+  "recipes": [
+    {
+      "id": "italian_romantic",
+      "context": "Italian dining",
+      "mood": "romantic",
+      "heroAssetIds": [
+        "cc0.kenney-food-kit.pizza",
+        "kaykit.restaurant-bits.table_round_A_decorated",
+        "cc0.kenney-food-kit.glass_wine"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-fantasy-town-kit.lantern",
+        "cc0.kenney-nature-kit.flower_red_a"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "italian_retro",
+      "context": "Italian food",
+      "mood": "retro",
+      "heroAssetIds": [
+        "cc0.kenney-food-kit.pizza_box",
+        "cc0.quaternius-junkfood.pizza",
+        "cc0.kenney-city-kit-commercial.detail_awning"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-retro-urban-kit.detail_light_double"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "japanese_ramen_noir",
+      "context": "Japanese ramen",
+      "mood": "noir",
+      "heroAssetIds": [
+        "cc0.quaternius-sushirestaurantkit.food_ramen",
+        "cc0.quaternius-sushirestaurantkit.environment_counter_straight"
+      ],
+      "accentAssetIds": [
+        "cc0.quaternius-sushirestaurantkit.decoration_wall_light",
+        "cc0.quaternius-sushirestaurantkit.decoration_bamboo"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "japanese_sushi_spring",
+      "context": "Japanese sushi",
+      "mood": "dreamy",
+      "heroAssetIds": [
+        "cc0.quaternius-sushirestaurantkit.food_salmon_roll",
+        "cc0.quaternius-sushirestaurantkit.food_ebi_nigiri",
+        "cc0.quaternius-sushirestaurantkit.environment_table"
+      ],
+      "accentAssetIds": [
+        "cc0.quaternius-sushirestaurantkit.decoration_sakura_tree"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "chinese_dim_sum_cozy",
+      "context": "Chinese dim sum",
+      "mood": "cozy",
+      "heroAssetIds": [
+        "cc0.kenney-food-kit.dim_sum",
+        "cc0.kenney-food-kit.steamer",
+        "cc0.kenney-food-kit.cup_tea"
+      ],
+      "accentAssetIds": [
+        "kaykit.furniture-bits.lamp_table"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "north_african_tajine",
+      "context": "North African tajine",
+      "mood": "warm",
+      "heroAssetIds": [
+        "cc0.kenney-food-kit.tajine",
+        "cc0.kenney-food-kit.cup_tea",
+        "cc0.kenney-fantasy-town-kit.wall_arch"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-fantasy-town-kit.lantern"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "french_bakery_romance",
+      "context": "French bakery",
+      "mood": "romantic",
+      "heroAssetIds": [
+        "cc0.kenney-food-kit.croissant",
+        "cc0.kenney-food-kit.loaf_baguette",
+        "kaykit.restaurant-bits.table_round_A_decorated"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-nature-kit.flower_purple_a"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "mexican_taco_market",
+      "context": "Mexican taco",
+      "mood": "lively",
+      "heroAssetIds": [
+        "cc0.kenney-food-kit.taco",
+        "cc0.kenney-fantasy-town-kit.stall",
+        "kaykit.restaurant-bits.crate_tomatoes"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-holiday-kit.lights_colored"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "retro_diner",
+      "context": "Retro diner",
+      "mood": "nostalgic",
+      "heroAssetIds": [
+        "cc0.quaternius-junkfood.milkshake",
+        "cc0.quaternius-junkfood.hotdog",
+        "cc0.kenney-furniture-kit.stool_bar"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-retro-urban-kit.detail_light_double"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "brunch_garden",
+      "context": "Brunch",
+      "mood": "sunny",
+      "heroAssetIds": [
+        "cc0.kenney-food-kit.pancakes",
+        "cc0.kenney-food-kit.waffle",
+        "cc0.kenney-food-kit.cup_coffee"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-nature-kit.flower_red_a"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "seafood_coastal",
+      "context": "Seafood",
+      "mood": "coastal",
+      "heroAssetIds": [
+        "cc0.kenney-food-kit.mussel_open",
+        "cc0.kenney-pirate-kit.structure_platform_dock"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-pirate-kit.palm_detailed_straight"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "vegetarian_picnic",
+      "context": "Vegetarian food",
+      "mood": "natural",
+      "heroAssetIds": [
+        "cc0.kenney-food-kit.salad",
+        "cc0.kenney-food-kit.skewer_vegetables",
+        "cc0.kenney-fantasy-town-kit.stall"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-nature-kit.flower_purple_a"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "lounge_listening",
+      "context": "Listening lounge",
+      "mood": "cozy",
+      "heroAssetIds": [
+        "cc0.kenney-furniture-kit.lounge_design_sofa",
+        "cc0.kenney-furniture-kit.speaker",
+        "cc0.kenney-furniture-kit.radio"
+      ],
+      "accentAssetIds": [
+        "kaykit.furniture-bits.lamp_standing"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "folk_acoustic_cafe",
+      "context": "Acoustic music",
+      "mood": "intimate",
+      "heroAssetIds": [
+        "cc0.the-base-mesh.acoustic_guitar",
+        "cc0.the-base-mesh.guitar_stand",
+        "cc0.kenney-food-kit.cup_coffee"
+      ],
+      "accentAssetIds": [
+        "kaykit.furniture-bits.lamp_table"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "piano_romantic",
+      "context": "Piano music",
+      "mood": "romantic",
+      "heroAssetIds": [
+        "cc0.the-base-mesh.piano",
+        "cc0.kenney-food-kit.glass_wine"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-nature-kit.flower_red_a"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "haunted_street",
+      "context": "Haunted",
+      "mood": "mysterious",
+      "heroAssetIds": [
+        "cc0.kenney-graveyard-kit.character_ghost",
+        "cc0.kenney-graveyard-kit.crypt_large",
+        "cc0.kenney-graveyard-kit.pine_crooked"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-graveyard-kit.lantern_candle"
+      ],
+      "activation": "vibe_selected",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "haunted_feast",
+      "context": "Haunted dining",
+      "mood": "playful_spooky",
+      "heroAssetIds": [
+        "kaykit.restaurant-bits.table_round_A_decorated",
+        "cc0.kenney-graveyard-kit.pumpkin_carved"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-graveyard-kit.character_ghost",
+        "cc0.kenney-graveyard-kit.lantern_candle"
+      ],
+      "activation": "vibe_selected",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "fantasy_market",
+      "context": "Storybook market",
+      "mood": "fantasy",
+      "heroAssetIds": [
+        "cc0.kenney-fantasy-town-kit.stall",
+        "cc0.kenney-fantasy-town-kit.fountain_round"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-fantasy-town-kit.lantern"
+      ],
+      "activation": "vibe_selected",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "cyberpunk_night",
+      "context": "Cyberpunk",
+      "mood": "neon",
+      "heroAssetIds": [
+        "cc0.quaternius-cyberpunkgamekit.computer",
+        "cc0.quaternius-cyberpunkgamekit.antenna_1"
+      ],
+      "accentAssetIds": [
+        "cc0.quaternius-cyberpunkgamekit.light_square"
+      ],
+      "activation": "vibe_selected",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "arcade_party",
+      "context": "Arcade",
+      "mood": "playful",
+      "heroAssetIds": [
+        "cc0.kenney-mini-arcade.arcade_machine",
+        "cc0.kenney-mini-arcade.pinball",
+        "cc0.kenney-mini-arcade.dance_machine"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-retro-urban-kit.detail_light_double"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "winter_festive",
+      "context": "Winter holiday",
+      "mood": "cozy",
+      "heroAssetIds": [
+        "cc0.kenney-holiday-kit.tree_decorated",
+        "cc0.kenney-holiday-kit.snowman_hat"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-holiday-kit.lights_colored",
+        "cc0.kenney-holiday-kit.gingerbread_man"
+      ],
+      "activation": "explicit_or_verified_seasonal_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "hanukkah_observance",
+      "context": "Hanukkah",
+      "mood": "respectful",
+      "heroAssetIds": [
+        "cc0.kenney-holiday-kit.hanukkah_menorah"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-holiday-kit.lantern_hanging"
+      ],
+      "activation": "explicit_holiday_request_only",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "kwanzaa_observance",
+      "context": "Kwanzaa",
+      "mood": "respectful",
+      "heroAssetIds": [
+        "cc0.kenney-holiday-kit.kwanzaa_kinara"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-holiday-kit.lantern_hanging"
+      ],
+      "activation": "explicit_holiday_request_only",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "haunted_harbor",
+      "context": "Haunted harbor",
+      "mood": "surreal",
+      "heroAssetIds": [
+        "cc0.kenney-pirate-kit.ship_ghost",
+        "cc0.kenney-pirate-kit.structure_platform_dock"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-graveyard-kit.lantern_candle"
+      ],
+      "activation": "vibe_selected",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "waterfront_romance",
+      "context": "Waterfront",
+      "mood": "romantic",
+      "heroAssetIds": [
+        "cc0.kenney-pirate-kit.boat_row_small",
+        "cc0.kenney-pirate-kit.structure_platform_dock"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-nature-kit.flower_purple_a"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "retro_book_cafe",
+      "context": "Book café",
+      "mood": "nostalgic",
+      "heroAssetIds": [
+        "kaykit.furniture-bits.book_set",
+        "cc0.kenney-furniture-kit.lounge_design_sofa",
+        "cc0.kenney-food-kit.cup_coffee"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-retro-urban-kit.detail_awning_wide"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "modern_city_dining",
+      "context": "City dining",
+      "mood": "modern",
+      "heroAssetIds": [
+        "cc0.kenney-city-kit-commercial.detail_parasol_a",
+        "kaykit.restaurant-bits.table_round_A_decorated"
+      ],
+      "accentAssetIds": [
+        "cc0.kenney-city-kit-commercial.detail_awning"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "carnival_playful",
+      "context": "Carnival games",
+      "mood": "bright",
+      "heroAssetIds": [
+        "cc0.kenney-mini-arcade.claw_machine",
+        "cc0.kenney-mini-arcade.prize_wheel"
+      ],
+      "accentAssetIds": [
+        "cc0.quaternius-junkfood.cupcake"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "cyberpunk_ramen",
+      "context": "Ramen",
+      "mood": "futuristic",
+      "heroAssetIds": [
+        "cc0.quaternius-sushirestaurantkit.food_ramen",
+        "cc0.quaternius-sushirestaurantkit.environment_counter_straight"
+      ],
+      "accentAssetIds": [
+        "cc0.quaternius-cyberpunkgamekit.light_square"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    },
+    {
+      "id": "space_whimsy",
+      "context": "Sci-fi",
+      "mood": "playful",
+      "heroAssetIds": [
+        "kaykit.space-base-bits.lander_A",
+        "cc0.quaternius-cyberpunkgamekit.computer"
+      ],
+      "accentAssetIds": [
+        "cc0.quaternius-cyberpunkgamekit.light_square"
+      ],
+      "activation": "explicit_or_verified_context",
+      "status": "references_validated_composition_not_assembled"
+    }
+  ]
+}

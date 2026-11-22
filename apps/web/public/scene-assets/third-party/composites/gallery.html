@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vibenta — Two-Slot Scene Layout Review</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.181.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.181.0/examples/jsm/"}}</script>
+<style>
+:root{color-scheme:dark;font:14px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:#101725;color:#e9f2fd}
+header{padding:16px 24px;background:#182337;border-bottom:1px solid #35445b}
+h1{font-size:21px;margin:0 0 7px}p{margin:5px 0;color:#adbed5}
+.notice{border-left:3px solid #e6ae62;padding:7px 11px;background:#302c32;color:#f1d5ac;max-width:1100px}
+main{display:grid;grid-template-columns:minmax(270px,340px) minmax(0,1fr);min-height:calc(100vh - 125px)}
+aside{padding:18px;border-right:1px solid #36485f;background:#172135}
+aside>div{margin-bottom:14px}label{display:block;margin:4px 0 6px;color:#c4d2e8;font-size:12px}
+input,select,button{width:100%;font:inherit;color:#f4f7fc;background:#25344a;border:1px solid #50627d;border-radius:7px;padding:9px}
+button{cursor:pointer}button:hover{background:#304760}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #b3d5ff}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.actions button{font-size:12px}
+#pass{border-color:#5b9773}#fix{border-color:#c18c53}
+#status{font-size:12px;min-height:32px;padding:9px;border-radius:6px;background:#25344a}
+#details{font-size:12px;color:#c6d4e7;overflow-wrap:anywhere;line-height:1.65}
+#details strong{color:#fff}
+.viewer{position:relative;min-height:540px;overflow:hidden}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+.overlay{position:absolute;top:12px;left:12px;right:12px;pointer-events:none;display:flex;justify-content:space-between;gap:8px}
+.overlay span{padding:7px 12px;border-radius:8px;background:#142033d9;font-size:12px;color:#ecf2fd}
+#legend{position:absolute;bottom:12px;left:12px;padding:10px;background:#142033dc;border-radius:8px;color:#e4edfa;font-size:12px;max-width:580px}
+small{color:#a7b9d0}
+@media(max-width:760px){main{display:block}aside{border:0;border-bottom:1px solid #36485f}.viewer{height:62vh;min-height:390px}.overlay span{font-size:10px}}
+</style></head>
+<body><header><h1>Vibenta — Two-Slot 3D Composition Review</h1>
+<p>Standalone asset QA only. Drag to orbit; scroll or pinch to zoom. These fictional preview objects are not real venue geometry.</p>
+<p class="notice">Authoring transforms and ID checks are complete, but visual appearance, collision clearance, texture correctness, art direction and performance are NOT approved until reviewed here. Three.js is CDN-loaded; serve this file through Vite with internet access.</p></header>
+<main><aside>
+<div><label for="filter">Find theme</label><input id="filter" placeholder="jazz, ramen, spooky, cozy…" autocomplete="off"></div>
+<div><label for="scene">Composition</label><select id="scene" aria-label="Choose a scene composition"></select></div>
+<div id="status" role="status">Loading manifests…</div>
+<div id="details"></div>
+<div class="actions"><button id="pass" type="button">Mark inspected</button><button id="fix" type="button">Needs adjustment</button></div>
+<div><button id="export" type="button">Export local QA decisions (JSON)</button></div>
+<p><small>Review decisions are stored in this browser only. Export them to share with the team; they do not change source manifests or authorize map rendering. Never infer that decor exists at a real venue.</small></p>
+</aside><section class="viewer" id="viewport" aria-label="Interactive three-dimensional preview">
+<div class="overlay"><span>LEFT: context hero</span><span>RIGHT: mood accent</span></div>
+<div id="legend">The center corridor is intentionally empty in this preview. Real map-route and pin occlusion must be checked separately.</div></section></main>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+const $=id=>document.getElementById(id);
+const viewport=$('viewport'),sceneSelect=$('scene'),filter=$('filter'),status=$('status'),details=$('details');
+let library,models=new Map(),review={},requestId=0,current=null;
+try{review=JSON.parse(localStorage.getItem('vibenta-scene-layout-qa-v1')||'{}');}catch{review={};}
+const world=new THREE.Scene();world.background=new THREE.Color('#263449');
+world.add(new THREE.HemisphereLight(0xe4edff,0x334254,2.0));
+const sun=new THREE.DirectionalLight(0xffdfb2,2.1);sun.position.set(6,12,7);world.add(sun);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;viewport.prepend(renderer.domElement);
+const camera=new THREE.PerspectiveCamera(46,1,0.05,150);camera.position.set(5.5,5.2,10.5);
+const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,0.6,0);controls.enableDamping=!matchMedia('(prefers-reduced-motion: reduce)').matches;controls.maxDistance=35;controls.minDistance=2.5;controls.update();
+const stage=new THREE.Group();world.add(stage);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(22,14),new THREE.MeshStandardMaterial({color:'#182333',roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=-0.028;world.add(ground);
+function pad(x,r,color){const mat=new THREE.MeshStandardMaterial({color,roughness:0.85,metalness:0.05});const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,0.035,64),mat);m.position.set(x,-0.02,0);world.add(m);const ring=new THREE.Mesh(new THREE.TorusGeometry(r-0.07,0.017,5,80),new THREE.MeshBasicMaterial({color:'#a6c2df'}));ring.rotation.x=Math.PI/2;ring.position.set(x,0.02,0);world.add(ring);}
+pad(-2.8,1.8,'#334960');pad(2.8,1.36,'#40516b');
+const corridor=new THREE.Mesh(new THREE.PlaneGeometry(0.35,3.6),new THREE.MeshBasicMaterial({color:'#aabbd8',transparent:true,opacity:0.13,side:THREE.DoubleSide}));corridor.rotation.x=-Math.PI/2;corridor.position.y=0.003;world.add(corridor);
+const loader=new GLTFLoader();
+const esc=s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+function resize(){const w=viewport.clientWidth,h=viewport.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/Math.max(1,h);camera.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(viewport);resize();
+function clearStage(){while(stage.children.length){const child=stage.children[0];stage.remove(child);/* shared glTF resources are intentionally reused */}}
+function entries(){if(!library)return[];const q=filter.value.trim().toLowerCase();return library.scenes.filter(s=>(s.id+' '+s.context+' '+s.mood).toLowerCase().includes(q));}
+function refill(){const items=entries(),prev=sceneSelect.value;sceneSelect.replaceChildren();for(const s of items){const o=document.createElement('option');o.value=s.id;o.textContent=s.context+' · '+s.mood+' ('+s.id+')';sceneSelect.append(o);}if(items.some(s=>s.id===prev))sceneSelect.value=prev;else if(items.length)sceneSelect.value=items[0].id;if(!items.length){clearStage();status.textContent='No matching scenes';return;}void show(sceneSelect.value);}
+async function loadPlacement(p,center,ticket){const info=models.get(p.assetId);if(!info)throw Error('Missing manifest ID: '+p.assetId);const loaded=await loader.loadAsync(info.uri);if(ticket!==requestId)return;
+const obj=loaded.scene.clone(true);obj.rotation.y=THREE.MathUtils.degToRad(p.yawDegrees||0);obj.updateMatrixWorld(true);const box=new THREE.Box3().setFromObject(obj);if(box.isEmpty())throw Error('Empty geometry: '+p.assetId);
+const size=box.getSize(new THREE.Vector3()),max=Math.max(size.x,size.y,size.z);if(!(max>0.00001))throw Error('Zero geometry bounds: '+p.assetId);
+obj.scale.multiplyScalar(Math.min(200,Math.max(0.0002,p.targetMaxDimension/max)));obj.updateMatrixWorld(true);box.setFromObject(obj);const mid=box.getCenter(new THREE.Vector3());
+obj.position.set(center[0]+p.position[0]-mid.x,center[1]+p.position[1]-box.min.y,center[2]+p.position[2]-mid.z);
+stage.add(obj);
+return {id:p.assetId,dimensions:[size.x,size.y,size.z].map(x=>Number(x.toFixed(3))),normalizedSpan:Number((max*obj.scale.x).toFixed(3))};}
+async function show(id){if(!library)return;const s=library.scenes.find(x=>x.id===id);if(!s)return;current=s;const ticket=++requestId;clearStage();world.background.set(s.palette.background);status.textContent='Loading 3D models…';const parts=[...Object.values(s.slots).flatMap(slot=>slot.placements.map(p=>({p,center:slot.center})))];const passed=[],failed=[];
+for(const part of parts){if(ticket!==requestId)return;try{const result=await loadPlacement(part.p,part.center,ticket);if(result)passed.push(result);}catch(e){failed.push(part.p.assetId+': '+e.message);}}
+if(ticket!==requestId)return;const prior=review[s.id];status.textContent=(failed.length?'Load errors: '+failed.length+'; ':'')+passed.length+'/'+parts.length+' meshes loaded. QA: '+(prior?prior.decision:'not reviewed');
+details.innerHTML='<p><strong>'+esc(s.context)+'</strong> · '+esc(s.mood)+'</p><p><strong>Activation:</strong> '+esc(s.activation)+'</p><p><strong>Objects:</strong> '+parts.length+'</p>'+passed.map(x=>'<div>✓ '+esc(x.id)+'</div>').join('')+failed.map(x=>'<div style="color:#ffb0a4">✕ '+esc(x)+'</div>').join('')+'<p><small>Transforms are normalized previews, not verified real-world sizes. Mark inspected only after checking geometry, art direction and intersections.</small></p>';}
+function decide(decision){if(!current)return;review[current.id]={decision,updatedAt:new Date().toISOString()};localStorage.setItem('vibenta-scene-layout-qa-v1',JSON.stringify(review));status.textContent='Saved local review: '+decision+'. Export to share.';}
+$('pass').onclick=()=>decide('inspected_visual_only');$('fix').onclick=()=>decide('needs_adjustment');
+$('export').onclick=()=>{const data={schemaVersion:'1.0.0',type:'local_browser_review',warning:'Not integrated map QA or production approval',reviews:review};const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='vibenta-scene-visual-reviews.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1500);};
+filter.oninput=refill;sceneSelect.onchange=()=>void show(sceneSelect.value);
+try{const [scenes,modelibr,kaykit]=await Promise.all([fetch('./layouts.v1.json'),fetch('../modelibr/manifest.v1.json'),fetch('../kaykit/manifest.v1.json')].map(async p=>{const r=await p;if(!r.ok)throw Error('HTTP '+r.status);return r.json();}));
+library=scenes;for(const m of [...modelibr.models,...kaykit.models])models.set(m.id,m);refill();
+}catch(e){status.textContent='Failed to load manifests: '+e.message;}
+renderer.setAnimationLoop(()=>{controls.update();renderer.render(world,camera);});
+</script></body></html>

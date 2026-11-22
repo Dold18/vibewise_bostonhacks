@@ -1,0 +1,450 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "verified_named_assets_pending_local_download",
+  "provider": "3DAssets.dev",
+  "providerApi": "https://3dassets.dev/api/v1/packs/{pack}",
+  "providerLicenseClaim": "CC0-1.0",
+  "why": "Curated exact named objects from publisher pack pages, cross-tagged for food, music and vibe; assets must be downloaded, byte-validated and visually QA'd before enabling.",
+  "requiredRuntimePolicy": [
+    "only enable after visual and performance QA",
+    "never imply model depicts a real venue object",
+    "never obstruct routes, stops, labels, attribution, or selection hitboxes",
+    "lazy-load 1-2 set pieces in any scene",
+    "no automatically played audio"
+  ],
+  "families": [
+    {
+      "id": "orchestra",
+      "packSlug": "orchestra-and-band-instruments",
+      "sourceUrl": "https://3dassets.dev/packs/orchestra-and-band-instruments",
+      "wanted": [
+        {
+          "title": "Violin",
+          "tags": [
+            "classical",
+            "romantic",
+            "orchestra"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Double Bass",
+          "tags": [
+            "jazz",
+            "classical",
+            "acoustic"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Alto Saxophone",
+          "tags": [
+            "jazz",
+            "soul",
+            "noir"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Tenor Saxophone",
+          "tags": [
+            "jazz",
+            "blues",
+            "soul"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Five String Banjo",
+          "tags": [
+            "country",
+            "folk",
+            "acoustic"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Bongo Pair",
+          "tags": [
+            "latin_dance",
+            "acoustic",
+            "percussion"
+          ],
+          "placement": "contextual_hero_or_accent"
+        }
+      ]
+    },
+    {
+      "id": "nightclub",
+      "packSlug": "nightclub-and-dj-booth",
+      "sourceUrl": "https://3dassets.dev/packs/nightclub-and-dj-booth",
+      "wanted": [
+        {
+          "title": "DJ Mixer",
+          "tags": [
+            "edm",
+            "house",
+            "techno",
+            "hip_hop"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Turntable Deck",
+          "tags": [
+            "hip_hop",
+            "disco",
+            "retro",
+            "dj"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "CDJ Media Player",
+          "tags": [
+            "edm",
+            "electronic",
+            "club"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Disco Ball on a Motor",
+          "tags": [
+            "disco_funk",
+            "party",
+            "retro"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Smoke Machine",
+          "tags": [
+            "nightlife",
+            "rock",
+            "edm"
+          ],
+          "placement": "contextual_hero_or_accent"
+        }
+      ]
+    },
+    {
+      "id": "live-stage",
+      "packSlug": "live-music-venue-and-festival-stage",
+      "sourceUrl": "https://3dassets.dev/packs/live-music-venue-and-festival-stage",
+      "wanted": [
+        {
+          "title": "Guitar Amp Stack",
+          "tags": [
+            "rock",
+            "metal",
+            "blues",
+            "indie_alternative"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Drum Kit Shell Set",
+          "tags": [
+            "rock",
+            "pop",
+            "indie_alternative"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Keyboard Rig",
+          "tags": [
+            "pop",
+            "rock",
+            "rnb_soul"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Guitar Stand with Guitar",
+          "tags": [
+            "rock",
+            "indie_alternative",
+            "metal"
+          ],
+          "placement": "contextual_hero_or_accent"
+        }
+      ]
+    },
+    {
+      "id": "japanese-dining",
+      "packSlug": "izakaya-alley-and-ramen-shop",
+      "sourceUrl": "https://3dassets.dev/packs/izakaya-alley-and-ramen-shop",
+      "wanted": [
+        {
+          "title": "Bowl of Ramen",
+          "tags": [
+            "japanese",
+            "ramen",
+            "food"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Gyoza Plate",
+          "tags": [
+            "japanese",
+            "food",
+            "dining"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Round Paper Lantern",
+          "tags": [
+            "japanese",
+            "warm",
+            "nightlife"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Ramen Shop Front Bay",
+          "tags": [
+            "japanese",
+            "ramen",
+            "street_food"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Ramen Counter Module",
+          "tags": [
+            "japanese",
+            "restaurant",
+            "counter"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Izakaya Front Bay",
+          "tags": [
+            "japanese",
+            "izakaya",
+            "nightlife"
+          ],
+          "placement": "contextual_hero_or_accent"
+        }
+      ]
+    },
+    {
+      "id": "bakery-cafe",
+      "packSlug": "bakery-and-cafe",
+      "sourceUrl": "https://3dassets.dev/packs/bakery-and-cafe",
+      "wanted": [
+        {
+          "title": "Croissant",
+          "tags": [
+            "bakery_dessert",
+            "french",
+            "brunch"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Two group espresso machine",
+          "tags": [
+            "coffee_tea",
+            "italian",
+            "cafe"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Curved glass pastry case",
+          "tags": [
+            "french",
+            "bakery_dessert",
+            "cafe"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Pastry paper bag",
+          "tags": [
+            "bakery_dessert",
+            "street_food"
+          ],
+          "placement": "contextual_hero_or_accent"
+        }
+      ]
+    },
+    {
+      "id": "street-food",
+      "packSlug": "street-food-market-and-food-trucks",
+      "sourceUrl": "https://3dassets.dev/packs/street-food-market-and-food-trucks",
+      "wanted": [
+        {
+          "title": "Pizza Trailer with Chimney",
+          "tags": [
+            "italian",
+            "pizza",
+            "street_food"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Coffee Van",
+          "tags": [
+            "coffee_tea",
+            "street_food",
+            "market"
+          ],
+          "placement": "contextual_hero_or_accent"
+        }
+      ]
+    },
+    {
+      "id": "indian-market",
+      "packSlug": "indian-bazaar-street-and-temple",
+      "sourceUrl": "https://3dassets.dev/packs/indian-bazaar-street-and-temple",
+      "wanted": [
+        {
+          "title": "Spice Stall with Open Sacks",
+          "tags": [
+            "indian",
+            "market",
+            "food"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Tea Stall with Kettle and Glass Rack",
+          "tags": [
+            "indian",
+            "coffee_tea",
+            "street_food"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Sweet Counter with Trays",
+          "tags": [
+            "indian",
+            "bakery_dessert",
+            "market"
+          ],
+          "placement": "contextual_hero_or_accent"
+        }
+      ]
+    },
+    {
+      "id": "greek-taverna",
+      "packSlug": "greek-island-village-and-harbour",
+      "sourceUrl": "https://3dassets.dev/packs/greek-island-village-and-harbour",
+      "wanted": [
+        {
+          "title": "Taverna Front With Awning",
+          "tags": [
+            "greek",
+            "mediterranean",
+            "restaurant"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Taverna Serving Counter",
+          "tags": [
+            "greek",
+            "dining",
+            "restaurant"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Grape Pergola With Vine",
+          "tags": [
+            "greek",
+            "mediterranean",
+            "romantic"
+          ],
+          "placement": "contextual_hero_or_accent"
+        }
+      ]
+    },
+    {
+      "id": "korean-market",
+      "packSlug": "korean-hanok-village-and-street",
+      "sourceUrl": "https://3dassets.dev/packs/korean-hanok-village-and-street",
+      "wanted": [
+        {
+          "title": "Low Table",
+          "tags": [
+            "korean",
+            "dining",
+            "cozy"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Hanging Paper Lantern",
+          "tags": [
+            "korean",
+            "warm",
+            "traditional"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Market Stall With Awning",
+          "tags": [
+            "korean",
+            "market",
+            "street_food"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Produce Basket Set",
+          "tags": [
+            "korean",
+            "food",
+            "market"
+          ],
+          "placement": "contextual_hero_or_accent"
+        }
+      ]
+    },
+    {
+      "id": "music-studio",
+      "packSlug": "music-recording-studio-and-instruments",
+      "sourceUrl": "https://3dassets.dev/packs/music-recording-studio-and-instruments",
+      "wanted": [
+        {
+          "title": "Vocal Microphone with Pop Shield",
+          "tags": [
+            "hip_hop",
+            "pop",
+            "rnb_soul",
+            "recording"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Synth Keyboard on an X Stand",
+          "tags": [
+            "lofi",
+            "electronic",
+            "indie_alternative"
+          ],
+          "placement": "contextual_hero_or_accent"
+        },
+        {
+          "title": "Mixing Console",
+          "tags": [
+            "recording",
+            "music",
+            "lofi"
+          ],
+          "placement": "contextual_hero_or_accent"
+        }
+      ]
+    }
+  ]
+}
