@@ -1,9 +1,8 @@
 -- Place registry (docs/superpowers/specs/2026-11-21-non-food-places-design.md §5).
 -- Runs against the local stack after `supabase db reset` (needs supabase/seed.sql).
 begin;
-create extension if not exists pgtap with schema extensions;
 
-select plan(38);
+select plan(45);
 
 -- Schema shape.
 select has_table('public', 'places', 'places registry exists');
@@ -24,6 +23,17 @@ select hasnt_column('public', 'place_vibe_inputs', 'restaurant_id', 'place_vibe_
 select has_column('public', 'place_deals', 'place_ref', 'place_deals.place_ref exists');
 select hasnt_column('public', 'place_deals', 'restaurant_id', 'place_deals.restaurant_id is gone');
 
+-- Privileges: place_points is pipeline-only; the catalog and registry are public reads;
+-- the place_photos upload column grant followed the rename.
+select ok(not has_table_privilege('anon', 'public.place_points', 'select'), 'anon cannot select place_points');
+select ok(not has_table_privilege('authenticated', 'public.place_points', 'select'), 'authenticated cannot select place_points');
+select ok(has_table_privilege('anon', 'public.catalog_places', 'select'), 'anon can select catalog_places');
+select ok(has_table_privilege('authenticated', 'public.catalog_places', 'select'), 'authenticated can select catalog_places');
+select ok(has_table_privilege('anon', 'public.places', 'select'), 'anon can select places');
+select ok(has_table_privilege('authenticated', 'public.places', 'select'), 'authenticated can select places');
+select ok(has_column_privilege('authenticated', 'public.place_photos', 'place_ref', 'insert'),
+          'authenticated can insert place_photos.place_ref');
+
 -- Sync triggers on every type table.
 select has_trigger('public', t, 'places_sync_delete', t || ' has the delete sync trigger')
 from unnest(array['restaurants', 'museums', 'parks', 'landmarks', 'entertainment']) as t;
@@ -31,6 +41,9 @@ select has_trigger('public', t, 'places_sync_place_id', t || ' has the place_id 
 from unnest(array['restaurants', 'museums', 'parks', 'landmarks', 'entertainment']) as t;
 
 -- Seeded cafe sits on the registry with the same id.
+-- The id-equality check below and the new-id > max-restaurant-id check further down exercise
+-- the seed path only: on `db reset` restaurants is empty when the migration runs. The
+-- populated-data path (copy existing ids, then advance the sequence) was verified manually.
 select is(
   (select place_type from public.places where place_id = 'osm:node/990000001'),
   'restaurants',

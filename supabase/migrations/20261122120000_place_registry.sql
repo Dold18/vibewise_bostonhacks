@@ -86,7 +86,8 @@ create trigger places_sync_delete
   for each row execute function public.places_sync_delete();
 create trigger places_sync_place_id
   after update of place_id on public.restaurants
-  for each row execute function public.places_sync_place_id();
+  for each row when (old.place_id is distinct from new.place_id)
+  execute function public.places_sync_place_id();
 
 -- 5.4 Type tables: the type-neutral columns of restaurants plus `kind`. No food columns.
 create table public.museums (
@@ -215,28 +216,32 @@ create trigger places_sync_delete
   for each row execute function public.places_sync_delete();
 create trigger places_sync_place_id
   after update of place_id on public.museums
-  for each row execute function public.places_sync_place_id();
+  for each row when (old.place_id is distinct from new.place_id)
+  execute function public.places_sync_place_id();
 
 create trigger places_sync_delete
   after delete on public.parks
   for each row execute function public.places_sync_delete();
 create trigger places_sync_place_id
   after update of place_id on public.parks
-  for each row execute function public.places_sync_place_id();
+  for each row when (old.place_id is distinct from new.place_id)
+  execute function public.places_sync_place_id();
 
 create trigger places_sync_delete
   after delete on public.landmarks
   for each row execute function public.places_sync_delete();
 create trigger places_sync_place_id
   after update of place_id on public.landmarks
-  for each row execute function public.places_sync_place_id();
+  for each row when (old.place_id is distinct from new.place_id)
+  execute function public.places_sync_place_id();
 
 create trigger places_sync_delete
   after delete on public.entertainment
   for each row execute function public.places_sync_delete();
 create trigger places_sync_place_id
   after update of place_id on public.entertainment
-  for each row execute function public.places_sync_place_id();
+  for each row when (old.place_id is distinct from new.place_id)
+  execute function public.places_sync_place_id();
 
 -- Access: readable by everyone, no client writes (same as restaurants).
 alter table public.places        enable row level security;
