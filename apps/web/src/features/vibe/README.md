@@ -1,6 +1,6 @@
 # Adaptive outing engine
 
-The active quiz is `liveEngine.ts` + `ui/liveQuiz.ts`, mounted in the existing discovery vibe step. See [accepted design](../../../../../../docs/VIBE_QUIZ_DESIGN.md) for behavior and boundaries. The older `engine.ts`/`model.ts`/`questions.ts` seven-axis prototype remains only for compatibility; it is not used by the live UI.
+The active quiz is `liveEngine.ts` + `ui/liveQuiz.ts`, mounted in the existing discovery vibe step. See [accepted design](../../../../../docs/VIBE_QUIZ_DESIGN.md) for behavior and boundaries. The older `engine.ts`/`model.ts`/`questions.ts` seven-axis prototype remains only for compatibility; it is not used by the live UI.
 
 - `profile.ts`: canonical immutable session/provider contracts and pinned MiniLM identity.
 - `evidence.ts`: replayable explicit ledger and conservative corrections.
