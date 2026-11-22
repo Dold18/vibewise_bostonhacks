@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createPhotoClient } from '../photoClient';
+import { createPhotoClient, scaledSize } from '../photoClient';
 import { prepareMessage } from '../photoSend';
 import { fromAccountStore, photoAccess } from '../photoAccess';
 
@@ -74,6 +74,26 @@ describe('photoClient', () => {
     await client.describe(f);
     await client.describe(f);
     expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+  it('throwing token provider yields unavailable / null quota without fetching', async () => {
+    const fetchImpl = vi.fn();
+    const client = createPhotoClient({ access: { getAccessToken: async () => { throw new Error('boom'); } }, prepare: prep, fetchImpl: fetchImpl as unknown as typeof fetch });
+    expect(await client.describe(file())).toMatchObject({ ok: false, reason: 'unavailable' });
+    expect(await client.quota()).toBeNull();
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+  it('treats a blank description as unavailable and does not cache it', async () => {
+    const { client, fetchImpl } = setup(() => res(200, { description: '   ', remainingToday: 4 }));
+    const f = file();
+    expect(await client.describe(f)).toMatchObject({ ok: false, reason: 'unavailable' });
+    expect(client.cached(f)).toBeUndefined();
+    await client.describe(f);
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+  it('scaledSize never upscales and caps the long edge', () => {
+    expect(scaledSize(2048, 1024, 1024)).toEqual({ w: 1024, h: 512 });
+    expect(scaledSize(500, 800, 1024)).toEqual({ w: 500, h: 800 });
+    expect(scaledSize(1, 5000, 1024)).toEqual({ w: 1, h: 1024 });
   });
   it('quota parses the body, null when signed out or 401', async () => {
     const q = setup(() => res(200, { remainingToday: 3, limit: 5 }));

@@ -28,7 +28,8 @@ export function createPhotoClient(deps: { access: Pick<PhotoAccessSource, 'getAc
   const slot = <T>(m: WeakMap<File, Map<string, T>>, f: File) => { let s = m.get(f); if (!s) m.set(f, s = new Map()); return s; };
 
   async function run(file: File, question: string | undefined, key: string): Promise<PhotoResult> {
-    const token = await deps.access.getAccessToken();
+    let token: string | null;
+    try { token = await deps.access.getAccessToken(); } catch { return fail('unavailable'); }
     if (!token) return fail('signed_out');
     let img: Prepared;
     try { img = await prepare(file); } catch { return fail('unreadable'); }
@@ -40,7 +41,7 @@ export function createPhotoClient(deps: { access: Pick<PhotoAccessSource, 'getAc
         signal: AbortSignal.timeout(TIMEOUT_MS),
       });
       const body = (await r.json().catch(() => ({}))) as { description?: unknown; remainingToday?: unknown; error?: unknown };
-      if (r.ok && typeof body.description === 'string') {
+      if (r.ok && typeof body.description === 'string' && body.description.trim()) {
         slot(cache, file).set(key, body.description);
         return { ok: true, description: body.description, remainingToday: typeof body.remainingToday === 'number' ? body.remainingToday : null };
       }
@@ -65,9 +66,9 @@ export function createPhotoClient(deps: { access: Pick<PhotoAccessSource, 'getAc
       return p;
     },
     async quota() {
-      const token = await deps.access.getAccessToken();
-      if (!token) return null;
       try {
+        const token = await deps.access.getAccessToken();
+        if (!token) return null;
         const r = await doFetch(QUOTA_URL, { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(TIMEOUT_MS) });
         if (!r.ok) return null;
         const b = (await r.json()) as { remainingToday?: unknown; limit?: unknown };
@@ -78,20 +79,28 @@ export function createPhotoClient(deps: { access: Pick<PhotoAccessSource, 'getAc
   };
 }
 
+export function scaledSize(width: number, height: number, maxEdge: number): { w: number; h: number } {
+  const scale = Math.min(1, maxEdge / Math.max(width, height));
+  return { w: Math.max(1, Math.round(width * scale)), h: Math.max(1, Math.round(height * scale)) };
+}
+
 export async function downscaleToJpeg(file: File, maxEdge = 1024): Promise<Prepared> {
   const bitmap = await createImageBitmap(file);
   try {
-    const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
-    const w = Math.max(1, Math.round(bitmap.width * scale)), h = Math.max(1, Math.round(bitmap.height * scale));
+    const { w, h } = scaledSize(bitmap.width, bitmap.height, maxEdge);
     let blob: Blob;
     if (typeof OffscreenCanvas !== 'undefined') {
       const c = new OffscreenCanvas(w, h);
-      c.getContext('2d')!.drawImage(bitmap, 0, 0, w, h);
+      const ctx = c.getContext('2d')!;
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(bitmap, 0, 0, w, h);
       blob = await c.convertToBlob({ type: 'image/jpeg', quality: 0.85 });
     } else {
       const c = document.createElement('canvas');
       c.width = w; c.height = h;
-      c.getContext('2d')!.drawImage(bitmap, 0, 0, w, h);
+      const ctx = c.getContext('2d')!;
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(bitmap, 0, 0, w, h);
       blob = await new Promise<Blob>((res, rej) => c.toBlob(b => (b ? res(b) : rej(new Error('encode failed'))), 'image/jpeg', 0.85));
     }
     const bytes = new Uint8Array(await blob.arrayBuffer());
