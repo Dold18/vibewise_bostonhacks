@@ -4,11 +4,11 @@
 **Track:** Bos(tons) of Eats and Streets  
 **Status:** Early planning and parallel implementation setup
 
-> **Find places by how you want to feel.** Vibenta learns a student's desired aesthetic from images, text, music, movies and an adaptive visual quiz. A Living Map of Boston converges on real recommendations, then shows how to reach them on the MBTA. The full vision includes group planning, Recreate Mode, student-friendly places and authorized campus events.
+> **Find places by how you want to feel.** Vibenta learns a student's desired aesthetic from images, text, music, movies and a generative vibe quiz. A Living Map of Boston converges on real recommendations, then shows how to reach them on the MBTA. The full vision includes group planning, Recreate Mode, student-friendly places and authorized campus events.
 
 ## What we are building
 - **Living Map:** Boston basemap, real venue pins and cards, dynamic filters and map atmosphere reacting to preference changes.
-- **Vibe Engine:** image/text/media references, visual Akinator-like questioning, Vibe DNA and real recommendation re-ranking.
+- **Vibe Engine:** image/text/media references, a 10-question generative vibe quiz, Vibe DNA and embedding-based recommendation ranking.
 - **Transit connection:** a selected destination produces walking/MBTA legs and travel information on the same map.
 - **Group / student features:** fair joint discovery, real student discounts/feedback, public or organizer-authorized events.
 - **Recreate Mode:** match visual inspiration to authentic photos of locations that can actually be visited.
@@ -21,7 +21,7 @@ This is the **full product vision**, not a claim that every feature is already c
 | [Product brief](docs/PRODUCT.md) | Goals, complete features, what judges should experience |
 | [Architecture](docs/ARCHITECTURE.md) | Modules and data flow; proposed tech choices |
 | [Contracts](docs/CONTRACTS.md) | `Place`, `TransitRequest`, `TransitResponse`, map ↔ route handoff |
-| [Data model](docs/DATA_MODEL.md) | Proposed Supabase schema, vibe vocabulary, enrichment pipeline, review/data compliance |
+| [Data model](docs/DATA_MODEL.md) | Proposed Supabase schema, enrichment pipeline, review/data compliance |
 | [Workstreams](docs/WORKSTREAMS.md) | Who owns map, transit, vibe and integration; branch rules |
 | [Roadmap](docs/ROADMAP.md) | Ordered milestones and acceptance tests |
 | [Decision log](docs/DECISIONS.md) | What's accepted vs still proposed |

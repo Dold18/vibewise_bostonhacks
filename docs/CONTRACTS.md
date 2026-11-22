@@ -36,7 +36,7 @@ export interface Place {
     attribution?: string;
     source: "licensed" | "first_party" | "provider";
   };
-  vibeTags: string[];            // initially curated; later from Vibe Engine
+  vibeTags?: string[];           // optional display chips (e.g. "cozy"); free-form, not a ranking vocabulary
   studentDiscount?: {
     description: string;
     verifiedAt: string;         // ISO datetime
@@ -107,7 +107,7 @@ export interface MapSelection {
 
 export interface VibeProfile {
   userId: string;
-  tags: Record<string, number>;  // e.g. cozy: 0.8, electric: 0.1
+  vibeText?: string;             // quiz `vibe_so_far`, a media-derived description, or the user's own text; embedded with MiniLM
   categories: PlaceCategory[];
   budgetCents?: number;
   origin?: GeoPoint;
