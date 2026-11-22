@@ -1,9 +1,10 @@
 import { AttributionControl, Map as MapLibreMap, Marker, setWorkerUrl } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
-import { BUILDING_3D_LAYER, BUILDING_3D_OPACITY, mapStyle } from './mapStyle';
+import { BUILDING_3D_LAYERS, BUILDING_3D_OPACITY, mapStyle } from './mapStyle';
 import { PIN_COLORS } from './pinColors';
 import { mountAccount } from './features/account';
+import { mountScene, sceneDevHook } from './features/scene';
 import {
   CATEGORIES,
   formatAddress,
@@ -109,7 +110,9 @@ function pinElement(): HTMLElement {
   el.append(chip);
   const body = document.createElement('span');
   body.className = 'pin-body';
-  body.innerHTML = `<svg viewBox="0 0 28 40" width="28" height="40" aria-hidden="true"><path d="${PIN_PATH}" /></svg>`;
+  // Two-tone contrast ring (issue #40): a dark ring under the head's light edge,
+  // so every pin stays visible on light, mid-tone and dark map themes.
+  body.innerHTML = `<svg viewBox="0 0 28 40" width="28" height="40" aria-hidden="true"><path class="pin-ring" d="${PIN_PATH}" /><path class="pin-head" d="${PIN_PATH}" /></svg>`;
   el.append(body);
   return el;
 }
@@ -328,6 +331,7 @@ let routeBox: HTMLElement | null = null;
 let routeSeq = 0; // id of the current selection's request; anything older is stale
 let routeAbort: AbortController | undefined;
 let routePlace: Place | null = null;
+let scene: ReturnType<typeof mountScene> | undefined; // assigned once accounts mount, at the bottom
 let discovery: DiscoveryPanelHandle | undefined; // assigned when the panel mounts, at the bottom
 
 const currentOrigin = (): LatLng | null => discovery?.getPreferences().origin?.location ?? null;
@@ -337,12 +341,15 @@ function cancelRoute() {
   routeSeq++;
   routeAbort?.abort();
   routePlace = null;
+  scene?.setNavigation(false);
   clearRoute(map);
 }
 
 async function showRouteTo(place: Place) {
   cancelRoute();
   routePlace = place;
+  // Coalesced with the cancel above: switching destinations stays in navigation.
+  scene?.setNavigation(true);
   const box = routeBox; // this selection's own box; a newer card replaces routeBox
   if (!box) return;
   const seq = routeSeq;
@@ -660,8 +667,8 @@ function syncControls() {
 function syncDepth() {
   const depth = Math.min(1, Math.max(0, (map.getPitch() - 3) / 22));
   map.getContainer().style.setProperty('--depth', depth.toFixed(3));
-  if (map.getLayer(BUILDING_3D_LAYER)) {
-    map.setPaintProperty(BUILDING_3D_LAYER, 'fill-extrusion-opacity', BUILDING_3D_OPACITY * depth);
+  for (const id of BUILDING_3D_LAYERS) {
+    if (map.getLayer(id)) map.setPaintProperty(id, 'fill-extrusion-opacity', BUILDING_3D_OPACITY * depth);
   }
 }
 map.on('style.load', syncDepth);
@@ -692,7 +699,17 @@ discovery = mountDiscoveryPanel(document.body, {
 });
 
 // Accounts: sign-in in the top right; the map theme follows the user's vibes.
-mountAccount(document.body, { map });
+const account = mountAccount(document.body, { map });
+
+// Scene Composer: the session owns the map's look (account taste until an
+// outing scene exists). Navigation keeps the palette and drops decorations.
+scene = mountScene({
+  theme: account.theme,
+  account: account.store,
+  reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)'),
+  onError: (error) => console.error('[scene]', error),
+});
+if (import.meta.env.DEV) Object.assign(window, { vibentaScene: sceneDevHook(scene, map) });
 
 // A different starting point makes the shown route wrong: re-plan for the open card's place.
 let lastOrigin = currentOrigin();

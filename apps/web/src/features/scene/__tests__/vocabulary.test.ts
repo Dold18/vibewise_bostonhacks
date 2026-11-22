@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { basePalette } from '../../../mapStyle';
 import { VIBE_KEYS } from '../../account/vibes';
-import { PALETTE_ADAPTER_V0, SCENE_ADAPTER_V1_PROPOSED } from '../capabilities';
+import { PALETTE_ADAPTER_V0, SCENE_ADAPTER_V1 } from '../capabilities';
 import { SCENE_CATALOG } from '../catalog';
 import { presetsFromDescriptors, presetsFromVibeTags, VIBE_KEY_PRESETS } from '../lexicon';
 import { choiceOf, PRESET_IDS, PRESETS } from '../presets';
@@ -85,7 +85,7 @@ describe('swatches', () => {
 
   it('V0 realizes 128 of the 828 catalog variations; the proposed v1 adapter 148', () => {
     expect(realized(PALETTE_ADAPTER_V0)).toBe(128);
-    expect(realized(SCENE_ADAPTER_V1_PROPOSED)).toBe(148);
+    expect(realized(SCENE_ADAPTER_V1)).toBe(148);
   });
 });
 

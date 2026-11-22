@@ -121,8 +121,8 @@
   }
 }
 
-/* Dark map: outline pins in white so they stay visible (blend.ts DARK_PIN_EDGE). */
-.vibe-dark .pin path {
-  stroke: #fff;
-  stroke-width: 1.5;
-}
+/*
+ * Dark map: pins used to get a white outline here (blend.ts DARK_PIN_EDGE).
+ * Every pin now has an always-on two-tone contrast ring (style.css, issue #40)
+ * whose light edge is that white outline, so no dark-mode override is needed.
+ */

@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { basePalette, buildMapStyle } from '../../../mapStyle';
 import { buildAssetRegistry } from '../assets';
-import { PALETTE_ADAPTER_V0, previewAllCapabilities, SCENE_ADAPTER_V1_PROPOSED, supports } from '../capabilities';
+import { PALETTE_ADAPTER_V0, previewAllCapabilities, SCENE_ADAPTER_V1, supports } from '../capabilities';
 import { SCENE_CATALOG } from '../catalog';
 import { hexToLab } from '../color';
 import { compileScene } from '../compile';
@@ -61,8 +61,8 @@ describe('neutral and completeness', () => {
 
 describe('determinism', () => {
   it('the same intent and profile give a byte-identical state', () => {
-    const a = compileScene({ outing: DESIGN_EXAMPLE, capabilities: SCENE_ADAPTER_V1_PROPOSED });
-    const b = compileScene({ outing: JSON.parse(JSON.stringify(DESIGN_EXAMPLE)), capabilities: SCENE_ADAPTER_V1_PROPOSED });
+    const a = compileScene({ outing: DESIGN_EXAMPLE, capabilities: SCENE_ADAPTER_V1 });
+    const b = compileScene({ outing: JSON.parse(JSON.stringify(DESIGN_EXAMPLE)), capabilities: SCENE_ADAPTER_V1 });
     expect(stableStringify(a)).toBe(stableStringify(b));
     expect(a.hash).toBe(b.hash);
   });
@@ -181,7 +181,7 @@ describe('capabilities: never report an unimplemented effect as active', () => {
 
   it('light intensity and angle apply only with the proposed v1 adapter', () => {
     const v0 = only('sunlit_coast');
-    const v1 = only('sunlit_coast', 1, { capabilities: SCENE_ADAPTER_V1_PROPOSED });
+    const v1 = only('sunlit_coast', 1, { capabilities: SCENE_ADAPTER_V1 });
     expect(v0.lighting.intensity).toBe(0.35);
     expect(v0.lighting.position).toEqual([1.4, 295, 40]);
     expect(v1.lighting.intensity).toBe(0.55);
@@ -191,7 +191,7 @@ describe('capabilities: never report an unimplemented effect as active', () => {
   it('blends light azimuth along the short arc', () => {
     // morning_low is 80°; from the standard 295° the short way is +145° through north, not −215°.
     // With no presets, the override applies at the minimum presence (0.35).
-    const s = compileScene({ outing: intent([], { overrides: [{ key: 'lighting_and_shadows.light_angle', value: 'morning_low' }] }), capabilities: SCENE_ADAPTER_V1_PROPOSED });
+    const s = compileScene({ outing: intent([], { overrides: [{ key: 'lighting_and_shadows.light_angle', value: 'morning_low' }] }), capabilities: SCENE_ADAPTER_V1 });
     expect(s.lighting.position[1]).toBeCloseTo((295 + 0.35 * 145) % 360, 1);
   });
 });
@@ -237,8 +237,8 @@ describe('constraints', () => {
   });
 
   it('while navigating lifts dim light to a safe level, without disabling the theme', () => {
-    const browse = compileScene({ outing: intent([['noir_nocturne', 1]]), capabilities: SCENE_ADAPTER_V1_PROPOSED });
-    const nav = compileScene({ outing: intent([['noir_nocturne', 1]]), capabilities: SCENE_ADAPTER_V1_PROPOSED, context: { navigation: 'route' } });
+    const browse = compileScene({ outing: intent([['noir_nocturne', 1]]), capabilities: SCENE_ADAPTER_V1 });
+    const nav = compileScene({ outing: intent([['noir_nocturne', 1]]), capabilities: SCENE_ADAPTER_V1, context: { navigation: 'route' } });
     expect(browse.lighting.intensity).toBe(0.2);
     expect(nav.lighting.intensity).toBe(0.28);
     expect(nav.lighting.color).toBe(browse.lighting.color);
