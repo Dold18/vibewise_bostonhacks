@@ -21,6 +21,8 @@ export interface AccountProfile {
 
 export interface AccountBackend {
   getUser(): Promise<AccountUser | null>;
+  /** The current session's access token, or null when signed out. */
+  getAccessToken(): Promise<string | null>;
   onAuthChange(cb: (user: AccountUser | null) => void): () => void;
   signIn(email: string, password: string): Promise<{ error?: string }>;
   signUp(email: string, password: string): Promise<{ error?: string; needsConfirmation?: boolean }>;
@@ -87,6 +89,10 @@ export function createSupabaseBackend(client: SupabaseClient): AccountBackend {
     async getUser() {
       const { data } = await client.auth.getSession();
       return toUser(data.session?.user);
+    },
+    async getAccessToken() {
+      const { data } = await client.auth.getSession();
+      return data.session?.access_token ?? null;
     },
     onAuthChange(cb) {
       // Supabase warns against awaiting its own calls inside this callback, and

@@ -4,7 +4,7 @@ Status: user-approved refinement of PR #35, 2026-11-21. Supersedes its fixed-ten
 
 ## Session and generation
 
-The existing two-step outing form owns practical constraints and browser-local photos. An explicit **Refine this vibe** action starts or resumes a separate outing session. Photos remain local and are not analyzed. The legacy seven-axis engine remains for compatibility tests; it does not drive this UI.
+The existing two-step outing form owns practical constraints and the optional photo. An explicit **Start vibe quiz** action starts or resumes a separate outing session. A photo (on the vibe step or with an own-words answer) requires sign-in and is sent to Google Gemini for a short text description, added to the text as a `Photo:` line; Vibenta doesn't store the photo, and the quiz uses only the description. See `docs/superpowers/specs/2026-11-22-vibe-photo-input-design.md`. The legacy seven-axis engine remains for compatibility tests; it does not drive this UI.
 
 The canonical executable contract is `apps/web/src/features/vibe/profile.ts`: `OutingVibeProfile`, schema 1.0.0. It contains session ID, monotonically increasing revision, original input, current `vibe_so_far`, explicit evidence with provenance/polarity, unresolved qualifiers, immutable history, question families/topics, completion state, and embedding identity/status/revision. Gemini interpretation is recorded as a generated summary checkpoint, not promoted into explicit evidence. Practical preferences and persistent account taste remain separate.
 

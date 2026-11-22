@@ -30,6 +30,8 @@ export interface AccountStore {
   getState(): AccountState;
   subscribe(listener: (s: AccountState) => void): () => void;
   start(): Promise<void>;
+  /** The signed-in user's access token; null in any other state. */
+  getAccessToken(): Promise<string | null>;
   signIn(email: string, password: string): Promise<void>;
   signUp(email: string, password: string): Promise<void>;
   signOut(): Promise<void>;
@@ -103,6 +105,11 @@ export function createAccountStore(
       } catch {
         set({ status: 'signed_out', error: "Can't reach the server. Check your connection and try again." });
       }
+    },
+
+    async getAccessToken() {
+      if (!backend || !signedIn()) return null;
+      return backend.getAccessToken();
     },
 
     async signIn(email, password) {

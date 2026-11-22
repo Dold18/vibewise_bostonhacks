@@ -21,12 +21,15 @@ describe('canonical adaptive session with no venues',()=>{
  it('generates the initial question from original input, then updates one versioned profile per answer',async()=>{
   const calls:GenerationContext[]=[];const s=createLiveVibeSession({generate:async c=>{calls.push(c);return result(c);}},embedder);
   s.start('Like a rainy bookshop, absolutely not crowded',2,'fixture');await ready(s);
-  expect(calls[0].originalInput.imageCount).toBe(2);expect(calls[0].history).toHaveLength(0);
+  expect(calls[0].originalInput).toEqual({text:'Like a rainy bookshop, absolutely not crowded',imageCount:1,imageProcessing:'described'});expect(calls[0].history).toHaveLength(0);
   const v=s.getSnapshot()!.version;s.answer({kind:'choice',optionId:'a'});await ready(s);
   expect(s.getSnapshot()!.version).toBeGreaterThan(v);expect(calls.at(-1)!.history).toHaveLength(1);
   expect(s.getSnapshot()!.evidence.some(e=>e.polarity==='dealbreaker'&&e.text.includes('crowded'))).toBe(true);
   expect(s.getSnapshot()!.vibe_so_far).toContain('not crowded');
  });
+ it('no photo means not_sent',async()=>{const calls:GenerationContext[]=[];const s=createLiveVibeSession({generate:async c=>{calls.push(c);return result(c);}},embedder);s.start('A',0,'f');await ready(s);expect(calls[0].originalInput.imageProcessing).toBe('not_sent');});
+ it('accepts 800-char corrections and rejects 801',async()=>{const s=createLiveVibeSession(generator,embedder);s.start('A scene',0,'f');await ready(s);expect(()=>s.answer({kind:'correction',text:'x'.repeat(801)})).toThrow(/1–800/);s.answer({kind:'correction',text:'x'.repeat(800)});await ready(s);expect(s.getSnapshot()!.history).toHaveLength(1);});
+ it('accepts 800-char free-text answers (words plus a photo line) and rejects 801',async()=>{const s=createLiveVibeSession(generator,embedder);s.start('A scene',0,'f');await ready(s);expect(()=>s.answer({kind:'text',text:'x'.repeat(801)})).toThrow(/1–800/);s.answer({kind:'text',text:'x'.repeat(800)});await ready(s);expect(s.getSnapshot()!.history).toHaveLength(1);});
  it('opposite answers produce different semantic descriptions without inventing venue rankings',async()=>{
   const a=createLiveVibeSession(generator,embedder),b=createLiveVibeSession(generator,embedder);a.start('A new scene',0,'same');b.start('A new scene',0,'same');await ready(a);await ready(b);
   a.answer({kind:'choice',optionId:'a'});b.answer({kind:'choice',optionId:'b'});await ready(a);await ready(b);

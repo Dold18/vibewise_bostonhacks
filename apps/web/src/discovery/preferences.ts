@@ -9,6 +9,7 @@
  * verbatim for the future Vibe Engine and is deliberately ignored by filtering.
  */
 import { supportedVibeImage, MAX_VIBE_IMAGES } from './vibeImages';
+import { MAX_TYPED_TEXT } from '../features/vibe/photoMessage';
 import {
   addDays,
   bostonWallTime,
@@ -89,7 +90,8 @@ export const TIMING_OPTIONS = [
 ] as const satisfies readonly Option<string>[];
 export type TimingKind = (typeof TIMING_OPTIONS)[number]['id'];
 
-export const VIBE_TEXT_MAX_LENGTH = 500;
+/** One typed-text limit for the vibe description and the quiz's own-words boxes. */
+export const VIBE_TEXT_MAX_LENGTH = MAX_TYPED_TEXT;
 
 /** Hours that define "Tonight" on a Boston clock: 7 PM until 3 AM next day. */
 export const TONIGHT_START_HOUR = 19;

@@ -19,7 +19,7 @@ function el<K extends keyof HTMLElementTagNameMap>(
   return node;
 }
 
-export function mountAccountUi(container: HTMLElement, store: AccountStore): () => void {
+export function mountAccountUi(container: HTMLElement, store: AccountStore): { destroy(): void; open(): void } {
   let open = false;
   let mode: Mode = 'sign_in';
   let busy = false;
@@ -227,11 +227,14 @@ export function mountAccountUi(container: HTMLElement, store: AccountStore): () 
   const unsubscribe = store.subscribe(render);
   render(store.getState());
 
-  return () => {
-    unsubscribe();
-    document.removeEventListener('keydown', onKey);
-    document.removeEventListener('pointerdown', onPointer);
-    button.remove();
-    popover.remove();
+  return {
+    open: () => setOpen(true),
+    destroy: () => {
+      unsubscribe();
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onPointer);
+      button.remove();
+      popover.remove();
+    },
   };
 }

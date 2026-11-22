@@ -18,7 +18,7 @@ export interface Embedding { readonly status: 'idle'|'pending'|'ready'|'unavaila
   readonly negativeVector?: readonly number[]; readonly reason?: string }
 export interface OutingVibeProfile {
   readonly schemaVersion: '1.0.0'; readonly sessionId: string; readonly version: number;
-  readonly originalInput: { readonly text: string; readonly imageCount: number; readonly imageProcessing: 'not_sent' };
+  readonly originalInput: { readonly text: string; readonly imageCount: number; readonly imageProcessing: 'not_sent' | 'described' };
   readonly vibe_so_far: string; readonly evidence: readonly Evidence[]; readonly qualifiers: readonly string[];
   readonly history: readonly Answer[]; readonly askedFamilies: readonly string[]; readonly askedTopics: readonly Topic[];
   readonly question: Question|null; readonly phase: 'generating'|'question'|'results';

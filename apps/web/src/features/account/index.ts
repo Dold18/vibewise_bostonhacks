@@ -12,10 +12,10 @@ import { mountAccountUi } from './ui';
 
 export type { AccountState, AccountStore, RecordResult } from './session';
 
-export function mountAccount(container: HTMLElement, opts: { map: MapLibreMap }): { store: AccountStore; theme: ThemeController; destroy(): void } {
+export function mountAccount(container: HTMLElement, opts: { map: MapLibreMap }): { store: AccountStore; theme: ThemeController; destroy(): void; openSignIn(): void } {
   const client = createAccountClient();
   const store = createAccountStore(client ? createSupabaseBackend(client) : null, { includeDev: import.meta.env.DEV });
-  const unmountUi = mountAccountUi(container, store);
+  const ui = mountAccountUi(container, store);
   const theme = startThemeController(opts.map, store);
   void store.start();
 
@@ -36,7 +36,8 @@ export function mountAccount(container: HTMLElement, opts: { map: MapLibreMap })
     theme,
     destroy() {
       theme.destroy();
-      unmountUi();
+      ui.destroy();
     },
+    openSignIn: ui.open,
   };
 }

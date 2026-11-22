@@ -5,7 +5,10 @@ import { parseSearchRequest, type SearchResponse } from '../src/features/vibe/se
 import { createSupabaseCatalog, rankRestaurants, type CatalogProvider } from './catalogIndex.ts';
 import { createGeminiGenerator } from './vibeGemini.ts';
 import { createMiniLM } from './miniLM.ts';
-export function createVibeRouter(deps:{generator?:GenerationProvider;embedder?:EmbeddingProvider;catalog?:CatalogProvider}={}) {
+import { createPhotoRoutes, type PhotoDeps } from './photoApi.ts';
+import { createSupabasePhotoAuth, supabaseServerEnv } from './photoAuth.ts';
+import { createGeminiPhotoDescriber } from './photoDescriber.ts';
+export function createVibeRouter(deps:{generator?:GenerationProvider;embedder?:EmbeddingProvider;catalog?:CatalogProvider;photo?:PhotoDeps}={}) {
  const reload=()=>{try{process.loadEnvFile(process.env.VIBENTA_ENV_FILE??new URL('../../../.env',import.meta.url));}catch{/* Config can be supplied later without exposing its contents. */}};
  const router=Router(), generator=deps.generator??{generate(context,signal){reload();return createGeminiGenerator({apiKey:process.env.GEMINI_API_KEY,model:process.env.VIBE_GEMINI_MODEL}).generate(context,signal);}},embedder=deps.embedder??createMiniLM();
  // Catalog search reads the same Supabase project as the browser, with the same publishable key
@@ -20,6 +23,7 @@ export function createVibeRouter(deps:{generator?:GenerationProvider;embedder?:E
   if(envCatalog?.id!==id)envCatalog={id,provider:createSupabaseCatalog({url,key})};
   return envCatalog.provider;
  };
+ const photo:PhotoDeps=deps.photo??{auth(){reload();return createSupabasePhotoAuth(supabaseServerEnv());},describer(){reload();return createGeminiPhotoDescriber({apiKey:process.env.GEMINI_API_KEY,model:process.env.VIBE_GEMINI_MODEL});},unlimited(){reload();return process.env.VIBE_IMAGE_UNLIMITED==='true';}};
  const clients=new Map<string,{at:number;count:number}>();let inflight=0;
  router.use((req,res,next)=>{
   const key=req.ip??'local',now=Date.now(),old=clients.get(key),entry=old&&now-old.at<60000?old:{at:now,count:0};
@@ -27,6 +31,7 @@ export function createVibeRouter(deps:{generator?:GenerationProvider;embedder?:E
   if(++entry.count>80||inflight>=4){res.setHeader('Retry-After','5');res.status(429).json({error:'Vibe service is busy; please retry.'});return;}
   inflight++;res.once('close',()=>{inflight--;});next();
  });
+ router.use(createPhotoRoutes(photo));
  router.get('/status',(_req,res)=>{reload();res.json({geminiConfigured:!!process.env.GEMINI_API_KEY,modelKey:MODEL_KEY});});
  router.post('/generate',async(req,res)=>{
   if(!validContext(req.body)){res.status(400).json({error:'Invalid bounded quiz context'});return;}

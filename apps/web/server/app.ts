@@ -19,6 +19,8 @@ const app = express();
 // Behind Vercel's proxy the socket address is the proxy's, so every visitor would share one
 // rate-limit bucket in vibeApi.ts. Trust X-Forwarded-For only when actually deployed there.
 if (process.env.VERCEL) app.set("trust proxy", true);
+// Photo reads carry one downscaled image; every other route keeps the 64kb limit.
+app.use("/api/vibe/describe-image", express.json({ limit: "2mb" }));
 app.use(express.json({ limit: "64kb" }));
 
 app.post("/api/transit/route", async (req, res) => {
