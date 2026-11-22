@@ -35,6 +35,8 @@ export interface VibeArgs {
   /** --model; null falls back to GEMINI_MODEL, then DEFAULT_GEMINI_MODEL. */
   model: string | null;
   rpm: number;
+  /** Places processed at the same time (Gemini calls stay within --rpm). */
+  concurrency: number;
   chunk: number;
   seed: number | null;
   photos: boolean;
@@ -100,6 +102,7 @@ export function parseVibeArgs(argv: string[]): VibeArgs {
       all: { type: 'boolean', default: false },
       model: { type: 'string' },
       limit: { type: 'string' }, rpm: { type: 'string' }, chunk: { type: 'string' }, seed: { type: 'string' },
+      concurrency: { type: 'string' },
       'ids-file': { type: 'string' },
     },
     strict: true,
@@ -117,6 +120,7 @@ export function parseVibeArgs(argv: string[]): VibeArgs {
     model: values.model?.trim() ?? null,
     limit: positiveInt('limit', values.limit, 300),
     rpm: positiveInt('rpm', values.rpm, 60),
+    concurrency: positiveInt('concurrency', values.concurrency, 1),
     chunk: positiveInt('chunk', values.chunk, 25),
     seed: values.seed === undefined ? null : positiveInt('seed', values.seed, 0),
     idsFile: values['ids-file'] ?? null,
@@ -175,6 +179,8 @@ export interface VibeDeps<R extends { id: number; name: string } = VibeRestauran
   /** null in a dry run. */
   write: ((id: number, v: { description: string; embedding: number[]; profile: VibeProfile | null }) => Promise<boolean>) | null;
   chunk: number;
+  /** Rows processed at the same time; 1 (default) is strictly one after another. */
+  concurrency?: number;
   sleep?: (ms: number) => Promise<void>;
   log?: (line: string) => void;
   /** Delays between the 3 attempts for a malformed or empty answer. */
@@ -196,13 +202,30 @@ export async function runVibeEnrichment<R extends { id: number; name: string } =
   const richSamples: VibeSummary['samples'] = [];
   const thinSamples: VibeSummary['samples'] = [];
 
-  for (let i = 0; i < d.rows.length; i++) {
-    if (i > 0 && i % d.chunk === 0) {
-      d.log?.(`progress ${i}/${d.rows.length}: ${s.succeeded} ok, ${s.failed.length} failed, ${s.skippedAlreadyDone} skipped (last id ${d.rows[i - 1]!.id})`);
+  // Workers take the next row until rows run out or the run stops early. JavaScript runs one callback at a
+  // time, so the shared counters below need no locking; Gemini pacing is shared inside `generate`.
+  let next = 0;
+  let done = 0;
+  const workers = Math.max(1, Math.min(d.concurrency ?? 1, d.rows.length));
+  await Promise.all(Array.from({ length: workers }, async () => {
+    while (!s.stoppedEarly) {
+      const i = next++;
+      if (i >= d.rows.length) return;
+      const row = d.rows[i]!;
+      await processRow(row);
+      done++;
+      if (done % d.chunk === 0 && done < d.rows.length) {
+        d.log?.(`progress ${done}/${d.rows.length}: ${s.succeeded} ok, ${s.failed.length} failed, ${s.skippedAlreadyDone} skipped (last id ${row.id})`);
+      }
     }
-    const row = d.rows[i]!;
+  }));
+  // A mix for manual review: up to 5 rich-input and 5 thin-input cases.
+  s.samples = [...richSamples.slice(0, 5), ...thinSamples.slice(0, 5)];
+  return s;
+
+  async function processRow(row: R): Promise<void> {
     // Never process a row that was enriched since selection (re-run or partial-failure resume).
-    if (!(await d.isStillUnenriched(row.id))) { s.skippedAlreadyDone++; continue; }
+    if (!(await d.isStillUnenriched(row.id))) { s.skippedAlreadyDone++; return; }
 
     let image: VibeImage | undefined;
     const photoUrl = d.photoUrls.get(row.id);
@@ -234,7 +257,7 @@ export async function runVibeEnrichment<R extends { id: number; name: string } =
         if (err instanceof GeminiRequestError) {
           // A rejected image is the one 4xx worth retrying: send the facts without it.
           if (sendImage) { sendImage = undefined; lastError = `request rejected with image: ${err.message}`; continue; }
-          s.stoppedEarly = err.message; // bad key, bad model name: no point continuing
+          s.stoppedEarly ??= err.message; // bad key, bad model name: no point continuing
           break;
         }
         lastError = (err as Error).message;
@@ -244,12 +267,12 @@ export async function runVibeEnrichment<R extends { id: number; name: string } =
       }
     }
     if (attempts > 1) s.retriedRows++;
-    if (s.stoppedEarly) break;
+    if (s.stoppedEarly) return;
     if (result === null) {
       s.failed.push({ id: row.id, name: row.name, reason: lastError || 'no result' });
       quotaStreak = quota ? quotaStreak + 1 : 0;
-      if (quotaStreak >= maxQuota) { s.stoppedEarly = `${maxQuota} rows in a row failed on quota/overload`; break; }
-      continue;
+      if (quotaStreak >= maxQuota) s.stoppedEarly ??= `${maxQuota} rows in a row failed on quota/overload`;
+      return;
     }
     quotaStreak = 0;
 
@@ -257,11 +280,11 @@ export async function runVibeEnrichment<R extends { id: number; name: string } =
       const embedding = await d.embed(result.description);
       if (d.write) {
         const wrote = await d.write(row.id, { description: result.description, embedding, profile: result.profile });
-        if (!wrote) { s.skippedAlreadyDone++; continue; }
+        if (!wrote) { s.skippedAlreadyDone++; return; }
       }
     } catch (err) {
       s.failed.push({ id: row.id, name: row.name, reason: `embed/write: ${(err as Error).message}` });
-      continue;
+      return;
     }
     s.succeeded++;
     if (sendImage) s.withPhoto++;
@@ -270,9 +293,6 @@ export async function runVibeEnrichment<R extends { id: number; name: string } =
     const entry = { id: row.id, name: row.name, rich: bundle.hasDescriptive || !!sendImage, photo: !!sendImage, description: result.description, profile: result.profile };
     (entry.rich ? richSamples : thinSamples).push(entry);
   }
-  // A mix for manual review: up to 5 rich-input and 5 thin-input cases.
-  s.samples = [...richSamples.slice(0, 5), ...thinSamples.slice(0, 5)];
-  return s;
 }
 
 export function formatVibeSummary(s: VibeSummary, dryRun: boolean, noun = 'restaurants'): string {
@@ -312,7 +332,7 @@ async function main(): Promise<void> {
     apiKey: requireEnv('GEMINI_API_KEY'), model, rpm: args.rpm,
     systemPrompt: flavor.systemPrompt, responseSchema: flavor.responseSchema,
   });
-  const mode = `${args.dryRun ? 'dry run' : 'writing'}, model ${model}, ${args.rpm} rpm`;
+  const mode = `${args.dryRun ? 'dry run' : 'writing'}, model ${model}, ${args.rpm} rpm, concurrency ${args.concurrency}`;
 
   const before = await enrichmentCounts(client, table);
   console.log(`Table ${table}. Before: ${countsLine(before)}`);
@@ -342,7 +362,7 @@ async function main(): Promise<void> {
   const embed = await createEmbedder();
 
   const common = {
-    inputs, photoUrls, embed, generate, chunk: args.chunk, log: (l: string) => console.log(l),
+    inputs, photoUrls, embed, generate, chunk: args.chunk, concurrency: args.concurrency, log: (l: string) => console.log(l),
     isStillUnenriched: (id: number) => isStillUnenriched(client, table, id),
     fetchImage,
     write: args.dryRun ? null : (id: number, v: { description: string; embedding: number[]; profile: VibeProfile | null }) => writeEnrichment(client, table, id, v),
