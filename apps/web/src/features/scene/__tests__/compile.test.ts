@@ -7,7 +7,7 @@ import { SCENE_CATALOG } from '../catalog';
 import { hexToLab } from '../color';
 import { compileScene } from '../compile';
 import { COST, EFFECT_BUDGET } from '../constraints';
-import { FLOORS, labelsPass, pinsPass } from '../guard';
+import { FLOORS, labelsPass, pinsPass, ringPasses } from '../guard';
 import { contrastRatio } from '../color';
 import { PRESET_IDS, type ScenePresetId } from '../presets';
 import { diffScene, stableStringify, type SceneState } from '../state';
@@ -23,7 +23,7 @@ const only = (id: ScenePresetId, weight = 1, extra = {}) => compileScene({ outin
 function expectLegible(s: SceneState) {
   const p = s.palette;
   expect(labelsPass(p), `labels on ${p.land}`).toBe(true);
-  expect(pinsPass(p.land, s.darkMode), `pins on ${p.land}`).toBe(true);
+  expect(s.pinEdge === 'two_tone' ? ringPasses(p.land) : pinsPass(p.land, s.darkMode), `pins on ${p.land}`).toBe(true);
   expect(contrastRatio(p.waterLabel, p.water)).toBeGreaterThanOrEqual(FLOORS.water);
 }
 
@@ -218,14 +218,32 @@ describe('constraints', () => {
     expect(s.resolved['air_and_atmosphere.snow']).toBe('off');
   });
 
-  it('protects route legibility while navigating but keeps the scene’s colors', () => {
-    const browse = compileScene({ outing: DESIGN_EXAMPLE, capabilities: ALL });
-    const route = compileScene({ outing: DESIGN_EXAMPLE, capabilities: ALL, context: { navigation: 'route' } });
-    expect(browse.overlays.some((o) => o.key.startsWith('cinematic_and_artistic.'))).toBe(true);
-    expect(route.overlays.some((o) => o.key.startsWith('cinematic_and_artistic.'))).toBe(false);
-    for (const o of route.overlays) expect(['air_and_atmosphere.fog_volume', 'air_and_atmosphere.vignette', 'air_and_atmosphere.grain', 'air_and_atmosphere.fog_hue']).toContain(o.key);
-    expect(route.resolved['neighborhood_and_places.local_fog_clearing']).toBe('clear_route_area');
-    expect(route.palette.land).not.toBe(basePalette.land);
+  it.each(['route', 'focus'] as const)('while navigating (%s) keeps the palette but drops overlays, ambient motion and decorations', (navigation) => {
+    const { registry } = realRegistry();
+    const browse = compileScene({ outing: DESIGN_EXAMPLE, capabilities: ALL, assets: registry });
+    const nav = compileScene({ outing: DESIGN_EXAMPLE, capabilities: ALL, assets: registry, context: { navigation } });
+    expect(browse.overlays.length).toBeGreaterThan(1);
+    expect(nav.palette).toEqual(browse.palette);
+    expect(nav.darkMode).toBe(browse.darkMode);
+    for (const o of nav.overlays) {
+      expect(o).toMatchObject({ key: 'air_and_atmosphere.vignette', value: 'soft' });
+      expect(o.opacity).toBeLessThanOrEqual(0.35);
+    }
+    expect(nav.motion.ambient).toBe(false);
+    expect(nav.resolved['marker_recommendations.pin_pulse']).toBe('off');
+    expect(nav.resolved['lighting_and_shadows.bloom']).toBe('off');
+    expect(nav.setPiece).toBeNull();
+    expect(nav.diagnostics.find((d) => d.code === 'navigation_legibility')?.detail).toMatch(/palette kept/);
+  });
+
+  it('while navigating lifts dim light to a safe level, without disabling the theme', () => {
+    const browse = compileScene({ outing: intent([['noir_jazz', 1]]), capabilities: SCENE_ADAPTER_V1_PROPOSED });
+    const nav = compileScene({ outing: intent([['noir_jazz', 1]]), capabilities: SCENE_ADAPTER_V1_PROPOSED, context: { navigation: 'route' } });
+    expect(browse.lighting.intensity).toBe(0.2);
+    expect(nav.lighting.intensity).toBe(0.28);
+    expect(nav.lighting.color).toBe(browse.lighting.color);
+    expect(nav.palette).toEqual(browse.palette);
+    expect(nav.source).toBe('outing');
   });
 
   it('honors reduced motion', () => {

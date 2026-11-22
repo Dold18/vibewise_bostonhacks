@@ -24,7 +24,7 @@ import { choiceOf, PRESETS, PRESET_IDS } from './presets';
 import {
   groupValues, preferredLabels, realizeLighting, realizeMotion, realizeOverlays, realizePalette, realizeSky, realizeUi,
 } from './realize';
-import { DEFAULT_CONTEXT, hashString, stableStringify, type DisabledRequest, type SceneContext, type SceneState, type SetPiece } from './state';
+import { DEFAULT_CONTEXT, renderHash, type DisabledRequest, type SceneContext, type SceneState, type SetPiece } from './state';
 
 export const COMPILER_VERSION = '0.1.0';
 
@@ -43,6 +43,12 @@ export interface CompileInput {
   readonly assets?: AssetRegistry | null;
   readonly catalog?: SceneCatalog;
   readonly base?: Palette;
+  /**
+   * The scene currently on screen. Enables hysteresis (discrete values and the
+   * guard's pin/label choices stick instead of flickering at thresholds). The
+   * output is still a pure function of all inputs, including this one.
+   */
+  readonly previous?: Pick<SceneState, 'resolved' | 'palette' | 'pinEdge'> | null;
 }
 
 const round3 = (n: number) => Math.round(n * 1000) / 1000;
@@ -110,6 +116,14 @@ export function compileScene(input: CompileInput = {}): SceneState {
     work.set(o.key, { choices: o.value === setting.default ? [] : [{ value: o.value, weight }], provenance: 'override' });
   }
 
+  // Hysteresis hints: what each model-editable setting showed last time.
+  if (input.previous) {
+    for (const s of catalog.settings) {
+      const slot = work.get(s.key)!;
+      if (slot.provenance !== 'locked' && input.previous.resolved[s.key] !== undefined) slot.prefer = input.previous.resolved[s.key];
+    }
+  }
+
   // 2. Conflict and safety rules.
   const env: RuleEnv = { catalog, context, note };
   for (const rule of RULES) rule.apply(work, env);
@@ -123,7 +137,7 @@ export function compileScene(input: CompileInput = {}): SceneState {
     for (const c of slot.choices) {
       if (!kept.includes(c)) disabled.push({ key: s.key, value: c.value, reason: `not implemented in ${capabilities.id}` });
     }
-    work.set(s.key, { choices: kept, provenance: 'capability' });
+    work.set(s.key, { choices: kept, provenance: 'capability', prefer: slot.prefer });
   }
   performanceBudget.apply(work, env);
 
@@ -139,7 +153,10 @@ export function compileScene(input: CompileInput = {}): SceneState {
   }
 
   // 5. Realization and the contrast guard.
-  const guarded = guardPalette(realizePalette(work, base), preferredLabels(work, catalog));
+  const guarded = guardPalette(realizePalette(work, base), preferredLabels(work, catalog), {
+    contrastRing: capabilities.features.has('pin_contrast_ring'),
+    previous: input.previous ? { pinEdge: input.previous.pinEdge, palette: input.previous.palette } : undefined,
+  });
   for (const c of guarded.corrections) note('contrast_guard', c);
   const palette = guarded.palette;
   const textures = (key: string) => (capabilities.features.has('svg_textures') ? input.assets?.texturesByKey.get(key) ?? [] : []);
@@ -158,16 +175,17 @@ export function compileScene(input: CompileInput = {}): SceneState {
     disabled,
     palette,
     darkMode: guarded.darkMode,
+    pinEdge: guarded.pinEdge,
     lighting: realizeLighting(work, palette),
     sky: realizeSky(work, palette),
     overlays: realizeOverlays(work, catalog, textures),
     markers: groupValues(work, catalog, 'marker_recommendations'),
     ui: realizeUi(work, catalog),
-    motion: realizeMotion(work, catalog, context.reducedMotion),
+    motion: realizeMotion(work, catalog, context.reducedMotion, context.navigation !== 'browse'),
     setPiece: chooseSetPiece(presets, input.assets ?? null, capabilities, context, disabled, note),
     diagnostics,
   };
-  return Object.freeze({ ...state, hash: hashString(stableStringify(state)) });
+  return Object.freeze({ ...state, hash: renderHash(state) });
 }
 
 /**

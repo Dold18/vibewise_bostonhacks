@@ -11,6 +11,8 @@ import type { Choice, Provenance, SceneContext } from './state';
 export interface Slot {
   choices: Choice[];
   provenance: Provenance;
+  /** The value shown last time (hysteresis hint); absent on a first compile. */
+  prefer?: string;
 }
 export type Work = Map<SceneKey, Slot>;
 
@@ -28,6 +30,15 @@ export interface ConstraintRule {
 /** Below this weight a discrete setting stays at its default (palette blending still uses it). */
 export const MIN_DISCRETE_WEIGHT = 0.08;
 
+/**
+ * Hysteresis for discrete values, used when the previous scene is known:
+ * a value that is off must reach `enter` to appear; a value that is on stays
+ * while it keeps `exit` weight and trails the leader by less than `margin`.
+ * The band around MIN_DISCRETE_WEIGHT stops a value flickering on and off
+ * when quiz weights hover near the threshold.
+ */
+export const HYSTERESIS = Object.freeze({ enter: 0.1, exit: 0.06, margin: 0.05 });
+
 /** The dominant choice of a slot, or null when the default holds. Ties go to catalog value order. */
 export function winner(work: Work, key: SceneKey, catalog: SceneCatalog): Choice | null {
   const slot = work.get(key);
@@ -41,12 +52,18 @@ export function winner(work: Work, key: SceneKey, catalog: SceneCatalog): Choice
       (Math.abs(c.weight - best.weight) <= 1e-9 && setting.values.indexOf(c.value) < setting.values.indexOf(best.value))
     ) best = c;
   }
-  return best && best.weight >= MIN_DISCRETE_WEIGHT && best.value !== setting.default ? best : null;
+  const on = best && best.value !== setting.default ? best : null;
+  const prefer = slot.prefer;
+  if (prefer === undefined) return on && on.weight >= MIN_DISCRETE_WEIGHT ? on : null;
+  if (prefer === setting.default) return on && on.weight >= HYSTERESIS.enter ? on : null;
+  const held = slot.choices.find((c) => c.value === prefer);
+  if (held && held.weight >= HYSTERESIS.exit && best!.weight - held.weight < HYSTERESIS.margin) return held;
+  return on && on.weight >= MIN_DISCRETE_WEIGHT ? on : null;
 }
 
 const set = (work: Work, key: SceneKey, choices: Choice[]) => {
   const slot = work.get(key);
-  if (slot) work.set(key, { choices, provenance: 'constraint' });
+  if (slot) work.set(key, { choices, provenance: 'constraint', prefer: slot.prefer });
 };
 
 const DAY_SKIES = new Set(['neutral', 'clear_blue', 'warm_dawn', 'golden_hour', 'storm_gray', 'dream_pastel']);
@@ -93,44 +110,65 @@ const singlePrecipitation: ConstraintRule = {
   },
 };
 
-/** Paint above the canvas tints routes and stops, so these go entirely while navigating. */
-const ROUTE_SUPPRESSED_GROUPS = new Set(['cinematic_and_artistic']);
-const ROUTE_SUPPRESSED_KEYS = new Set([
-  'air_and_atmosphere.rain', 'air_and_atmosphere.snow', 'air_and_atmosphere.sparkle', 'air_and_atmosphere.fireflies',
-  'air_and_atmosphere.petals', 'air_and_atmosphere.dust_motes', 'air_and_atmosphere.light_shafts', 'air_and_atmosphere.lens_glare',
-  'air_and_atmosphere.chromatic_aberration', 'air_and_atmosphere.scanlines', 'air_and_atmosphere.distortion',
-  'air_and_atmosphere.volumetric_weather', 'air_and_atmosphere.haze_profile', 'natural_land.leaf_particles',
-  'neighborhood_and_places.place_scene_particles', 'lighting_and_shadows.bloom',
+/**
+ * Navigation policy (design §5, ratified 2026-11-21): while a route or focused
+ * destination is on screen the scene keeps its palette and a safe version of its
+ * lighting, but nothing may compete with routes, stops or pins.
+ */
+/** Overlay paint sits above the canvas and tints routes: every overlay goes except a soft edge vignette. */
+const NAV_OVERLAY_GROUPS = new Set(['air_and_atmosphere', 'cinematic_and_artistic']);
+const NAV_KEEP = new Set(['air_and_atmosphere.vignette']);
+/** Decorations and glows outside the overlay groups. */
+const NAV_DECORATIONS = new Set([
+  'natural_land.leaf_particles', 'neighborhood_and_places.place_scene_particles', 'lighting_and_shadows.bloom',
 ]);
-/** Kept but capped while navigating: [key, value, max weight]. */
-const ROUTE_CAPS: ReadonlyArray<readonly [SceneKey, string, number]> = [
-  ['air_and_atmosphere.fog_volume', 'whisper', 0.35],
-  ['air_and_atmosphere.vignette', 'soft', 0.35],
+/** Ambient motion is stilled (scene color transitions and pin updates still animate). */
+const NAV_STILL = new Set([
+  'animation_and_morph.ambient_pace', 'animation_and_morph.particle_motion', 'animation_and_morph.motion_texture',
+  'animation_and_morph.color_wave', 'animation_and_morph.effect_stagger', 'animation_and_morph.building_reveal_motion',
+  'sky_and_horizon.cloud_motion', 'water_and_coast.surface_motion', 'water_and_coast.shimmer_speed',
+  'marker_recommendations.pin_pulse',
+]);
+/** Safe lighting: [key, value, replacement] so buildings and streets stay readable. */
+const NAV_SAFE_LIGHT: ReadonlyArray<readonly [SceneKey, string, string]> = [
+  ['lighting_and_shadows.light_intensity', 'dim', 'subtle'],
+  ['lighting_and_shadows.ambient_fill', 'deep_shadow', 'muted'],
 ];
+export const NAV_VIGNETTE_MAX = 0.35;
 
 const navigationLegibility: ConstraintRule = {
   id: 'navigation_legibility',
   apply(work, { catalog, context, note }) {
     if (context.navigation === 'browse') return;
     const dropped: string[] = [];
+    const stilled: string[] = [];
     for (const s of catalog.settings) {
-      if (!ROUTE_SUPPRESSED_GROUPS.has(s.group.id) && !ROUTE_SUPPRESSED_KEYS.has(s.key)) continue;
-      if (winner(work, s.key, catalog)) {
-        set(work, s.key, []);
-        dropped.push(s.key);
-      }
+      const overlay = NAV_OVERLAY_GROUPS.has(s.group.id) && !NAV_KEEP.has(s.key);
+      if (!overlay && !NAV_DECORATIONS.has(s.key) && !NAV_STILL.has(s.key)) continue;
+      if (!winner(work, s.key, catalog)) continue;
+      set(work, s.key, []);
+      (NAV_STILL.has(s.key) ? stilled : dropped).push(s.key);
     }
-    for (const [key, value, cap] of ROUTE_CAPS) {
-      const w = winner(work, key, catalog);
-      if (w && (w.value !== value || w.weight > cap)) {
-        set(work, key, [{ value, weight: Math.min(w.weight, cap) }]);
-        dropped.push(`${key}→${value}`);
-      }
+    const vignette = winner(work, 'air_and_atmosphere.vignette', catalog);
+    if (vignette && (vignette.value !== 'soft' || vignette.weight > NAV_VIGNETTE_MAX)) {
+      set(work, 'air_and_atmosphere.vignette', [{ value: 'soft', weight: Math.min(vignette.weight, NAV_VIGNETTE_MAX) }]);
+      dropped.push('air_and_atmosphere.vignette→soft');
     }
-    if (winner(work, 'air_and_atmosphere.fog_volume', catalog)) {
-      set(work, 'neighborhood_and_places.local_fog_clearing', [{ value: 'clear_route_area', weight: 1 }]);
+    const lit: string[] = [];
+    for (const [key, from, to] of NAV_SAFE_LIGHT) {
+      const slot = work.get(key);
+      if (!slot?.choices.some((c) => c.value === from)) continue;
+      const merged = new Map<string, number>();
+      for (const c of slot.choices) merged.set(c.value === from ? to : c.value, (merged.get(c.value === from ? to : c.value) ?? 0) + c.weight);
+      set(work, key, [...merged].map(([value, weight]) => ({ value, weight: Math.round(weight * 1000) / 1000 })));
+      lit.push(`${key} ${from}→${to}`);
     }
-    if (dropped.length) note('navigation_legibility', `${context.navigation}: protected route legibility (${dropped.join(', ')})`);
+    const parts = [
+      dropped.length && `overlays/decorations off: ${dropped.join(', ')}`,
+      stilled.length && `ambient motion stilled: ${stilled.join(', ')}`,
+      lit.length && `safe lighting: ${lit.join(', ')}`,
+    ].filter(Boolean);
+    if (parts.length) note('navigation_legibility', `${context.navigation}: palette kept; ${parts.join('; ')}`);
   },
 };
 

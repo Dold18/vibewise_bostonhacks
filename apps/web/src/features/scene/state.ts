@@ -64,6 +64,11 @@ export interface SceneState {
   readonly palette: Palette;
   /** White-edged pins (vibeTheme `vibe-dark`; that class changes nothing else). */
   readonly darkMode: boolean;
+  /**
+   * Pin treatment the guard relied on: none, white edge (`darkMode`), or the
+   * proposed two-tone contrast ring (only on renderers that declare it).
+   */
+  readonly pinEdge: 'none' | 'white' | 'two_tone';
   readonly lighting: { readonly color: string; readonly intensity: number; readonly position: readonly [number, number, number] };
   readonly sky: {
     readonly skyColor: string;
@@ -79,7 +84,10 @@ export interface SceneState {
   readonly motion: { readonly transitionMs: number; readonly ambient: boolean };
   readonly setPiece: SetPiece | null;
   readonly diagnostics: readonly Diagnostic[];
-  /** Stable hash of everything above. Equal hash ⇒ nothing to re-render. */
+  /**
+   * Render hash: everything above except `sessionVersion` and `diagnostics`.
+   * Equal hash ⇒ identical look ⇒ nothing to re-render, even across versions.
+   */
   readonly hash: string;
 }
 
@@ -105,6 +113,12 @@ export function hashString(text: string): string {
   return (a >>> 0).toString(16).padStart(8, '0') + (b >>> 0).toString(16).padStart(8, '0');
 }
 
+/** Hash of what a renderer reads; excludes `sessionVersion` and `diagnostics`. */
+export function renderHash(state: Omit<SceneState, 'hash'>): string {
+  const { sessionVersion: _v, diagnostics: _d, ...look } = state;
+  return hashString(stableStringify(look));
+}
+
 export interface SceneDiff {
   readonly same: boolean;
   readonly resolved: readonly SceneKey[];
@@ -116,13 +130,14 @@ export interface SceneDiff {
   readonly ui: boolean;
   readonly motion: boolean;
   readonly setPiece: boolean;
+  readonly pins: boolean;
 }
 
 /** What changed between two states (a null `from` means everything did). */
 export function diffScene(from: SceneState | null, to: SceneState): SceneDiff {
   const eq = (a: unknown, b: unknown) => stableStringify(a) === stableStringify(b);
   if (from && from.hash === to.hash) {
-    return { same: true, resolved: [], palette: [], lighting: false, sky: false, overlays: false, markers: false, ui: false, motion: false, setPiece: false };
+    return { same: true, resolved: [], palette: [], lighting: false, sky: false, overlays: false, markers: false, ui: false, motion: false, setPiece: false, pins: false };
   }
   return {
     same: false,
@@ -135,5 +150,6 @@ export function diffScene(from: SceneState | null, to: SceneState): SceneDiff {
     ui: !from || !eq(from.ui, to.ui),
     motion: !from || !eq(from.motion, to.motion),
     setPiece: !from || !eq(from.setPiece, to.setPiece),
+    pins: !from || from.darkMode !== to.darkMode || from.pinEdge !== to.pinEdge,
   };
 }

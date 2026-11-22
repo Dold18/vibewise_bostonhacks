@@ -13,7 +13,11 @@ import {
 } from './swatches';
 
 /** Non-setting features the compiler may reference. */
-export type SceneFeature = 'set_piece_3d' | 'svg_textures';
+export type SceneFeature =
+  | 'set_piece_3d'
+  | 'svg_textures'
+  /** Two-tone (light + dark) pin outline, proposed to the map owner; lets the ground change lightness continuously. */
+  | 'pin_contrast_ring';
 
 export interface CapabilityProfile {
   readonly id: string;
@@ -75,6 +79,11 @@ export function previewAllCapabilities(catalog: SceneCatalog): CapabilityProfile
   return profile(
     'preview-all',
     Object.fromEntries(catalog.settings.map((s) => [s.key, s.values])),
-    ['set_piece_3d', 'svg_textures'],
+    ['set_piece_3d', 'svg_textures', 'pin_contrast_ring'],
   );
+}
+
+/** Any profile plus extra features (e.g. to preview the proposed pin ring). */
+export function withFeatures(base: CapabilityProfile, ...features: SceneFeature[]): CapabilityProfile {
+  return Object.freeze({ id: `${base.id}+${features.join('+')}`, values: base.values, features: new Set([...base.features, ...features]) });
 }

@@ -173,12 +173,12 @@ export function realizeUi(work: Work, catalog: SceneCatalog): SceneState['ui'] {
   return { accent: ACCENTS[tokens.accent_token] ?? null, tokens };
 }
 
-export function realizeMotion(work: Work, catalog: SceneCatalog, reducedMotion: boolean): SceneState['motion'] {
+export function realizeMotion(work: Work, catalog: SceneCatalog, reducedMotion: boolean, navigating = false): SceneState['motion'] {
   const transition = winner(work, 'animation_and_morph.scene_transition', catalog)?.value ?? 'soft_crossfade';
   const pace = winner(work, 'animation_and_morph.ambient_pace', catalog);
   return {
     // Reduced motion keeps a near-instant fade: colors still change, nothing travels.
     transitionMs: reducedMotion ? Math.min(150, TRANSITION_MS[transition] ?? 800) : TRANSITION_MS[transition] ?? 800,
-    ambient: !reducedMotion && pace !== null,
+    ambient: !reducedMotion && !navigating && pace !== null,
   };
 }

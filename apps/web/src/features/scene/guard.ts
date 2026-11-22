@@ -58,17 +58,25 @@ function shiftL(hex: string, dL: number): string {
 
 const STEP = 0.01;
 
-/** Pick the pin treatment; nudge the ground only if no treatment works. */
-function fixPins(land: string): { land: string; whiteEdge: boolean } {
-  if (pinsPass(land, false)) return { land, whiteEdge: false };
-  if (pinsPass(land, true)) return { land, whiteEdge: true };
+/** Dark half of the proposed two-tone pin ring (the light half is DARK_PIN_EDGE, white). */
+export const RING_DARK = '#1a1d24';
+/** A two-tone ring is visible on any ground: one of its tones always contrasts. */
+export const ringPasses = (land: string) => Math.max(contrastRatio(DARK_PIN_EDGE, land), contrastRatio(RING_DARK, land)) >= FLOORS.pins;
+
+export type PinEdge = 'none' | 'white' | 'two_tone';
+
+/** Pick the pin treatment (previous one first, for stability); nudge the ground only if none works. */
+function fixPins(land: string, ring: boolean, previous?: PinEdge): { land: string; edge: PinEdge } {
+  if (ring && ringPasses(land)) return { land, edge: 'two_tone' };
+  const order: PinEdge[] = previous === 'white' ? ['white', 'none'] : ['none', 'white'];
+  for (const edge of order) if (pinsPass(land, edge === 'white')) return { land, edge };
   for (let i = 1; i <= 100; i++) {
     const down = shiftL(land, -STEP * i);
-    if (pinsPass(down, true)) return { land: down, whiteEdge: true };
+    if (pinsPass(down, true)) return { land: down, edge: 'white' };
     const up = shiftL(land, STEP * i);
-    if (pinsPass(up, false)) return { land: up, whiteEdge: false };
+    if (pinsPass(up, false)) return { land: up, edge: 'none' };
   }
-  return { land: B.land, whiteEdge: false };
+  return { land: B.land, edge: 'none' };
 }
 
 /** Push a label set toward black or white until it passes on `p.land`. */
@@ -96,32 +104,45 @@ export interface GuardResult {
   readonly palette: Palette;
   /** White-edged pins (vibeTheme's `vibe-dark` class). */
   readonly darkMode: boolean;
+  readonly pinEdge: PinEdge;
   readonly corrections: readonly string[];
+}
+
+export interface GuardOptions {
+  /** The renderer draws the two-tone pin ring: pins pass on any ground, so it is never nudged. */
+  readonly contrastRing?: boolean;
+  /** The scene on screen: its pin edge and labels are kept while they still pass (no flicker). */
+  readonly previous?: { readonly pinEdge: PinEdge; readonly palette: Palette };
 }
 
 /**
  * @param preferred the label system the scene asked for, if any; otherwise the
  *                  palette's own labels are tried first.
  */
-export function guardPalette(input: Palette, preferred: TextSet | null): GuardResult {
+export function guardPalette(input: Palette, preferred: TextSet | null, options: GuardOptions = {}): GuardResult {
   const corrections: string[] = [];
-  const pins = fixPins(input.land);
+  const pins = fixPins(input.land, options.contrastRing === true, options.previous?.pinEdge);
   if (pins.land !== input.land) corrections.push(`land: lightness nudged ${input.land} → ${pins.land} so pins stay visible`);
   const grounded = { ...input, land: pins.land };
 
+  // Own/requested labels first; previous labels only matter once those fail, so a
+  // neutral scene is always exactly the plain map, whatever was shown before.
   const own = preferred ?? textOf(input);
-  const sets = [own, DARK_TEXT, LIGHT_TEXT];
+  const previous = options.previous ? textOf(options.previous.palette) : null;
+  const sets = [own, previous, DARK_TEXT, LIGHT_TEXT].filter((x): x is TextSet => x !== null);
   let chosen = sets.find((s) => labelsPass({ ...grounded, ...s }));
   if (!chosen) {
     const made = synthesizeLabels(grounded, own);
     const changed = TEXT_KEYS.filter((k) => made[k] !== own[k]).map((k) => `${k} ${own[k]} → ${made[k]}`);
     corrections.push(`labels: pushed toward ${lightness(made.textPrimary) < lightness(grounded.land) ? 'black' : 'white'} for contrast (${changed.join(', ')})`);
     chosen = made;
+  } else if (chosen === previous && chosen !== own) {
+    corrections.push('labels: kept the previous labels for continuity');
   } else if (chosen !== own) {
     corrections.push(`labels: switched to ${chosen === LIGHT_TEXT ? 'light' : 'dark'} text for contrast`);
   }
   const palette = fixWaterLabel({ ...grounded, ...chosen }, corrections);
-  return { palette, darkMode: pins.whiteEdge, corrections };
+  return { palette, darkMode: pins.edge === 'white', pinEdge: pins.edge, corrections };
 }
 
 function fixWaterLabel(p: Palette, corrections: string[]): Palette {
