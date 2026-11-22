@@ -2,9 +2,10 @@
 // POSTs to /api/transit/route (proxied here by Vite), and only this server-side file imports it.
 // Run: `npm run server` (or `npm run dev:all` for Vite + this together). Needs Node >= 22.
 import express from "express";
+import { createVibeRouter } from "./vibeApi.ts";
 import { planTripLive } from "../src/features/transit/ride.ts";
 
-try { process.loadEnvFile(new URL("../../../.env", import.meta.url)); } catch { /* no .env: MBTA keyless */ }
+try { process.loadEnvFile(process.env.VIBENTA_ENV_FILE ?? new URL("../../../.env", import.meta.url)); } catch { /* no .env: MBTA keyless */ }
 
 const isPoint = (p: unknown): p is { lat: number; lng: number } => {
   const o = p as { lat?: unknown; lng?: unknown } | null;
@@ -13,7 +14,7 @@ const isPoint = (p: unknown): p is { lat: number; lng: number } => {
 };
 
 const app = express();
-app.use(express.json({ limit: "10kb" }));
+app.use(express.json({ limit: "64kb" }));
 
 app.post("/api/transit/route", async (req, res) => {
   const { origin, destination } = req.body ?? {};
@@ -27,6 +28,8 @@ app.post("/api/transit/route", async (req, res) => {
     res.status(500).json({ status: "error", message: `Transit planner failed: ${(e as Error).message}` });
   }
 });
+
+app.use("/api/vibe", createVibeRouter());
 
 const port = Number(process.env.TRANSIT_API_PORT ?? 8787);
 app.listen(port, "127.0.0.1", () => console.log(`transit API on http://127.0.0.1:${port}`));

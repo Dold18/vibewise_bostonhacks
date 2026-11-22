@@ -1,3 +1,4 @@
+import { mapPaletteForPreview } from './design/visualFoundation';
 import type {
   ExpressionSpecification,
   LayerSpecification,
@@ -17,7 +18,7 @@ type Filter = ExpressionSpecification;
  * Every color the map style uses. The vibe theme (src/features/vibeTheme)
  * blends these toward a user's top vibes; `basePalette` is the plain map.
  */
-export const basePalette = {
+export const basePalette = mapPaletteForPreview({
   land: '#f3f3f0',
   urban: '#eceae6',
   water: '#9fcaf5',
@@ -49,7 +50,7 @@ export const basePalette = {
   sky: '#bcd9f7',
   horizon: '#e9f2fb',
   light: '#ffffff',
-};
+});
 export type PaletteKey = keyof typeof basePalette;
 /** Colors as `#rrggbb`. */
 export type Palette = Record<PaletteKey, string>;
@@ -66,6 +67,43 @@ function withAlpha(hex: string, alpha: number): string {
 const SOURCE = 'openmaptiles';
 export const BUILDING_3D_LAYER = 'building-3d';
 export const BUILDING_3D_OPACITY = 0.92;
+
+/**
+ * 3D buildings are drawn in height bands, each with a constant color sampled
+ * from the height gradient (0 m → building3d, 60 m → building3dMid, 200 m →
+ * building3dHigh). A single layer colored by `render_height` is data-driven
+ * paint, which MapLibre never animates and re-lays-out in its workers on
+ * every change (browser QA: a visible snap on every theme change, ~400 ms per
+ * relayout). Constant per-band colors transition natively with the rest of
+ * the map. A building has one height, so it gets one band color either way.
+ * The first band keeps the original layer id.
+ */
+export const BUILDING_3D_BANDS: readonly { id: string; min: number; max: number; sampleHeight: number }[] = [
+  { id: BUILDING_3D_LAYER, min: 0, max: 15, sampleHeight: 7.5 },
+  { id: 'building-3d-b2', min: 15, max: 35, sampleHeight: 25 },
+  { id: 'building-3d-b3', min: 35, max: 60, sampleHeight: 47.5 },
+  { id: 'building-3d-b4', min: 60, max: 110, sampleHeight: 85 },
+  { id: 'building-3d-b5', min: 110, max: 200, sampleHeight: 155 },
+  { id: 'building-3d-b6', min: 200, max: Infinity, sampleHeight: 200 },
+];
+/** Every 3D building layer (for camera-driven opacity in main.ts). */
+export const BUILDING_3D_LAYERS: readonly string[] = BUILDING_3D_BANDS.map((b) => b.id);
+
+/** Per-channel sRGB interpolation, as MapLibre's `interpolate` does for colors. */
+function mixHex(a: string, b: string, t: number): string {
+  const ca = parseInt(a.slice(1), 16);
+  const cb = parseInt(b.slice(1), 16);
+  const ch = (n: number, shift: number) => (n >> shift) & 255;
+  return `#${[16, 8, 0].map((s) => Math.round(ch(ca, s) + (ch(cb, s) - ch(ca, s)) * t).toString(16).padStart(2, '0')).join('')}`;
+}
+
+/** The height-gradient color at `h` meters (what the former single layer showed). */
+export function buildingColorAt(palette: Palette, h: number): string {
+  if (h <= 0) return palette.building3d;
+  if (h < 60) return mixHex(palette.building3d, palette.building3dMid, h / 60);
+  if (h < 200) return mixHex(palette.building3dMid, palette.building3dHigh, (h - 60) / 140);
+  return palette.building3dHigh;
+}
 const name: ExpressionSpecification = ['coalesce', ['get', 'name:en'], ['get', 'name_en'], ['get', 'name']];
 
 const notTunnel: Filter = ['!=', ['get', 'brunnel'], 'tunnel'];
@@ -275,36 +313,31 @@ const buildLayers = (palette: Palette): LayerSpecification[] => [
     },
   },
 
-  // --- 2.5D extruded buildings ---
-  {
-    id: BUILDING_3D_LAYER,
-    type: 'fill-extrusion',
-    source: SOURCE,
-    'source-layer': 'building',
-    minzoom: 14,
-    filter: ['!', ['has', 'hide_3d']],
-    paint: {
-      'fill-extrusion-color': [
-        'interpolate',
-        ['linear'],
-        ['coalesce', ['get', 'render_height'], 0],
-        0,
-        palette.building3d,
-        60,
-        palette.building3dMid,
-        200,
-        palette.building3dHigh,
-      ],
-      'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 14, 0, 15, ['coalesce', ['get', 'render_height'], 0]],
-      'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
-      // Starts at full strength; main.ts fades it with camera pitch (0 when top-down).
-      'fill-extrusion-opacity': BUILDING_3D_OPACITY,
-      // Follows the camera pitch frame by frame, so it keeps MapLibre's default
-      // 300ms instead of the slower style-wide theme transition.
-      'fill-extrusion-opacity-transition': { duration: 300, delay: 0 },
-      'fill-extrusion-vertical-gradient': true,
-    },
-  },
+  // --- 2.5D extruded buildings (height bands; see BUILDING_3D_BANDS) ---
+  ...BUILDING_3D_BANDS.map((band): LayerSpecification => {
+    const height: ExpressionSpecification = ['coalesce', ['get', 'render_height'], 0];
+    const inBand: Filter[] = [['>=', height, band.min]];
+    if (Number.isFinite(band.max)) inBand.push(['<', height, band.max]);
+    return {
+      id: band.id,
+      type: 'fill-extrusion',
+      source: SOURCE,
+      'source-layer': 'building',
+      minzoom: 14,
+      filter: ['all', ['!', ['has', 'hide_3d']], ...inBand],
+      paint: {
+        'fill-extrusion-color': buildingColorAt(palette, band.sampleHeight),
+        'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 14, 0, 15, height],
+        'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
+        // Starts at full strength; main.ts fades it with camera pitch (0 when top-down).
+        'fill-extrusion-opacity': BUILDING_3D_OPACITY,
+        // Follows the camera pitch frame by frame, so it keeps MapLibre's default
+        // 300ms instead of the slower style-wide theme transition.
+        'fill-extrusion-opacity-transition': { duration: 300, delay: 0 },
+        'fill-extrusion-vertical-gradient': true,
+      },
+    };
+  }),
 
   // --- Labels ---
   {
@@ -319,23 +352,6 @@ const buildLayers = (palette: Palette): LayerSpecification[] => [
       'text-max-width': 8,
     },
     paint: { 'text-color': palette.waterLabel, 'text-halo-color': withAlpha(palette.halo, 0.6), 'text-halo-width': 1 },
-  },
-  {
-    id: 'road-label',
-    type: 'symbol',
-    source: SOURCE,
-    'source-layer': 'transportation_name',
-    minzoom: 13,
-    filter: classIn('motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'minor'),
-    layout: {
-      'symbol-placement': 'line',
-      'text-field': name,
-      'text-font': ['Noto Sans Regular'],
-      'text-size': ['interpolate', ['linear'], ['zoom'], 13, 10, 17, 13],
-      'text-rotation-alignment': 'map',
-      'text-pitch-alignment': 'viewport',
-    },
-    paint: { 'text-color': palette.textSecondary, 'text-halo-color': palette.halo, 'text-halo-width': 1.5 },
   },
   {
     id: 'place-neighbourhood',
@@ -370,8 +386,37 @@ const buildLayers = (palette: Palette): LayerSpecification[] => [
   },
 ];
 
-/** The full map style in the given colors. Only colors depend on the palette. */
-export function buildMapStyle(palette: Palette): StyleSpecification {
+/**
+ * Light, sky/fog and transition parameters a scene may set (Scene Composer,
+ * approved interface). The defaults are today's values, so
+ * `buildMapStyle(palette)` is unchanged.
+ */
+export interface SceneStyle {
+  /** MapLibre light intensity, 0–1. */
+  lightIntensity: number;
+  /** MapLibre light position [radial, azimuthal°, polar°], viewport-anchored. */
+  lightPosition: [number, number, number];
+  /** Fog color; null = follow `palette.land` (today's behavior). */
+  fogColor: string | null;
+  skyHorizonBlend: number;
+  horizonFogBlend: number;
+  fogGroundBlend: number;
+  /** Duration of the style-wide transition (used once, when the map is created). */
+  transitionMs: number;
+}
+
+export const DEFAULT_SCENE_STYLE: Readonly<SceneStyle> = Object.freeze({
+  lightIntensity: 0.35,
+  lightPosition: [1.4, 295, 40] as [number, number, number],
+  fogColor: null,
+  skyHorizonBlend: 0.6,
+  horizonFogBlend: 0.7,
+  fogGroundBlend: 0.85,
+  transitionMs: THEME_TRANSITION_MS,
+});
+
+/** The full map style in the given colors and scene parameters. */
+export function buildMapStyle(palette: Palette, scene: Readonly<SceneStyle> = DEFAULT_SCENE_STYLE): StyleSpecification {
   return {
     version: 8,
     name: 'Vibenta Maps Draft',
@@ -379,20 +424,24 @@ export function buildMapStyle(palette: Palette): StyleSpecification {
     sources: {
       [SOURCE]: { type: 'vector', url: 'https://tiles.openfreemap.org/planet' },
     },
-    transition: { duration: THEME_TRANSITION_MS, delay: 0 },
-    // Light from the screen's left (azimuth 295°); pin shadows in style.css fall
-    // the opposite way (115°) so the two stay consistent.
-    light: { anchor: 'viewport', color: palette.light, intensity: 0.35, position: [1.4, 295, 40] },
+    transition: { duration: scene.transitionMs, delay: 0 },
+    // Light from the screen's left by default (azimuth 295°). Pin shadows in
+    // style.css fall the opposite way via --light-azimuth (lightShadowAngle),
+    // so the two stay consistent when a scene moves the light.
+    light: { anchor: 'viewport', color: palette.light, intensity: scene.lightIntensity, position: [...scene.lightPosition] },
     sky: {
       'sky-color': palette.sky,
       'horizon-color': palette.horizon,
-      'fog-color': palette.land,
-      'sky-horizon-blend': 0.6,
-      'horizon-fog-blend': 0.7,
-      'fog-ground-blend': 0.85,
+      'fog-color': scene.fogColor ?? palette.land,
+      'sky-horizon-blend': scene.skyHorizonBlend,
+      'horizon-fog-blend': scene.horizonFogBlend,
+      'fog-ground-blend': scene.fogGroundBlend,
     },
     layers: buildLayers(palette),
   };
 }
 
 export const mapStyle: StyleSpecification = buildMapStyle(basePalette);
+
+/** Screen angle (deg) pin shadows fall at for a light azimuth: directly opposite the light. */
+export const lightShadowAngle = (azimuth: number) => (((azimuth + 180) % 360) + 360) % 360;

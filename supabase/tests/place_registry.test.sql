@@ -2,7 +2,7 @@
 -- Runs against the local stack after `supabase db reset` (needs supabase/seed.sql).
 begin;
 
-select plan(45);
+select plan(83);
 
 -- Schema shape.
 select has_table('public', 'places', 'places registry exists');
@@ -33,6 +33,20 @@ select ok(has_table_privilege('anon', 'public.places', 'select'), 'anon can sele
 select ok(has_table_privilege('authenticated', 'public.places', 'select'), 'authenticated can select places');
 select ok(has_column_privilege('authenticated', 'public.place_photos', 'place_ref', 'insert'),
           'authenticated can insert place_photos.place_ref');
+
+-- The registry and the new type tables: client roles read, never write.
+select ok(has_table_privilege(r, 'public.' || t, 'select'), r || ' can select ' || t)
+from unnest(array['museums', 'parks', 'landmarks', 'entertainment']) as t
+cross join unnest(array['anon', 'authenticated']) as r;
+select ok(not has_table_privilege(r, 'public.' || t, 'insert'), r || ' cannot insert into ' || t)
+from unnest(array['places', 'museums', 'parks', 'landmarks', 'entertainment']) as t
+cross join unnest(array['anon', 'authenticated']) as r;
+select ok(not has_table_privilege(r, 'public.' || t, 'update'), r || ' cannot update ' || t)
+from unnest(array['places', 'museums', 'parks', 'landmarks', 'entertainment']) as t
+cross join unnest(array['anon', 'authenticated']) as r;
+select ok(not has_table_privilege(r, 'public.' || t, 'delete'), r || ' cannot delete from ' || t)
+from unnest(array['places', 'museums', 'parks', 'landmarks', 'entertainment']) as t
+cross join unnest(array['anon', 'authenticated']) as r;
 
 -- Sync triggers on every type table.
 select has_trigger('public', t, 'places_sync_delete', t || ' has the delete sync trigger')

@@ -30,9 +30,14 @@ describe('diffPaint', () => {
     expect(diffPaint(buildMapStyle(basePalette), buildMapStyle({ ...basePalette }))).toEqual([]);
   });
 
-  it('reports a changed color inside an expression', () => {
+  it('reports every 3D building band a changed palette entry feeds', () => {
+    // building3dHigh shapes the gradient from 60 m up: bands b4 (60–110 m) to b6 (200 m+).
     const changes = diffPaint(buildMapStyle(basePalette), buildMapStyle({ ...basePalette, building3dHigh: '#000000' }));
-    expect(changes.map((c) => `${c.layerId}/${c.property}`)).toEqual(['building-3d/fill-extrusion-color']);
+    expect(changes.map((c) => `${c.layerId}/${c.property}`)).toEqual([
+      'building-3d-b4/fill-extrusion-color',
+      'building-3d-b5/fill-extrusion-color',
+      'building-3d-b6/fill-extrusion-color',
+    ]);
   });
 });
 

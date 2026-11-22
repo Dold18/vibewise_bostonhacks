@@ -3,13 +3,14 @@
  * map's design tokens (--surface, --text, --accent, ...) with fallbacks, so
  * no map styles are overridden.
  *
- * Stacking, relative to the map UI (style.css):
- *   expanded             z 1   below the search results (top bar, z 2)
- *   collapsed + card     z 0   docked bottom-left; the destination card wins any overlap
- *   expanded over card   z 2   the user explicitly opened it on top of the card
+ * Only the user collapses or expands the panel; map overlays never change it.
+ * Stacking: panel z 1 (phone sheet z 2) < destination popup < trip planner z 3.
+ * The map moves the camera so a popup clears the panel where it can.
  */
 
-.vb-discovery {
+/* Shared tokens and base styles for every Vibenta overlay (panel, trip planner, popups). */
+.vb-discovery,
+.vb-ui {
   --vb-surface: var(--surface, #fff);
   --vb-hover: var(--surface-hover, #f1f3f4);
   --vb-text: var(--text, #202124);
@@ -21,6 +22,12 @@
   --vb-warning: #b3261e;
   --vb-radius: 16px;
 
+  color: var(--vb-text);
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.vb-discovery {
   position: absolute;
   top: var(--vb-top, 72px);
   left: 12px;
@@ -39,38 +46,34 @@
   animation: vb-enter 0.22s ease-out;
 }
 
-.vb-discovery [hidden] {
+.vb-discovery [hidden],
+.vb-ui [hidden] {
   display: none !important;
 }
 
 .vb-discovery *,
 .vb-discovery *::before,
-.vb-discovery *::after {
+.vb-discovery *::after,
+.vb-ui *,
+.vb-ui *::before,
+.vb-ui *::after {
   box-sizing: border-box;
 }
 
-.vb-discovery button {
+.vb-discovery button,
+.vb-ui button {
   font: inherit;
   color: inherit;
   cursor: pointer;
 }
 
-.vb-discovery :focus-visible {
+.vb-discovery :focus-visible,
+.vb-ui :focus-visible {
   outline: 2px solid var(--vb-accent);
   outline-offset: 2px;
 }
 
-/* ---------- Collapsed / card states ---------- */
-
-.vb-discovery.is-collapsed.card-open {
-  top: auto;
-  bottom: 40px;
-  z-index: 0;
-}
-
-.vb-discovery.is-expanded.card-open {
-  z-index: 2;
-}
+/* ---------- Collapsed summary ---------- */
 
 .vb-summary-btn {
   position: relative;
@@ -741,6 +744,158 @@
   padding: 0 16px;
 }
 
+/* ---------- Quick Tools ---------- */
+
+.vb-quick-tools {
+  display: flex;
+  gap: 6px;
+  margin: -2px 0 14px;
+}
+
+.vb-tool {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--vb-border);
+  border-radius: 17px;
+  background: var(--vb-surface);
+  color: var(--vb-muted) !important;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.vb-tool svg {
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.vb-tool:hover {
+  background: var(--vb-hover);
+  color: var(--vb-text) !important;
+}
+
+.vb-tool-badge {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--vb-accent-soft);
+  color: #174ea6;
+  font-size: 11px;
+  line-height: 18px;
+}
+
+/* ---------- Secondary views (Search, Saved) ---------- */
+
+.vb-view {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 20px 16px;
+}
+
+.vb-view-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px -8px;
+}
+
+.vb-view-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.vb-search-form {
+  border-width: 1px;
+  border-color: var(--vb-border);
+  padding-right: 2px;
+}
+
+.vb-search-form:focus-within {
+  border-color: var(--vb-accent);
+}
+
+.vb-search-form .vb-search-input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.vb-search-submit svg {
+  fill: var(--vb-accent);
+}
+
+.vb-view-note {
+  margin: 6px 2px 8px;
+  font-size: 11px;
+  color: var(--vb-muted);
+}
+
+.vb-view-status {
+  margin: 8px 2px;
+  font-size: 13px;
+  color: var(--vb-muted);
+}
+
+.vb-view-status:empty {
+  display: none;
+}
+
+.vb-result-list {
+  list-style: none;
+  margin: 0 -8px;
+  padding: 0;
+}
+
+.vb-result {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  min-width: 0;
+  padding: 9px 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+}
+
+.vb-result:hover {
+  background: var(--vb-hover);
+}
+
+.vb-result-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.vb-result-sub {
+  font-size: 12px;
+  color: var(--vb-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vb-saved-item {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.vb-saved-item .vb-result {
+  flex: 1;
+}
+
 /* ---------- Motion ---------- */
 
 .vb-reveal:not([hidden]) {
@@ -793,14 +948,6 @@
     z-index: 1;
   }
 
-  /* With the destination card filling the bottom, dock the summary under the search bar. */
-  .vb-discovery.is-collapsed.card-open {
-    top: var(--vb-top, 72px);
-    bottom: auto;
-    right: 12px;
-    z-index: 1;
-  }
-
   .vb-handle {
     display: block;
     position: absolute;
@@ -825,7 +972,7 @@
     rotate: 0deg;
   }
 
-  .vb-discovery:not(.card-open) .vb-summary-chevron {
+  .vb-discovery .vb-summary-chevron {
     rotate: 180deg;
   }
 
@@ -859,6 +1006,26 @@
     opacity: 0;
   }
 }
+
+/* Quick Tools and the complete, original preferences form are independent cards. */
+.vb-discovery { background: transparent; box-shadow: none; gap: 12px; }
+.vb-widget { background: var(--vb-surface); border-radius: var(--vb-radius); box-shadow: var(--vb-shadow); min-height: 0; }
+.vb-preferences-widget { display: flex; flex-direction: column; min-height: 80px; flex: 1 1 auto; }
+.vb-tools-widget { flex: 0 0 auto; padding: 8px; }
+.vb-tools-widget .vb-quick-tools { margin: 0; border: 0; padding: 0; }
+.vb-tools-expansion { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 300ms ease, opacity 300ms ease; }
+.vb-tools-expansion.is-open { grid-template-rows: 1fr; opacity: 1; }
+.vb-tools-inner { min-height: 0; overflow: hidden; }
+.vb-tools-widget .vb-view { max-height: min(48vh, 470px); overflow-y: auto; padding: 8px; }
+.vb-tools-widget .vb-planner-fields { padding: 0; }
+.vb-tools-widget .vb-view-header { position: sticky; top: 0; background: var(--vb-surface); z-index: 2; }
+.vb-tools-widget .vb-view-header .vb-view-title { flex: 1; }
+@media (max-width: 640px) {
+  .vb-discovery { max-height: calc(100% - 64px); gap: 8px; }
+  .vb-preferences-widget { max-height: 55vh; }
+  .vb-tools-widget .vb-view { max-height: 34vh; }
+}
+@media (prefers-reduced-motion: reduce) { .vb-tools-expansion { transition: none; } }
 
 /* ---------- Two-step discovery / vibe composition ---------- */
 .vb-discovery .vb-step[hidden],
@@ -1253,4 +1420,35 @@
     transition: none;
     transform: none !important;
   }
+}
+
+/* A single interchangeable card slot beneath the independent Quick Tools. */
+.vb-directions-slot { overflow: hidden; display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.vb-discovery.directions-expanded { max-height: calc(100% - var(--vb-top, 12px) - 48px); }
+.vb-directions-control { display: flex; align-items: center; gap: 10px; align-self: flex-start; padding: 4px 10px 4px 4px; border-radius: 24px; background: var(--vb-surface); box-shadow: var(--vb-shadow); }
+.vb-directions-pill { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 22px; padding: 10px 14px; background: var(--vb-accent-soft); font-weight: 600; }
+.vb-directions-pill svg { fill: currentColor; }
+.vb-directions-footer { padding: 10px 18px; border-top: 1px solid var(--vb-border); }
+.vb-exit-navigation { color: #a82018 !important; }
+.vb-discovery.directions-expanded .vb-directions-slot { animation: vb-enter .18s ease-out; }
+@media (max-width: 640px) {
+  .vb-discovery.directions-expanded { max-height: 74dvh; bottom: env(safe-area-inset-bottom, 0px); }
+  .vb-discovery.directions-expanded.is-collapsed { left: 8px; right: 64px; bottom: 40px; }
+  body[data-focus="navigation"] .vb-discovery:not(.directions-expanded) { max-height: 70dvh; }
+  body[data-focus="navigation"] .vb-preferences-widget { max-height: 55dvh; }
+  .vb-directions-control { margin-bottom: env(safe-area-inset-bottom, 0px); }
+}
+@media (prefers-reduced-motion: reduce) { .vb-discovery.directions-expanded .vb-directions-slot { animation: none; } }
+
+/* Blue accents identify preferences and committed choices without tinting every surface. */
+.vb-preferences-widget { border: 1px solid #d3e3fd; }
+.vb-preferences-widget .vb-header { background: #f4f8ff; border-bottom: 1px solid #dce8fc; border-radius: 15px 15px 0 0; padding-bottom: 12px; }
+.vb-preferences-widget .vb-title { color: #174ea6; }
+.vb-preferences-widget .vb-label { color: #285a96; }
+.vb-preferences-widget .vb-minimize { color: #1a73e8; }
+.vb-preferences-widget .vb-field.has-value .vb-trigger { background: #eef5ff; border-color: #a9c9f7; }
+.vb-preferences-widget .vb-trigger:hover { border-color: #8bb6f7; background: #f5f9ff; }
+.vb-preferences-widget .vb-field.is-open .vb-trigger, .vb-preferences-widget .vb-trigger:focus-visible { border-color: #1a73e8; box-shadow: 0 0 0 2px #d3e3fd; }
+@media (max-width: 640px) {
+  body[data-focus="navigation"] .vb-discovery.directions-expanded { max-height: 74dvh; }
 }

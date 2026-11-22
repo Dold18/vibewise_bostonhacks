@@ -53,8 +53,8 @@
 
 ### M3 — Simple vibe quiz and scoring
 **Owner:** Vibe owner.
-- [ ] Run the fixed 10-question generative quiz (VIBE_QUIZ_DESIGN.md) with static fallback questions.
-- [ ] Embed the vibe text with MiniLM and rank places by cosine similarity (EMBEDDING_PIPELINE.md), after the user's category/constraint filters.
+- [ ] Run the variable-length creative Gemini quiz (target 3–4, maximum 10) with neutral creative fallback questions and Show My Matches at every stage.
+- [ ] Embed every successful summary with the pinned MiniLM runtime; publish one revisioned outing profile. Rank eligible places only when verified compatible catalog embeddings exist.
 - [ ] Choosing an answer visibly changes card order and marker importance.
 - [ ] Expose simple match explanation.
 - [ ] Transit still works after re-ranking.
@@ -125,3 +125,8 @@ Saved lists/ratings; Student Pulse with real sufficient samples; campus affinity
 
 ## Competition deadline
 BostonHacks 2026 hackathon submission is scheduled for **Sunday, November 22, 2026 at 9:00 AM local Boston time**. Confirm any updated organizer instruction or extension. Prioritize a fully reproducible end-to-end demo over breadth.
+
+
+## Adaptive engine integration gate (2026-11-21)
+
+Implementation and automated checks live on `feature/vibe-engine-live`; this does not mark live venue matching or Scene Composer rendering complete. Acceptance includes zero-venue operation, durable exclusions, neutral skips, replay/edit, stale request rejection, real MiniLM inference, creative family variety, graceful provider failure, desktop/mobile UI and temporary account-safe theme preview. Live Gemini quality additionally requires credentials. Real convergence requires verified catalog embedding provenance; PR #32 renderer integration and the separate map UI branch must be coordinated before a combined release.
