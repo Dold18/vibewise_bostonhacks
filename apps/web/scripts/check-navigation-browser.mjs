@@ -35,7 +35,7 @@ try{
 await send('Runtime.enable');await send('Page.enable');await send('Network.enable');await send('Emulation.setFocusEmulationEnabled',{enabled:true});await send('Page.bringToFront');
 await send('Fetch.enable',{patterns:[{urlPattern:'*overpass*'},{urlPattern:'*/api/transit/route'},{urlPattern:'*nominatim*'}]});
 await send('Page.addScriptToEvaluateOnNewDocument',{source:`window.__geoCalls=0;navigator.geolocation.getCurrentPosition=()=>{window.__geoCalls++};`});
-await send('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});await send('Page.navigate',{url:'http://localhost:5173/'});
+await send('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});await send('Page.navigate',{url:process.env.VIBENTA_QA_URL??'http://localhost:5173/'});
 await waitFor('!!window.vibentaTrip&&!!window.map&&map.loaded()&&document.querySelectorAll(".pin").length>0');
 for(const width of [1440,1366,1280]){await send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false});await sleep(250);const l=await layout();check('Discovery cards '+width,Object.values(l).every(Boolean),l);await shot('discovery-'+width);}
 check('preferences keep blue header and field accents',await js('getComputedStyle(document.querySelector(".vb-title")).color==="rgb(23, 78, 166)"&&getComputedStyle(document.querySelector(".vb-preferences-widget .vb-label")).color==="rgb(40, 90, 150)"'));

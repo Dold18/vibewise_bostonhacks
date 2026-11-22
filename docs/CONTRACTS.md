@@ -202,3 +202,12 @@ No mock route should be presented as real. Fixtures for offline development must
 
 ## 7. Change control
 After agreement, change this contract **together with** shared executable types, tests and consuming code in one PR. Require review by both map and transit owners for breaking changes; do not have agents independently rename types or fields.
+
+
+## 8. Current-outing profile (approved 2026-11-21)
+
+The new session-scoped `OutingVibeProfile` and provider interfaces are defined in `apps/web/src/features/vibe/profile.ts`, with runtime validation in `validation.ts` and behavioral coverage in `__tests__/live.test.ts`. This additive contract is approved by the Adaptive Vibe Engine implementation request. It does not replace `Place`, transit types, coordinate order, practical discovery preferences, or persistent account `VibeProfile`/`VibeSignal`.
+
+Consumers subscribe to `outingProfiles` for the same frozen snapshot, identified by session ID plus monotonic revision. An embedding is usable only when status is ready, its revision matches the profile and its model fingerprint matches the catalog. Summary checkpoints are Gemini-derived; evidence explicitly labels original input, chosen answers or corrections. Clear emits null. Revisions truncate future answers and invalidate pending work.
+
+`adapters.ts` supplies the PR #32 proposed SceneIntent 1.0.0 shape plus the original profile. Empty presets/overrides intentionally avoid asserting an unmerged effects registry. Existing palette descriptors are for rendering only, never an alternate venue-ranking vocabulary. Provisional outing updates must not be written through account `recordVibe`.

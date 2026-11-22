@@ -13,8 +13,12 @@ to Step 1 and forward again preserves both text and photos during the session.
 Clear all removes them; refresh does not retain photos. `Save my vibe` collapses
 the panel with a clear summary.
 
-**Not included yet:** the adaptive Vibe Quiz, AI/image interpretation, or vibe
-matching against map pins. This screen is the input foundation for those features.
+**Refine this vibe** starts the adaptive questionnaire within Step 2. Text and
+answers go to the server's Gemini integration; photos stay local. Back/resume,
+answer revision and Clear all preserve or reset the same in-memory session.
+The versioned publisher feeds the existing Scene Composer and compatible catalog
+recommendations. Missing Gemini uses labeled local questions; missing or
+incompatible embeddings leave pins unranked. Image interpretation is not included.
 
 ## Mounting
 
@@ -186,7 +190,7 @@ map connectors, never as verified pedestrian paths.
 Step 1 contains practical fields and Continue to your vibe. Step 2 has one
 “What’s your vibe?” heading, the descriptive text field, seven examples and an
 optional photo drop zone. Files stay in memory (up to five JPG/PNG/WebP images,
-8 MB each). Nothing is uploaded or analyzed; previews use revoked-on-removal
+8 MB each). Photos are not uploaded or analyzed; previews use revoked-on-removal
 object URLs. Back, Continue, and Directions preserve the original File objects.
 The preference normalizer intentionally does not restore File objects from JSON.
 

@@ -5,6 +5,11 @@ import './design/visualFoundation.css';
 import { activateVisualPreview } from './design/visualFoundation';
 import { BUILDING_3D_LAYERS, BUILDING_3D_OPACITY, mapStyle } from './mapStyle';
 import { PIN_COLORS } from './pinColors';
+import { outingProfiles } from './features/vibe/publisher';
+import type { Ranking } from './features/vibe/adapters';
+import { semanticMarkerState } from './features/map/semanticMarkers';
+import { createConvergence, mapDisplay } from './features/vibe/convergence';
+import { rankPlaces } from './discovery/filter';
 import { mountAccount } from './features/account';
 import { mountScene, sceneDevHook } from './features/scene';
 import {
@@ -44,7 +49,7 @@ import { markerVisible, setMarkerVisible } from './features/map/markerVisibility
 import { createRouteHubs } from './features/map/routeHubs';
 import { paddingAround } from './features/map/routeFrame';
 import { drawRoute, clearRoute, routeBounds, routeStations } from './transitRoute';
-import { catalogPlacesNear, isCatalogCategory } from './catalog';
+import { catalogPlacesNear, catalogSemanticCandidates, isCatalogCategory } from './catalog';
 import { activeKinds, chipText } from './deals';
 
 const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
@@ -82,6 +87,8 @@ const PIN_PATH = 'M14 0C6.3 0 0 6.2 0 13.9 0 24.3 14 40 14 40s14-15.7 14-26.1C28
 let markers: Marker[] = [];
 let shadows: Marker[] = [];
 let selectedPin: HTMLElement | null = null;
+let semanticRanking: Ranking | null = null;
+let refreshConvergence = () => {};
 let markerPlaces: Place[] = [];
 let dealTimer: ReturnType<typeof setInterval> | undefined;
 let temporaryPlaceMarker: Marker | null = null;
@@ -188,6 +195,7 @@ function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: 
   const openPin = open ? pinById.get(open.id) : undefined;
   if (openPin) { selectPin(openPin); temporaryPlaceMarker?.remove(); temporaryPlaceMarker = null; }
   syncMarkerVisibility();
+  refreshConvergence();
 }
 
 /** Refresh deal badges as schedules and freshness change. */
@@ -210,6 +218,9 @@ function clearPins() {
   markers = [];
   shadows = [];
   markerPlaces = [];
+  shownPlaces = [];
+  pinById.clear();
+  pinLooks.clear();
   selectedPin = null;
   clearInterval(dealTimer);
   dealTimer = undefined;
@@ -349,10 +360,15 @@ function syncMarkerVisibility() {
   const relevant = [placePopup.current()?.id, s.from?.placeId, s.to?.placeId].filter((id): id is string => !!id);
   const mode = focus.mode();
   for (const [id, pin] of pinById) {
-    const visible = markerVisible(mode, 'discovery', id, relevant) && !(mode === 'search' && searchMarkers.has(id));
+    const appearance = semanticMarkerState(semanticRanking, id, mode, relevant, mapDisplay.showAll);
+    const visible = appearance.visible && !(mode === 'search' && searchMarkers.has(id));
     setMarkerVisible(pin, visible);
+    pin.style.setProperty('--pin-scale', String(appearance.scale));
     const shadow = shadows[Number(pin.dataset.index)]?.getElement();
-    if (shadow) setMarkerVisible(shadow, visible);
+    if (shadow) {
+      setMarkerVisible(shadow, visible);
+      shadow.style.setProperty('--pin-scale', String(appearance.scale));
+    }
   }
   for (const [id, { marker }] of searchMarkers) setMarkerVisible(marker.getElement(), markerVisible(mode, 'search', id, mode === 'discovery' ? [placePopup.current()?.id ?? ''] : relevant));
   if (temporaryPlaceMarker) setMarkerVisible(temporaryPlaceMarker.getElement(), mode !== 'navigation');
@@ -409,6 +425,7 @@ async function showCategories(categories: Category[], detail: 'tiles' | 'full', 
   if (!refresh) closePopup();
   if (categories.length === 0) {
     clearPins();
+    refreshConvergence();
     hideToast();
     return;
   }
@@ -698,6 +715,21 @@ const scene = mountScene({
   onError: (error) => console.error('[scene]', error),
 });
 if (import.meta.env.DEV) Object.assign(window, { vibentaScene: sceneDevHook(scene, map) });
+// One publisher feeds the existing compiler/session and the existing pin system.
+scene.connectProfiles(outingProfiles);
+const convergence = createConvergence(
+  outingProfiles,
+  signal => catalogSemanticCandidates(rankPlaces(shownPlaces, discovery.getPreferences()).included.map(row => row.place), signal),
+  ranking => {
+    semanticRanking = ranking;
+    syncMarkerVisibility();
+    if (import.meta.env.DEV) Object.assign(window, { vibentaOutingRanking: ranking });
+  },
+);
+refreshConvergence = () => { void convergence.refresh(); };
+const stopConvergence = discovery.subscribe(refreshConvergence);
+if (import.meta.env.DEV) Object.assign(window, { vibentaOutingProfiles: outingProfiles });
+
 
 saved.subscribe(() => placePopup.refreshSaved());
 
@@ -769,3 +801,12 @@ if (import.meta.env.DEV) Object.assign(window, { vibentaTrip: trip });
 // Place names stay attached to DOM pins, with collisions resolved after camera/marker updates.
 const pinLabels = createPinLabels(map.getContainer(), () => [...document.querySelectorAll('.vb-discovery, .vb-place-popup, .map-controls, .vb-route-hub, .vb-hub-label')]);
 map.on('render', pinLabels.schedule);
+
+// Release the profile consumers before Vite replaces this entry module.
+if (import.meta.hot) import.meta.hot.dispose(() => {
+  stopConvergence();
+  convergence.destroy();
+  discovery.destroy();
+  scene.destroy();
+  account.destroy();
+});

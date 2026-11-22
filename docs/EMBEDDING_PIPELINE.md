@@ -46,7 +46,7 @@ The specific mechanism for gathering and generating each tier is designed and im
 
 - **Text query** ("cozy ramen place for a rainy night"): embedded directly with MiniLM. No LLM call, no HyDE (§6).
 - **Media query** (photo, song, or movie reference): sent to Gemini first, which produces a vibe-text description **in the same descriptive vocabulary as the catalog's vibe layer** (atmosphere/mood language, not plot summary or genre classification). That text is then embedded with MiniLM like any text query. This step is **mandatory**: MiniLM cannot process non-text input, so this is how any media input becomes usable at all.
-- **Quiz input:** see [VIBE_QUIZ_DESIGN.md](VIBE_QUIZ_DESIGN.md). The quiz produces a `vibe_so_far` text passage, embedded the same way as any other text at the end.
+- **Quiz input:** see [VIBE_QUIZ_DESIGN.md](VIBE_QUIZ_DESIGN.md). The quiz produces a `vibe_so_far` text passage, embedded the same way as any other text after every successful summary update, asynchronously and tagged with the outing revision.
 
 ## 6. HyDE: considered and not used for plain text queries
 
@@ -61,3 +61,14 @@ If text-query retrieval quality is later found to be poor in testing, revisit th
 1. **Hard filters** (never touch the embedding): budget ceiling, open-now, dietary restriction, transit reachability / distance. Binary inclusion/exclusion, applied before or alongside ranking.
 2. **Embedding similarity** (the core ranking mechanism): cosine similarity between the query vector and each catalog entry's vector, over entries that survive the hard filters. This single mechanism handles both cuisine-literal and mood/aesthetic queries, because both kinds of information live in the same combined-text embedding.
 3. **Optional tag-based boost** (small, tiebreaker only): if structured tags are also extracted separately (e.g. explicit cuisine category), a small bonus for a tag match can nudge close rankings. It must **never** be large enough to override what embedding similarity already determined, or the system silently reverts to keyword matching.
+
+
+## Interactive runtime and compatibility gate (2026-11-21)
+
+The live server uses `@huggingface/transformers` 4.3.2 with `Xenova/all-MiniLM-L6-v2`, revision `751bff37182d3f1213fa05d7196b954e230abad9`, fp32 CPU, mean pooling, L2 normalization, 384 dimensions. Exact fingerprint:
+
+`Xenova/all-MiniLM-L6-v2@751bff37182d3f1213fa05d7196b954e230abad9:fp32:mean:l2`
+
+`server/miniLM.ts` lazy-loads the real model and caches bounded text results. No vectors are synthesized when inference fails. Browser request deduplication and session/revision checks prevent stale work from becoming current. Exclusions lead the input passage to reduce loss from tokenizer truncation. Negation in a general sentence embedding is imperfect; this is not a guarantee that every semantic exclusion is enforceable as a hard filter.
+
+Existing `restaurants.embedding` has no fingerprint column. Consequently the read-only catalog adapter is disabled unless the catalog owner verifies its generator uses this exact configuration and sets `VITE_CATALOG_EMBEDDING_MODEL_KEY` to this fingerprint. Dimension alone is insufficient. No migration or catalog re-embedding is performed by this branch. If a different catalog model/configuration is deployed, reconcile the shared pin before enabling comparison. The quiz itself never requires catalog access.

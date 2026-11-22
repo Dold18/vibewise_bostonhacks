@@ -1,3 +1,4 @@
+import { MODEL_KEY, validateVector } from './features/vibe/profile';
 /**
  * Read-only access to our own place catalog: the Supabase `restaurants` table
  * filled offline by `pipeline/` (OpenStreetMap + Foursquare OS Places).
@@ -280,4 +281,22 @@ export async function catalogPlacesNear(
 function humanize(s: string): string {
   const t = s.replace(/_/g, ' ');
   return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+/** Optional single-model vectors for currently eligible places. No schema writes or secondary catalog. */
+export async function catalogSemanticCandidates(places:readonly Place[],signal:AbortSignal) {
+  const supabase=getClient();
+  if(!supabase||import.meta.env.VITE_CATALOG_EMBEDDING_MODEL_KEY!==MODEL_KEY)return [];
+  const indexed=new Map(places.filter(p=>p.tags['catalog:place_id']).map(p=>[p.tags['catalog:place_id'],p]));
+  const ids=[...indexed.keys()];if(!ids.length)return [];
+  const out:import('./features/vibe/adapters').SemanticCandidate[]=[];
+  for(let i=0;i<ids.length;i+=100){
+    const {data,error}=await supabase.from('restaurants').select('place_id,embedding').in('place_id',ids.slice(i,i+100)).abortSignal(signal);
+    if(error)throw Error('Catalog vectors unavailable');
+    for(const row of data??[]){
+      const p=indexed.get(row.place_id);if(!p||!row.embedding)continue;
+      try{const raw=typeof row.embedding==='string'?JSON.parse(row.embedding):row.embedding;const embedding=validateVector(raw,MODEL_KEY);out.push({id:p.id,location:{lat:p.lat,lng:p.lon},embedding,modelKey:MODEL_KEY,eligible:true,provenance:'catalog'});}catch{/* Unknown vectors never become fabricated scores. */}
+    }
+  }
+  return out;
 }

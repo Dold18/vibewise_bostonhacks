@@ -167,3 +167,8 @@ export function startThemeController(map: ThemeMap, store: AccountStore, options
     },
   };
 }
+
+/** Legacy target adapter retained for engine consumers; live scenes use setScene. */
+export function resolveThemeTarget(saved: ThemeTarget | null, outing: ThemeTarget | null, navigating: boolean): ThemeTarget | null {
+  return navigating ? null : outing ?? saved;
+}
