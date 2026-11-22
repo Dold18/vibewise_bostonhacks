@@ -21,7 +21,7 @@ const SESSIONS = [
 const BANNED = /\b(embark|tapestry|symphony|whispers?|elevate|curated|vibe check|journey of)\b/i;
 const ctxFor = (text, history, summary, qualifiers, version, sessionId) => ({ sessionId, version, originalInput: { text, imageCount: 0, imageProcessing: 'not_sent' }, vibe_so_far: summary, history, evidence: evidenceFrom(text, history), qualifiers });
 
-const report = { generatedAt: new Date().toISOString(), model: process.env.VIBE_GEMINI_MODEL ?? 'gemini-2.5-flash', sessions: [] };
+const report = { generatedAt: new Date().toISOString(), model: process.env.VIBE_GEMINI_MODEL ?? 'gemini-3.5-flash-lite', sessions: [] };
 for (const [index, [text, policy]] of SESSIONS.entries()) {
   const sessionId = `LIVE-EVAL-${Date.now().toString(36)}-${index}`;
   const session = { input: text, policy, turns: [], errors: [] };

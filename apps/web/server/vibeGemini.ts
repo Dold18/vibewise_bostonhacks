@@ -87,7 +87,7 @@ Recommend finish after about 4–6 informative answers when the desired experien
 When an authoredSceneQuestion is supplied, use that exact next question (its options are explicit requests). Valid question family ids: ${FAMILIES.map((f) => f.id).join(', ')}. topic must come from unusedTopics. id: a short unique slug.`;
 
 export function createGeminiGenerator(options: { apiKey?: string; model?: string; fetchImpl?: typeof fetch; timeoutMs?: number; attempts?: number } = {}): GenerationProvider {
-  const model = options.model ?? 'gemini-2.5-flash'; if (!/^[a-zA-Z0-9._-]+$/.test(model)) throw Error('Invalid Gemini model');
+  const model = options.model ?? 'gemini-3.5-flash-lite'; if (!/^[a-zA-Z0-9._-]+$/.test(model)) throw Error('Invalid Gemini model');
   return {
     async generate(context: GenerationContext, signal: AbortSignal) {
       if (!options.apiKey) throw Error('Gemini unavailable');
