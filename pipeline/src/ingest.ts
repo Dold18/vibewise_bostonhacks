@@ -121,6 +121,7 @@ export function reuseOrphanIds(
 export interface SummaryInput {
   type: PlaceType;
   osm: number; fsq: number; matches: number; dropped: number; staleFsqDropped: number; unparseableDates?: number;
+  subVenuesDropped?: number;           // non-food only: Foursquare-only places inside an OSM place's bounds
   existingKeys: Set<string>; rows: PlaceRow[]; actions: RekeyAction[]; notSeen: number | null;
   crossTypeSkipped: number | null; conflictsSkipped: number | null;   // null in a dry run (no database read)
   orphansReused: number | null; orphansCleared: number | null;
@@ -144,6 +145,7 @@ export function summarize(input: SummaryInput): string {
     `Duplicates dropped: ${input.dropped}`,
     `Stale Foursquare dropped: ${input.staleFsqDropped}`,
     `Foursquare unparseable refresh dates: ${input.unparseableDates ?? 0}`,
+    ...(input.type === 'restaurants' ? [] : [`Foursquare sub-venues dropped: ${input.subVenuesDropped ?? 0}`]),
     `Inserted: ${inserted}`,
     `Updated: ${input.rows.length - inserted}`,
     `Promoted: ${promoted}`,
@@ -200,14 +202,16 @@ async function main(): Promise<void> {
   const base = {
     type: args.type, osm: osm.length, fsq: fsq.length, matches: merged.matches.length,
     dropped: merged.dropped.length, staleFsqDropped: merged.staleFsqDropped,
-    unparseableDates: merged.unparseableDates,
+    unparseableDates: merged.unparseableDates, subVenuesDropped: merged.subVenuesDropped.length,
   };
+  // Food output stays exactly as before: the sub-venue filter never runs for restaurants.
+  const subVenueRecord = args.type === 'restaurants' ? {} : { foursquareSubVenues: merged.subVenuesDropped };
   const cacheFile = (name: string) => path.join(CACHE_DIR, `${name}-${args.type}.json`);
 
   if (args.dryRun) {
     await fs.mkdir(CACHE_DIR, { recursive: true });
     await fs.writeFile(cacheFile('rows'), JSON.stringify(rows, null, 2));
-    await fs.writeFile(cacheFile('matches'), JSON.stringify({ matches: merged.matches, dropped: merged.dropped }, null, 2));
+    await fs.writeFile(cacheFile('matches'), JSON.stringify({ matches: merged.matches, dropped: merged.dropped, ...subVenueRecord }, null, 2));
     console.log(summarize({
       ...base, existingKeys: new Set(), rows, actions: [], notSeen: null, crossTypeSkipped: null, conflictsSkipped: null,
       orphansReused: null, orphansCleared: null,
@@ -250,7 +254,7 @@ async function main(): Promise<void> {
   await fs.writeFile(cacheFile('not-seen'), JSON.stringify(notSeenIds, null, 2));
   await fs.writeFile(
     cacheFile('skipped'),
-    JSON.stringify({ crossTypeDuplicates: cross.duplicates, typeConflicts: conflicts }, null, 2),
+    JSON.stringify({ crossTypeDuplicates: cross.duplicates, typeConflicts: conflicts, ...subVenueRecord }, null, 2),
   );
   const existingKeys = new Set(existing.map((e) => `${e.source}:${e.source_id}`));
   console.log(summarize({

@@ -173,3 +173,10 @@ test('reuseOrphanIds never reuses an id registered under another type', () => {
   assert.equal(reused.size, 0);
   assert.deepEqual(toRegister, []);
 });
+
+test('summarize prints Foursquare sub-venues dropped only for non-food types', () => {
+  const museums = summarize({ ...baseInput, type: 'museums', subVenuesDropped: 3 }).split('\n');
+  assert.ok(museums.includes('Foursquare sub-venues dropped: 3'));
+  const food = summarize({ ...baseInput, subVenuesDropped: 0 }).split('\n');
+  assert.equal(food.some((l) => l.startsWith('Foursquare sub-venues')), false);
+});
