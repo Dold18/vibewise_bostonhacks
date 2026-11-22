@@ -215,3 +215,8 @@ Migration `supabase/migrations/20261121180000_create_accounts.sql`. Users sign i
 2. Build the ~20 to 30 query validation set (EMBEDDING_PIPELINE.md §2).
 3. Do unknown-price and unknown-hours places pass the filters by default?
 4. Is the Yelp trial worth wiring up before the deadline, or do student reviews alone cover the demo?
+
+
+## Current-outing session boundary (2026-11-21)
+
+The adaptive quiz profile is browser-memory session state, not a new database table or an automatic `vibe_events` write. Uploaded references remain local. Read-only venue convergence uses existing `restaurants.embedding`, with an explicit deployment fingerprint gate documented in EMBEDDING_PIPELINE.md. No migration is included; the existing vector column alone does not prove compatible model provenance.

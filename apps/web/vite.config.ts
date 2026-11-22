@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, type Plugin } from 'vite';
 
@@ -29,6 +30,7 @@ function maplibreWorker(): Plugin {
 
 export default defineConfig({
   plugins: [maplibreWorker()],
+  envDir: process.env.VIBENTA_ENV_FILE ? dirname(process.env.VIBENTA_ENV_FILE) : '../..',
   // The transit API runs in server/index.ts; the browser only ever talks to Vite's origin.
-  server: { proxy: { '/api': `http://127.0.0.1:${process.env.TRANSIT_API_PORT ?? 8787}` } },
+  server: { port:Number(process.env.VITE_PORT??5173), proxy: { '/api': `http://127.0.0.1:${process.env.TRANSIT_API_PORT ?? 8787}` } },
 });

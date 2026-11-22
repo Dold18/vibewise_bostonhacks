@@ -28,6 +28,7 @@ import { createLocationField } from './locationField';
 import { createMultiSelectField } from './multiSelectField';
 import { createSelectField } from './selectField';
 import { createTimingField } from './timingField';
+import { createLiveQuiz } from '../../features/vibe/ui/liveQuiz';
 import { createVibeStep } from './vibeStep';
 
 export interface PanelDeps {
@@ -99,6 +100,10 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   });
 
   const vibeStep = createVibeStep(prefs);
+  let quizMode=false;
+  const liveQuiz=createLiveQuiz(()=>toggleQuiz(false));
+  const beginQuiz=h('button',{type:'button',class:'vb-primary-btn vb-begin-quiz'},'Refine this vibe');
+  beginQuiz.addEventListener('click',()=>{toggleQuiz(true);const p=prefs.getState();const previous=liveQuiz.session.getSnapshot();if(previous&&previous.originalInput.text===p.vibeText.trim()&&previous.originalInput.imageCount===p.vibeImages.length)liveQuiz.resume();else liveQuiz.start(p.vibeText,p.vibeImages.length);});
   let currentStep: 'plan' | 'vibe' = 'plan';
 
   // --- Notes, header, footer ------------------------------------------------
@@ -118,6 +123,8 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
   const resetBtn = h('button', { type: 'button', class: 'vb-text-btn' }, 'Clear all');
   resetBtn.addEventListener('click', () => {
     dispatch({ type: 'reset' });
+    liveQuiz.session.clear();
+    toggleQuiz(false);
     showStep('plan');
     activity.focus();
   });
@@ -150,6 +157,8 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     'section',
     { class: 'vb-step', 'data-step': 'vibe', 'aria-labelledby': titleId, hidden: true },
     vibeStep.root,
+    beginQuiz,
+    liveQuiz.root,
   );
 
   const continueBtn = h('button', { type: 'button', class: 'vb-primary-btn vb-continue-btn' }, 'Continue to your vibe');
@@ -176,12 +185,14 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
     footer,
   );
 
+  function toggleQuiz(next:boolean){quizMode=next;vibeStep.root.hidden=next;beginQuiz.hidden=next;liveQuiz.root.hidden=!next;vibeActions.hidden=next||currentStep!=='vibe';}
+
   function showStep(next: 'plan' | 'vibe') {
     currentStep = next;
     planSection.hidden = next !== 'plan';
     vibeSection.hidden = next !== 'vibe';
     planActions.hidden = next !== 'plan';
-    vibeActions.hidden = next !== 'vibe';
+    vibeActions.hidden = next !== 'vibe'||quizMode;
     root.dataset.step = next;
     heading.textContent = next === 'plan' ? 'Plan your outing' : 'Find your vibe';
     subtitle.textContent = next === 'plan'
@@ -189,7 +200,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
       : 'Use words, images, memories or music to show us what you mean.';
     footerNote.textContent = next === 'plan'
       ? 'Next: describe the atmosphere you have in mind. All these details stay saved.'
-      : 'Your inspiration is saved here. Visual matching and the adaptive quiz are coming next.';
+      : 'Refine this outing with a few imaginative questions. Photos stay local.';
     if (next === 'vibe') {
       closePopups();
       // Keep the instructional placeholder visible until the user clicks the box.
@@ -304,6 +315,7 @@ export function createPanel({ prefs, layout, provider, geolocation, now, mapLaye
       unsubLayout();
       fields.forEach((f) => f.destroy());
       vibeStep.destroy();
+      liveQuiz.destroy();
     },
   };
 }

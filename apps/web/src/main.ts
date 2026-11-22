@@ -3,6 +3,11 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import './style.css';
 import { BUILDING_3D_LAYER, BUILDING_3D_OPACITY, mapStyle } from './mapStyle';
 import { PIN_COLORS } from './pinColors';
+import { outingProfiles } from './features/vibe/publisher';
+import { subscribeScene } from './features/vibe/adapters';
+import { createConvergence, mapDisplay } from './features/vibe/convergence';
+import { rankPlaces } from './discovery/filter';
+import { VIBE_KEYS } from './features/account/vibes';
 import { mountAccount } from './features/account';
 import {
   CATEGORIES,
@@ -18,7 +23,7 @@ import {
   type TilePoi,
 } from './osm';
 import { mountDiscoveryPanel, type DiscoveryPanelHandle } from './discovery';
-import { catalogPlacesNear, isCatalogCategory, priceLabel } from './catalog';
+import { catalogPlacesNear, catalogSemanticCandidates, isCatalogCategory, priceLabel } from './catalog';
 import { clearRoute, drawRoute, fetchRoute, renderRouteState, type LatLng, type RouteState } from './transitRoute';
 
 const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
@@ -53,6 +58,8 @@ const PIN_PATH = 'M14 0C6.3 0 0 6.2 0 13.9 0 24.3 14 40 14 40s14-15.7 14-26.1C28
 let markers: Marker[] = [];
 let shadows: Marker[] = [];
 let selectedPin: HTMLElement | null = null;
+let candidatePlaces:Place[]=[];
+let refreshConvergence=()=>{};
 
 /*
  * MapLibre positions every marker by rewriting its element's inline
@@ -107,6 +114,7 @@ function pinElement(): HTMLElement {
 /** `icon` is the card icon: one for every place, or chosen per place (mixed categories). */
 function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: string | ((place: Place) => string | undefined)) {
   clearPins();
+  candidatePlaces=places;
   // Shadows first so every pin draws above every shadow.
   shadows = places.map((place) =>
     new Marker({ element: shadowElement(), anchor: 'bottom', pitchAlignment: 'map', rotationAlignment: 'viewport' })
@@ -127,6 +135,7 @@ function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: 
     });
     return new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
   });
+  refreshConvergence();
 }
 
 /** Every pin the same: what search results and location types use until match scores exist. */
@@ -250,16 +259,19 @@ let discovery: DiscoveryPanelHandle | undefined; // assigned when the panel moun
 const currentOrigin = (): LatLng | null => discovery?.getPreferences().origin?.location ?? null;
 
 /** Invalidate any in-flight request and remove the drawn route. */
+let syncOutingSafety=()=>{};
 function cancelRoute() {
   routeSeq++;
   routeAbort?.abort();
   routePlace = null;
+  syncOutingSafety();
   clearRoute(map);
 }
 
 async function showRouteTo(place: Place) {
   cancelRoute();
   routePlace = place;
+  syncOutingSafety();
   const box = routeBox; // this selection's own box; a newer card replaces routeBox
   if (!box) return;
   const seq = routeSeq;
@@ -609,7 +621,30 @@ discovery = mountDiscoveryPanel(document.body, {
 });
 
 // Accounts: sign-in in the top right; the map theme follows the user's vibes.
-mountAccount(document.body, { map });
+const account = mountAccount(document.body, { map });
+syncOutingSafety=()=>{account.theme.setNavigation(!!routePlace||document.body.dataset.focus==='navigation');refreshConvergence();};
+subscribeScene(outingProfiles,scene=>{
+  const tags=Object.fromEntries(VIBE_KEYS.map(k=>[k,scene?.preview[k]??0])) as Record<typeof VIBE_KEYS[number],number>;
+  account.theme.setOuting(scene&&Object.values(tags).some(v=>v>0)?{tags,strength:.6}:null);
+  syncOutingSafety();
+});
+const convergence=createConvergence(outingProfiles,signal=>catalogSemanticCandidates(rankPlaces(candidatePlaces,discovery.getPreferences()).included.map(r=>r.place),signal),ranking=>{
+  const mode=document.body.dataset.focus==='navigation'||routePlace?'navigation':document.body.dataset.focus==='search'||currentSelection===null?'search':'discovery';
+  candidatePlaces.forEach((place,i)=>{
+    const pin=markers[i]?.getElement();if(!pin)return;
+    const row=mode==='discovery'&&ranking?.status==='ready'?ranking.all.find(r=>r.id===place.id):undefined;
+    const hidden=!!row?.weak&&!mapDisplay.showAll&&mode==='discovery'&&!pin.classList.contains('selected');
+    // Shadows follow their pin; neither may leave a floating visual after convergence.
+    for(const element of [pin,shadows[i]?.getElement()]) {
+      element?.style.setProperty('--pin-scale',String(row?.scale??1));
+      element?.classList.toggle('vb-vibe-weak',hidden);
+    }
+  });
+  if(import.meta.env.DEV)Object.assign(window,{vibentaOutingRanking:ranking});
+});
+refreshConvergence=()=>{void convergence.refresh();};
+discovery.subscribe(refreshConvergence);
+if(import.meta.env.DEV)Object.assign(window,{vibentaOutingProfiles:outingProfiles});
 
 // A different starting point makes the shown route wrong: re-plan for the open card's place.
 let lastOrigin = currentOrigin();
