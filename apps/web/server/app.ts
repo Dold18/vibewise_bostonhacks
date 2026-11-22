@@ -3,11 +3,12 @@
 // /api/transit/route, and only this server-side code imports it.
 import express from "express";
 import { createVibeRouter } from "./vibeApi.ts";
+import { loadLocalEnv } from "./env.ts";
 import { planTripLive } from "../src/features/transit/ride.ts";
 
-// Local runs read the repo-root .env. On Vercel there is no file: values come from the
-// project's environment variables, which are already in process.env.
-try { process.loadEnvFile(process.env.VIBENTA_ENV_FILE ?? new URL("../../../.env", import.meta.url)); } catch { /* no .env: MBTA keyless */ }
+// Local runs read VIBENTA_ENV_FILE (if set), the repo-root .env and apps/web/.env (see env.ts).
+// On Vercel there is no file: values come from the project's environment variables.
+loadLocalEnv();
 
 const isPoint = (p: unknown): p is { lat: number; lng: number } => {
   const o = p as { lat?: unknown; lng?: unknown } | null;

@@ -1,5 +1,5 @@
 import type { ProfilePublisher } from './publisher.ts';
-import { cosine, immutable, MODEL_KEY, validateVector, type OutingVibeProfile } from './profile.ts';
+import { cosine, immutable, MODEL_KEY, preferenceScore, validateVector, type OutingVibeProfile } from './profile.ts';
 import type { VibeKey, VibeScores } from '../account/vibes';
 /** PR #32 boundary only: its compiler/assets are not assumed to exist. */
 export interface SceneIntent { schemaVersion:'1.0.0';sessionVersion:number;presets:readonly {id:string;weight:number}[];descriptors:readonly string[];overrides:readonly {key:string;value:string;intensity?:number}[] }
@@ -13,8 +13,8 @@ export function sceneFor(profile:OutingVibeProfile):{profile:OutingVibeProfile;i
 export function subscribeScene(publisher:ProfilePublisher,consume:(scene:ReturnType<typeof sceneFor>|null)=>void){return publisher.subscribe(p=>consume(p?sceneFor(p):null));}
 export interface SemanticCandidate { id:string;location:{lat:number;lng:number};embedding:readonly number[];modelKey:string;eligible:boolean;provenance:'catalog'|'fixture' }
 export interface Ranking { sessionId:string;version:number;status:'ready'|'unavailable';reason?:string;all:readonly {id:string;location:{lat:number;lng:number};score:number;scale:number;weak:boolean}[];provenance:'catalog'|'fixture'|null }
-/** Penalty for similarity to explicit exclusions; calibrated on real MiniLM fixtures (scripts/ranking-real-minilm.mjs). */
-export const AVOID_WEIGHT=0.6;
+// The exclusion penalty is shared with the final catalog search (profile.ts preferenceScore).
+export { AVOID_WEIGHT } from './profile.ts';
 /** Never invent venue vectors or compare unknown model spaces. Caller owns hard-filter eligibility. */
 export function rankCandidates(p:OutingVibeProfile,candidates:readonly SemanticCandidate[]):Ranking {
  const unavailable=(reason:string):Ranking=>({sessionId:p.sessionId,version:p.version,status:'unavailable',reason,all:[],provenance:null});
@@ -25,7 +25,7 @@ export function rankCandidates(p:OutingVibeProfile,candidates:readonly SemanticC
  if(eligible.some(c=>c.modelKey!==MODEL_KEY))return unavailable('Catalog model metadata is incompatible or unverified.');
  // Explicit dislikes subtract similarity to what the user excluded (MiniLM cannot read negation inside one query).
  let negative:number[]|undefined;try{negative=p.embedding.negativeVector?validateVector(p.embedding.negativeVector,p.embedding.modelKey):undefined;}catch{return unavailable('Incompatible exclusion embedding');}
- let rows:Ranking['all'];try{rows=eligible.map(c=>{const v=validateVector(c.embedding,c.modelKey);return {id:c.id,location:{...c.location},score:cosine(query,v)-(negative?AVOID_WEIGHT*Math.max(0,cosine(negative,v)):0),scale:1,weak:false};}).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));}catch{return unavailable('Invalid catalog embeddings');}
+ let rows:Ranking['all'];try{rows=eligible.map(c=>{const v=validateVector(c.embedding,c.modelKey);return {id:c.id,location:{...c.location},score:preferenceScore(cosine(query,v),negative?cosine(negative,v):undefined),scale:1,weak:false};}).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));}catch{return unavailable('Invalid catalog embeddings');}
  const best=rows[0]?.score??0,worst=rows.at(-1)?.score??best,spread=best-worst;
  return immutable({sessionId:p.sessionId,version:p.version,status:'ready',provenance:eligible.some(c=>c.provenance==='fixture')?'fixture':'catalog',all:rows.map(c=>{const relative=spread>.02?(c.score-worst)/spread:1;return {...c,scale:.7+.55*relative,weak:relative<.12};})});
 }

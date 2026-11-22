@@ -31,5 +31,5 @@ eligible, compatible catalog vectors and updates the existing markers via
 - `media/localDirector.ts` is the offline fallback, always labeled `source:'local'`.
 - `media/sceneBridge.ts` sends the accepted mood to the Scene Composer's existing untrusted `sceneIntent` input. It affects atmosphere only.
 - `ui/mediaStage.ts` holds the renderers. Looking, widening, sliding and playing are never evidence.
-- Ranking: exclusions are embedded separately (`negativeText` → `embedding.negativeVector`) and subtracted in `rankCandidates`; they are never mixed into the positive query. Real-MiniLM check: `node scripts/ranking-real-minilm.mjs` (fixture venues).
+- Ranking: exclusions are embedded separately (`negativeText` → `embedding.negativeVector`) and subtracted with one policy (`preferenceScore` in `profile.ts`) by both the live map ranking (`rankCandidates`) and the final catalog search (`negativeVector` on `POST /api/vibe/search`); they are never mixed into the positive query. Real-MiniLM check: `node scripts/ranking-real-minilm.mjs` (fixture venues).
 - QA: `node scripts/quiz-media-browser.mjs` (real app, headless Chrome), then `node scripts/summarize-media-qa.mjs`. Live Gemini: `node scripts/gemini-live-eval.mjs` (real requests only; reports BLOCKED without a key). Acceptance status lives in `docs/VIBE_QUIZ_V2_ACCEPTANCE.md`.

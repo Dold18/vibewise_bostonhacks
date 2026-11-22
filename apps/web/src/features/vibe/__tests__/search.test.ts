@@ -6,7 +6,8 @@ import {
   createSupabaseCatalog, parsePoint, rankRestaurants, rowToRestaurant, straightLineMeters,
   type CatalogProvider, type CatalogRestaurant, type RestaurantRow,
 } from '../../../../server/catalogIndex';
-import { MODEL_KEY } from '../profile';
+import { AVOID_WEIGHT, MODEL_KEY, preferenceScore, type OutingVibeProfile } from '../profile';
+import { rankCandidates } from '../adapters';
 import { budgetToMaxPriceBand, parseSearchRequest } from '../searchContract';
 
 /** A unit vector pointing mostly along axis `i`, with `tilt` toward axis `j`. */
@@ -307,9 +308,22 @@ describe('POST /api/vibe/search', () => {
     vi.stubEnv('SUPABASE_URL', ''); vi.stubEnv('VITE_SUPABASE_URL', ''); vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', ''); vi.stubEnv('VITE_SUPABASE_PUBLISHABLE_KEY', '');
     vi.stubEnv('VIBENTA_ENV_FILE', '/nonexistent/.env');
     const none = await server({ catalog: null });
-    expect((await none.post({ text: 'a' })).status).toBe(503);
+    const noneRes = await none.post({ text: 'a' });
+    expect(noneRes.status).toBe(503);
+    expect((await noneRes.json()).error).toBe('Catalog search is not configured.');
     vi.unstubAllEnvs();
   });
+  it('an empty SUPABASE_* line (a copied template) falls back to the VITE_SUPABASE_* pair', async () => {
+    vi.stubEnv('VIBENTA_ENV_FILE', '/nonexistent/.env');
+    vi.stubEnv('SUPABASE_URL', ''); vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', '');
+    vi.stubEnv('VITE_SUPABASE_URL', 'http://127.0.0.1:9'); vi.stubEnv('VITE_SUPABASE_PUBLISHABLE_KEY', 'sb_publishable_test_only');
+    const s = await server({ catalog: null });
+    const res = await s.post({ vector: unit(0), modelKey: MODEL_KEY });
+    // Configured (it tried the fallback project, which refuses the connection), not "not configured".
+    expect(res.status).toBe(503);
+    expect((await res.json()).error).toBe('Search unavailable. Please retry.');
+    vi.unstubAllEnvs();
+  }, 20_000); // supabase-js retries a refused connection for about 7 s
 });
 
 describe('createSupabaseCatalog', () => {
@@ -339,5 +353,61 @@ describe('createSupabaseCatalog', () => {
     const catalog = createSupabaseCatalog({ url: 'https://example.supabase.co', key: 'TEST-FIXTURE-NOT-A-KEY' });
     const rows = await catalog.restaurants(new AbortController().signal);
     expect(rows.map((r) => r.placeId)).toEqual(['osm:node/1', 'osm:node/4']);
+  });
+});
+
+describe('exclusions (negativeVector) in the final search', () => {
+  const q = unit(0, 3, 0.2);
+  const avoid = unit(1);
+  const rows = [
+    restaurant({ id: 'bar', vec: unit(0, 1, 0.6), category: 'bar' }),   // closest to the query, but like the exclusion
+    restaurant({ id: 'cafe', vec: unit(0, 2, 0.7), category: 'cafe' }), // a bit further, nothing like the exclusion
+    restaurant({ id: 'pricey', vec: unit(0), priceBand: '$$$$' }),      // best match, over budget
+  ];
+  it('parses an optional exclusion vector with the same model key, normalized, and omits it when absent', () => {
+    const r = parseSearchRequest({ vector: q, negativeVector: avoid.map((v) => v * 4), modelKey: MODEL_KEY });
+    expect(r.ok && r.value.negativeVector && Math.hypot(...r.value.negativeVector)).toBeCloseTo(1, 6);
+    const none = parseSearchRequest({ vector: q, modelKey: MODEL_KEY });
+    expect(none.ok && 'negativeVector' in none.value).toBe(false);
+  });
+  it('rejects an exclusion vector with the wrong model key or shape', () => {
+    expect(parseSearchRequest({ vector: q, negativeVector: avoid, modelKey: 'other-model' }).ok).toBe(false);
+    expect(parseSearchRequest({ text: 'quiet dinner', negativeVector: avoid }).ok).toBe(false);
+    expect(parseSearchRequest({ vector: q, negativeVector: avoid.slice(1), modelKey: MODEL_KEY }).ok).toBe(false);
+  });
+  it('lowers places like the exclusion with the shared policy, after the hard filters still apply', () => {
+    const plain = rankRestaurants(rows, q, { maxPriceBand: '$$' }, 10);
+    expect(plain.results.map((r) => r.placeId)).toEqual(['bar', 'cafe']);
+    expect(plain.exclusionApplied).toBe(false);
+    const avoided = rankRestaurants(rows, q, { maxPriceBand: '$$' }, 10, avoid);
+    expect(avoided.results.map((r) => r.placeId)).toEqual(['cafe', 'bar']);
+    expect(avoided.exclusionApplied).toBe(true);
+    const cosQ = Math.sqrt(0.96) * 0.8, cosAvoid = 0.6;
+    expect(avoided.results[1]!.score).toBeCloseTo(preferenceScore(cosQ, cosAvoid), 3);
+    expect(avoided.results[1]!.score).toBeCloseTo(cosQ - AVOID_WEIGHT * cosAvoid, 3);
+  });
+  it('scores exactly like the live map ranking for the same quiz vectors and places', () => {
+    const p = {
+      sessionId: 's', version: 2,
+      embedding: { status: 'ready', modelKey: MODEL_KEY, version: 2, vector: q, negativeVector: avoid },
+    } as unknown as OutingVibeProfile;
+    const live = rankCandidates(p, rows.slice(0, 2).map((r) => ({
+      id: r.placeId, location: { lat: r.lat, lng: r.lng }, embedding: [...r.embedding], modelKey: MODEL_KEY, eligible: true, provenance: 'catalog' as const,
+    })));
+    const final = rankRestaurants(rows.slice(0, 2), q, {}, 10, avoid);
+    expect(final.results.map((r) => r.placeId)).toEqual(live.all.map((r) => r.id));
+    final.results.forEach((r, i) => expect(r.score).toBeCloseTo(live.all[i]!.score, 4));
+  });
+  it('the route applies a sent exclusion and reports it', async () => {
+    const s = await server();
+    const query = unit(0, 1, 0.6); // 'a' (axis 0) beats 'b' (axis 1) on its own
+    const plain = await (await s.post({ vector: query, modelKey: MODEL_KEY })).json();
+    expect(plain.results.map((r: { placeId: string }) => r.placeId)).toEqual(['a', 'b']);
+    expect(plain.exclusionApplied).toBe(false);
+    const res = await s.post({ vector: query, negativeVector: unit(0), modelKey: MODEL_KEY });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.exclusionApplied).toBe(true);
+    expect(body.results.map((r: { placeId: string }) => r.placeId)).toEqual(['b', 'a']);
   });
 });

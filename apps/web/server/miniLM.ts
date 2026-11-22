@@ -1,10 +1,12 @@
 /** Server-only, pinned local MiniLM. No random/placeholder embeddings and no venue access. */
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { pipeline, env, type FeatureExtractionPipeline } from '@huggingface/transformers';
 import { MODEL, MODEL_KEY, validateVector } from '../src/features/vibe/profile.ts';
 export function createMiniLM() {
  let extractor:Promise<FeatureExtractionPipeline>|null=null;
  const cache=new Map<string,readonly number[]>();
- env.cacheDir=process.env.VIBENTA_MODEL_CACHE??'/private/tmp/vibenta-minilm-cache';
+ env.cacheDir=process.env.VIBENTA_MODEL_CACHE??join(tmpdir(),'vibenta-minilm-cache');
  const load=()=>extractor??=(pipeline('feature-extraction',MODEL.id,{revision:MODEL.revision,dtype:MODEL.dtype,device:'cpu'}) as Promise<FeatureExtractionPipeline>).catch(e=>{extractor=null;throw e;});
  return {async embed(text:string,signal:AbortSignal) {
   signal.throwIfAborted();const cached=cache.get(text);if(cached)return {modelKey:MODEL_KEY,vector:cached};
