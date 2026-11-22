@@ -3,7 +3,7 @@
   "title": "Vibenta contextual/thematic asset source registry",
   "collectedOn": "2026-11-21",
   "status": "source_pages_verified_assets_NOT_downloaded_or_imported",
-  "note": "Pack-level source inventory for a future curated, optimized 3D/2D library. Advertised counts are NOT tested file counts, not unique across packs, and not yet usable scene objects. Do not add them to the existing 225 generated assets.",
+  "note": "Pack-level inventory only. Cuisine, music, aesthetic, venue and occasion are orthogonal dimensions; model-level selection must verify exact props, licensing, visual style and navigation-safe placement. Sourcing is not importing.",
   "reusePolicy": {
     "requiredLicense": "CC0-1.0",
     "retainProvenance": true,
@@ -869,6 +869,224 @@
       "priority": "P0",
       "status": "sourced_not_downloaded",
       "caveat": "47 separate low-poly GLBs, claimed 6.2 MB total, saxophone/trumpet/stands/stage; visually inspect and independently validate downloaded files."
+    },
+    {
+      "id": "3dassets-ramen-alley",
+      "publisher": "3DAssets.dev",
+      "name": "Izakaya Alley and Ramen Shop",
+      "sourceUrl": "https://3dassets.dev/packs/izakaya-alley-and-ramen-shop",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 65,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "japanese",
+        "ramen",
+        "izakaya",
+        "street_food",
+        "noir"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "3dassets-food-trucks",
+      "publisher": "3DAssets.dev",
+      "name": "Street Food Market and Food Trucks",
+      "sourceUrl": "https://3dassets.dev/packs/street-food-market-and-food-trucks",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 49,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "street_food",
+        "mexican",
+        "italian",
+        "american",
+        "market",
+        "casual"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "3dassets-cafe-bakery",
+      "publisher": "3DAssets.dev",
+      "name": "Cafe, Bakery and Coffee Bar",
+      "sourceUrl": "https://3dassets.dev/packs/bakery-and-cafe",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 112,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "coffee",
+        "bakery",
+        "brunch",
+        "french",
+        "cozy"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "3dassets-nightclub-dj",
+      "publisher": "3DAssets.dev",
+      "name": "Nightclub and DJ Booth",
+      "sourceUrl": "https://3dassets.dev/packs/nightclub-and-dj-booth",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 56,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "edm",
+        "electronic",
+        "house",
+        "techno",
+        "hip_hop",
+        "nightlife"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "3dassets-live-stage",
+      "publisher": "3DAssets.dev",
+      "name": "Live Music Venue and Festival Stage",
+      "sourceUrl": "https://3dassets.dev/packs/live-music-venue-and-festival-stage",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 55,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "rock",
+        "pop",
+        "indie",
+        "metal",
+        "punk",
+        "live_music"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "3dassets-fresh-produce",
+      "publisher": "3DAssets.dev",
+      "name": "Food, Fresh Produce and Groceries",
+      "sourceUrl": "https://3dassets.dev/packs/fresh-produce-and-groceries",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 149,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "fresh_food",
+        "vegetarian",
+        "market",
+        "farm_to_table",
+        "food_general"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "3dassets-indian-bazaar",
+      "publisher": "3DAssets.dev",
+      "name": "Indian Bazaar Street and Temple",
+      "sourceUrl": "https://3dassets.dev/packs/indian-bazaar-street-and-temple",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 62,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "indian",
+        "bazaar",
+        "street_food",
+        "market"
+      ],
+      "priority": "P0",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "3dassets-restaurant-kitchen",
+      "publisher": "3DAssets.dev",
+      "name": "Restaurant Kitchen and Dining Room",
+      "sourceUrl": "https://3dassets.dev/packs/restaurant-kitchen-and-dining",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": null,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "restaurant",
+        "dining",
+        "food_general",
+        "fine_dining"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "3dassets-junk-food",
+      "publisher": "3DAssets.dev",
+      "name": "Fast Food Counter and Drive-Thru",
+      "sourceUrl": "https://3dassets.dev/packs/fast-food-and-drive-thru",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": 128,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "american",
+        "fast_food",
+        "casual_dining"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "Publisher says models are AI-generated and CC0. Verify each selected model's visual quality, originality/licensing requirements and actual binary provenance before importing. Do not treat listed model counts as acquired."
+    },
+    {
+      "id": "quaternius-junk-food",
+      "publisher": "Quaternius",
+      "name": "Junk Food Pack",
+      "sourceUrl": "https://quaternius.com/packs/junkfood.html",
+      "licenseClaim": "CC0-1.0",
+      "licenseVerification": "publisher_primary_page",
+      "access": "free_site_download",
+      "advertisedCount": null,
+      "advertisedCountNote": "publisher_listed_total_not_imported",
+      "assetClass": "3d",
+      "tags": [
+        "american",
+        "pizza",
+        "fast_food",
+        "street_food"
+      ],
+      "priority": "P1",
+      "status": "sourced_not_downloaded",
+      "caveat": "Check model-level files, usable formats, license text and content before importing."
     }
   ],
   "recipes": [
@@ -1094,6 +1312,222 @@
         "kenney-foliage"
       ],
       "requiresCuration": true
+    },
+    {
+      "id": "rock_concert",
+      "context": [
+        "rock",
+        "energetic"
+      ],
+      "hero": "Stage riser, drums, amplifiers and guitar silhouettes",
+      "accent": "Moving abstract light beams",
+      "sourceIds": [
+        "3dassets-live-stage",
+        "3dassets-nightclub-dj",
+        "3dassets-orchestra"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "edm_neon",
+      "context": [
+        "electronic",
+        "high_energy"
+      ],
+      "hero": "DJ decks, mixer, truss and colored light objects",
+      "accent": "Geometric pulses and haze",
+      "sourceIds": [
+        "3dassets-nightclub-dj",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "classical_serene",
+      "context": [
+        "classical",
+        "serene"
+      ],
+      "hero": "String instruments, piano/stand and small performance platform",
+      "accent": "Soft amber light",
+      "sourceIds": [
+        "3dassets-orchestra",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "latin_dance",
+      "context": [
+        "latin",
+        "festive"
+      ],
+      "hero": "Bongos, maracas and compact performance corner",
+      "accent": "Warm rhythmic light patterns",
+      "sourceIds": [
+        "3dassets-orchestra",
+        "3dassets-live-stage",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "country_acoustic",
+      "context": [
+        "country",
+        "rustic"
+      ],
+      "hero": "Banjo, acoustic music corner, wood decor",
+      "accent": "Low warm lantern light",
+      "sourceIds": [
+        "3dassets-orchestra",
+        "kenney-furniture"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "hiphop_urban",
+      "context": [
+        "hip_hop",
+        "urban"
+      ],
+      "hero": "DJ mixer, stage monitor and abstract waveform sculpture",
+      "accent": "Rhythmic accent lighting",
+      "sourceIds": [
+        "3dassets-nightclub-dj",
+        "3dassets-live-stage"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "japanese_neon_ramen",
+      "context": [
+        "japanese",
+        "neon"
+      ],
+      "hero": "Ramen-counter vignette, vending machine and small lanterns",
+      "accent": "Night glow with restrained mist",
+      "sourceIds": [
+        "3dassets-ramen-alley",
+        "quaternius-sushi",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "mexican_lively_streetfood",
+      "context": [
+        "mexican",
+        "lively"
+      ],
+      "hero": "Generic street stall with verified taco/food props when available",
+      "accent": "Warm string lights",
+      "sourceIds": [
+        "3dassets-food-trucks",
+        "kenney-food"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "indian_evening_market",
+      "context": [
+        "indian",
+        "warm"
+      ],
+      "hero": "Food market vignette using actual stalls and food-service objects",
+      "accent": "Warm decorative lights",
+      "sourceIds": [
+        "3dassets-indian-bazaar",
+        "3dassets-food-trucks"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "french_cafe_romantic",
+      "context": [
+        "french",
+        "romantic"
+      ],
+      "hero": "Bakery table, pastry display and chairs",
+      "accent": "Soft warm window and lantern lighting",
+      "sourceIds": [
+        "3dassets-cafe-bakery",
+        "kenney-furniture",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "american_retro_diner",
+      "context": [
+        "american",
+        "retro"
+      ],
+      "hero": "Counter, food props and optional stylized diner sign",
+      "accent": "Retro geometric lighting",
+      "sourceIds": [
+        "3dassets-junk-food",
+        "kenney-retro-urban",
+        "kenney-light-masks"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "korean_bbq_night",
+      "context": [
+        "korean",
+        "energetic"
+      ],
+      "hero": "Dining table and grill props once model-level verified",
+      "accent": "Neon and warm table lighting",
+      "sourceIds": [
+        "3dassets-restaurant-kitchen",
+        "kenney-furniture"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "chinese_dim_sum",
+      "context": [
+        "chinese",
+        "cozy"
+      ],
+      "hero": "Dim sum baskets and tea set once sourced; current restaurant props only as base",
+      "accent": "Warm restaurant lighting",
+      "sourceIds": [
+        "kenney-food",
+        "3dassets-restaurant-kitchen"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
+    },
+    {
+      "id": "mediterranean_garden",
+      "context": [
+        "mediterranean",
+        "relaxed"
+      ],
+      "hero": "Outdoor table, produce and olive/greenery vignette",
+      "accent": "Sun-washed light and breeze",
+      "sourceIds": [
+        "3dassets-fresh-produce",
+        "kenney-nature",
+        "kenney-furniture"
+      ],
+      "requiresCuration": true,
+      "status": "proposed_not_built"
     }
   ],
   "openGaps": [
@@ -1109,5 +1543,20 @@
     "Validate transforms, orientation, pivots, GLB materials, triangle count, draw calls, compressed file size, and available LOD.",
     "Tag every selected model with themes, semantic context, size class, anchor type, interaction-safe bounding footprint and accessibility fallback.",
     "Never render an invented physical object as factual local venue data; maintain navigational paths, station icons, labels, attribution, and interaction hit targets."
-  ]
+  ],
+  "sourcingGuidance": {
+    "semanticAxes": [
+      "cuisine",
+      "music_genre",
+      "mood",
+      "venue_type",
+      "occasion",
+      "visual_style",
+      "intensity"
+    ],
+    "noAssumptions": "Never infer actual venue cuisine, music programming or cultural detail from the visual theme alone. Only mix genres explicitly supplied by user or supported by venue data.",
+    "qualityPriority": "Prefer fewer recognizable, versatile, visually coherent hero/ambient props over high generic asset counts.",
+    "licenseRestriction": "Do not import free-for-use packs with 'do not redistribute' terms into public GitHub; permit explicit authorized embedding only after legal review.",
+    "countRule": "Advertised model counts and conceptual recipes are not imported or renderer-ready assets."
+  }
 }
