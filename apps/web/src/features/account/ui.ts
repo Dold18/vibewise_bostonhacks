@@ -6,6 +6,7 @@
 import type { AccountState, AccountStore } from './session';
 import { VIBE_LABELS } from './vibes';
 import './account.css';
+import { vwIconHtml } from '../../design/vibewise/icons';
 
 type Mode = 'sign_in' | 'sign_up';
 
@@ -70,10 +71,12 @@ export function mountAccountUi(container: HTMLElement, store: AccountStore): () 
   const confirmRow = el('div', { className: 'account-confirm', hidden: true }, confirmText, confirmYes, confirmNo);
   const panelError = el('p', { className: 'account-error', hidden: true });
   panelError.setAttribute('role', 'alert');
-  const signOutBtn = el('button', { type: 'button', className: 'account-secondary' }, 'Sign out');
+  const signOutBtn = el('button', { type: 'button', className: 'account-link account-signout' }, 'Sign out');
+  signOutBtn.insertAdjacentHTML('afterbegin', vwIconHtml('logout', { size: 18 }));
   const panel = el(
     'div',
     { className: 'account-panel' },
+    el('p', { className: 'account-eyebrow' }, 'Your corner of the city'),
     who,
     el('div', { className: 'account-vibes-head' }, vibesHeading, sample),
     chips,
@@ -107,7 +110,7 @@ export function mountAccountUi(container: HTMLElement, store: AccountStore): () 
   function showSignInLabel() {
     if (button.querySelector('.account-btn-label')) return;
     button.innerHTML =
-      '<svg class="account-btn-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8m0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4" /></svg>' +
+      vwIconHtml('person', { size: 24, className: 'vw-icon account-btn-icon' }) +
       '<span class="account-btn-label">Sign in</span>';
   }
 
