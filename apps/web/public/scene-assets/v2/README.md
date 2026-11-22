@@ -1,11 +1,17 @@
-# Vibenta scene texture variants v2
+# Vibenta scene texture and motif variants v2
 
-**192 original SVG variants in 12 atlas files**. Each atlas is a 1024 × 1024 image with sixteen 256 × 256 cells. `manifest.json` gives named atlas coordinates and UVs. Preview locally at `/scene-assets/v2/gallery.html`.
+**224 original SVG cells across 14 atlas files.** Each atlas is a 1024 × 1024 vector with sixteen 256 × 256 cells. The per-cell IDs, source atlas paths, pixel rects and UV positions are in `manifest.json`. The gallery at `/scene-assets/v2/gallery.html` is dynamically populated from that manifest.
 
-Design range: brick masonry, stone and concrete, pavement, roofing, timber, glass and metal, natural ground, water, artistic print, atmosphere, architectural light/details, cinematic effects. Every family has four patterns and four palettes.
+## Included assets
 
-Files are reusable stylized textures and graphics, **not** pre-rendered Boston map images, observed architecture/weather or physical PBR scans. No renderer code, shader, live map integration, or licensing of third-party materials is included.
+- **192 illustrated materials/effects** from the original 12 atlases: brick, stone/concrete, pavement, roofing, timber, glass/metal, nature, water, artistic print, atmosphere, architectural light/details and cinematic effects.
+- **16 contextual food motifs** in `food_motifs.svg`: pizza, noodles, dumplings, taco, croissant, espresso, teacup, seafood, skewer, burger, cupcake, garden salad, bread, sushi, tabletop grill and stew pot.
+- **16 contextual music motifs** in `music_motifs.svg`: piano, acoustic guitar, electric guitar, sax, trumpet, drums, violin, microphone, turntable, mixer, waveform, headphones, disco ball, vinyl, maracas and stage lights.
 
-Variants use renderer-driven tint/opacity/UV scaling and don't require new AI image generation during the quiz. Support the scene catalog through a guarded mapping layer, and never obscure navigation and MBTA routes.
+All illustrations in this directory are original procedural vectors. The food/music motifs are not 3D models. They serve as light 2D decorative accents or optional theme graphics.
 
-There is also a more nuanced **192-cell WebP atlas set** available as a user download in the conversation; these GitHub-resident vector atlases are its lightweight, editable counterparts, not byte-for-byte identical graphics.
+## Usage restrictions
+
+These are static asset sources, **not** active renderer effects, photographic textures, PBR scans or true building/restaurant observations. Only show explicit or independently verified themed food/music cues, never infer cuisine or performances from venue identity or user demographics. Keep route geometry, labels, MBTA lines, attribution and destination pins legible. Reduced-motion and focus-mode constraints apply when these are integrated.
+
+There is also a separately generated offline WebP atlas variant set from earlier development; it is not included in the GitHub-resident source count.
