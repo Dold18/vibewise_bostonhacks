@@ -75,3 +75,23 @@ test('a neighbouring deal schedule does not leak onto a line', () => {
   assert.equal(rows[0]!.timing, 'unconfirmed');
   assert.equal(rows.length, 2);
 });
+
+test('a timing word on the next line downgrades student any_time to unconfirmed', () => {
+  const rows = matchDeals(plain('10% off with student ID', 'Valid Tuesdays only.'), URL_, AT);
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0]!.kind, 'student');
+  assert.equal(rows[0]!.timing, 'unconfirmed');
+  assert.equal(rows[0]!.schedule, null);
+});
+
+test('opening hours are never joined onto a deal', () => {
+  const a = matchDeals(plain('Happy Hour', 'Open Mon–Sat 11am–10pm'), URL_, AT);
+  assert.equal(a.length, 1);
+  assert.equal(a[0]!.title, 'Happy Hour');
+  assert.equal(a[0]!.timing, 'unconfirmed');
+  const b = matchDeals(plain('Tuesday specials', 'Kitchen hours Mon-Fri 11-9pm'), URL_, AT);
+  assert.equal(b.length, 1);
+  assert.equal(b[0]!.title, 'Tuesday specials');
+  assert.equal(b[0]!.timing, 'unconfirmed');
+  assert.equal(b[0]!.schedule, null);
+});

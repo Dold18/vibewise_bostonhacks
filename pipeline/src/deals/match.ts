@@ -1,5 +1,5 @@
 import { parse, HTMLElement, type Node } from 'node-html-parser';
-import { parseSchedule, timingFor } from './schedule.ts';
+import { hasTimingWords, parseSchedule, timingFor } from './schedule.ts';
 import type { DealKind, DealRow } from './types.ts';
 
 export interface PageLine {
@@ -13,6 +13,7 @@ export const DISCOUNT_TERM = /\d+\s?% off|\$\d+ off|\bdiscount|\bfree\b|half[- ]
 export const SPECIAL_TERM =
   /\bhappy[\s-]?hour\b|half[- ]price|\d+\s?% off|\bbogo\b|\bbuy one,? get one\b|\b(?:sun|mon|tue(?:s)?|wed(?:nes)?|thu(?:r(?:s)?)?|fri|sat(?:ur)?)(?:day)?s?\s+specials?\b/i;
 
+const OPENING_HOURS = /\b(open|opens|opening|hours|kitchen|closed|dining|serving)\b/i;
 const MAX_DEALS = 5;
 const MAX_TITLE = 120;
 const MAX_QUOTE = 200;
@@ -88,18 +89,23 @@ export function matchDeals(lines: PageLine[], pageUrl: string, checkedAt: string
     if (!kind) continue;
 
     let text = line.text;
-    if (!parseSchedule(text)) {
-      const next = lines.slice(i + 1).find((l) => !l.link);
-      if (next && parseSchedule(next.text) && !hasDealTerm(next.text)) {
-        text = `${line.text} · ${next.text}`;
-      }
+    const next = parseSchedule(text) ? undefined : lines.slice(i + 1).find((l) => !l.link);
+    if (
+      next &&
+      parseSchedule(next.text) &&
+      !hasDealTerm(next.text) &&
+      !OPENING_HOURS.test(next.text)
+    ) {
+      text = `${line.text} · ${next.text}`;
     }
 
     const title = cutTitle(text);
     const key = title.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
-    const { timing, schedule } = timingFor(kind, text);
+    let { timing, schedule } = timingFor(kind, text);
+    // The next line may only downgrade any_time (spec 4.3); it never adds a schedule.
+    if (timing === 'any_time' && next && hasTimingWords(next.text)) timing = 'unconfirmed';
     rows.push({
       kind,
       title,
