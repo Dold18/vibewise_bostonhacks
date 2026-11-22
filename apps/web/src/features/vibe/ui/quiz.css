@@ -351,6 +351,52 @@
   width: 100%;
 }
 
+/*
+ * The results phase's one primary action (matchesView.ts is the state source):
+ * Show My Matches → Finding your matches… → Rank My Matches ⇄ Show Unranked Matches.
+ */
+.vb-quiz-results-action {
+  gap: 10px;
+  min-height: 48px;
+  font-size: 15px;
+  box-shadow: 3px 4px 0 var(--vw-ink);
+}
+
+.vb-quiz-results-action:active:not([aria-disabled='true']) {
+  box-shadow: 1px 2px 0 var(--vw-ink);
+}
+
+/* Loading keeps focus (aria-disabled, not disabled) and shows the V3 spinner with its text. */
+.vb-quiz-results-action[aria-disabled='true'],
+.vb-quiz-results-action[aria-disabled='true']:hover {
+  background: var(--vw-secondary);
+  box-shadow: none;
+  cursor: progress;
+}
+
+.vb-quiz-results-action .vb-quiz-spinner {
+  width: 18px;
+  height: 18px;
+}
+
+/* Ranked: the same control now turns ranking off, so it reads as the secondary state, marked in lime. */
+.vb-quiz-results-action[data-ranked='true'] {
+  background: var(--vw-secondary);
+  box-shadow: inset 0 0 0 2px var(--vw-ink), 3px 4px 0 var(--vw-lime);
+}
+
+.vb-quiz-results-action[data-ranked='true']:hover {
+  background: var(--vw-secondary-hover);
+}
+
+.vb-quiz-notice.vb-quiz-matches-error {
+  padding: 11px 12px;
+  border-radius: var(--vw-r-notice);
+  background: var(--vw-error-bg);
+  color: var(--vw-error);
+  font-weight: 600;
+}
+
 .vb-live-quiz > .vb-primary-btn:not(.vb-quiz-matches) {
   width: 100%;
   background: var(--vw-secondary);
@@ -364,9 +410,6 @@
   align-self: flex-start;
 }
 
-.vb-live-quiz > .vb-text-btn[aria-pressed] {
-  align-self: center;
-}
 
 /* ---------- Evolving summary: the printed artifact ---------- */
 

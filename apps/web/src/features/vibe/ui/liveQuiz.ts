@@ -5,7 +5,7 @@ import { presentationOf } from '../media/presentation';
 import { h } from '../../../discovery/ui/dom';
 import { createLiveVibeSession, type LiveVibeSession } from '../liveEngine';
 import { apiEmbeddingProvider, apiGenerationProvider } from '../providers';
-import { mapDisplay } from '../convergence';
+import { matchesView } from '../matchesView';
 import { outingProfiles } from '../publisher';
 import type { Answer, OutingVibeProfile, Response } from '../profile';
 import { apertureArt } from '../../../design/vibewise/brand';
@@ -17,6 +17,8 @@ function focusKeyIn(root:HTMLElement):string|null {
  if(el.classList.contains('vb-quiz-prompt'))return 'prompt';
  if(el.classList.contains('vb-quiz-correction'))return 'correction';
  if(el.classList.contains('vb-media-freetext'))return 'freetext';
+ // The results action changes its label (Show → Finding… → Rank → Show Unranked); keep focus on it by role.
+ if(el.classList.contains('vb-quiz-results-action'))return 'results-action';
  if(el instanceof HTMLButtonElement){const same=[...root.querySelectorAll('button')].filter(b=>b.textContent===el.textContent);return `button:${el.textContent}:${same.indexOf(el)}`;}
  return null;
 }
@@ -26,22 +28,47 @@ function restoreFocus(root:HTMLElement,key:string|null) {
  if(key==='prompt')target=root.querySelector<HTMLElement>('.vb-quiz-prompt[tabindex]');
  else if(key==='correction')target=root.querySelector<HTMLElement>('.vb-quiz-correction');
  else if(key==='freetext')target=root.querySelector<HTMLElement>('.vb-media-freetext');
+ else if(key==='results-action')target=root.querySelector<HTMLElement>('.vb-quiz-results-action');
  else {const [,text,index]=key.match(/^button:(.*):(\d+)$/s)??[];target=[...root.querySelectorAll('button')].filter(b=>b.textContent===text)[Number(index)];}
  (target??root).focus({preventScroll:true});
 }
 export function createLiveQuiz(onBack:()=>void) {
  const session=createLiveVibeSession(apiGenerationProvider(),apiEmbeddingProvider(),outingProfiles);
  const root=h('section',{class:'vb-live-quiz','aria-label':'Vibe quiz',tabindex:'-1',hidden:true});
- let editing:number|null=null;let active=false;let lastQuestion='';let lastSignature='';
+ let editing:number|null=null;let active=false;let lastQuestion='';let lastSignature='';let lastResults='';
  const previews=new Map<string,ScenePreviewState>();
  const mediaViews=new Map<string,MediaViewState>();
  const button=(text:string,run:()=>void,className='vb-text-btn')=>{const b=h('button',{type:'button',class:className},text);b.addEventListener('click',run);return b;};
  const respond=(response:Response)=>{const index=editing;editing=null;if(index===null)session.answer(response);else session.revise(index,response);};
+ /** Ask for the final catalog matches of the current session (moving the quiz to its results first if needed). */
+ const requestMatches=()=>{editing=null;const p=session.getSnapshot();if(!p)return;if(p.phase!=='results')session.showMatches();const id=session.getSnapshot()?.sessionId;if(id)matchesView.request(id);};
+ /** The one primary control of the results phase; its label follows matchesView, never a separate flag. */
+ function resultsAction(p:OutingVibeProfile) {
+  const m=matchesView.getState(),stage=matchesView.isRequested(p.sessionId)?m.stage:'idle';
+  const action=(text:string,run:()=>void)=>{const b=button(text,run,'vb-primary-btn vb-quiz-matches vb-quiz-results-action');b.dataset.matchesStage=stage;return b;};
+  if(stage==='loading'){
+   // aria-disabled, not disabled: the button keeps focus while the search runs.
+   const b=action('',()=>{});b.setAttribute('aria-disabled','true');b.setAttribute('aria-busy','true');
+   b.append(h('span',{class:'vb-quiz-spinner','aria-hidden':'true'}),'Finding your matches…');return [b];
+  }
+  if(stage==='shown'&&m.count>0){
+   const b=action(m.ranked?'Show Unranked Matches':'Rank My Matches',()=>matchesView.toggleRanked());b.dataset.ranked=String(m.ranked);return [b];
+  }
+  if(stage==='shown')return [h('p',{class:'vb-quiz-notice',role:'status'},'No places match your vibe and filters. Try a wider budget or fewer cuisines.')];
+  const retry=stage==='error'?[h('p',{class:'vb-quiz-notice vb-quiz-matches-error',role:'alert'},`Couldn’t load your matches: ${m.message??'The search service is unavailable.'}`)]:[];
+  return [action('Show My Matches',requestMatches),...retry];
+ }
+ function resultsNote(p:OutingVibeProfile) {
+  const m=matchesView.getState(),stage=matchesView.isRequested(p.sessionId)?m.stage:'idle';
+  if(stage==='loading')return 'Searching the venue catalog with your budget, starting point and cuisine choices…';
+  if(stage==='shown'&&m.count>0)return m.ranked?'Larger pins fit your vibe more closely. Numbers 1–3 mark your top matches.':`${m.count} ${m.count===1?'match':'matches'} from the venue catalog are on the map. Rank them to see which fit your vibe best.`;
+  return 'Your final matches come from the venue catalog, using your budget, starting point and cuisine choices.';
+ }
  const statusText=(p:OutingVibeProfile)=>p.embedding.status==='ready'?'Semantic profile updated.':p.embedding.status==='pending'?'Updating the semantic profile…':p.embedding.status==='unavailable'?'Semantic matching is temporarily unavailable. Your answers are safe.':'Your text and answers are saved in this session.';
  function render(p:OutingVibeProfile|null) {
   // Embedding progress alone must not rebuild the question: that would restart a playing
   // YouTube player, reset a reveal/slider and drop focus from a half-typed answer.
-  const signature=p?JSON.stringify([p.sessionId,p.phase,p.question?.id,p.history.length,p.history.map(a=>a.response),p.vibe_so_far,p.qualifiers,p.notice,p.generation,p.completion,p.embedding.status==='unavailable',editing,mapDisplay.showAll]):'';
+  const signature=p?JSON.stringify([p.sessionId,p.phase,p.question?.id,p.history.length,p.history.map(a=>a.response),p.vibe_so_far,p.qualifiers,p.notice,p.generation,p.completion,p.embedding.status==='unavailable',editing,matchesView.getState()]):'';
   const status=root.querySelector<HTMLElement>('.vb-quiz-semantic-status');
   if(p&&signature===lastSignature&&status){status.textContent=statusText(p);return;}
   lastSignature=signature;
@@ -77,7 +104,7 @@ export function createLiveQuiz(onBack:()=>void) {
      respond({kind:'choice',optionId});
      // The visible B2 commit explicitly says See matches; use the existing user exit,
      // preserving automatic stopping thresholds and asynchronous summary guards.
-     if(presentation.step==='B2')session.showMatches();
+     if(presentation.step==='B2')requestMatches();
     },previous?.kind==='choice'?previous.optionId:undefined);
     if(stage)root.append(stage);
    } else {
@@ -94,12 +121,15 @@ export function createLiveQuiz(onBack:()=>void) {
    // A new question takes focus. Query at run time: a later render in the same tick may have replaced this title.
    if(active&&lastQuestion!==question.id){lastQuestion=question.id;queueMicrotask(()=>{if(active&&!root.hidden&&root.offsetParent!==null)root.querySelector<HTMLElement>('.vb-quiz-prompt[tabindex]')?.focus();});}
   }
-  if(p.phase==='results'&&editing===null) {
-   const toggle=button(mapDisplay.showAll?'Show ranked places':'Show all places',()=>mapDisplay.setShowAll(!mapDisplay.showAll));
-   toggle.setAttribute('aria-pressed',String(mapDisplay.showAll));root.append(toggle);
-   root.append(h('h3',{class:'vb-quiz-prompt'},p.completion.reason==='maximum'?'Your scene, in ten answers.':'Your outing, coming into focus.'),h('div',{class:'vb-quiz-complete-art'},apertureArt(118)),h('p',{class:'vb-quiz-results-note'},'You can explore the map now. Your final matches load from the venue catalog using your budget, starting point and cuisine choices.'));
+  const showingResults=p.phase==='results'&&editing===null;
+  if(showingResults) {
+   // One primary action at the top, visible without scrolling: Show My Matches → Rank My Matches ⇄ Show Unranked Matches.
+   root.append(...resultsAction(p));
+   root.append(h('h3',{class:'vb-quiz-prompt'},p.completion.reason==='maximum'?'Your scene, in ten answers.':'Your outing, coming into focus.'),h('div',{class:'vb-quiz-complete-art'},apertureArt(118)),h('p',{class:'vb-quiz-results-note','aria-live':'polite'},resultsNote(p)));
    if(p.completion.canContinue&&p.history.length<10)root.append(button('Continue Refining',()=>session.continueRefining(),'vb-primary-btn'));
-  }
+   // Entering results moves focus to that action and scrolls it into view.
+   if(active&&lastResults!==p.sessionId){lastResults=p.sessionId;queueMicrotask(()=>{const target=root.querySelector<HTMLElement>('.vb-quiz-results-action');if(active&&!root.hidden&&root.offsetParent!==null&&target){target.focus({preventScroll:true});target.scrollIntoView?.({block:'nearest'});}});}
+  } else lastResults='';
   const reading=p.phase==='question'&&editing===null&&p.question?presentationOf(p.question):undefined;
   if(reading&&p.history.length&&reading.source==='gemini')root.append(h('div',{class:'vb-quiz-reading'},h('p',{},h('strong',{},'What I’ve picked up: '),reading.design.known),button('Not quite',()=>{editing=p.history.length-1;lastQuestion='';render(session.getSnapshot());root.querySelector<HTMLTextAreaElement>('.vb-quiz-correction')?.focus();})));
   if(p.history.length) {
@@ -123,12 +153,13 @@ export function createLiveQuiz(onBack:()=>void) {
    history.append(button(`${i+1}. ${label??'Answer'} — Edit`,()=>{editing=i;lastQuestion='';render(session.getSnapshot());}));
   });root.append(history);
   root.append(button('Start over',()=>{editing=null;previews.clear();mediaViews.clear();session.start(p.originalInput.text,p.originalInput.imageCount);}));
-  const matches=button('Show My Matches',()=>{editing=null;session.showMatches();},'vb-primary-btn vb-quiz-matches');root.append(matches);
+  // Early request while the quiz is unfinished (or while editing an answer). Completed results use the top action instead.
+  if(!showingResults)root.append(button('Show My Matches',requestMatches,'vb-primary-btn vb-quiz-matches'));
   if(editing!==null)root.append(button('Cancel edit',()=>{editing=null;render(session.getSnapshot());}));
   if(p.originalInput.imageCount)root.append(h('p',{class:'vb-quiz-photo-note'},'Your photos stay in this browser. This quiz uses your text; photos are not uploaded or analyzed.'));
   restoreFocus(root,focusKey);
  }
  const off=outingProfiles.subscribe(render);
- const offDisplay=mapDisplay.subscribe(()=>render(session.getSnapshot()));
- return {root,session:session as LiveVibeSession,start(text:string,imageCount:number){active=true;editing=null;previews.clear();mediaViews.clear();session.start(text,imageCount);},resume(){active=true;render(session.getSnapshot());},focus(){const target=root.querySelector<HTMLElement>('.vb-quiz-prompt[tabindex]')??root;target.focus();target.scrollIntoView?.({block:'nearest'});},destroy(){active=false;off();offDisplay();session.clear();session.destroy();}};
+ const offMatches=matchesView.subscribe(()=>render(session.getSnapshot()));
+ return {root,session:session as LiveVibeSession,start(text:string,imageCount:number){active=true;editing=null;previews.clear();mediaViews.clear();session.start(text,imageCount);},resume(){active=true;render(session.getSnapshot());},focus(){const target=root.querySelector<HTMLElement>('.vb-quiz-prompt[tabindex]')??root.querySelector<HTMLElement>('.vb-quiz-results-action')??root;target.focus();target.scrollIntoView?.({block:'nearest'});},destroy(){active=false;off();offMatches();session.clear();session.destroy();}};
 }

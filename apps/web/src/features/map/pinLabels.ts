@@ -26,7 +26,8 @@ export function createPinLabels(container: HTMLElement, getObstacles: () => Elem
     const all = [...container.querySelectorAll<HTMLElement>('.pin, .vb-trip-destination')];
     for (const pin of all) {
       let label = pin.querySelector<HTMLElement>('.pin-name');
-      const name = pin.getAttribute('aria-label')?.replace(/^Destination: /, '');
+      // A pin's plain name (data-name) when it has one: its aria-label may add a deal or a match rank for screen readers.
+      const name = pin.dataset.name ?? pin.getAttribute('aria-label')?.replace(/^Destination: /, '');
       if (!name) continue;
       if (!label) {
         label = document.createElement('span'); label.className = 'pin-name'; label.setAttribute('aria-hidden','true'); pin.append(label);
