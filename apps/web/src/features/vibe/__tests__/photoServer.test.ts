@@ -46,7 +46,7 @@ describe('photo describer',()=>{
 });
 const running:Server[]=[];afterEach(async()=>{for(const x of running.splice(0))await new Promise<void>(r=>x.close(()=>r()));});
 const ok={mimeType:'image/jpeg',data:'QUJD'};
-async function serve(o:{describe?:()=>Promise<string>;remaining?:number;record?:number;unlimited?:boolean;noAuth?:boolean}={}) {
+async function serve(o:{describe?:(...args:unknown[])=>Promise<string>;remaining?:number;record?:number;unlimited?:boolean;noAuth?:boolean}={}) {
  let count=o.remaining??5;
  const quota={remaining:vi.fn(async()=>count),record:vi.fn(async()=>o.record??(--count))};
  const auth:PhotoAuth={verify:async t=>t==='good'?(quota as PhotoQuota):null};
@@ -55,7 +55,7 @@ async function serve(o:{describe?:()=>Promise<string>;remaining?:number;record?:
  const app=express();app.use(express.json({limit:'2mb'}));app.use('/api/vibe',createPhotoRoutes(deps));
  const s=app.listen(0,'127.0.0.1');running.push(s);await new Promise<void>(r=>s.once('listening',r));const a=s.address();if(!a||typeof a==='string')throw Error('no server');
  const base=`http://127.0.0.1:${a.port}/api/vibe`;
- const post=(body:unknown,token:string|null='good')=>fetch(`${base}/describe-image`,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify(body)});
+ const post=(body:unknown,token:string|null='good',signal?:AbortSignal)=>fetch(`${base}/describe-image`,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify(body),signal});
  const get=(token:string|null='good')=>fetch(`${base}/photo-quota`,{headers:token?{Authorization:`Bearer ${token}`}:{}});
  return {post,get,quota,describer};
 }
@@ -73,6 +73,14 @@ describe('photo routes',()=>{
  it('503 when the describer throws, recording nothing and leaking nothing',async()=>{const s=await serve({describe:async()=>{throw Error('SECRET-DETAIL');}});const r=await s.post(ok);expect(r.status).toBe(503);expect(JSON.stringify(await r.json())).not.toContain('SECRET');expect(s.quota.record).not.toHaveBeenCalled();});
  it('422 for an empty description, recording nothing',async()=>{const s=await serve({describe:async()=>''});const r=await s.post(ok);expect(r.status).toBe(422);expect(await r.json()).toEqual({error:'unreadable'});expect(s.quota.record).not.toHaveBeenCalled();});
  it('429 without a description when record races to -1',async()=>{const s=await serve({remaining:1,record:-1});const r=await s.post(ok);expect(r.status).toBe(429);const b=await r.json();expect(b).toEqual({error:'daily_limit',remainingToday:0});expect(b.description).toBeUndefined();});
+ it('records no use when the client left before the description arrived',async()=>{
+  let release!:()=>void;const gate=new Promise<void>(r=>{release=r;});let seen:AbortSignal|undefined;
+  // A describer that ignores the abort and resolves anyway, as a slow provider call can.
+  const s=await serve({describe:async(...args:unknown[])=>{seen=args[1] as AbortSignal;await gate;return 'Warm light';}});
+  const client=new AbortController();const sent=s.post(ok,'good',client.signal).catch(()=>null);
+  await vi.waitFor(()=>expect(seen).toBeDefined());client.abort();await vi.waitFor(()=>expect(seen!.aborted).toBe(true));
+  release();await sent;await new Promise(r=>setTimeout(r,50));
+  expect(s.describer.describe).toHaveBeenCalledTimes(1);expect(s.quota.record).not.toHaveBeenCalled();});
  it('503 when a quota RPC throws without leaking',async()=>{const s=await serve();s.quota.remaining.mockRejectedValue(Error('SECRET-DB'));const r=await s.post(ok);expect(r.status).toBe(503);expect(JSON.stringify(await r.json())).not.toContain('SECRET');});
  it('unlimited skips quota calls but still needs a token',async()=>{const s=await serve({unlimited:true});const r=await s.post(ok);expect(r.status).toBe(200);expect(await r.json()).toEqual({description:'Warm light',remainingToday:null});expect(s.quota.remaining).not.toHaveBeenCalled();expect(s.quota.record).not.toHaveBeenCalled();expect((await s.post(ok,null)).status).toBe(401);});
  it('503 when auth is not configured',async()=>{const s=await serve({noAuth:true});expect((await s.post(ok)).status).toBe(503);expect((await s.get()).status).toBe(503);});

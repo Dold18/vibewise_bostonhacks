@@ -39,7 +39,9 @@ export function createPhotoRoutes(deps: PhotoDeps): Router {
   try {
    if (!unlimited && (await quota.remaining(DAILY_PHOTO_LIMIT)) <= 0) { res.status(429).json({ error: 'daily_limit', remainingToday: 0 }); return; }
    const description = await deps.describer().describe(input, abort.signal);
-   if (!description) { if (!res.headersSent && !res.destroyed) res.status(422).json({ error: 'unreadable' }); return; }
+   // The client left while the photo was read: send nothing and don't charge a use for a description nobody receives.
+   if (abort.signal.aborted || res.destroyed) return;
+   if (!description) { res.status(422).json({ error: 'unreadable' }); return; }
    let remainingToday: number | null = null;
    if (!unlimited) {
     remainingToday = await quota.record(DAILY_PHOTO_LIMIT);
