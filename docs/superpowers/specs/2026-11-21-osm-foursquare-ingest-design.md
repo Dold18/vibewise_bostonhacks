@@ -91,7 +91,7 @@ One bounding box covering Boston, Cambridge, Somerville and Brookline: **south 4
 ### 6.3 OSM collection (`osm.ts`)
 - **Query:** one Overpass query over the bbox: `nwr["amenity"~"^(restaurant|fast_food|cafe|bar|pub|ice_cream|food_court)$"]["name"](bbox); out center tags;` with `[timeout:180]`.
 - **Endpoints:** the same mirrors as `apps/web/src/osm.ts`, tried in order.
-- **Request headers:** `User-Agent: vibewise-ingest/0.1 (+https://github.com/Dold18/vibenta_bostonhacks)`.
+- **Request headers:** `User-Agent: vibewise-ingest/0.1 (+https://github.com/Dold18/vibewise_bostonhacks)`.
 - **Retries:** exponential backoff on 429/5xx/timeouts, max 4 attempts per mirror, starting at 5 s.
 - **Cache:** the raw response is saved to `pipeline/.cache/osm-<date>.json`. Re-runs on the same day reuse it unless `--refresh` is passed.
 - **Skipped:** elements with `disused:amenity`, `was:amenity`, or no usable coordinate.

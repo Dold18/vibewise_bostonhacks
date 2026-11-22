@@ -35,7 +35,7 @@
 **Pinned values (put them in `pipeline/src/config.ts`)**
 - Study-area bbox: south `42.227`, west `-71.191`, north `42.418`, east `-70.986`.
 - OSM amenities: `restaurant, fast_food, cafe, bar, pub, ice_cream, food_court`.
-- User-Agent: `vibewise-ingest/0.1 (+https://github.com/Dold18/vibenta_bostonhacks)`.
+- User-Agent: `vibewise-ingest/0.1 (+https://github.com/Dold18/vibewise_bostonhacks)`.
 - Matching thresholds: same name ≤ `50` m; similar name (token Jaccard ≥ `0.6`) ≤ `25` m. Within-source duplicates: same name ≤ `50` m.
 - `FSQ_MAX_AGE_DAYS = 730`. Upsert batch size `500`. Overpass retries: max `4` attempts per mirror, backoff starting at `5000` ms and doubling.
 - Default `FSQ_RELEASE = 2026-01-12`.

@@ -33,7 +33,7 @@
 
 ### D-009 · Accepted · Product name is VibeWise
 - **Decision:** The product brand is **VibeWise**. Use it in the UI, docs, package names and outbound identifiers (for example the `vibewise-ingest` User-Agent).
-- **Kept as is:** The repository name `vibenta_bostonhacks`, its GitHub URL, and the Supabase `project_id`. Renaming those would break links and the local Supabase stack.
+- **Repository:** Renamed on GitHub to `Dold18/vibewise_bostonhacks`. The Supabase `project_id` stays `vibenta_bostonhacks` because it names the local Docker containers and changing it would start a fresh local database.
 - **Supersedes:** P-001.
 
 ## Proposed decisions (not yet ratified)

@@ -1,6 +1,6 @@
 # Product Vision — VibeWise
 > **Status:** Draft v0.1 · BostonHacks 2026 · Track: Bos(tons) of Eats and Streets  
-> **Naming:** The product is called **VibeWise**. It was earlier called Vibenta, which is why the repository is still `vibenta_bostonhacks`.
+> **Naming:** The product is called **VibeWise**. It was earlier called Vibenta.
 
 ## One-line pitch
 Discover Boston by the *feeling* you want, then turn that feeling into a real, affordable, public-transit-accessible outing.

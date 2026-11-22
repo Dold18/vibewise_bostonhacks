@@ -1,6 +1,6 @@
 # VibeWise — BostonHacks 2026
 
-**Product name:** VibeWise (formerly the working name Vibenta; the repository is still `vibenta_bostonhacks`)  
+**Product name:** VibeWise (formerly the working name Vibenta)  
 **Track:** Bos(tons) of Eats and Streets  
 **Status:** Early planning and parallel implementation setup
 

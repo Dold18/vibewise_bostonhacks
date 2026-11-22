@@ -2,7 +2,7 @@ import type { Bbox } from './types.ts';
 
 export const STUDY_BBOX: Bbox = { south: 42.227, west: -71.191, north: 42.418, east: -70.986 };
 export const OSM_AMENITIES = ['restaurant', 'fast_food', 'cafe', 'bar', 'pub', 'ice_cream', 'food_court'] as const;
-export const USER_AGENT = 'vibewise-ingest/0.1 (+https://github.com/Dold18/vibenta_bostonhacks)';
+export const USER_AGENT = 'vibewise-ingest/0.1 (+https://github.com/Dold18/vibewise_bostonhacks)';
 
 export const MATCH_SAME_NAME_METERS = 50;
 export const MATCH_SIMILAR_NAME_METERS = 25;
