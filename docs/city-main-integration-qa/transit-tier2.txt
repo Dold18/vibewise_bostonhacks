@@ -1,0 +1,133 @@
+#### 1. hub table (as encoded) and audit
+  Red↔Orange: Downtown Crossing (place-dwnxg)
+      Downtown Crossing serves Red: Red:Red-3-0/Red-1-0…
+      Downtown Crossing serves Orange: Orange:Orange-3-0/Orange-3-1
+  Red↔Green: Park Street (place-pktrm)
+      Park Street serves Red: Red:Red-3-0/Red-1-0…
+      Park Street serves Green: Green-B:Green-B-812-0/Green-B-816-0*… Green-C:Green-C-832-0/Green-C-836-0*… Green-D:Green-D-855-0/Green-D-845-0*… Green-E:Green-E-886-0/Green-E-885-0*…
+  Orange↔Green: Haymarket (place-haecl), North Station (place-north)
+      Haymarket serves Orange: Orange:Orange-3-0/Orange-3-1
+      Haymarket serves Green: Green-B:Green-B-816-0*/Green-B-816-1* Green-C:Green-C-836-0*/Green-C-836-1* Green-D:Green-D-855-0/Green-D-845-0*… Green-E:Green-E-886-0/Green-E-885-0*…   ⚠ Green-B,Green-C only via time-limited (*) patterns
+      North Station serves Orange: Orange:Orange-3-0/Orange-3-1
+      North Station serves Green: Green-B:Green-B-816-0*/Green-B-816-1* Green-C:Green-C-836-0*/Green-C-836-1* Green-D:Green-D-855-0/Green-D-845-0*… Green-E:Green-E-886-0/Green-E-885-0*…   ⚠ Green-B,Green-C only via time-limited (*) patterns
+  Orange↔Blue: State (place-state)
+      State serves Orange: Orange:Orange-3-0/Orange-3-1
+      State serves Blue: Blue:Blue-6-0/Blue-8-0*…
+  Green↔Blue: Government Center (place-gover)
+      Government Center serves Green: Green-B:Green-B-812-0/Green-B-816-0*… Green-C:Green-C-832-0/Green-C-836-0*… Green-D:Green-D-855-0/Green-D-845-0*… Green-E:Green-E-886-0/Green-E-885-0*…
+      Government Center serves Blue: Blue:Blue-6-0/Blue-8-0*…
+  Red↔Blue: NO CANDIDATE → Tier 0
+  walk transfers:
+    Haymarket→Haymarket 0m | North Station→North Station 0m | Haymarket→Government Center 376m
+
+#### 2. pattern-level validation proofs (hub is on the right COLOR but wrong BRANCH)
+  Green C → Coolidge Corner → Green B (Boston College): {"ok":false,"failedLeg":"B","reason":"no_shared_pattern"}
+  Red Alewife → Shawmut (Ashmont) → Quincy Center (Braintree): {"ok":false,"failedLeg":"B","reason":"no_shared_pattern"}
+  control: Alewife → JFK/UMass → Quincy Center validates (both Red branches share the trunk): ok
+
+#### 3. planTier2 geometry
+  Harvard (Red) → Ruggles (Orange): Harvard →[Red-1-0 agnostic]→ Downtown Crossing →[Orange-3-0]→ Ruggles  (rejected before winner: 0)
+  Harvard (Red) → Fenway (Green-D): Harvard →[Red-1-0 agnostic]→ Park Street →[Green-D-855-0 agnostic]→ Fenway  (rejected before winner: 0)
+  Northeastern (Green-E) → Oak Grove (Orange): Northeastern University →[Green-E-886-1]→ Haymarket →[Orange-3-1]→ Oak Grove  (rejected before winner: 0)
+  Ruggles (Orange) → Airport (Blue): Ruggles →[Orange-3-1]→ State →[Blue-6-1 agnostic]→ Airport  (rejected before winner: 0)
+  Prudential (Green-E) → Wood Island (Blue): Prudential →[Green-E-886-1]→ Government Center →[Blue-6-1 agnostic]→ Wood Island  (rejected before winner: 0)
+  Harvard (Red) → Airport (Blue): no_tier1_route (no_candidate_hub)
+  BU (Green-B) → Cleveland Circle (Green-C): no_tier1_route (no_candidate_hub)
+
+#### 4. live (real MBTA API)
+
+== Harvard (Red) → Ruggles (Orange) @ Mon 12:30 PM
+  status: ok, TIER 2 via Downtown Crossing, transfers=1
+  leg A Red (route+direction): Harvard → Downtown Crossing, 720s, Mon 12:36 PM → Mon 12:48 PM [schedule-derived]
+  hub wait: 480s [schedule-derived]
+  leg B Orange (pattern, Orange-3-0): Downtown Crossing → Ruggles, 420s, Mon 12:56 PM → Mon 1:03 PM [schedule-derived]
+  legs: walk:20s → subway:Red:720s → subway:Orange:420s → walk:33s; option total 1673s (excludes wait for train A)
+  last train back (final leg): Orange Ruggles → Downtown Crossing departs Tue 12:37 AM [scheduled]
+
+== Harvard (Red) → Fenway (Green-D) @ Mon 12:30 PM
+  status: ok, TIER 2 via Park Street, transfers=1
+  leg A Red (route+direction): Harvard → Park Street, 600s, Mon 12:36 PM → Mon 12:46 PM [schedule-derived]
+  hub wait: 600s [schedule-derived]
+  leg B Green-D (route+direction): Park Street → Fenway, 960s, Mon 12:56 PM → Mon 1:12 PM [schedule-derived]
+  legs: walk:20s → subway:Red:600s → subway:D:960s → walk:11s; option total 2191s (excludes wait for train A)
+  last train back (final leg): Green-D Fenway → Park Street departs Tue 12:37 AM [scheduled]
+
+== Northeastern (Green-E) → Oak Grove (Orange) @ Mon 12:30 PM
+  status: ok, TIER 2 via Haymarket, transfers=1
+  leg A Green-E (pattern, Green-E-886-1): Northeastern University → Haymarket, 1080s, Mon 12:38 PM → Mon 12:56 PM [schedule-derived]
+  hub wait: 300s [schedule-derived]
+  leg B Orange (pattern, Orange-3-1): Haymarket → Oak Grove, 900s, Mon 1:01 PM → Mon 1:16 PM [schedule-derived]
+  legs: walk:26s → subway:E:1080s → subway:Orange:900s → walk:2s; option total 2308s (excludes wait for train A)
+  last train back (final leg): Orange Oak Grove → Haymarket departs Tue 12:30 AM [scheduled]
+
+== Ruggles (Orange) → Airport (Blue) @ Mon 12:30 PM
+  status: ok, TIER 2 via State, transfers=1
+  leg A Orange (pattern, Orange-3-1): Ruggles → State, 540s, Mon 12:32 PM → Mon 12:41 PM [schedule-derived]
+  hub wait: 120s [schedule-derived]
+  leg B Blue (route+direction): State → Airport, 360s, Mon 12:43 PM → Mon 12:49 PM [schedule-derived]
+  legs: walk:33s → subway:Orange:540s → subway:Blue:360s → walk:5s; option total 1058s (excludes wait for train A)
+  last train back (final leg): Blue Airport → State departs Tue 12:35 AM [scheduled]
+
+== Prudential (Green-E) → Wood Island (Blue) @ Mon 12:30 PM
+  status: ok, TIER 2 via Government Center, transfers=1
+  leg A Green-E (pattern, Green-E-886-1): Prudential → Government Center, 720s, Mon 12:34 PM → Mon 12:46 PM [schedule-derived]
+  hub wait: 180s [schedule-derived]
+  leg B Blue (route+direction): Government Center → Wood Island, 540s, Mon 12:49 PM → Mon 12:58 PM [schedule-derived]
+  legs: walk:47s → subway:E:720s → subway:Blue:540s → walk:4s; option total 1491s (excludes wait for train A)
+  last train back (final leg): Blue Wood Island → Government Center departs Tue 12:33 AM [scheduled]
+
+== Harvard (Red) → Airport (Blue)  [Red↔Blue: no hub] @ Mon 12:30 PM
+  status: no_tier1_route (no_candidate_hub) → Tier 0, nothing drawn
+
+== BU (Green-B) → Cleveland Circle (Green-C)  [same line, different branch: not in table] @ Mon 12:30 PM
+  status: no_tier1_route (no_candidate_hub) → Tier 0, nothing drawn
+
+== Oak Grove (Orange) → BU (Green-B): Haymarket's Green-B is mornings-only → walk to Government Center @ Mon 12:30 PM
+  status: ok, TIER 2 via Haymarket, transfers=1
+  leg A Orange (pattern, Orange-3-0): Oak Grove → Haymarket, 780s, Mon 12:32 PM → Mon 12:45 PM [schedule-derived]
+  hub wait: 198s [schedule-derived]
+  leg B Green-B (route+direction): Government Center → Boston University Central, 1140s, Mon 12:53 PM → Mon 1:12 PM [schedule-derived]
+  legs: walk:2s → subway:Orange:780s → walk:282s → subway:B:1140s → walk:97s; option total 2499s (excludes wait for train A)
+  last train back (final leg): Green-B Boston University Central → Government Center departs Tue 12:41 AM [scheduled]
+
+== Oak Grove (Orange) → BU (Green-B): same pair when Green-B-816-0's one trip is catchable @ Mon 6:15 AM
+  status: ok, TIER 2 via Haymarket, transfers=1
+  leg A Orange (pattern, Orange-3-0): Oak Grove → Haymarket, 780s, Mon 6:20 AM → Mon 6:33 AM [schedule-derived]
+  hub wait: 360s [schedule-derived]
+  leg B Green-B (pattern, Green-B-816-0): Haymarket → Boston University Central, 1260s, Mon 6:39 AM → Mon 7:00 AM [schedule-derived]
+  legs: walk:2s → subway:Orange:780s → subway:B:1260s → walk:97s; option total 2499s (excludes wait for train A)
+  last train back (final leg): none (no scheduled return trips found after 20:00)
+
+== BU (Green-B) → Chinatown (Orange) Sat 3:35 PM: reported no_service case @ Sat 3:35 PM
+  status: ok, TIER 2 via Government Center, transfers=1
+  leg A Green-B (route+direction): Boston University Central → Government Center, 1200s, Sat 3:45 PM → Sat 4:05 PM [schedule-derived]
+  hub wait: 678s [schedule-derived]
+  leg B Orange (pattern, Orange-3-0): Haymarket → Chinatown, 240s, Sat 4:21 PM → Sat 4:25 PM [schedule-derived]
+  legs: walk:97s → subway:B:1200s → walk:282s → subway:Orange:240s → walk:21s; option total 2518s (excludes wait for train A)
+  last train back (final leg): Orange Chinatown → Haymarket departs Sun 1:43 AM [scheduled]
+
+== BU (Green-B) → Chinatown (Orange) midday @ Mon 12:30 PM
+  status: ok, TIER 2 via Government Center, transfers=1
+  leg A Green-B (route+direction): Boston University Central → Government Center, 1200s, Mon 12:38 PM → Mon 12:58 PM [schedule-derived]
+  hub wait: 438s [schedule-derived]
+  leg B Orange (pattern, Orange-3-0): Haymarket → Chinatown, 300s, Mon 1:10 PM → Mon 1:15 PM [schedule-derived]
+  legs: walk:97s → subway:B:1200s → walk:282s → subway:Orange:300s → walk:21s; option total 2338s (excludes wait for train A)
+  last train back (final leg): Orange Chinatown → Haymarket departs Tue 12:43 AM [scheduled]
+
+== BU (Green-B) → Chinatown (Orange): same pair while Green-B-816 runs @ Mon 5:20 AM
+  status: ok, TIER 2 via Haymarket, transfers=1
+  leg A Green-B (pattern, Green-B-816-1): Boston University Central → Haymarket, 1140s, Mon 5:30 AM → Mon 5:49 AM [schedule-derived]
+  hub wait: 300s [schedule-derived]
+  leg B Orange (pattern, Orange-3-0): Haymarket → Chinatown, 240s, Mon 5:54 AM → Mon 5:58 AM [schedule-derived]
+  legs: walk:97s → subway:B:1140s → subway:Orange:240s → walk:21s; option total 1798s (excludes wait for train A)
+  last train back (final leg): Orange Chinatown → Haymarket departs Tue 12:43 AM [scheduled]
+
+== BU (Green-B) → Chinatown (Orange) at 02:30: nothing runs on either hub @ Mon 2:30 AM
+  status: no_service (failed leg A) — nothing drawn
+  Transfer route needs leg A, which is not running. No train service on Green-B from Boston University Central to Haymarket at Mon 2:30 AM (checked MBTA /schedules); night bus or walk. Nearest stop: Boston University Central, ~2 min walk (estimate).
+
+== Harvard (Red) → Ruggles (Orange) after service ends @ Mon 2:30 AM
+  status: no_service (failed leg A) — nothing drawn
+  Transfer route needs leg A, which is not running. No train service on Red from Harvard to Downtown Crossing at Mon 2:30 AM (checked MBTA /schedules); night bus or walk. Nearest stop: Harvard, ~0 min walk (estimate).
+
+All Tier 2 checks passed

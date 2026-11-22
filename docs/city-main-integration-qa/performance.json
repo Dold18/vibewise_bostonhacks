@@ -1,0 +1,492 @@
+{
+  "url": "http://127.0.0.1:5217/",
+  "seed": 424242,
+  "viewport": {
+    "W": 1440,
+    "H": 900,
+    "DPR": 1
+  },
+  "mode": "perf",
+  "worlds": [],
+  "errors": [],
+  "perf": {
+    "downtown": {
+      "static": {
+        "median": 12.8,
+        "p90": 14,
+        "max": 33.1
+      },
+      "pan": {
+        "frames": 160,
+        "fps": 51.1,
+        "median": 16.7,
+        "p95": 33.4,
+        "max": 49.9,
+        "over50ms": 0
+      },
+      "orbit": {
+        "frames": 175,
+        "fps": 55.9,
+        "median": 16.7,
+        "p95": 33.3,
+        "max": 66.6,
+        "over50ms": 1
+      },
+      "zoom": {
+        "frames": 181,
+        "fps": 58.1,
+        "median": 16.7,
+        "p95": 16.8,
+        "max": 66.7,
+        "over50ms": 1
+      },
+      "transitionToSettledMs": 1334,
+      "memory": {
+        "usedMB": 245,
+        "totalMB": 301
+      },
+      "report": {
+        "seed": 424242,
+        "sceneHash": "1dea8b0801a10ac5",
+        "planHash": "8abc462e5dc88507",
+        "presets": [],
+        "source": "outing",
+        "navigation": "browse",
+        "grade": {
+          "global_grade.palette_family": "sunwashed",
+          "sky_and_horizon.sky_mode": "warm_dawn",
+          "lighting_and_shadows.light_color": "white",
+          "cinematic_and_artistic.render_aesthetic": "clean_map",
+          "building_surfaces.wall_palette": "soft_plaster",
+          "building_surfaces.roof_palette": "cream"
+        },
+        "sections": {
+          "buildings": {
+            "facade_look": "smooth_cement@0.43"
+          },
+          "streets": {
+            "grass_texture": "grainy@0.38",
+            "park_glow": "soft_green@0.45",
+            "water_texture": "gentle_ripples@0.57"
+          },
+          "decorations": {},
+          "atmosphere": {
+            "vignette": "soft@1.00",
+            "light_shafts": "sunbeams@1.00",
+            "ambient_pace": "slow@0.93",
+            "particle_motion": "float@0.47"
+          }
+        },
+        "buildings": {
+          "mounted": true,
+          "updates": 2,
+          "families": [
+            "lime render",
+            "painted clapboard",
+            "board-formed concrete",
+            "mustard painted render",
+            "coral painted render",
+            "sea-glass painted boards",
+            "rendered tower"
+          ],
+          "roofs": [
+            "palette cream",
+            "green roofs",
+            "tile",
+            "membrane",
+            "tile"
+          ],
+          "strength": 0.8865750000000001,
+          "night": 0.077,
+          "engine": {
+            "buildings": 6489,
+            "triangles": 96681,
+            "buildMs": 28,
+            "uploads": 8,
+            "uniformUpdates": 0,
+            "gpuDrawMs": 8.43290361666667,
+            "textures": 6,
+            "missing": [],
+            "skippedSeamEdges": 583
+          }
+        },
+        "streets": {
+          "presence": 1,
+          "roads": "limestone/limestone",
+          "walk": "concrete_slabs",
+          "ground": "sand_grain",
+          "green": "grainy",
+          "lamps": "none@0.00",
+          "stats": {
+            "installs": 1,
+            "texturesPainted": 23,
+            "paintMs": 203.90000009536743,
+            "lastUpdateMs": 0.5999999642372131,
+            "imageUpdates": 23,
+            "paintSets": 112,
+            "recipeHash": "6b9df826b0f3702e",
+            "pending": 0
+          }
+        },
+        "decor": {
+          "motifs": {
+            "woodland": 0.1,
+            "coastal": 1,
+            "playful": 0.2,
+            "modern": 0.2
+          },
+          "strength": 0.82,
+          "hidden": false,
+          "cast": {
+            "secondary": [
+              "cc0.kenney-nature-kit.tree_oak",
+              "cc0.kenney-retro-urban-kit.tree_park_large"
+            ],
+            "micro": [
+              "kaykit.medieval-nature.rock_single_B",
+              "cc0.kenney-city-kit-commercial.detail_parasol_b",
+              "cc0.kenney-city-kit-commercial.detail_parasol_a",
+              "kaykit.medieval-nature.rock_single_C",
+              "cc0.kenney-nature-kit.flower_red_a"
+            ]
+          },
+          "onScreen": {
+            "secondary": 10,
+            "micro": 2
+          },
+          "shown": {
+            "total": 33,
+            "byTier": {
+              "secondary": 31,
+              "micro": 2
+            },
+            "byPattern": {
+              "promenade": 27,
+              "accent": 3,
+              "grove": 1,
+              "detail": 2
+            },
+            "bySurface": {
+              "path_edge": 25,
+              "sidewalk": 7,
+              "park": 1
+            },
+            "byAsset": {
+              "cc0.kenney-retro-urban-kit.tree_park_large": 17,
+              "cc0.kenney-nature-kit.tree_oak": 14,
+              "kaykit.medieval-nature.rock_single_C": 1,
+              "cc0.kenney-nature-kit.flower_red_a": 1
+            }
+          },
+          "collisions": 0,
+          "timing": {
+            "refreshMs": 475.4000000357628,
+            "composeMs": 473.69999998807907,
+            "cells": 32,
+            "regions": 0,
+            "tiles": 4,
+            "candidates": 13037
+          }
+        },
+        "atmosphere": {
+          "passes": {
+            "fogHeight": 0.35,
+            "fogDrift": 0.5,
+            "wind": 0.15,
+            "hazeHorizon": 0.1,
+            "grainSize": 0.3,
+            "vignette": 0.35,
+            "glowThreshold": 0.95,
+            "shafts": 0.65,
+            "motion": 0.4,
+            "drift": 0.5,
+            "density": 1
+          },
+          "load": 0.385,
+          "quality": "high",
+          "layers": true
+        },
+        "composer": {
+          "fidelity": 1,
+          "overrides": 40,
+          "anchors": [],
+          "unrealized": 0,
+          "coherenceOk": true,
+          "confidence": 0.777,
+          "presence": 0.727,
+          "compositionId": "7aaa8e7dc54b9b15"
+        },
+        "city": [
+          {
+            "id": "buildings",
+            "status": "ready",
+            "deliveries": 4,
+            "failures": 0,
+            "overBudget": []
+          },
+          {
+            "id": "streets",
+            "status": "ready",
+            "deliveries": 3,
+            "failures": 0,
+            "overBudget": []
+          },
+          {
+            "id": "decorations",
+            "status": "ready",
+            "deliveries": 4,
+            "failures": 0,
+            "overBudget": []
+          },
+          {
+            "id": "atmosphere",
+            "status": "ready",
+            "deliveries": 3,
+            "failures": 0,
+            "overBudget": []
+          }
+        ],
+        "disabled": 13
+      }
+    },
+    "beacon": {
+      "static": {
+        "median": 11.5,
+        "p90": 13.8,
+        "max": 16
+      },
+      "pan": {
+        "frames": 181,
+        "fps": 57.8,
+        "median": 16.7,
+        "p95": 16.8,
+        "max": 66.7,
+        "over50ms": 1
+      },
+      "orbit": {
+        "frames": 182,
+        "fps": 58.1,
+        "median": 16.7,
+        "p95": 16.8,
+        "max": 100.1,
+        "over50ms": 1
+      },
+      "zoom": {
+        "frames": 180,
+        "fps": 58.7,
+        "median": 16.7,
+        "p95": 16.7,
+        "max": 83.4,
+        "over50ms": 1
+      },
+      "transitionToSettledMs": 1137,
+      "memory": {
+        "usedMB": 404,
+        "totalMB": 460
+      },
+      "report": {
+        "seed": 424242,
+        "sceneHash": "1dea8b0801a10ac5",
+        "planHash": "8abc462e5dc88507",
+        "presets": [],
+        "source": "outing",
+        "navigation": "browse",
+        "grade": {
+          "global_grade.palette_family": "sunwashed",
+          "sky_and_horizon.sky_mode": "warm_dawn",
+          "lighting_and_shadows.light_color": "white",
+          "cinematic_and_artistic.render_aesthetic": "clean_map",
+          "building_surfaces.wall_palette": "soft_plaster",
+          "building_surfaces.roof_palette": "cream"
+        },
+        "sections": {
+          "buildings": {
+            "facade_look": "smooth_cement@0.43"
+          },
+          "streets": {
+            "grass_texture": "grainy@0.38",
+            "park_glow": "soft_green@0.45",
+            "water_texture": "gentle_ripples@0.57"
+          },
+          "decorations": {},
+          "atmosphere": {
+            "vignette": "soft@1.00",
+            "light_shafts": "sunbeams@1.00",
+            "ambient_pace": "slow@0.93",
+            "particle_motion": "float@0.47"
+          }
+        },
+        "buildings": {
+          "mounted": true,
+          "updates": 4,
+          "families": [
+            "lime render",
+            "painted clapboard",
+            "board-formed concrete",
+            "mustard painted render",
+            "coral painted render",
+            "sea-glass painted boards",
+            "rendered tower"
+          ],
+          "roofs": [
+            "palette cream",
+            "green roofs",
+            "tile",
+            "membrane",
+            "tile"
+          ],
+          "strength": 0.8865750000000001,
+          "night": 0.077,
+          "engine": {
+            "buildings": 8748,
+            "triangles": 120498,
+            "buildMs": 18,
+            "uploads": 19,
+            "uniformUpdates": 0,
+            "gpuDrawMs": 8.77714888333333,
+            "textures": 6,
+            "missing": [],
+            "skippedSeamEdges": 1427
+          }
+        },
+        "streets": {
+          "presence": 1,
+          "roads": "limestone/limestone",
+          "walk": "concrete_slabs",
+          "ground": "sand_grain",
+          "green": "grainy",
+          "lamps": "none@0.00",
+          "stats": {
+            "installs": 1,
+            "texturesPainted": 46,
+            "paintMs": 336.8000001311302,
+            "lastUpdateMs": 0.6000000238418579,
+            "imageUpdates": 46,
+            "paintSets": 188,
+            "recipeHash": "6b9df826b0f3702e",
+            "pending": 0
+          }
+        },
+        "decor": {
+          "motifs": {
+            "woodland": 0.1,
+            "coastal": 1,
+            "playful": 0.2,
+            "modern": 0.2
+          },
+          "strength": 0.82,
+          "hidden": false,
+          "cast": {
+            "secondary": [
+              "cc0.kenney-nature-kit.tree_oak",
+              "cc0.kenney-retro-urban-kit.tree_park_large"
+            ],
+            "micro": [
+              "kaykit.medieval-nature.rock_single_B",
+              "cc0.kenney-city-kit-commercial.detail_parasol_b",
+              "cc0.kenney-city-kit-commercial.detail_parasol_a",
+              "kaykit.medieval-nature.rock_single_C",
+              "cc0.kenney-nature-kit.flower_red_a"
+            ]
+          },
+          "onScreen": {
+            "secondary": 12,
+            "micro": 3
+          },
+          "shown": {
+            "total": 48,
+            "byTier": {
+              "secondary": 45,
+              "micro": 3
+            },
+            "byPattern": {
+              "promenade": 34,
+              "accent": 10,
+              "grove": 1,
+              "detail": 3
+            },
+            "bySurface": {
+              "path_edge": 32,
+              "park": 5,
+              "sidewalk": 9,
+              "waterfront": 2
+            },
+            "byAsset": {
+              "cc0.kenney-nature-kit.tree_oak": 23,
+              "cc0.kenney-retro-urban-kit.tree_park_large": 22,
+              "cc0.kenney-nature-kit.flower_red_a": 3
+            }
+          },
+          "collisions": 0,
+          "timing": {
+            "refreshMs": 1.4000000357627869,
+            "composeMs": 0.2999999523162842,
+            "cells": 34,
+            "regions": 0,
+            "tiles": 2,
+            "candidates": 16442
+          }
+        },
+        "atmosphere": {
+          "passes": {
+            "fogHeight": 0.35,
+            "fogDrift": 0.5,
+            "wind": 0.15,
+            "hazeHorizon": 0.1,
+            "grainSize": 0.3,
+            "vignette": 0.35,
+            "glowThreshold": 0.95,
+            "shafts": 0.65,
+            "motion": 0.4,
+            "drift": 0.5,
+            "density": 1
+          },
+          "load": 0.385,
+          "quality": "high",
+          "layers": true
+        },
+        "composer": {
+          "fidelity": 1,
+          "overrides": 40,
+          "anchors": [],
+          "unrealized": 0,
+          "coherenceOk": true,
+          "confidence": 0.777,
+          "presence": 0.727,
+          "compositionId": "7aaa8e7dc54b9b15"
+        },
+        "city": [
+          {
+            "id": "buildings",
+            "status": "ready",
+            "deliveries": 6,
+            "failures": 0,
+            "overBudget": []
+          },
+          {
+            "id": "streets",
+            "status": "ready",
+            "deliveries": 5,
+            "failures": 0,
+            "overBudget": []
+          },
+          {
+            "id": "decorations",
+            "status": "ready",
+            "deliveries": 6,
+            "failures": 0,
+            "overBudget": []
+          },
+          {
+            "id": "atmosphere",
+            "status": "ready",
+            "deliveries": 5,
+            "failures": 0,
+            "overBudget": []
+          }
+        ],
+        "disabled": 13
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "checks": [
+    {
+      "name": "back-forward cache preserves live composer and renderers",
+      "ok": true
+    },
+    {
+      "name": "repeated scene changes have one listener and unique layers",
+      "ok": true
+    },
+    {
+      "name": "retained heap stays bounded across 60 updates",
+      "ok": true,
+      "detail": {
+        "beforeMB": 50.0409049987793,
+        "afterMB": 50.7338981628418,
+        "deltaMB": 0.6929931640625
+      }
+    },
+    {
+      "name": "no browser errors",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

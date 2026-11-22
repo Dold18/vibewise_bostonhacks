@@ -56,10 +56,12 @@ try{
  await btn('Show ranked places');check('ranked display can reveal weaker places again',await js("[...document.querySelectorAll('.vb-live-quiz button')].some(b=>b.textContent==='Show all places'&&b.getAttribute('aria-pressed')==='false')"));
  check('no catalog does not fabricate rankings',await js("vibentaOutingRanking.status==='unavailable'"));
  await btn('Continue Refining');check('continue refinement returns one question',(await profile()).phase==='question');
- const before=(await profile()).vibe_so_far;generationFailure=true;await click('.vb-quiz-answer');await waitFor("vibentaOutingProfiles.getSnapshot()?.generation==='fallback'");
+ const before=(await profile()).vibe_so_far;const fallbackEmbeddingsStart=embeddingTexts.length;generationFailure=true;await click('.vb-quiz-answer');await waitFor("vibentaOutingProfiles.getSnapshot()?.generation==='fallback'");
  await waitFor("vibentaOutingProfiles.getSnapshot()?.embedding.status==='ready'");
  const fallbackAnswer=(await profile()).history.at(-1);const fallbackDescription=fallbackAnswer.question.options.find(o=>o.id===fallbackAnswer.response.optionId).description;
- check('fallback answer reaches MiniLM with explicit exclusion',embeddingTexts.at(-1).includes(fallbackDescription)&&embeddingTexts.at(-1).includes('not crowded'));
+ // Positive and negative evidence use separate MiniLM queries (evidence.ts).
+ const fallbackEmbeddings=embeddingTexts.slice(fallbackEmbeddingsStart); // Unchanged negative evidence may use its existing cached vector.
+ check('fallback answer and exclusion reach separate MiniLM queries',fallbackEmbeddings.some(t=>t.includes(fallbackDescription)&&!t.includes('not crowded'))&&embeddingTexts.some(t=>t.includes('crowded')&&!t.includes('not crowded')&&!t.includes(fallbackDescription)),{fallbackDescription,fallbackEmbeddings,negativeQueries:embeddingTexts.filter(t=>t.includes('crowded'))});
  check('failure preserves summary and keeps new answer',(await profile()).vibe_so_far===before&&(await profile()).history.length===4);
  generationFailure=false;embeddingFailure=true;await btn('Try AI again');await waitFor("vibentaOutingProfiles.getSnapshot()?.embedding.status==='unavailable'");
  check('AI recovery includes pending history; unavailable embedding honest',(await profile()).history.length===4&&(await profile()).generation==='gemini');
@@ -73,7 +75,7 @@ try{
  await js("window.__quizPhotos=[...vibentaDiscovery.getPreferences().vibeImages];vibentaTrip.dispatch({type:'navigateTo',destination:{label:'TEST FIXTURE destination',location:{lat:42.355,lng:-71.06},source:'local_suggestion'},discoveryOrigin:null})");
  await waitFor("map.getPitch()===0&&document.querySelector('.vb-preferences-widget').hidden");
  check('Directions preserves the mounted quiz and local File objects',await js("!document.querySelector('.vb-directions-slot').hidden&&!document.querySelector('.vb-live-quiz').hidden&&window.__quizPhotos.every((f,i)=>vibentaDiscovery.getPreferences().vibeImages[i]===f)")&&(await profile()).version===resumed.version);
- check('one scene session consumes the adaptive version with navigation safety',await js("vibentaScene.state().sessionVersion===vibentaOutingProfiles.getSnapshot().version&&vibentaScene.state().source==='outing'&&vibentaScene.state().overlays.length===0&&!vibentaScene.state().motion.ambient&&document.querySelectorAll('.account-btn').length===1&&vibentaScene.session.stats().listeners===1"));
+ check('one scene session consumes the adaptive version with navigation safety',await js("(window.vibentaCity?vibentaCity.composer.last()?.version===vibentaScene.state().sessionVersion:vibentaScene.state().sessionVersion===vibentaOutingProfiles.getSnapshot().version)&&vibentaScene.state().source==='outing'&&vibentaScene.state().overlays.every(o=>o.key==='air_and_atmosphere.vignette'&&o.value==='soft'&&o.opacity<=0.35)&&!vibentaScene.state().motion.ambient&&document.querySelectorAll('.account-btn').length===1&&vibentaScene.session.stats().listeners===1"));
  await click('[aria-label="Collapse directions"]');
  check('collapsed Directions restores the current quiz',await js("!document.querySelector('.vb-preferences-widget').hidden&&!document.querySelector('.vb-live-quiz').hidden"));
  await click('.vb-directions-control .vb-exit-navigation');await waitFor('map.getPitch()>5');

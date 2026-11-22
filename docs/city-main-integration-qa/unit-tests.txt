@@ -1,0 +1,16 @@
+
+> web@0.0.0 test
+> vitest run
+
+
+ RUN  v5.1.1 /private/tmp/vibenta-city-changer-main-integration/apps/web
+
+
+ Test Files  91 passed (91)
+      Tests  1082 passed (1082)
+   Start at  06:15:12
+   Duration  7.56s (tests 83%, import 12%, transform 3%, worker 1%)
+
+    Isolate  91 workers spawned · ~123ms startup each (spawn + environment, per file)
+             at least ~1.47s faster with isolate: false — reuses workers across files instead of one per file
+

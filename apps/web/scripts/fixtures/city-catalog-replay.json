@@ -1,0 +1,59 @@
+{
+  "modelKey": "Xenova/all-MiniLM-L6-v2@751bff37182d3f1213fa05d7196b954e230abad9:fp32:mean:l2",
+  "candidates": 7601,
+  "indexed": 7601,
+  "filtersApplied": [],
+  "results": [
+    {
+      "placeId": "osm:node/11378587042",
+      "name": "Beacon Hill Books & Cafe",
+      "score": 0.5999,
+      "category": "cafe",
+      "cuisines": [],
+      "priceBand": "$",
+      "priceSource": "estimate",
+      "description": "This cozy bookstore cafe offers a welcoming, literary atmosphere ideal for quiet solo reading or meeting friends over afternoon tea. Serving breakfast, lunch, coffee, drinks, and evening supper, it focuses on locally sourced cafe fare alongside beer, wine, and liquor. The intimate neighborhood setting suits relaxed studying, casual daytime catch-ups, and peaceful breaks.",
+      "address": "71 Charles Street, 02114",
+      "website": "https://www.bhbooks.com",
+      "hoursRaw": "Mo off; Tu-Sa 09:00-11:00 open \"Breakfast\", Tu-Sa 11:00-15:30 open \"Lunch\", Tu-Sa 15:30-17:00 open \"Coffee & Drinks (Kitchen Closed)\", Tu-Sa 17:00-21:00 open \"Supper\", Tu-Sa 17:00-21:00 open \"Supper\"; Su 11:00-21:00 open \"Afternoon Tea\"",
+      "location": {
+        "lat": 42.3581991,
+        "lng": -71.0703264
+      }
+    },
+    {
+      "placeId": "fsq:4ff0da52e4b0e19833764234",
+      "name": "Barnes & Noble Caf\u00e9",
+      "score": 0.4811,
+      "category": "cafe",
+      "cuisines": [],
+      "priceBand": "$",
+      "priceSource": "estimate",
+      "description": "This casual bookstore cafe offers an affordable spot to grab a beverage while studying or browsing. The counter serves hot coffees, Frappuccino blended drinks, and specialty cafe items. It caters well to students and shoppers looking for a quick caffeine fix or a relaxed break.",
+      "address": "111 Huntington Ave, Boston 02199",
+      "website": "https://www.barnesandnoble.com/h/cafe",
+      "hoursRaw": null,
+      "location": {
+        "lat": 42.346183387423736,
+        "lng": -71.08131743404012
+      }
+    },
+    {
+      "placeId": "fsq:4f324f4119836c91c7cb0dac",
+      "name": "Bag Ladies Tea",
+      "score": 0.4364,
+      "category": "nightlife",
+      "cuisines": [],
+      "priceBand": "$",
+      "priceSource": "estimate",
+      "description": "This specialty tea company offers themed collections featuring literary-inspired Novel Tea bags with printed quote tags and whimsical blends. Operating at an affordable price point, the products cater to book clubs, casual readers, and gift shoppers seeking a comforting, bookish treat. The packaging embraces an antique aesthetic paired with classic teacups and vintage volumes.",
+      "address": "167 Corey Rd, Brighton 02135",
+      "website": "http://www.bagladiestea.com/",
+      "hoursRaw": null,
+      "location": {
+        "lat": 42.342769462662545,
+        "lng": -71.13941528313364
+      }
+    }
+  ]
+}
