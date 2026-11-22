@@ -659,6 +659,20 @@ button {
     top: 124px;
     left: 12px;
     right: auto;
+    /* Compact: title and scale share a row so the sheet stays clear of the docked panel. */
+    grid-template-columns: auto auto;
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 3px;
+    padding: 6px 10px 7px;
+  }
+  .vb-legend-scale svg {
+    max-height: 22px;
+    width: auto;
+  }
+  .vb-legend-top {
+    grid-column: 1 / -1;
+    font-size: 11px;
   }
 }
 
