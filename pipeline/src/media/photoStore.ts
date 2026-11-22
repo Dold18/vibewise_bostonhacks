@@ -12,8 +12,8 @@ export type ProcessedImage =
   | { ok: false; reason: 'too_small' | 'not_image' };
 
 /** Object path in the place-photos bucket: stable per (place, source URL). */
-export function storagePathFor(restaurantId: number, url: string): string {
-  return `pipeline/${restaurantId}/${createHash('sha256').update(url).digest('hex').slice(0, 16)}.webp`;
+export function storagePathFor(placeRef: number, url: string): string {
+  return `pipeline/${placeRef}/${createHash('sha256').update(url).digest('hex').slice(0, 16)}.webp`;
 }
 
 /** Resize to at most 800 px on the longest side (never upscaled), WebP q75, metadata stripped. */

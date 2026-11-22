@@ -10,6 +10,9 @@ import type { Ranking } from './features/vibe/adapters';
 import { semanticMarkerState } from './features/map/semanticMarkers';
 import { createConvergence, mapDisplay } from './features/vibe/convergence';
 import { rankPlaces } from './discovery/filter';
+import { focalLengthPx, perspectiveScale, quantizeScale } from './pinPerspective';
+import { CAMERA_KEYS, cameraStep, isTypingTarget } from './keyboardCamera';
+import { cullOrder, cullOverlapping, cullsAtZoom, type PinBox } from './pinCulling';
 import { mountAccount } from './features/account';
 import { mountScene, sceneDevHook } from './features/scene';
 import {
@@ -71,6 +74,7 @@ const map = new MapLibreMap({
   ...TILTED,
   maxPitch: 75,
   attributionControl: false,
+  keyboard: false, // replaced by the WASD / arrow-key camera below
 });
 map.addControl(new AttributionControl({ compact: true }), 'bottom-left');
 map.on('error', (e) => console.error('[map]', e.error?.message ?? e));
@@ -90,6 +94,8 @@ let selectedPin: HTMLElement | null = null;
 let semanticRanking: Ranking | null = null;
 let refreshConvergence = () => {};
 let markerPlaces: Place[] = [];
+// Whether every pin is at its flat-map size (--pin-distance 1); see syncPinPerspective.
+let pinsFlat = true;
 let dealTimer: ReturnType<typeof setInterval> | undefined;
 let temporaryPlaceMarker: Marker | null = null;
 
@@ -186,6 +192,8 @@ function showPlaces(places: Place[], lookFor: (place: Place) => PinLook, icon?: 
     return new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
   });
   markerPlaces = places;
+  pinsFlat = false; // new pins have no --pin-distance yet; size them for the current camera
+  syncPinPerspective();
   updateDealChips(new Date());
   dealTimer = setInterval(() => updateDealChips(new Date()), 60_000);
   // Pins refreshed under an open popup (the map moved): keep its place highlighted.
@@ -211,6 +219,64 @@ function updateDealChips(now: Date) {
     pin.setAttribute('aria-label', text ? `${place.name}, deal on now` : place.name);
   });
   placePopup.refreshDeals(now);
+  scheduleCull(); // a deal starting or ending changes which pins win overlaps
+}
+
+/**
+ * Hide pins sitting almost on top of a more important one until zooming in spreads them
+ * apart (see pinCulling.ts). Screen-space, so it runs once the camera settles
+ * rather than every frame. Pins well off screen are left alone, and from
+ * CULL_MAX_ZOOM in nothing is hidden.
+ *
+ * Works on top of syncMarkerVisibility: pins it hides (focus mode, vibe
+ * ranking) take no part and stay inert, and the vibe match it writes to
+ * --pin-scale decides who wins after the selected, trip and deal pins.
+ */
+function cullPins() {
+  if (!markers.length) return;
+  const canvas = map.getCanvas();
+  const margin = 60;
+  const boxes: PinBox[] = [];
+  const contenders: boolean[] = [];
+  const scores: number[] = [];
+  const trip_ = trip.getState();
+  const relevant = new Set([placePopup.current()?.id, trip_.from?.placeId, trip_.to?.placeId]);
+  markers.forEach((marker, i) => {
+    const pin = marker.getElement();
+    const { x, y } = map.project(marker.getLngLat());
+    const matchScale = parseFloat(pin.style.getPropertyValue('--pin-scale')) || 1;
+    const scale = matchScale * (parseFloat(pin.style.getPropertyValue('--pin-distance')) || 1);
+    boxes.push({ x, y, width: 28 * scale, height: 40 * scale });
+    const onScreen = x > -margin && x < canvas.clientWidth + margin && y > -margin && y < canvas.clientHeight + 40 + margin;
+    contenders.push(onScreen && !pin.classList.contains('vb-marker-hidden'));
+    const hasDeal = pin.querySelector<HTMLElement>('.pin-deal')?.hidden === false;
+    scores.push(
+      (pin === selectedPin ? 1000 : 0) + (relevant.has(markerPlaces[i]?.id) ? 100 : 0) + (hasDeal ? 10 : 0) + matchScale,
+    );
+  });
+  // Zoomed in to street level, every pin shows (an empty contest hides nothing).
+  const order = cullsAtZoom(map.getZoom()) ? cullOrder(scores).filter((i) => contenders[i]) : [];
+  const visible = cullOverlapping(boxes, order);
+  markers.forEach((marker, i) => {
+    const pin = marker.getElement();
+    const culled = !visible[i];
+    pin.classList.toggle('culled', culled);
+    shadows[i]?.getElement().classList.toggle('culled', culled);
+    // Not clickable or focusable while culled; setMarkerVisible owns inert for focus-hidden pins.
+    const inert = culled || pin.classList.contains('vb-marker-hidden');
+    if (pin.inert !== inert) pin.inert = inert;
+  });
+}
+
+// Keyboard movement fires moveend every frame, so wait until the camera has
+// rested. A drag or held key still in progress will schedule again when it ends.
+let cullTimer: ReturnType<typeof setTimeout> | undefined;
+function scheduleCull() {
+  clearTimeout(cullTimer);
+  cullTimer = setTimeout(() => {
+    if (map.isMoving() || heldKeys.size) return;
+    cullPins();
+  }, 150);
 }
 
 function clearPins() {
@@ -237,6 +303,7 @@ function selectPin(el: HTMLElement) {
   setPinSelected(selectedPin, false);
   selectedPin = el;
   setPinSelected(el, true);
+  cullPins(); // the selected pin always shows, even if it was hidden behind another
 }
 
 // ---------------------------------------------------------------------------
@@ -256,6 +323,7 @@ const placePopup = createPlacePopup(map, {
   onClose: () => {
     setPinSelected(selectedPin, false);
     selectedPin = null;
+    cullPins(); // the deselected pin no longer outranks the pins it was covering
     for (const { marker } of searchMarkers.values()) marker.getElement().classList.remove('selected');
     queueMicrotask(syncTrip);
     temporaryPlaceMarker?.remove(); temporaryPlaceMarker = null;
@@ -270,6 +338,8 @@ function openPlace(place: Place, look: { color: string; icon?: string }) {
     const el = pinElement(); el.classList.add('selected', 'vb-temporary-place'); el.setAttribute('aria-label', place.name);
     el.style.setProperty('--pin-color', look.color);
     temporaryPlaceMarker = new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
+    pinsFlat = false;
+    syncPinPerspective();
   }
   placePopup.open(place, look);
   syncMarkerVisibility();
@@ -353,6 +423,8 @@ function showSearchResults(places: Place[]) {
     const marker = new Marker({ element: el, anchor: 'bottom' }).setLngLat([place.lon, place.lat]).addTo(map);
     searchMarkers.set(place.id, { place, marker });
   }
+  pinsFlat = false; // new pins have no --pin-distance yet
+  syncPinPerspective();
   syncMarkerVisibility();
 }
 function syncMarkerVisibility() {
@@ -372,6 +444,7 @@ function syncMarkerVisibility() {
   }
   for (const [id, { marker }] of searchMarkers) setMarkerVisible(marker.getElement(), markerVisible(mode, 'search', id, mode === 'discovery' ? [placePopup.current()?.id ?? ''] : relevant));
   if (temporaryPlaceMarker) setMarkerVisible(temporaryPlaceMarker.getElement(), mode !== 'navigation');
+  cullPins(); // visibility and match scale changed which pins compete; also restores culled pins' inert
 }
 
 function openSearchResult(place: Place) {
@@ -585,6 +658,73 @@ $('zoom-in').addEventListener('click', () => map.zoomIn());
 $('zoom-out').addEventListener('click', () => map.zoomOut());
 $('compass').addEventListener('click', () => map.easeTo({ bearing: 0 }));
 
+/*
+ * Keyboard camera (see keyboardCamera.ts): WASD moves, Left/Right arrows
+ * turn, Up/Down arrows tilt, +/- zoom. Held keys move continuously, one step
+ * per animation frame.
+ *
+ * Keys only drive the map when the map is what the user last worked with:
+ * focus (or, with nothing focused, the last click) is on the map, its pins or
+ * its controls. Anywhere else (place popup, search, discovery panel, route
+ * planner, account) keeps its own keys, so arrows still scroll what's read.
+ * Navigation's pitch lock keeps the map flat and north-up: arrows do nothing
+ * then, while WASD and +/- still pan and zoom.
+ */
+const heldKeys = new Set<string>();
+let keyFrame = 0;
+let lastKeyTime = 0;
+let lastPointerTarget: Element | null = null;
+document.addEventListener('pointerdown', (e) => {
+  lastPointerTarget = e.target instanceof Element ? e.target : null;
+}, { capture: true });
+
+function keysAreForMap(e: KeyboardEvent): boolean {
+  if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return false;
+  const target = e.target instanceof HTMLElement ? e.target : null;
+  if (isTypingTarget(target)) return false;
+  const nothingFocused = !target || target === document.body || target === document.documentElement;
+  const context = nothingFocused ? lastPointerTarget : target;
+  if (!context || context === document.body) return true;
+  return !!context.closest('#map, .map-controls') && !context.closest('.maplibregl-popup');
+}
+
+function keyCameraFrame(now: number) {
+  // The rAF timestamp is the frame's start, which can be just before the
+  // keydown that set lastKeyTime: clamp at 0 so the first step never runs
+  // backwards, and at 0.1 s so a stalled frame doesn't jump.
+  const dt = Math.max(0, Math.min(0.1, (now - lastKeyTime) / 1000));
+  lastKeyTime = now;
+  // jumpTo would cancel a running ease or flight (2D/3D toggle, compass,
+  // flying to a search result) or fight a drag, so hold still until it ends.
+  if (!map.isMoving()) {
+    const step = cameraStep(heldKeys, dt);
+    if (pitchLock.isLocked()) step.bearing = step.pitch = 0;
+    const centerPx = map.project(map.getCenter());
+    map.jumpTo({
+      center: map.unproject([centerPx.x + step.panX, centerPx.y + step.panY]),
+      bearing: map.getBearing() + step.bearing,
+      pitch: Math.min(map.getMaxPitch(), Math.max(0, map.getPitch() + step.pitch)),
+      zoom: map.getZoom() + step.zoom,
+    });
+  }
+  keyFrame = heldKeys.size ? requestAnimationFrame(keyCameraFrame) : 0;
+}
+
+document.addEventListener('keydown', (e) => {
+  if (!keysAreForMap(e)) return;
+  if (CAMERA_KEYS.has(e.code)) {
+    e.preventDefault(); // arrows would otherwise scroll a focused panel
+    heldKeys.add(e.code);
+    if (!keyFrame) {
+      lastKeyTime = performance.now();
+      keyFrame = requestAnimationFrame(keyCameraFrame);
+    }
+  }
+});
+document.addEventListener('keyup', (e) => heldKeys.delete(e.code));
+// Keys released while the window is in the background never send keyup.
+window.addEventListener('blur', () => heldKeys.clear());
+
 tiltBtn.addEventListener('click', () => {
   if (pitchLock.isLocked()) return;
   const flat = map.getPitch() < 5;
@@ -613,7 +753,55 @@ function syncDepth() {
     if (map.getLayer(id)) map.setPaintProperty(id, 'fill-extrusion-opacity', BUILDING_3D_OPACITY * depth);
   }
 }
+/**
+ * In the tilted view, size each pin (and its shadow) by its distance from the
+ * camera, so pins toward the horizon shrink like the map under them. MapLibre
+ * draws markers at a fixed pixel size, so this sets --pin-distance per pin
+ * (see pinPerspective.ts); the CSS multiplies it into the pin's scale.
+ */
+function syncPinPerspective() {
+  // Discovery pins with their shadows, plus search-result and saved-place pins (no shadows).
+  const pins: [Marker, Marker | undefined][] = [
+    ...markers.map((m, i): [Marker, Marker | undefined] => [m, shadows[i]]),
+    ...[...searchMarkers.values()].map(({ marker }): [Marker, undefined] => [marker, undefined]),
+    ...(temporaryPlaceMarker ? [[temporaryPlaceMarker, undefined] as [Marker, undefined]] : []),
+  ];
+  const pitch = map.getPitch();
+  if (pitch < 0.5) {
+    if (!pinsFlat) {
+      for (const [pin, shadow] of pins) {
+        pin.getElement().style.setProperty('--pin-distance', '1');
+        pin.getElement().style.removeProperty('--pin-z');
+        shadow?.getElement().style.setProperty('--pin-distance', '1');
+      }
+      pinsFlat = true;
+    }
+    return;
+  }
+  pinsFlat = false;
+  const focal = focalLengthPx(map.getCanvas().clientHeight, map.getVerticalFieldOfView());
+  const centerY = map.project(map.getCenter()).y;
+  // Only write what changed: restyling every pin every frame is what made the
+  // tilted map lag (see PIN_SCALE_STEP). Reading inline style doesn't force layout.
+  for (const [marker, shadow] of pins) {
+    const y = map.project(marker.getLngLat()).y;
+    const scale = quantizeScale(perspectiveScale(y - centerY, pitch, focal));
+    const pin = marker.getElement();
+    if (pin.style.getPropertyValue('--pin-distance') !== scale) {
+      pin.style.setProperty('--pin-distance', scale);
+      shadow?.getElement().style.setProperty('--pin-distance', scale);
+    }
+    // Nearer (lower on screen) pins paint over farther ones; 8 px bands are plenty for overlap order.
+    const z = String(Math.max(1, Math.round(y / 8)));
+    if (pin.style.getPropertyValue('--pin-z') !== z) pin.style.setProperty('--pin-z', z);
+  }
+}
+
 map.on('style.load', syncDepth);
+map.on('move', syncPinPerspective);
+map.on('resize', syncPinPerspective);
+map.on('moveend', scheduleCull);
+map.on('resize', scheduleCull);
 map.on('rotate', syncControls);
 map.on('pitch', () => {
   syncControls();

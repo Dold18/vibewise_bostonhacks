@@ -5,6 +5,7 @@ import { connect } from './db.ts';
 import { cityLicenseInput, loadCityLicenses, matchCityLicenses, type CityLicense } from './media/cityLicenses.ts';
 import { fetchEnrichPlaces, fetchHiddenKeys, fetchStudentReviewText, writePlaceMedia } from './media/db.ts';
 import { nameKey } from './normalize.ts';
+import { PLACE_TYPE_CONFIG, parseTypeOption, type PlaceType } from './placeTypes.ts';
 import { createPoliteFetcher, type FetchResult } from './media/http.ts';
 import { facingPhoto } from './media/mapillary.ts';
 import { loadCampuses, loadDemoIds, loadStops, tierOf, type Tier } from './media/priority.ts';
@@ -16,11 +17,13 @@ import { loadListings, matchListing, type Listing } from './media/wikivoyage.ts'
 
 const CACHE_DIR = path.resolve(import.meta.dirname, '..', '.cache');
 const DEMO_FILE = path.resolve(import.meta.dirname, '..', 'demo-places.txt');
-const OSM_TAGS_LEFT_OUT = new Set(['name', 'amenity', 'wikidata', 'wikimedia_commons', 'image']);
+const OSM_TAGS_LEFT_OUT = new Set([
+  'name', 'amenity', 'wikidata', 'wikimedia_commons', 'image', 'tourism', 'leisure', 'historic', 'natural', 'wikipedia',
+]);
 const PHOTO_SOURCES: PhotoSource[] = ['osm', 'wikidata', 'website', 'commons', 'mapillary'];
 const INPUT_SOURCES: VibeSource[] = ['website', 'wiki', 'osm_tags', 'city_licenses', 'student_reviews'];
 
-export interface MediaArgs { dryRun: boolean; refresh: boolean; limit: number | null; concurrency: number; tiers: Tier[] }
+export interface MediaArgs { type: PlaceType; dryRun: boolean; refresh: boolean; limit: number | null; concurrency: number; tiers: Tier[] }
 
 export interface EnrichContext {
   website: (p: EnrichPlace) => Promise<{ photos: PhotoCandidate[]; input: VibeInput | null; failure: FetchResult | null }>;
@@ -31,10 +34,12 @@ export interface EnrichContext {
   licenses: CityLicense[];
   mapillary: ((p: EnrichPlace) => Promise<PhotoCandidate | null>) | null;
   /** Keys of hidden photos (rank.ts photoKey). A failure here fails the place: unfiltered photos are never written. */
-  hiddenKeys: (restaurantId: number) => Promise<Set<string>>;
-  studentReviews: (restaurantId: number) => Promise<string[]>;
+  hiddenKeys: (placeRef: number) => Promise<Set<string>>;
+  studentReviews: (placeRef: number) => Promise<string[]>;
   /** How many catalog places share each nameKey; chains get no name-only Wikivoyage match. */
   nameCounts: Map<string, number>;
+  /** Per-type generic name words; empty (restaurants) keeps the food-only behavior. */
+  extraGeneric?: ReadonlySet<string>;
 }
 
 export interface PlaceResult {
@@ -59,6 +64,7 @@ export function parseMediaArgs(argv: string[]): MediaArgs {
   const { values } = parseArgs({
     args: argv,
     options: {
+      type: { type: 'string' },
       'dry-run': { type: 'boolean', default: false },
       refresh: { type: 'boolean', default: false },
       limit: { type: 'string' },
@@ -72,6 +78,7 @@ export function parseMediaArgs(argv: string[]): MediaArgs {
     throw new Error(`invalid --tiers '${values.tiers}' (expected a list of 1, 2, 3)`);
   }
   return {
+    type: parseTypeOption(values.type),
     dryRun: values['dry-run'],
     refresh: values.refresh,
     limit: positiveInt('limit', values.limit, null),
@@ -118,7 +125,7 @@ export async function enrichPlace(place: EnrichPlace, ctx: EnrichContext): Promi
   const title = linked.wikidata?.enwikiTitle;
   const wp = title ? await attempt('wikipedia', () => ctx.wikipedia(title), null, 'wiki') : null;
   const sameNamePlaces = ctx.nameCounts.get(nameKey(place.name)) ?? 1;
-  const wv = await attempt('wikivoyage', async () => matchListing(place, ctx.listings, { sameNamePlaces }), null, 'wiki');
+  const wv = await attempt('wikivoyage', async () => matchListing(place, ctx.listings, { sameNamePlaces, extraGeneric: ctx.extraGeneric }), null, 'wiki');
   const wikiParts = [wp ? `Wikipedia: ${wp.text}` : null, wv?.content ? `Wikivoyage: ${wv.content}` : null].filter((s): s is string => s !== null);
   if (wikiParts.length > 0) {
     const wvUrl = wv ? `https://en.wikivoyage.org/wiki/${encodeURIComponent(wv.pageTitle.replace(/ /g, '_'))}` : null;
@@ -182,8 +189,8 @@ async function main(): Promise<void> {
   console.log(`Loaded ${listings.length} Wikivoyage listings, ${licenses.length} city licenses, ${demo.size} demo places`);
 
   // Name counts come from the whole catalog, not just unchecked rows, so chains are recognized on resumed runs too.
-  const catalog = await fetchEnrichPlaces(client, { refresh: true });
-  const all = args.refresh ? catalog : await fetchEnrichPlaces(client, { refresh: false });
+  const catalog = await fetchEnrichPlaces(client, { refresh: true, type: args.type });
+  const all = args.refresh ? catalog : await fetchEnrichPlaces(client, { refresh: false, type: args.type });
   const nameCounts = new Map<string, number>();
   for (const p of catalog) nameCounts.set(nameKey(p.name), (nameCounts.get(nameKey(p.name)) ?? 0) + 1);
   const tiered = all.map((p) => ({ p, tier: tierOf(p, { demo, stops, campuses }) }));
@@ -192,16 +199,18 @@ async function main(): Promise<void> {
   const skippedTiers = tiered.length - wanted.length;
   console.log(`Processing ${queue.length} of ${all.length} places (tiers ${args.tiers.join(',')}${args.dryRun ? ', dry run' : ''})`);
 
+  const extraGeneric = PLACE_TYPE_CONFIG[args.type].genericNameWords;
   const ctx: EnrichContext = {
     website: (p) => scrapeWebsite(p, web),
     linked: (p) => linkedPhotos(p, api),
-    geosearch: (p) => geosearchPhotos(p, api),
+    geosearch: (p) => geosearchPhotos(p, api, extraGeneric),
     wikipedia: (t) => wikipediaExtract(t, api),
     listings, licenses,
     mapillary: mapillaryToken ? (p) => facingPhoto(p, mapillaryToken, api) : null,
     hiddenKeys: (id) => fetchHiddenKeys(client, id),
     studentReviews: (id) => fetchStudentReviewText(client, id),
     nameCounts,
+    extraGeneric,
   };
 
   const results: PlaceResult[] = [];
@@ -227,7 +236,7 @@ async function main(): Promise<void> {
         dryRows.push({ placeId: p.placeId, name: p.name, tier, ...r });
       } else {
         try {
-          await writePlaceMedia(client, p.id, r.photos, r.inputs, new Date().toISOString(), r.keepSources);
+          await writePlaceMedia(client, args.type, p.id, r.photos, r.inputs, new Date().toISOString(), r.keepSources);
         } catch (err) {
           r.errors.push(`write: ${err instanceof Error ? err.message : String(err)}`);
         }

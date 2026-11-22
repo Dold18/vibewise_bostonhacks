@@ -50,11 +50,28 @@ describe('itinerary', () => {
     expect(JSON.stringify(it2).toLowerCase()).not.toContain('live');
   });
 
-  it('says the total excludes the first wait, and includes the transfer wait when there is one', () => {
+  it('without a first-train wait from the server, says the total excludes it, and includes the transfer wait when there is one', () => {
     expect(it2.summary).toBe('About 30 min · 1 transfer');
     expect(it2.summaryNote).toContain('Excludes waiting for the first train');
     expect(it2.summaryNote).toContain('scheduled wait at the transfer');
     expect(it2.steps[2]).toEqual({ kind: 'transfer', text: 'Transfer at Park Street', detail: 'Scheduled wait about 4 min' });
+  });
+
+  it('with firstTrainWaitSeconds, includes that wait in the total, adds a wait row before the first ride, and says so', () => {
+    const waited = buildItinerary({ ...TRANSFER, firstTrainWaitSeconds: 300 }, { fromLabel: 'Harvard Yard', toLabel: 'Fixture Cafe' });
+    // durationSec (1800, already includes the transfer wait) + 300 s first wait = 35 min.
+    expect(waited.summary).toBe('About 35 min · 1 transfer');
+    expect(waited.summaryNote).toContain('Assumes you leave now');
+    expect(waited.summaryNote).toContain('wait for the first train');
+    expect(waited.summaryNote).not.toContain('Excludes');
+    expect(waited.steps.map((s) => s.kind)).toEqual(['walk', 'wait', 'ride', 'transfer', 'ride', 'walk']);
+    expect(waited.steps[1]).toEqual({ kind: 'wait', text: 'Wait at Harvard', detail: '~5 min, next scheduled Red Line train' });
+    // The transfer wait is shown once, on the transfer step; it is not duplicated as a second wait row.
+    expect(waited.steps.filter((s) => s.kind === 'wait')).toHaveLength(1);
+    // A zero wait adds no row and leaves the total alone.
+    const zero = buildItinerary({ ...TRANSFER, firstTrainWaitSeconds: 0 }, { fromLabel: 'a', toLabel: 'b' });
+    expect(zero.steps.some((s) => s.kind === 'wait')).toBe(false);
+    expect(zero.summary).toBe('About 30 min · 1 transfer');
   });
 
   it('reports the last train back, or why it is unavailable', () => {

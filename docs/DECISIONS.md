@@ -142,7 +142,7 @@
     5. Mapillary street photos.
   - **Licensed photos** keep their license and credit. Allowed: CC0, Public Domain, CC BY, CC BY-SA.
   - **Website photos** are shown on cards with the domain credited and a link back. They may also be stored (copied into our storage) and embedded (e.g. CLIP image vectors). The current pipeline stores only their URLs. A `hidden` flag removes any photo.
-  - **Vibe inputs** come from website text, Wikipedia/Wikivoyage, OSM tags, Boston entertainment and alcohol license data, and student reviews. They are collected offline by `npm run enrich:media` into `place_vibe_inputs`.
+  - **Vibe inputs** come from website text, Wikipedia/Wikivoyage, OSM tags, Boston entertainment and alcohol license data, and student reviews. They are collected offline by `npm run enrich:media -- --type restaurants` into `place_vibe_inputs`.
   - New tables `place_photos`, `place_vibe_inputs` and `student_reviews`, plus a `place-photos` storage bucket (migration `20261121200000_create_place_media.sql`).
 - **Departure from AGENTS.md §5 / PRODUCT.md:** showing, storing and embedding website photos without the owner's permission departs from the "images must be licensed/authorized" rule.
   - **Decided 2026-11-21 by the project lead:** cards can show website photos, and website photos can be stored and embedded. This exception covers photos from a place's own website only. Third-party platforms (Google, Yelp, Tripadvisor, social media, delivery apps) stay excluded.
@@ -172,7 +172,7 @@
 - **Date / owner:** 2026-11-21 · Map workstream (pins, cards), with Integration (pipeline). **Flagged for team ratification.** Spec: `docs/superpowers/specs/2026-11-21-deal-markers-design.md`.
 - **Context:** Students want to see at a glance which places have a student discount or a special running now. Nothing in the catalog records deals, and `restaurants.hours` is never filled.
 - **Decision:**
-  - **Sources, in order:** a team-confirmed curated list (`pipeline/deals.curated.json`, ships empty); OSM `happy_hours` tags; and a rule-based scan of the place's own website (at most 2 linked pages, polite fetcher, robots honored). All run in `npm run enrich:deals`.
+  - **Sources, in order:** a team-confirmed curated list (`pipeline/deals.curated.json`, ships empty); OSM `happy_hours` tags; and a rule-based scan of the place's own website (at most 2 linked pages, polite fetcher, robots honored). All run in `npm run enrich:deals -- --type <type>`.
   - **Storage:** new table `place_deals` (migration `20261122090000_create_place_deals.sql`) plus `restaurants.deals_checked_at`. Everyone reads non-hidden rows; there are no client writes. `hidden` removes a bad row, and no run deletes a hidden row.
   - **Timing:** each deal has `timing` of `any_time` (student only), `scheduled` (parsed schedule, Boston local time) or `unconfirmed`. `unconfirmed` is never active.
   - **Website student deals (R7):** a website line with a student term and a broad discount term (`free`, `deal`, `discount`) is kept as a `student` deal, but `any_time` is allowed only when the line states a concrete offer (a percentage or dollar amount off, half price, a free item with student ID, or "student discount/price"). Otherwise it is `unconfirmed` (listed on the card, no chip). Lines with a date, holiday or expiry word never become `any_time` or a weekly schedule. When in doubt the scan shows fewer markers.
@@ -183,6 +183,24 @@
   - `Place` gains `deals?`, replacing `studentDiscount?`. This is a CONTRACTS.md change, proposed and not yet applied.
   - Venue open hours are not yet considered. When hours parsing lands, add "and the venue is open, if its hours are known".
 - **Revisit trigger:** A site owner objects (hide their deals), or hours parsing lands.
+
+### P-016 · Proposed · Non-food places: per-type tables, a `places` registry, and `--type`
+- **Date / owner:** 2026-11-21 · Integration (pipeline, data model); Map and Vibe workstreams consume it. **Flagged for team ratification.** Spec: `docs/superpowers/specs/2026-11-21-non-food-places-design.md`.
+- **Context:** The catalog only holds restaurants, but the map and vibe search should also cover museums, entertainment venues, parks and landmarks. The shared tables (`student_reviews`, `place_photos`, `place_vibe_inputs`, `place_deals`) were keyed on `restaurants.id`.
+- **Decision:**
+  - **One table per type:** `restaurants` (unchanged) plus `museums`, `entertainment`, `parks` and `landmarks`, with the type-neutral columns and a `kind` column. No food columns on the new tables.
+  - **Registry:** `places` (`id`, `place_id`, `place_type`) is the single id space. A type row's `id` is its registry id. Restaurants keep their ids, so photos, stored copies, vibe inputs and deals stay attached. The shared tables rename `restaurant_id` to `place_ref` and reference `places.id`.
+  - **Views:** `place_points` (service role, replaces `restaurant_points`) for the pipeline; `catalog_places` (public read) for the map index and vibe search.
+  - **`--type` on every pipeline script,** required: `ingest`, `enrich:media`, `enrich:photos`, `enrich:deals`, and `enrich:price` (restaurants only). Ingest cache files are per type.
+  - **One type per place, by precedence:** restaurants, museums, entertainment, parks, landmarks. If a place matches several types, the earliest in that order wins. A place already stored under another type is skipped (cross-type duplicates are not inserted; only an identical normalized name within 50 m counts, since a similar name is usually a different place in the same building, such as a museum's café), and ingest never moves a place between types automatically; a type change is a deliberate manual step.
+  - **Vibe ranking is left to the Vibe workstream:** `catalogSemanticCandidates` (on `origin/feature/vibe-engine-live`) still reads `restaurants`; the Vibe owner points it at `catalog_places` when ready. `apps/web/src/catalog.ts` on this branch already reads `catalog_places` and `places(place_deals(...))`.
+- **Why / alternatives:** Separate tables keep each type's columns honest and the food tables untouched. A registry gives the shared tables one foreign key target without changing any existing id.
+  - Ruled out: one wide table with nullable food columns (muddies the restaurant schema); a polymorphic `(place_type, place_id)` key in the shared tables (no foreign keys, no cascade); separate shared tables per type (duplicates photo, review and deal logic).
+- **Implications:**
+  - Proposed `PlaceCategory` mapping for the integration owner (CONTRACTS.md, not applied): `museums` -> `culture`, `parks` and `landmarks` -> `attraction`, `entertainment` -> `entertainment`. The running app uses `osm.ts`'s `Place`, which needs no change.
+  - The migration must not be pushed to the hosted project before the PR merges.
+  - Runbooks change from `npm run ingest` to `npm run ingest -- --type restaurants`.
+- **Revisit trigger:** A place type needs columns the shared set lacks, or automatic type moves become necessary.
 
 ## How to add a decision
 ~~~md

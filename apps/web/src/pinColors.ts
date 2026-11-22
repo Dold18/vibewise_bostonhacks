@@ -9,4 +9,6 @@ export const PIN_COLORS: Record<string, string> = {
   bars: '#c2185b',
   parks: '#1e8e3e',
   museums: '#1a73e8',
+  landmarks: '#8e24aa',
+  entertainment: '#f9a825',
 };

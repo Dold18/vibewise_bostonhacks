@@ -8,6 +8,13 @@ export const MATCH_SAME_NAME_METERS = 50;
 export const MATCH_SIMILAR_NAME_METERS = 25;
 export const MATCH_SIMILARITY_THRESHOLD = 0.6;
 export const DEDUPE_WITHIN_METERS = 50;
+// Non-food Foursquare sub-venues: a Foursquare-only place inside an OSM area (never a route) with a similar name merges
+// into it; other places inside are dropped only by areas up to this size (a campus, district or big park would swallow
+// real places). Similar, for areas up to this size: nameSimilarity at least SUB_VENUE_MERGE_SIMILARITY, or a token
+// subset either way. For larger areas: nameSimilarity at least MATCH_SIMILARITY_THRESHOLD, or the Foursquare tokens are
+// a subset of the OSM tokens and include a word outside the type's genericNameWords.
+export const SUB_VENUE_CONTAINER_MAX_HA = 20;
+export const SUB_VENUE_MERGE_SIMILARITY = 0.5;
 
 export const FSQ_MAX_AGE_DAYS = 730;
 export const UPSERT_BATCH_SIZE = 500;

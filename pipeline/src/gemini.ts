@@ -5,9 +5,10 @@
  */
 import { PRICE_SYSTEM_PROMPT, type PromptPlace } from './price.ts';
 
-// Chosen 2026-11-21: answered a test batch in under a second with thinking off;
-// gemini-3.5-flash gave the same bands ten times slower and gemini-3.8-flash timed out.
-export const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
+// 2026-11-21: gemini-2.5-flash now returns 404 ("no longer available to new users") for this
+// project's key, so the default moved to gemini-3.8-flash, confirmed working by `enrich:vibe`
+// (~3 s per restaurant, 300 of 300 succeeded). Override with GEMINI_MODEL.
+export const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 const BACKOFF_MS = [10_000, 20_000, 40_000]; // between the 4 attempts
 const REQUEST_TIMEOUT_MS = 180_000;

@@ -21,15 +21,21 @@ function recorder() {
 }
 
 test('parsePriceArgs defaults and flags', () => {
-  assert.deepEqual(parsePriceArgs([]), { dryRun: false, limit: null, force: false, batchSize: 100, rpm: 10 });
-  assert.deepEqual(parsePriceArgs(['--dry-run', '--limit=5', '--force', '--batch-size=20', '--rpm=4']),
-    { dryRun: true, limit: 5, force: true, batchSize: 20, rpm: 4 });
+  assert.deepEqual(parsePriceArgs(['--type=restaurants']), { type: 'restaurants', dryRun: false, limit: null, force: false, batchSize: 100, rpm: 10 });
+  assert.deepEqual(parsePriceArgs(['--type=restaurants', '--dry-run', '--limit=5', '--force', '--batch-size=20', '--rpm=4']),
+    { type: 'restaurants', dryRun: true, limit: 5, force: true, batchSize: 20, rpm: 4 });
 });
 
 test('parsePriceArgs rejects bad numbers', () => {
-  assert.throws(() => parsePriceArgs(['--limit=0']), /--limit/);
-  assert.throws(() => parsePriceArgs(['--rpm=x']), /--rpm/);
-  assert.throws(() => parsePriceArgs(['--batch-size=2.5']), /--batch-size/);
+  assert.throws(() => parsePriceArgs(['--type=restaurants', '--limit=0']), /--limit/);
+  assert.throws(() => parsePriceArgs(['--type=restaurants', '--rpm=x']), /--rpm/);
+  assert.throws(() => parsePriceArgs(['--type=restaurants', '--batch-size=2.5']), /--batch-size/);
+});
+
+test('parsePriceArgs is restaurants-only and needs --type', () => {
+  assert.throws(() => parsePriceArgs(['--type', 'parks']), /^Error: price estimates only apply to restaurants$/);
+  assert.throws(() => parsePriceArgs([]), /missing --type/);
+  assert.equal(parsePriceArgs(['--type', 'restaurants']).type, 'restaurants');
 });
 
 test('batches candidates and writes per batch', async () => {

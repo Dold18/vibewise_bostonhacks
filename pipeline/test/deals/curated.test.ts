@@ -11,7 +11,7 @@ test('student entry without schedule is any_time', () => {
   assert.deepEqual(r.errors, []);
   assert.equal(r.rows[0]!.timing, 'any_time');
   assert.equal(r.rows[0]!.schedule, null);
-  assert.equal(r.rows[0]!.restaurantId, 11);
+  assert.equal(r.rows[0]!.placeRef, 11);
   assert.equal(r.rows[0]!.source, 'curated');
   assert.equal(r.rows[0]!.quote, null);
 });

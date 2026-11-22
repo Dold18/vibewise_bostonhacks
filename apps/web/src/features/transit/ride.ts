@@ -162,7 +162,12 @@ async function lastTrainLabel(leg: LegSelection, arrivesAt: string, opts: LiveOp
   }
 }
 
-interface LiveOkBase { lastTrainBack: LastTrainBack | null; lastTrainBackNote?: string }
+interface LiveOkBase {
+  lastTrainBack: LastTrainBack | null; lastTrainBackNote?: string;
+  /** Scheduled wait for the first train: its departure minus when the rider reaches the boarding stop (request time + walk-in).
+   *  Additive: NOT included in option.durationSec. */
+  firstTrainWaitSeconds: number;
+}
 export type LivePlanResult =
   | ({ status: "ok"; tier: 1; option: TransitOption; plan: Tier1Plan; timing: RideTiming; service: ServiceCheck } & LiveOkBase)
   | ({
@@ -234,7 +239,8 @@ async function liveTier1(plan: Tier1Plan, opts: LiveOptions): Promise<LivePlanRe
     // Walk + scheduled ride + walk. Excludes the wait for the train (see timing.departsAt).
     durationSec: legs.reduce((s, l) => s + l.durationSec, 0),
   };
-  return { status: "ok", tier: 1, option, plan, timing, service, ...(await lastTrainLabel(plan.leg, timing.arrivesAt, opts)) };
+  const firstTrainWaitSeconds = Math.max(0, Math.round((Date.parse(timing.departsAt) - boardAfter.getTime()) / 1000));
+  return { status: "ok", tier: 1, option, plan, timing, service, firstTrainWaitSeconds, ...(await lastTrainLabel(plan.leg, timing.arrivesAt, opts)) };
 }
 
 const noServiceMessage = (route: string, leg: LegSelection, now: Date, nearest: { stop: { name: string }; walkSeconds: number }) =>
@@ -286,6 +292,7 @@ async function liveTier2(plan: Tier2Plan, opts: LiveOptions): Promise<LivePlanRe
   };
   return {
     status: "ok", tier: 2, option, plan, timings: [tA, tB], services: [sA, sB], transferWaitSeconds,
+    firstTrainWaitSeconds: Math.max(0, Math.round((Date.parse(tA.departsAt) - (now.getTime() + walkIn * 1000)) / 1000)),
     // Last train back for the FINAL leg only: destination → hub on leg B's line. It does not verify the connection home.
     ...(await lastTrainLabel(plan.legB, tB.arrivesAt, opts)),
   };
