@@ -1,21 +1,28 @@
-# Vibenta — KayKit 3D asset import (initial collection)
+# Vibenta — Official KayKit CC0 3D models
 
-This folder contains **12 actually imported 3D models** (6 haunted and 6 restaurant), sourced directly from the original official **KayKit / Kay Lousberg** GitHub repositories. They are separate from the 225 original v1/v2 SVG assets. These models are not yet used by the map.
+**40 actual imported models** from five official [KayKit](https://github.com/KayKit-Game-Assets) repositories. Not the same as the additional 40 exact-named `3DAssets.dev` candidates, which are still in the download queue.
 
-- [Halloween Bits source](https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0)
-- [Restaurant Bits source](https://github.com/KayKit-Game-Assets/KayKit-Restaurant-Bits-1.0)
-- License: **CC0 1.0 Universal**. The original LICENSE.txt is retained in each pack folder.
-- Source assets: unmodified .gltf + matching .bin + shared .png per pack.
-- Metadata: [manifest.v1.json](manifest.v1.json) with stable asset IDs, source paths, themes, placement-role candidates and honest QA states.
-- **Verification done:** glTF JSON parsed, referenced external buffer and shared texture filenames matched; one full model + buffer + texture + license from each pack spot-checked byte-identical to their publisher's GitHub blobs.
-- **Not done:** visual browser QA, geometry/scale orientation checks, WebGL renderer integration, GLB/Draco/meshopt optimization, GPU benchmarking, scene placements, quiz triggers, full-file SHA256 manifest.
+| Source family | Models | Main thematic uses |
+|---|---:|---|
+| Halloween Bits | 6 | Haunted, gothic, mysterious |
+| Restaurant Bits | 14 | Dining, comfort food, generic café props |
+| Furniture Bits | 8 | Cozy cafés, lounges, listening environments |
+| City Builder Bits | 8 | Stylized urban, retro, nightlife |
+| Space Base Bits | 4 | Sci-fi, futuristic, whimsical |
+| **Total** | **40** | |
 
-To use an asset in a browser 3D renderer, keep the .gltf in the same directory as its named .bin file and the shared PNG. Only load selected assets in the future; do not preload entire catalogs.
+Each model retains **original `.gltf` + matching `.bin`**. Each pack also retains its own original `LICENSE.txt` and a shared PNG palette texture. Models use external dependencies; preserve relative filenames when developing with Three.js/GLTFLoader or converting to GLB. Their original provenance and stable IDs are stored in [manifest.v1.json](manifest.v1.json).
 
-**Examples for eventual thematic installations (not implemented):**
-- Haunted hero vignette: arch_gate + tree_dead_large + lantern_hanging; optional pumpkin accent.
-- Restaurant hero vignette: table_round_A_decorated + chair_A + menu; optional food_dinner accent.
+**Integrity audit:** all **90 tracked source files** (40 glTF files, 40 binary buffers, five texture PNGs and five license files) have matching Git blob SHA identifiers against the publisher's original GitHub repositories. All 40 model glTF files had their buffer/texture dependency names checked during import. No mismatches reported.
 
-Actual Italian-specific hero models (pizza, pasta, oven, vine-covered facade) still need model-level sourcing. Do not describe generic restaurant objects as specifically Italian.
+**QA not yet done:** actual scene visual previews, renderer connection, device performance, model scale/pivot assessment, mesh complexity optimization and GLB conversion. The 40 models are *stored assets*, not working scene effects.
 
-**Map-safety rule:** all props are fictional stylizations, not geolocated ground truth. They must not occlude MBTA/walking paths, station icons, destination markers, attribution, or readable labels.
+## Intended design
+
+The asset system should combine independent **cuisine**, **music genre**, **venue context**, **occasion**, and **vibe** tags. The two optional set-piece slots should be:
+1. One context-specific focal installation (e.g. food setup or music equipment).
+2. One complementary atmospheric accent (e.g. foliage, light or surreal prop).
+
+Keep fictional props visibly illustrative and never state or imply the actual physical venue has them. In navigation/focus mode, protect labels, real road/building shapes, destination pins, station icons, walking/transit legs, attribution and click targets. Prefer hiding decorative props to obscuring safe route information.
+
+**Next gap:** cuisine- and genre-specific hero objects. Generic dining props do not count as completed Italian, Thai, Ethiopian, Chinese or other cuisine kits; furniture and city props do not count as rock/jazz/EDM instruments. Continue acquiring visually reviewed per-model GLBs from the [curated 3DAssets list](../../sources/curated-3dassets.v1.json) and additional legitimate CC0 suppliers.
