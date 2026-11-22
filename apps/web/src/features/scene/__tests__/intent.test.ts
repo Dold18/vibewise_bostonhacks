@@ -35,8 +35,8 @@ describe('sanitizeIntent', () => {
       {
         ...intent(),
         presets: [
-          { id: 'noir_jazz', weight: 0.2 },
-          { id: 'noir_jazz', weight: 0.1 },
+          { id: 'noir_nocturne', weight: 0.2 },
+          { id: 'noir_nocturne', weight: 0.1 },
           { id: 'vaporwave', weight: 0.5 },
           { id: 'neon_city', weight: Number.NaN },
           { id: 'amber_refuge', weight: -1 },
@@ -44,23 +44,23 @@ describe('sanitizeIntent', () => {
         ],
       },
     );
-    expect(r.intent!.presets).toEqual([{ id: 'noir_jazz', weight: 0.3 }]);
+    expect(r.intent!.presets).toEqual([{ id: 'noir_nocturne', weight: 0.3 }]);
     expect(codes(r).filter((c) => c === 'preset_dropped')).toHaveLength(4);
   });
 
   it('keeps the three strongest presets and normalizes only when weights exceed 1', () => {
-    const many = sanitizeIntent(intent([['noir_jazz', 0.9], ['neon_city', 0.6], ['amber_refuge', 0.3], ['retro_atlas', 0.2]]));
-    expect(many.intent!.presets.map((p) => p.id)).toEqual(['noir_jazz', 'neon_city', 'amber_refuge']);
+    const many = sanitizeIntent(intent([['noir_nocturne', 0.9], ['neon_city', 0.6], ['amber_refuge', 0.3], ['retro_atlas', 0.2]]));
+    expect(many.intent!.presets.map((p) => p.id)).toEqual(['noir_nocturne', 'neon_city', 'amber_refuge']);
     expect(many.intent!.presets.reduce((s, p) => s + p.weight, 0)).toBeCloseTo(1, 2);
 
     // Weights under 1 are a deliberate partial scene; the rest is the plain map.
-    const faint = sanitizeIntent(intent([['noir_jazz', 0.2], ['neon_city', 0.1]]));
-    expect(faint.intent!.presets).toEqual([{ id: 'noir_jazz', weight: 0.2 }, { id: 'neon_city', weight: 0.1 }]);
+    const faint = sanitizeIntent(intent([['noir_nocturne', 0.2], ['neon_city', 0.1]]));
+    expect(faint.intent!.presets).toEqual([{ id: 'noir_nocturne', weight: 0.2 }, { id: 'neon_city', weight: 0.1 }]);
   });
 
   it('orders presets canonically so equivalent intents are identical', () => {
-    const a = sanitizeIntent(intent([['neon_city', 0.3], ['noir_jazz', 0.3]])).intent;
-    const b = sanitizeIntent(intent([['noir_jazz', 0.3], ['neon_city', 0.3]])).intent;
+    const a = sanitizeIntent(intent([['neon_city', 0.3], ['noir_nocturne', 0.3]])).intent;
+    const b = sanitizeIntent(intent([['noir_nocturne', 0.3], ['neon_city', 0.3]])).intent;
     expect(a).toEqual(b);
   });
 

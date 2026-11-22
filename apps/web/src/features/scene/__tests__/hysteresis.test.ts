@@ -40,7 +40,7 @@ describe('discrete hysteresis', () => {
 
   it('a held value survives a close challenger but yields to a clear one', () => {
     const scene = (noir: number, neonW: number, previous?: ReturnType<typeof compileScene>) =>
-      compileScene({ outing: intent([['noir_jazz', noir], ['neon_city', neonW]]), previous });
+      compileScene({ outing: intent([['noir_nocturne', noir], ['neon_city', neonW]]), previous });
     const first = scene(0.5, 0.47);
     expect(first.resolved[SKY]).toBe('night_indigo');
     expect(scene(0.47, 0.5).resolved[SKY]).toBe('purple_twilight');
@@ -49,7 +49,7 @@ describe('discrete hysteresis', () => {
   });
 
   it('never lets history leak into a neutral scene', () => {
-    const dark = compileScene({ outing: intent([['noir_jazz', 1]]) });
+    const dark = compileScene({ outing: intent([['noir_nocturne', 1]]) });
     const back = compileScene({ previous: dark });
     expect(back.palette).toEqual(basePalette);
     expect(back.pinEdge).toBe('none');

@@ -72,7 +72,7 @@ describe('intentFromProfile', () => {
     const i = intentFromProfile({ sessionId: 's', version: 1, qualifiers: ['rain-lit and cinematic'] });
     const s = compileScene({ outing: i });
     expect(s.source).toBe('outing');
-    expect(s.presets.map((p) => p.id)).toEqual(expect.arrayContaining(['neon_city', 'noir_jazz']));
+    expect(s.presets.map((p) => p.id)).toEqual(expect.arrayContaining(['neon_city', 'noir_nocturne']));
     expect(s.diagnostics.filter((d) => d.code.endsWith('_dropped') || d.code === 'intent_rejected')).toEqual([]);
   });
 });
@@ -128,11 +128,11 @@ describe('connectProfiles: a full adaptive quiz', () => {
   it('prefers a valid model SceneIntent, and falls back when it is invalid or for an older version', () => {
     const { publisher, session, submissions } = setup();
     const model = (version: number) => ({
-      schemaVersion: '1.0.0', sessionVersion: version, presets: [{ id: 'noir_jazz', weight: 0.6 }], descriptors: [], overrides: [],
+      schemaVersion: '1.0.0', sessionVersion: version, presets: [{ id: 'noir_nocturne', weight: 0.6 }], descriptors: [], overrides: [],
     });
     publisher.publish(profile(1, ['cozy'], 0, { sceneIntent: model(1) }));
     expect(submissions.at(-1)).toMatchObject({ used: 'model', result: 'applied' });
-    expect(session.getState().presets[0].id).toBe('noir_jazz');
+    expect(session.getState().presets[0].id).toBe('noir_nocturne');
 
     publisher.publish(profile(2, ['cozy'], 1, { sceneIntent: { garbage: true } }));
     expect(submissions.at(-1)).toMatchObject({ used: 'fallback', result: 'applied' });

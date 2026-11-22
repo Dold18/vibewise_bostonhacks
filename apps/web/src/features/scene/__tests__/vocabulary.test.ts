@@ -7,7 +7,7 @@ import { SCENE_CATALOG } from '../catalog';
 import { presetsFromDescriptors, presetsFromVibeTags, VIBE_KEY_PRESETS } from '../lexicon';
 import { choiceOf, PRESET_IDS, PRESETS } from '../presets';
 import { LABEL_SYSTEMS, PALETTE_SWATCHES, RELATIONS } from '../swatches';
-import { realRegistry } from './fixtures';
+import { DESIGN_EXAMPLE, readJson, realRegistry } from './fixtures';
 
 describe('presets', () => {
   it.each(PRESET_IDS)('%s uses only valid, model-editable catalog values', (id) => {
@@ -31,6 +31,22 @@ describe('presets', () => {
         expect(registry.layouts.get(layoutId)?.activation, `${id} → ${layoutId}`).toBe('vibe_selected');
       }
     }
+  });
+});
+
+describe('preset naming', () => {
+  it('names describe aesthetics, never a cuisine or music genre (those need verified venue context)', () => {
+    const dims = (readJson('sources/coverage-readiness.v1.json') as { dimensions: Record<string, Array<{ id: string }>> }).dimensions;
+    const venueTerms = new Set(Object.values(dims).flat().map((d) => d.id));
+    expect(venueTerms.has('jazz')).toBe(true);
+    for (const id of PRESET_IDS) for (const token of id.split('_')) expect(venueTerms.has(token), `${id}: "${token}"`).toBe(false);
+  });
+
+  it('the test fixture is the design document’s worked example', async () => {
+    const { readFileSync } = await import('node:fs');
+    const doc = readFileSync(new URL('../../../../../../docs/SCENE_COMPOSER_DESIGN.md', import.meta.url), 'utf8');
+    const example = JSON.parse(doc.split('### Example model output after a quiz answer')[1].split('```json')[1].split('```')[0]);
+    expect(example).toEqual(DESIGN_EXAMPLE);
   });
 });
 
@@ -81,7 +97,7 @@ describe('lexicon', () => {
 
   it('turns descriptors into at most three presets at the requested presence', () => {
     const p = presetsFromDescriptors(['moody', 'rain-lit', 'intimate', 'cinematic'], 0.6);
-    expect(p[0].id).toBe('noir_jazz');
+    expect(p[0].id).toBe('noir_nocturne');
     expect(p.map((x) => x.id)).toContain('neon_city');
     expect(p.length).toBeLessThanOrEqual(3);
     expect(p.reduce((s, x) => s + x.weight, 0)).toBeCloseTo(0.6, 2);

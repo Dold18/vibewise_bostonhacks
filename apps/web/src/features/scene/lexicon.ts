@@ -18,20 +18,21 @@ type Pull = Partial<Record<ScenePresetId, number>>;
 export const VIBE_KEY_PRESETS: Readonly<Record<VibeKey, Pull>> = {
   cozy: { amber_refuge: 1 },
   lively: { neon_city: 0.6, sunlit_coast: 0.4 },
-  upscale: { noir_jazz: 0.5, minimal_modern: 0.5 },
+  upscale: { noir_nocturne: 0.5, minimal_modern: 0.5 },
   divey: { underground_indie: 1 },
   aesthetic: { dream_pastel: 0.6, retro_atlas: 0.4 },
   quiet: { woodland_story: 0.5, minimal_modern: 0.5 },
-  date_night: { noir_jazz: 0.55, amber_refuge: 0.45 },
+  date_night: { noir_nocturne: 0.55, amber_refuge: 0.45 },
   group_friendly: { sunlit_coast: 0.5, retro_atlas: 0.5 },
-  late_night: { neon_city: 0.6, noir_jazz: 0.4 },
+  late_night: { neon_city: 0.6, noir_nocturne: 0.4 },
   outdoor: { sunlit_coast: 0.6, woodland_story: 0.4 },
 };
 
 /** Word stems (matched at word starts) → art direction. Order is irrelevant; matching is set-based. */
 const WORDS: ReadonlyArray<readonly [RegExp, Pull]> = [
   [/^(cozy|cosy|snug|hygge|warm|amber|lamp|candle|fireside|bookish|book|refuge|comfort)/, { amber_refuge: 1 }],
-  [/^(noir|jazz|smoky|moody|midnight|speakeasy|velvet|cinematic|intimate|sultry)/, { noir_jazz: 1 }],
+  // A user's word like "jazz" may evoke an aesthetic; it never implies venue features or music props.
+  [/^(noir|jazz|smoky|moody|midnight|speakeasy|velvet|cinematic|intimate|sultry|nocturn)/, { noir_nocturne: 1 }],
   [/^(neon|cyber|electric|synth|arcade|glow|futur|rave$|club|rain$|rainy$|raining$|rainlit$)/, { neon_city: 1 }],
   [/^(dream|pastel|whimsi|ethereal|soft|fairy|magic|romantic|blush)/, { dream_pastel: 1 }],
   [/^(sun|bright|airy$|beach|coast|harbor|harbour|waterfront|sea$|seaside|breez|summer|picnic)/, { sunlit_coast: 1 }],

@@ -39,7 +39,7 @@ export const DESIGN_EXAMPLE = {
   schemaVersion: '1.0.0',
   sessionVersion: 7,
   presets: [
-    { id: 'noir_jazz', weight: 0.48 },
+    { id: 'noir_nocturne', weight: 0.48 },
     { id: 'neon_city', weight: 0.32 },
     { id: 'amber_refuge', weight: 0.2 },
   ],

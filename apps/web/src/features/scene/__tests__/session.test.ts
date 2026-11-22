@@ -43,7 +43,7 @@ describe('createSceneSession: basics', () => {
 describe('stale rejection', () => {
   it('rejects an older version of the current session', () => {
     const session = createSceneSession();
-    session.submit('s1', 3, v(3, [['noir_jazz', 0.6]]));
+    session.submit('s1', 3, v(3, [['noir_nocturne', 0.6]]));
     const before = session.getState();
     expect(session.submit('s1', 2, v(2, [['amber_refuge', 0.9]]))).toBe('stale');
     expect(session.getState()).toBe(before);
@@ -58,17 +58,17 @@ describe('stale rejection', () => {
 
   it('rejects an intent produced for a different version than it was delivered under', () => {
     const session = createSceneSession();
-    session.submit('s1', 5, v(5, [['noir_jazz', 0.5]]));
+    session.submit('s1', 5, v(5, [['noir_nocturne', 0.5]]));
     expect(session.submit('s1', 6, v(5, [['neon_city', 0.9]]))).toBe('stale');
     expect(session.submit('s1', 6, v(9, [['neon_city', 0.9]]))).toBe('rejected');
-    expect(session.getState().presets[0].id).toBe('noir_jazz');
+    expect(session.getState().presets[0].id).toBe('noir_nocturne');
   });
 
   it('retires replaced and cleared sessions so their late answers cannot return', () => {
     const session = createSceneSession();
-    session.submit('old', 5, v(5, [['noir_jazz', 0.5]]));
+    session.submit('old', 5, v(5, [['noir_nocturne', 0.5]]));
     session.submit('new', 1, v(1, [['sunlit_coast', 0.5]]));
-    expect(session.submit('old', 6, v(6, [['noir_jazz', 0.9]]))).toBe('stale');
+    expect(session.submit('old', 6, v(6, [['noir_nocturne', 0.9]]))).toBe('stale');
     session.clear();
     expect(session.getState().source).toBe('neutral');
     expect(session.submit('new', 2, v(2, [['sunlit_coast', 0.9]]))).toBe('stale');
@@ -86,7 +86,7 @@ describe('stale rejection', () => {
 
   it('a null intent means "no scene for this version": the account/neutral scene shows', () => {
     const session = createSceneSession({ account: { tags: { outdoor: 1 }, strength: 0.8 } });
-    session.submit('s1', 1, v(1, [['noir_jazz', 0.8]]));
+    session.submit('s1', 1, v(1, [['noir_nocturne', 0.8]]));
     expect(session.submit('s1', 2, null)).toBe('applied');
     expect(session.getState().source).toBe('account');
   });
@@ -199,7 +199,7 @@ describe('context, account and lifecycle', () => {
     const session = createSceneSession({ onError, compile: (i) => (fail ? (() => { throw new Error('boom'); })() : compileScene(i)) });
     const before = session.getState();
     fail = true;
-    expect(session.submit('s1', 1, v(1, [['noir_jazz', 0.5]]))).toBe('rejected');
+    expect(session.submit('s1', 1, v(1, [['noir_nocturne', 0.5]]))).toBe('rejected');
     expect(session.getState()).toBe(before);
     expect(onError).toHaveBeenCalled();
   });
@@ -213,7 +213,7 @@ describe('context, account and lifecycle', () => {
     expect(session.stats().listeners).toBe(1);
     session.destroy();
     expect(session.stats()).toMatchObject({ listeners: 0, cached: 0 });
-    expect(session.submit('s1', 1, v(1, [['noir_jazz', 0.5]]))).toBe('rejected');
+    expect(session.submit('s1', 1, v(1, [['noir_nocturne', 0.5]]))).toBe('rejected');
     expect(a).not.toHaveBeenCalled();
   });
 });

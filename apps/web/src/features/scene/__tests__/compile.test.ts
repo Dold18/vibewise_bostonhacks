@@ -98,7 +98,7 @@ describe('art direction', () => {
 
   it('blends presets continuously: the design example sits between its ingredients', () => {
     const mix = compileScene({ outing: DESIGN_EXAMPLE }).palette;
-    const noir = only('noir_jazz').palette;
+    const noir = only('noir_nocturne').palette;
     const amber = only('amber_refuge').palette;
     expect(dE(mix.building3d, noir.building3d)).toBeLessThan(dE(mix.building3d, amber.building3d));
     expect(mix.land).not.toBe(noir.land);
@@ -147,7 +147,7 @@ describe('precedence', () => {
   it('accepts the adaptive engine’s current shape: empty presets, account keys as descriptors', () => {
     const s = compileScene({ outing: intent([], { descriptors: ['cozy', 'date_night'] }) });
     expect(s.source).toBe('outing');
-    expect(s.presets.map((p) => p.id)).toEqual(['amber_refuge', 'noir_jazz']);
+    expect(s.presets.map((p) => p.id)).toEqual(['amber_refuge', 'noir_nocturne']);
   });
 
   it('never lets the model edit navigation safety or camera, even with every capability', () => {
@@ -237,8 +237,8 @@ describe('constraints', () => {
   });
 
   it('while navigating lifts dim light to a safe level, without disabling the theme', () => {
-    const browse = compileScene({ outing: intent([['noir_jazz', 1]]), capabilities: SCENE_ADAPTER_V1_PROPOSED });
-    const nav = compileScene({ outing: intent([['noir_jazz', 1]]), capabilities: SCENE_ADAPTER_V1_PROPOSED, context: { navigation: 'route' } });
+    const browse = compileScene({ outing: intent([['noir_nocturne', 1]]), capabilities: SCENE_ADAPTER_V1_PROPOSED });
+    const nav = compileScene({ outing: intent([['noir_nocturne', 1]]), capabilities: SCENE_ADAPTER_V1_PROPOSED, context: { navigation: 'route' } });
     expect(browse.lighting.intensity).toBe(0.2);
     expect(nav.lighting.intensity).toBe(0.28);
     expect(nav.lighting.color).toBe(browse.lighting.color);
@@ -283,7 +283,7 @@ describe('legibility guard', () => {
   });
 
   it('dark scenes get light labels', () => {
-    const s = only('noir_jazz');
+    const s = only('noir_nocturne');
     expect(hexToLab(s.palette.textPrimary)[0]).toBeGreaterThan(hexToLab(s.palette.land)[0]);
   });
 });

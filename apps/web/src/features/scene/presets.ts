@@ -6,14 +6,16 @@
  * swatches.ts, and shared by every preset and every model override. Adding a
  * preset is therefore pure data, and tests check every entry against the catalog.
  *
- * IDs are the proposed list from docs/SCENE_COMPOSER_DESIGN.md §2 (pending ratification).
+ * IDs ratified 2026-11-21 (docs/SCENE_COMPOSER_DESIGN.md §2): nine aesthetics plus
+ * `neutral`. Names describe an aesthetic, never an unverified venue feature;
+ * music- or cuisine-specific props need verified context (PR #33 activation rules).
  */
 import type { SceneKey } from './catalog';
 
 export const PRESET_IDS = [
   'neutral',
   'amber_refuge',
-  'noir_jazz',
+  'noir_nocturne',
   'neon_city',
   'dream_pastel',
   'sunlit_coast',
@@ -83,9 +85,9 @@ export const PRESETS: Readonly<Record<ScenePresetId, ScenePreset>> = {
     },
   },
 
-  noir_jazz: {
-    id: 'noir_jazz',
-    label: 'Noir jazz',
+  noir_nocturne: {
+    id: 'noir_nocturne',
+    label: 'Noir nocturne',
     summary: 'Midnight slate and indigo, gold light pooling on wet streets; intimate and cinematic.',
     settings: {
       'global_grade.palette_family': 'luxury_dark',
