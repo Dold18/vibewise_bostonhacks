@@ -13,6 +13,8 @@ export function sceneFor(profile:OutingVibeProfile):{profile:OutingVibeProfile;i
 export function subscribeScene(publisher:ProfilePublisher,consume:(scene:ReturnType<typeof sceneFor>|null)=>void){return publisher.subscribe(p=>consume(p?sceneFor(p):null));}
 export interface SemanticCandidate { id:string;location:{lat:number;lng:number};embedding:readonly number[];modelKey:string;eligible:boolean;provenance:'catalog'|'fixture' }
 export interface Ranking { sessionId:string;version:number;status:'ready'|'unavailable';reason?:string;all:readonly {id:string;location:{lat:number;lng:number};score:number;scale:number;weak:boolean}[];provenance:'catalog'|'fixture'|null }
+/** Penalty for similarity to explicit exclusions; calibrated on real MiniLM fixtures (scripts/ranking-real-minilm.mjs). */
+export const AVOID_WEIGHT=0.6;
 /** Never invent venue vectors or compare unknown model spaces. Caller owns hard-filter eligibility. */
 export function rankCandidates(p:OutingVibeProfile,candidates:readonly SemanticCandidate[]):Ranking {
  const unavailable=(reason:string):Ranking=>({sessionId:p.sessionId,version:p.version,status:'unavailable',reason,all:[],provenance:null});
@@ -21,7 +23,9 @@ export function rankCandidates(p:OutingVibeProfile,candidates:readonly SemanticC
  let query:number[];try{query=validateVector(p.embedding.vector,p.embedding.modelKey);}catch{return unavailable('Incompatible query embedding');}
  const eligible=candidates.filter(c=>c.eligible);
  if(eligible.some(c=>c.modelKey!==MODEL_KEY))return unavailable('Catalog model metadata is incompatible or unverified.');
- let rows:Ranking['all'];try{rows=eligible.map(c=>({id:c.id,location:{...c.location},score:cosine(query,validateVector(c.embedding,c.modelKey)),scale:1,weak:false})).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));}catch{return unavailable('Invalid catalog embeddings');}
+ // Explicit dislikes subtract similarity to what the user excluded (MiniLM cannot read negation inside one query).
+ let negative:number[]|undefined;try{negative=p.embedding.negativeVector?validateVector(p.embedding.negativeVector,p.embedding.modelKey):undefined;}catch{return unavailable('Incompatible exclusion embedding');}
+ let rows:Ranking['all'];try{rows=eligible.map(c=>{const v=validateVector(c.embedding,c.modelKey);return {id:c.id,location:{...c.location},score:cosine(query,v)-(negative?AVOID_WEIGHT*Math.max(0,cosine(negative,v)):0),scale:1,weak:false};}).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));}catch{return unavailable('Invalid catalog embeddings');}
  const best=rows[0]?.score??0,worst=rows.at(-1)?.score??best,spread=best-worst;
  return immutable({sessionId:p.sessionId,version:p.version,status:'ready',provenance:eligible.some(c=>c.provenance==='fixture')?'fixture':'catalog',all:rows.map(c=>{const relative=spread>.02?(c.score-worst)/spread:1;return {...c,scale:.7+.55*relative,weak:relative<.12};})});
 }

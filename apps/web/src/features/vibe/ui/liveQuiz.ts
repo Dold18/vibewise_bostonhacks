@@ -1,5 +1,7 @@
 import { scenePresentation, selectedCoffeeScene } from '../sessionB';
 import { emptyScenePreview, renderSceneStage, type ScenePreviewState } from './sceneStage';
+import { emptyMediaView, renderMediaStage, type MediaViewState } from './mediaStage';
+import { presentationOf } from '../media/presentation';
 import { h } from '../../../discovery/ui/dom';
 import { createLiveVibeSession, type LiveVibeSession } from '../liveEngine';
 import { apiEmbeddingProvider, apiGenerationProvider } from '../providers';
@@ -12,6 +14,7 @@ function focusKeyIn(root:HTMLElement):string|null {
  const el=document.activeElement;if(!(el instanceof HTMLElement)||!root.contains(el))return null;
  if(el.classList.contains('vb-quiz-prompt'))return 'prompt';
  if(el.classList.contains('vb-quiz-correction'))return 'correction';
+ if(el.classList.contains('vb-media-freetext'))return 'freetext';
  if(el instanceof HTMLButtonElement){const same=[...root.querySelectorAll('button')].filter(b=>b.textContent===el.textContent);return `button:${el.textContent}:${same.indexOf(el)}`;}
  return null;
 }
@@ -20,21 +23,33 @@ function restoreFocus(root:HTMLElement,key:string|null) {
  let target:HTMLElement|null|undefined;
  if(key==='prompt')target=root.querySelector<HTMLElement>('.vb-quiz-prompt[tabindex]');
  else if(key==='correction')target=root.querySelector<HTMLElement>('.vb-quiz-correction');
+ else if(key==='freetext')target=root.querySelector<HTMLElement>('.vb-media-freetext');
  else {const [,text,index]=key.match(/^button:(.*):(\d+)$/s)??[];target=[...root.querySelectorAll('button')].filter(b=>b.textContent===text)[Number(index)];}
  (target??root).focus({preventScroll:true});
 }
 export function createLiveQuiz(onBack:()=>void) {
  const session=createLiveVibeSession(apiGenerationProvider(),apiEmbeddingProvider(),outingProfiles);
  const root=h('section',{class:'vb-live-quiz','aria-label':'Vibe quiz',tabindex:'-1',hidden:true});
- let editing:number|null=null;let active=false;let lastQuestion='';
+ let editing:number|null=null;let active=false;let lastQuestion='';let lastSignature='';
  const previews=new Map<string,ScenePreviewState>();
+ const mediaViews=new Map<string,MediaViewState>();
  const button=(text:string,run:()=>void,className='vb-text-btn')=>{const b=h('button',{type:'button',class:className},text);b.addEventListener('click',run);return b;};
  const respond=(response:Response)=>{const index=editing;editing=null;if(index===null)session.answer(response);else session.revise(index,response);};
+ const statusText=(p:OutingVibeProfile)=>p.embedding.status==='ready'?'Semantic profile updated.':p.embedding.status==='pending'?'Updating the semantic profile…':p.embedding.status==='unavailable'?'Semantic matching is temporarily unavailable. Your answers are safe.':'Your text and answers are saved in this session.';
  function render(p:OutingVibeProfile|null) {
+  // Embedding progress alone must not rebuild the question: that would restart a playing
+  // YouTube player, reset a reveal/slider and drop focus from a half-typed answer.
+  const signature=p?JSON.stringify([p.sessionId,p.phase,p.question?.id,p.history.length,p.history.map(a=>a.response),p.vibe_so_far,p.qualifiers,p.notice,p.generation,p.completion,p.embedding.status==='unavailable',editing,mapDisplay.showAll]):'';
+  const status=root.querySelector<HTMLElement>('.vb-quiz-semantic-status');
+  if(p&&signature===lastSignature&&status){status.textContent=statusText(p);return;}
+  lastSignature=signature;
   // Snapshots re-render this view (e.g. embedding status updates). Keep the
   // user's place: focused control and any half-typed correction survive.
   const focusKey=focusKeyIn(root),draft=root.querySelector<HTMLTextAreaElement>('.vb-quiz-correction')?.value??'',draftFor=lastQuestion;
   root.replaceChildren();root.removeAttribute('aria-busy');if(!p)return;
+  // The quiz palette mirrors the latest interpretation (presentation only; the map follows the publisher).
+  const moodSource=[p.question,...[...p.history].reverse().map(a=>a.question)].find(q=>q&&presentationOf(q));
+  const mood=moodSource?presentationOf(moodSource)!.mood:undefined;if(mood)root.dataset.mood=mood;else delete root.dataset.mood;
   const back=button('Back to vibe description',()=>{active=false;onBack();});
   root.append(h('div',{class:'vb-quiz-top'},back,h('span',{class:'vb-quiz-count'},`${p.history.length} answered · up to 10`)));
   const selected=selectedCoffeeScene(p);
@@ -45,7 +60,13 @@ export function createLiveQuiz(onBack:()=>void) {
   if((p.phase==='question'||editing!==null)&&question) {
    const title=h('h3',{class:'vb-quiz-prompt',tabindex:'-1'},question.prompt);root.append(title);
    const presentation=scenePresentation(question);
-   if(presentation) {
+   const media=presentationOf(question);
+   if(media) {
+    const key=`${p.sessionId}:${question.id}:${editing??'current'}`;
+    if(!mediaViews.has(key))mediaViews.set(key,emptyMediaView());
+    const stage=renderMediaStage(question,mediaViews.get(key)!,respond,editing===null?undefined:p.history[editing]?.response);
+    if(stage)root.append(stage);
+   } else if(presentation) {
     const key=`${p.sessionId}:${question.id}:${editing??'current'}`;
     if(!previews.has(key))previews.set(key,emptyScenePreview());
     const previous=editing===null?undefined:p.history[editing]?.response;
@@ -76,6 +97,8 @@ export function createLiveQuiz(onBack:()=>void) {
    root.append(h('h3',{class:'vb-quiz-prompt'},p.completion.reason==='maximum'?'Your scene, in ten answers.':'Your outing, coming into focus.'),h('p',{class:'vb-quiz-results-note'},'You can explore the map now. Personalized venue matches will appear when compatible venue descriptions are available.'));
    if(p.completion.canContinue&&p.history.length<10)root.append(button('Continue Refining',()=>session.continueRefining(),'vb-primary-btn'));
   }
+  const reading=p.phase==='question'&&editing===null&&p.question?presentationOf(p.question):undefined;
+  if(reading&&p.history.length&&reading.source==='gemini')root.append(h('div',{class:'vb-quiz-reading'},h('p',{},h('strong',{},'What I’ve picked up: '),reading.design.known),button('Not quite',()=>{editing=p.history.length-1;lastQuestion='';render(session.getSnapshot());root.querySelector<HTMLTextAreaElement>('.vb-quiz-correction')?.focus();})));
   if(p.history.length) {
    const last=p.history.at(-1)!;
    if(last.response.kind==='choice'&&scenePresentation(last.question)) {
@@ -87,14 +110,14 @@ export function createLiveQuiz(onBack:()=>void) {
   const exclusions=p.evidence.filter(e=>e.polarity!=='want');
   if(exclusions.length)root.append(h('div',{class:'vb-quiz-exclusions'},h('strong',{},'Keeping in mind'),...exclusions.map(e=>h('span',{},e.text))));
   if(p.qualifiers.length)root.append(h('p',{class:'vb-quiz-notice'},`Still open: ${p.qualifiers.join(' · ')}`));
-  root.append(h('p',{class:'vb-quiz-semantic-status',role:'status'},p.embedding.status==='ready'?'Semantic profile updated.':p.embedding.status==='pending'?'Updating the semantic profile…':p.embedding.status==='unavailable'?'Semantic matching is temporarily unavailable. Your answers are safe.':'Your text and answers are saved in this session.'));
+  root.append(h('p',{class:'vb-quiz-semantic-status',role:'status'},statusText(p)));
   if(p.embedding.status==='unavailable')root.append(button('Retry semantic update',()=>void session.retryEmbedding()));
   const history=h('details',{class:'vb-quiz-history'},h('summary',{},'Review or edit answers'));
   p.history.forEach((answer:Answer,i)=>{
-   const label=answer.response.kind==='choice'?answer.question.options.find(o=>answer.response.kind==='choice'&&o.id===answer.response.optionId)?.label:answer.response.kind==='correction'?answer.response.text:answer.response.kind;
+   const label=answer.response.kind==='choice'?answer.question.options.find(o=>answer.response.kind==='choice'&&o.id===answer.response.optionId)?.label:answer.response.kind==='correction'||answer.response.kind==='text'?answer.response.text:answer.response.kind;
    history.append(button(`${i+1}. ${label??'Answer'} — Edit`,()=>{editing=i;lastQuestion='';render(session.getSnapshot());}));
   });root.append(history);
-  root.append(button('Start over',()=>{editing=null;previews.clear();session.start(p.originalInput.text,p.originalInput.imageCount);}));
+  root.append(button('Start over',()=>{editing=null;previews.clear();mediaViews.clear();session.start(p.originalInput.text,p.originalInput.imageCount);}));
   const matches=button('Show My Matches',()=>{editing=null;session.showMatches();},'vb-primary-btn vb-quiz-matches');root.append(matches);
   if(editing!==null)root.append(button('Cancel edit',()=>{editing=null;render(session.getSnapshot());}));
   if(p.originalInput.imageCount)root.append(h('p',{class:'vb-quiz-photo-note'},'Your photos stay in this browser. This quiz uses your text; photos are not uploaded or analyzed.'));
@@ -102,5 +125,5 @@ export function createLiveQuiz(onBack:()=>void) {
  }
  const off=outingProfiles.subscribe(render);
  const offDisplay=mapDisplay.subscribe(()=>render(session.getSnapshot()));
- return {root,session:session as LiveVibeSession,start(text:string,imageCount:number){active=true;editing=null;previews.clear();session.start(text,imageCount);},resume(){active=true;render(session.getSnapshot());},focus(){const target=root.querySelector<HTMLElement>('.vb-quiz-prompt[tabindex]')??root;target.focus();target.scrollIntoView?.({block:'nearest'});},destroy(){active=false;off();offDisplay();session.clear();session.destroy();}};
+ return {root,session:session as LiveVibeSession,start(text:string,imageCount:number){active=true;editing=null;previews.clear();mediaViews.clear();session.start(text,imageCount);},resume(){active=true;render(session.getSnapshot());},focus(){const target=root.querySelector<HTMLElement>('.vb-quiz-prompt[tabindex]')??root;target.focus();target.scrollIntoView?.({block:'nearest'});},destroy(){active=false;off();offDisplay();session.clear();session.destroy();}};
 }

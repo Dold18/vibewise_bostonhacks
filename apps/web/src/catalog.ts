@@ -391,14 +391,18 @@ function humanize(s: string): string {
 }
 
 /** Optional single-model vectors for currently eligible places. No schema writes or secondary catalog. */
-export async function catalogSemanticCandidates(places:readonly Place[],signal:AbortSignal) {
-  const supabase=getClient();
-  if(!supabase||import.meta.env.VITE_CATALOG_EMBEDDING_MODEL_KEY!==MODEL_KEY)return [];
+type VectorQuery = (table: string, ids: string[]) => Promise<{ data: Array<{ place_id: string; embedding: unknown }> | null; error: unknown }>;
+
+/**
+ * Vectors for the shown catalog places, from `catalog_places`, so every place type (food, museums,
+ * entertainment, parks, landmarks) can be ranked, not only restaurants. Ids are asked in chunks of 100.
+ */
+export async function semanticCandidatesWith(query:VectorQuery,places:readonly Place[]) {
   const indexed=new Map(places.filter(p=>p.tags['catalog:place_id']).map(p=>[p.tags['catalog:place_id'],p]));
   const ids=[...indexed.keys()];if(!ids.length)return [];
   const out:import('./features/vibe/adapters').SemanticCandidate[]=[];
   for(let i=0;i<ids.length;i+=100){
-    const {data,error}=await supabase.from('restaurants').select('place_id,embedding').in('place_id',ids.slice(i,i+100)).abortSignal(signal);
+    const {data,error}=await query('catalog_places',ids.slice(i,i+100));
     if(error)throw Error('Catalog vectors unavailable');
     for(const row of data??[]){
       const p=indexed.get(row.place_id);if(!p||!row.embedding)continue;
@@ -406,4 +410,13 @@ export async function catalogSemanticCandidates(places:readonly Place[],signal:A
     }
   }
   return out;
+}
+
+export async function catalogSemanticCandidates(places:readonly Place[],signal:AbortSignal) {
+  const supabase=getClient();
+  if(!supabase||import.meta.env.VITE_CATALOG_EMBEDDING_MODEL_KEY!==MODEL_KEY)return [];
+  return semanticCandidatesWith(async (table,ids)=>{
+    const {data,error}=await supabase.from(table).select('place_id,embedding').in('place_id',ids).abortSignal(signal);
+    return {data:data as Array<{place_id:string;embedding:unknown}>|null,error};
+  },places);
 }

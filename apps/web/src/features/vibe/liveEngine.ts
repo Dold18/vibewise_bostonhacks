@@ -1,7 +1,9 @@
 import { sessionBQuestion } from './sessionB.ts';
-import { constraintsText, embeddingText, evidenceFrom } from './evidence.ts';
+import { constraintsText, embeddingText, evidenceFrom, negativeText } from './evidence.ts';
 import { mapDisplay } from './convergence.ts';
 import { fallbackQuestion, guidanceFor } from './families.ts';
+import { localMediaQuestion } from './media/localDirector.ts';
+import { sceneIntentFor } from './media/sceneBridge.ts';
 import { createProfilePublisher } from './publisher.ts';
 import { cosine, immutable, MAX_QUESTIONS, MODEL_KEY, validateVector, type Answer, type EmbeddingProvider, type GenerationContext, type GenerationProvider, type OutingVibeProfile, type Response } from './profile.ts';
 import { validateGeneration } from './validation.ts';
@@ -14,7 +16,7 @@ export function replay(original:OutingVibeProfile['originalInput'],history:reado
 }
 export function completionFor(p:OutingVibeProfile,recommendation:'finish'|'refine',stable=false):OutingVibeProfile['completion'] {
  if(p.history.length>=MAX_QUESTIONS)return {recommended:true,reason:'maximum',canContinue:false};
- const informative=p.history.filter(a=>a.response.kind==='choice'||a.response.kind==='correction').length;
+ const informative=p.history.filter(a=>a.response.kind==='choice'||a.response.kind==='correction'||a.response.kind==='text').length;
  const detailed=p.vibe_so_far.trim().split(/\s+/).length>=14;
  const ambiguities=p.qualifiers.length>0;
  if(informative>=3&&detailed&&!ambiguities&&(recommendation==='finish'||stable))return {recommended:true,reason:stable?'stable_and_specific':'sufficient_detail',canContinue:!!guidanceFor(contextFor(p)).topics.length};
@@ -26,7 +28,8 @@ export function createLiveVibeSession(generator:GenerationProvider,embedder:Embe
  let state:OutingVibeProfile|null=null; let generation:AbortController|null=null, embedding:AbortController|null=null;
  let serial=0; let userResults=false; let priorVectors:readonly number[][]=[];
  const own=(id:string,v:number)=>state?.sessionId===id&&state.version===v;
- const publish=(p:OutingVibeProfile)=>{state=immutable(p);publisher.publish(state);};
+ // The accepted interpretation's atmosphere travels to the Scene Composer via its existing untrusted sceneIntent input.
+ const publish=(p:OutingVibeProfile)=>{const {sceneIntent:_old,...rest}=p;const sceneIntent=sceneIntentFor(rest as OutingVibeProfile);state=immutable(sceneIntent?{...rest,sceneIntent}:rest) as OutingVibeProfile;publisher.publish(state);};
  const bump=(patch:Partial<OutingVibeProfile>)=>{if(!state)return;generation?.abort();embedding?.abort();publish({...state,...patch,version:++serial,embedding:{status:'idle',modelKey:MODEL_KEY,version:serial}});};
  async function embedCurrent() {
   if(!state)return;
@@ -35,12 +38,14 @@ export function createLiveVibeSession(generator:GenerationProvider,embedder:Embe
   const p=state,id=p.sessionId,v=p.version;
   publish({...state,embedding:{status:'pending',modelKey:MODEL_KEY,version:v}});
   try {
-   const result=await embedder.embed(text,abort.signal); const vector=validateVector(result.vector,result.modelKey);
+   const avoid=negativeText(state.evidence);
+   const [result,negative]=await Promise.all([embedder.embed(text,abort.signal),avoid?embedder.embed(avoid,abort.signal):Promise.resolve(null)]);
+   const vector=validateVector(result.vector,result.modelKey);const negativeVector=negative?validateVector(negative.vector,negative.modelKey):undefined;
    if(!own(id,v)||abort.signal.aborted)return;
    priorVectors=[...priorVectors,vector].slice(-3) as readonly number[][];
    const stable=priorVectors.length===3&&cosine(priorVectors[0],priorVectors[1])>.97&&cosine(priorVectors[1],priorVectors[2])>.97;
    const completion=state!.completion.recommended?state!.completion:completionFor(state!,'refine',stable);
-   publish({...state!,completion,phase:completion.recommended&&state!.phase==='question'?'results':state!.phase,embedding:{status:'ready',modelKey:MODEL_KEY,version:v,vector}});
+   publish({...state!,completion,phase:completion.recommended&&state!.phase==='question'?'results':state!.phase,embedding:{status:'ready',modelKey:MODEL_KEY,version:v,vector,...(negativeVector?{negativeVector}:{})}});
   } catch {
    if(!own(id,v)||abort.signal.aborted)return;
    publish({...state!,embedding:{status:'unavailable',modelKey:MODEL_KEY,version:v,reason:'Semantic matching is temporarily unavailable. Your text and answers are retained.'}});
@@ -68,7 +73,7 @@ export function createLiveVibeSession(generator:GenerationProvider,embedder:Embe
    void embedCurrent();
   } catch {
    if(!own(id,v)||abort.signal.aborted)return;
-   const question=sessionBQuestion(c)??fallbackQuestion(c), completion=completionFor(state!,'refine');
+   const question=sessionBQuestion(c)??localMediaQuestion(c)??fallbackQuestion(c), completion=completionFor(state!,'refine');
    publish({...state!,question,phase:userResults||!question?'results':'question',generation:'fallback',completion:userResults?{...completion,recommended:true,reason:'user_request'}:completion,
     notice:'Using a local question while the AI is unavailable. Your last AI summary is unchanged; new answers still update semantic matching.'});
    void embedCurrent();
@@ -78,8 +83,8 @@ export function createLiveVibeSession(generator:GenerationProvider,embedder:Embe
   if(!state)return;const question=replaceIndex===undefined?state.question:state.history[replaceIndex]?.question;
   if(!question||replaceIndex===undefined&&(state.phase!=='question'||state.history.length>=MAX_QUESTIONS))return;
   if(response.kind==='choice'&&!question.options.some(o=>o.id===response.optionId))throw Error('Invalid option');
-  if(response.kind==='correction'&&(!response.text.trim()||response.text.length>500))throw Error('Correction must be 1–500 characters');
-  if(!['choice','skip','neither','unfamiliar','correction'].includes(response.kind))throw Error('Invalid answer');
+  if((response.kind==='correction'||response.kind==='text')&&(!response.text.trim()||response.text.length>500))throw Error('Answer text must be 1–500 characters');
+  if(!['choice','skip','neither','unfamiliar','correction','text'].includes(response.kind))throw Error('Invalid answer');
   const prefix=replaceIndex===undefined?state.history:state.history.slice(0,replaceIndex);
   const history:readonly Answer[]=[...prefix,{id:`answer-${serial+1}`,question,response:structuredClone(response)}];
   const reconstructed=replay(state.originalInput,prefix);if(replaceIndex===undefined){reconstructed.vibe_so_far=state.vibe_so_far;reconstructed.qualifiers=state.qualifiers;}const evidence=evidenceFrom(state.originalInput.text,history);

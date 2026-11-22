@@ -1,3 +1,6 @@
+// RETIRED 2026-11-22: the authored coffee opener is off by default (product decision; see
+// docs/VIBE_QUIZ_V2_ACCEPTANCE.md). This script exercises that dormant path and is kept for history.
+// Three of its checks already failed on pristine HEAD before retirement (documented in the same file).
 // Node 26 + Chrome on macOS. All quiz/embedding responses are TEST FIXTURES.
 // Start the app first; VIBENTA_QA_URL defaults to http://localhost:5174/.
 // This does not verify Gemini quality, real venue rankings, or transit providers.

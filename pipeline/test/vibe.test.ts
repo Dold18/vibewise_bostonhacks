@@ -24,9 +24,9 @@ test('capText cuts at a word boundary and marks truncation', () => {
 
 test('bundle: facts always, descriptive sources labeled and capped, licenses folded into facts', () => {
   const b = buildBundle(r(), [
-    { restaurant_id: 1, source: 'website', content: `<p>${'Great noodles. '.repeat(200)}</p>` },
-    { restaurant_id: 1, source: 'wiki', content: 'Wikivoyage: cozy spot.' },
-    { restaurant_id: 1, source: 'city_licenses', content: 'Entertainment license: Non-Live Entertainment, capacity 30.' },
+    { place_ref: 1, source: 'website', content: `<p>${'Great noodles. '.repeat(200)}</p>` },
+    { place_ref: 1, source: 'wiki', content: 'Wikivoyage: cozy spot.' },
+    { place_ref: 1, source: 'city_licenses', content: 'Entertainment license: Non-Live Entertainment, capacity 30.' },
   ]);
   assert.match(b.prompt, /^Facts: name=Taiwan Cafe, cuisine=taiwanese, price=\$, category=restaurant/);
   assert.match(b.prompt, /Amenity tags \(OpenStreetMap\): outdoor_seating=yes/);
@@ -55,7 +55,7 @@ const good = JSON.stringify({
 });
 
 test('bundle names the atmosphere evidence that exists', () => {
-  const web = [{ restaurant_id: 1, source: 'website', content: 'We serve hand-pulled noodles in a small family-run dining room with long communal tables and a loud open kitchen. Grandma started the place in 1982 and the recipes have not changed since; expect steaming bowls, crisp dumplings and strong tea.' }];
+  const web = [{ place_ref: 1, source: 'website', content: 'We serve hand-pulled noodles in a small family-run dining room with long communal tables and a loud open kitchen. Grandma started the place in 1982 and the recipes have not changed since; expect steaming bowls, crisp dumplings and strong tea.' }];
   assert.match(buildBundle(r(), web).prompt, /Atmosphere evidence: website text\. State a sensory detail/);
   assert.match(buildBundle(r(), [], true).prompt, /Atmosphere evidence: a photo\./);
   assert.match(buildBundle(r(), web, true).prompt, /website text and a photo/);
@@ -197,12 +197,12 @@ test('descriptiveLength ignores chain boilerplate and counts real content', () =
 });
 
 test('bundle demotes boilerplate text to facts-only and keeps real descriptive text', () => {
-  const boiler = [{ restaurant_id: 1, source: 'website', content: "Find your nearest Dunkin' at 806 Providence Hwy in Dedham and enjoy Dunkin's signature drinks, coffee, espresso, breakfast sandwiches and more! skip to main content 806 Providence Hwy" }];
+  const boiler = [{ place_ref: 1, source: 'website', content: "Find your nearest Dunkin' at 806 Providence Hwy in Dedham and enjoy Dunkin's signature drinks, coffee, espresso, breakfast sandwiches and more! skip to main content 806 Providence Hwy" }];
   const b = buildBundle(r({ name: "Dunkin'" }), boiler);
   assert.equal(b.hasDescriptive, false);
   assert.doesNotMatch(b.prompt, /From the restaurant's own website/);
   assert.match(b.prompt, /Atmosphere evidence: NONE/);
-  const real = [{ restaurant_id: 1, source: 'website', content: 'Noir is a chic, cozy bar serving craft cocktails and a menu of delectable bites in the heart of Harvard Square, mixing the nostalgic past with a contemporary style for a timeless and fresh experience, with a hidden back room and a fireplace.' }];
+  const real = [{ place_ref: 1, source: 'website', content: 'Noir is a chic, cozy bar serving craft cocktails and a menu of delectable bites in the heart of Harvard Square, mixing the nostalgic past with a contemporary style for a timeless and fresh experience, with a hidden back room and a fireplace.' }];
   const g = buildBundle(r({ name: 'Noir' }), real);
   assert.equal(g.hasDescriptive, true);
   assert.match(g.prompt, /From the restaurant's own website: Noir is a chic/);

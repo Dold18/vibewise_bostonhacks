@@ -4,10 +4,11 @@ import type {Server} from 'node:http';
 import {createVibeRouter} from '../../../../server/vibeApi';
 import {createGeminiGenerator} from '../../../../server/vibeGemini';
 import {fallbackQuestion,guidanceFor} from '../families';
+import {localMediaQuestion} from '../media/localDirector';
 import {MODEL_KEY,type GenerationContext} from '../profile';
 import {apiEmbeddingProvider} from '../providers';
 const c:GenerationContext={sessionId:'TEST-FIXTURE',version:1,originalInput:{text:'A cinematic evening with playful little surprises',imageCount:0,imageProcessing:'not_sent'},vibe_so_far:'A cinematic evening',history:[],evidence:[],qualifiers:[]};
-const output=()=>({vibe_so_far:'A cinematic evening with playful little discoveries and room to linger.',qualifiers:[],continuation:'refine' as const,reason:'Another detail may help',nextQuestion:fallbackQuestion(c)});
+const output=()=>({vibe_so_far:'A cinematic evening with playful little discoveries and room to linger.',qualifiers:[],continuation:'refine' as const,reason:'Another detail may help',nextQuestion:localMediaQuestion(c)});
 const running:Server[]=[];afterEach(async()=>{vi.unstubAllGlobals();for(const server of running.splice(0))await new Promise<void>(r=>server.close(()=>r()));});
 async function server() {
  const generator={generate:vi.fn(async()=>output())};
@@ -28,9 +29,9 @@ describe('Gemini request and failure behavior',()=>{
   const provider=createGeminiGenerator({apiKey:'TEST-FIXTURE-NOT-A-KEY',fetchImpl:fetchImpl as typeof fetch});
   expect((await provider.generate(c,new AbortController().signal)).vibe_so_far).toContain('cinematic');
   const init=fetchImpl.mock.calls[0] as unknown as [string,RequestInit];const body=JSON.parse(init[1].body as string);
-  expect((init[1].headers as Record<string,string>)['x-goog-api-key']).toBe('TEST-FIXTURE-NOT-A-KEY');expect(body.tools).toBeUndefined();expect(body.generationConfig.responseMimeType).toBe('application/json');expect(body.contents[0].parts[0].text).toContain('promisingFamilies');
+  expect((init[1].headers as Record<string,string>)['x-goog-api-key']).toBe('TEST-FIXTURE-NOT-A-KEY');expect(body.tools).toBeUndefined();expect(body.generationConfig.responseMimeType).toBe('application/json');expect(body.contents[0].parts[0].text).toContain('suggestedFamilies');expect(body.contents[0].parts[0].text).toContain('"library"');
  });
- it('retries poor/repeated output once, then fails safely',async()=>{const f=vi.fn(async()=>new Response(JSON.stringify({candidates:[{content:{parts:[{text:'{}'}]}}]})));const p=createGeminiGenerator({apiKey:'TEST-FIXTURE',fetchImpl:f as typeof fetch});await expect(p.generate(c,new AbortController().signal)).rejects.toThrow('valid, distinct');expect(f).toHaveBeenCalledTimes(2);});
+ it('retries poor/repeated output twice with feedback, then fails safely',async()=>{const f=vi.fn(async()=>new Response(JSON.stringify({candidates:[{content:{parts:[{text:'{}'}]}}]})));const p=createGeminiGenerator({apiKey:'TEST-FIXTURE',fetchImpl:f as typeof fetch});await expect(p.generate(c,new AbortController().signal)).rejects.toThrow('valid, distinct');expect(f).toHaveBeenCalledTimes(3);});
  it('returns promptly on rate limits without leaking provider error bodies',async()=>{const f=vi.fn(async()=>new Response('TEST FIXTURE provider details',{status:429}));await expect(createGeminiGenerator({apiKey:'TEST-FIXTURE',fetchImpl:f as typeof fetch}).generate(c,new AbortController().signal)).rejects.toThrow('rate limited');expect(f).toHaveBeenCalledOnce();});
  it('does not call external services with a missing key',async()=>{const f=vi.fn();await expect(createGeminiGenerator({fetchImpl:f}).generate(c,new AbortController().signal)).rejects.toThrow('unavailable');expect(f).not.toHaveBeenCalled();});
  it('aborts slow requests at the configured timeout',async()=>{const f=vi.fn((_url:unknown,init?:RequestInit)=>new Promise<Response>((_r,reject)=>init!.signal!.addEventListener('abort',()=>reject(new DOMException('Timeout','TimeoutError')))));await expect(createGeminiGenerator({apiKey:'TEST-FIXTURE',fetchImpl:f as typeof fetch,timeoutMs:5}).generate(c,new AbortController().signal)).rejects.toThrow();});
