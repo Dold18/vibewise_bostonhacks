@@ -81,6 +81,13 @@ describe('isActive', () => {
     expect(isActive(sun, at('2026-11-01T06:45:00Z'))).toBe(true); // 01:45 EST
   });
 
+  it('F13: is active inside a window on the spring-forward day (2027-03-14)', () => {
+    const early = special([{ days: [0], start: '03:30', end: '04:30' }], { checkedAt: '2027-03-10T12:00:00-05:00' });
+    expect(isActive(early, at('2027-03-14T07:45:00Z'))).toBe(true); // 03:45 EDT
+    expect(isActive(early, at('2027-03-14T07:15:00Z'))).toBe(false); // 03:15 EDT
+    expect(isActive(early, at('2027-03-14T08:30:00Z'))).toBe(false); // 04:30 EDT
+  });
+
   it('keeps a recent any_time student deal active and a 91-day-old one stale', () => {
     const now = at('2026-11-21T12:00:00-05:00');
     const day = 24 * 60 * 60 * 1000;
@@ -169,6 +176,12 @@ describe('describeSchedule', () => {
     expect(d([{ days: [2], start: '11:00', end: '14:00' }])).toBe('Tue 11am–2pm');
     expect(d([{ days: [2], start: '20:00', end: '24:00' }])).toBe('Tue 8pm–12am');
   });
+  it('F9: renders a full day as all day and a midnight start as 12am', () => {
+    expect(d([{ days: [0, 1, 2, 3, 4, 5, 6], start: '00:00', end: '24:00' }])).toBe('Daily, all day');
+    expect(d([{ days: [1, 2, 3], start: '00:00', end: '24:00' }])).toBe('Mon–Wed, all day');
+    expect(d([{ days: [2], start: '00:00', end: '00:01' }])).toBe('Tue 12am–12:01am');
+    expect(d([{ days: [2], start: '00:00', end: '06:00' }])).toBe('Tue 12am–6am');
+  });
   it('describes any_time and unconfirmed', () => {
     expect(describeSchedule(student())).toBe('Any time');
     expect(describeSchedule(student({ timing: 'unconfirmed' }))).toBe('Times not confirmed');
@@ -194,6 +207,12 @@ describe('toDeals', () => {
     source_url: 'https://example.com/menu',
     checked_at: '2026-11-20T17:00:00+00:00',
   };
+
+  it('F5: drops a window whose start equals its end but keeps 00:00-24:00', () => {
+    const w = (start: string, end: string) => ({ ...row, schedule: [{ days: [1], start, end }] });
+    expect(toDeals([w('16:00', '16:00')])).toEqual([]);
+    expect(toDeals([w('00:00', '24:00')])).toHaveLength(1);
+  });
 
   it('maps a valid row', () => {
     expect(toDeals([row])).toEqual([

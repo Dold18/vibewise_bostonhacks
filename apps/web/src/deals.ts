@@ -121,8 +121,10 @@ function formatClock(total: number): { text: string; meridiem: 'am' | 'pm' } {
 
 /** "4–6pm", "4:30–6:30pm", "10pm–1am". */
 function formatRange(start: string, end: string): string {
+  if (start === '00:00' && end === '24:00') return 'all day';
   const a = formatClock(minutes(start));
   const b = formatClock(minutes(end));
+  if (minutes(start) === 0) return `${a.text}am–${b.text}${b.meridiem}`; // "12am–6am", not "12–6am"
   return a.meridiem === b.meridiem ? `${a.text}–${b.text}${b.meridiem}` : `${a.text}${a.meridiem}–${b.text}${b.meridiem}`;
 }
 
@@ -144,7 +146,12 @@ function formatDays(days: number[]): string {
 export function describeSchedule(deal: Deal): string {
   if (deal.timing === 'any_time') return 'Any time';
   if (deal.timing !== 'scheduled' || !deal.schedule) return 'Times not confirmed';
-  return deal.schedule.map((w) => `${formatDays(w.days)} ${formatRange(w.start, w.end)}`).join('; ');
+  return deal.schedule
+    .map((w) => {
+      const range = formatRange(w.start, w.end);
+      return `${formatDays(w.days)}${range === 'all day' ? ',' : ''} ${range}`;
+    })
+    .join('; ');
 }
 
 export function chipText(kinds: ReadonlySet<DealKind>): string {
@@ -165,6 +172,7 @@ function parseWindow(raw: unknown): DealWindow | null {
   if (!days.every((d) => Number.isInteger(d) && (d as number) >= 0 && (d as number) <= 6)) return null;
   if (typeof start !== 'string' || !/^([01]\d|2[0-3]):[0-5]\d$/.test(start)) return null;
   if (typeof end !== 'string' || !(/^([01]\d|2[0-3]):[0-5]\d$/.test(end) || end === '24:00')) return null;
+  if (minutes(start) === minutes(end)) return null; // would read as a 24-hour window
   return { days: days as number[], start, end };
 }
 
