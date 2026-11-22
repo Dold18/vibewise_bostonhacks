@@ -311,6 +311,18 @@ const buildLayers = (palette: Palette, scene: Readonly<SceneStyle>): LayerSpecif
     },
   },
 
+  // Wharves, piers and pedestrian plazas (OSM area polygons): a paved surface
+  // tone, drawn over water so Boston's waterfront reads as built ground.
+  {
+    id: 'transport-area',
+    type: 'fill',
+    source: SOURCE,
+    'source-layer': 'transportation',
+    minzoom: 13,
+    filter: ['all', ['match', ['geometry-type'], ['Polygon', 'MultiPolygon'], true, false], classIn('pier', 'path', 'pedestrian')],
+    paint: { 'fill-color': palette.path, 'fill-opacity': ['interpolate', ['linear'], ['zoom'], 13, 0, 14, 0.85] },
+  },
+
   // --- Aeroways ---
   {
     id: 'aeroway-area',

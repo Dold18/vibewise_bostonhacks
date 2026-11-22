@@ -57,6 +57,7 @@ import { activeKinds, chipText } from './deals';
 // The Vibenta identity loads last so it styles every module's existing markup.
 import './design/identity/index.css';
 import { connectSceneAccent } from './design/sceneAccent';
+import { mountBaseMaterials } from './features/map/baseMaterials';
 
 const BOSTON = { lng: -71.0636, lat: 42.3555 }; // Boston Common
 const TILTED = { pitch: 60, bearing: -20 };
@@ -908,6 +909,9 @@ const scene = mountScene({
 if (import.meta.env.DEV) Object.assign(window, { vibentaScene: sceneDevHook(scene, map) });
 // Selected interface accents (not the identity itself) follow the active scene.
 const stopSceneAccent = connectSceneAccent(scene.session);
+// Ground textures (water, parks, urban ground, plazas) over the palette fills; loads lazily.
+const materials = mountBaseMaterials(map);
+if (import.meta.env.DEV) Object.assign(window, { vibentaMaterials: materials });
 // One publisher feeds the existing compiler/session and the existing pin system.
 scene.connectProfiles(outingProfiles);
 const convergence = createConvergence(
@@ -1001,6 +1005,7 @@ if (import.meta.hot) import.meta.hot.dispose(() => {
   convergence.destroy();
   discovery.destroy();
   stopSceneAccent();
+  materials.destroy();
   scene.destroy();
   account.destroy();
 });
