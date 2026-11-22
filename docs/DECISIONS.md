@@ -127,6 +127,18 @@
   - Test expectations changed: Oak Grove → BU and BU → Chinatown at midday were `no_service` and are now `ok` via the walk. Tests in `test-tier2.ts` cover both, plus the original Saturday 3:35 PM case.
 - **Revisit trigger:** The team rejects surface walks in Tier 2, or a second pair is wanted (needs its own review), or a real walking-time source is available.
 
+### P-014 · Proposed · User accounts and a vibe-reactive map theme
+- **Date / owner:** 2026-11-21 · Map workstream, with Integration (accounts) and Vibe (signal producer)
+- **Context:** The site should react over time to the vibes a user chooses, so it needs accounts and a per-user history. Spec: `docs/superpowers/specs/2026-11-21-user-accounts-vibe-theme-design.md`.
+- **Decision:**
+  - Supabase Auth, email + password. The account control sits in the top right.
+  - Tables `profiles` and `vibe_events` with owner-only RLS (DATA_MODEL.md §7a). No location is stored.
+  - The Vibe Engine reports readings through `recordVibe(VibeSignal)` (CONTRACTS.md). It is the only real producer; `dev` rows come from a dev-only hook and production builds ignore them.
+  - The account module derives a decayed taste and exposes it as `VibeProfile.tags`. The map palette blends toward the user's top vibes, within a contrast guard, and the top two vibes add CSS effects. Users can turn effects off, and can clear their history.
+- **Why / alternatives:** Rebuilding the palette and applying only changed paint keeps one color source and keeps the route overlay. Recoloring layers from a hand-kept list drifts out of sync; CSS filters tint labels and pins. Magic links and OAuth were deferred: email delivery is rate-limited, and OAuth needs credentials.
+- **Implications:** Workstream C owns "Vibe DNA"; it may replace the account module's taste calculation, and the theme reads only `VibeProfile.tags`. `mapStyle.ts` becomes `buildMapStyle(palette)`.
+- **Revisit trigger:** The Vibe Engine defines its own profile, or the team wants taste to affect ranking.
+
 ## How to add a decision
 ~~~md
 ### D-007 · Accepted/Proposed/Superseded · Short title

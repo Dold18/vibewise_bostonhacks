@@ -180,7 +180,37 @@ search_restaurants(
 - **Foursquare OS Places (Apache 2.0):** keep its attribution notice.
 - **Honesty:** unknown hours or price are stored as `null` / `'unknown'` and shown as such. Seeded reviews are flagged `is_seed` and labeled.
 
-## 7. Open questions for the team
+## 7. Map-theme vocabulary and user accounts (proposed, P-014)
+The map theme uses a small fixed vocabulary of 10 keys, each scored in **[0, 1]**. It describes the *user's* recent vibe readings for tinting the map. It is **not** a venue-side catalog: places carry no scores, and ranking uses only the embedding (EMBEDDING_PIPELINE.md). The Vibe Engine maps its output (for example the quiz `vibe_so_far` text) onto these keys when it reports a reading.
+
+| Key | Meaning |
+|---|---|
+| `cozy` | Warm, intimate, comfortable |
+| `lively` | Busy, loud, energetic |
+| `upscale` | Polished, dressy, special-occasion |
+| `divey` | Casual, no-frills, worn-in |
+| `aesthetic` | Visually striking, photogenic |
+| `quiet` | Calm; suits studying or conversation |
+| `date_night` | Good for two |
+| `group_friendly` | Big tables, shareable food, room for groups |
+| `late_night` | Open late; after-hours crowd |
+| `outdoor` | Patio, rooftop, waterfront, park-side |
+
+Changing the list means bumping `vocab_version`.
+
+### User accounts
+Migration `supabase/migrations/20261121180000_create_accounts.sql`. Users sign in with Supabase Auth (email + password).
+
+| Table | Columns | Access |
+|---|---|---|
+| `profiles` | `id` (= `auth.users.id`), `effects_enabled` (default true), `created_at`, `updated_at` | Owner reads, creates and updates their own row. Created automatically by a trigger on sign-up. |
+| `vibe_events` | `id`, `user_id` (default `auth.uid()`), `created_at`, `source` (`quiz`/`text`/`image`/`song`/`place`/`dev`), `scores` (theme-vocabulary keys above, values in [0,1], checked by `is_valid_vibe_scores`), `vocab_version`, optional `place_id` | Owner reads, adds and deletes (clears) their own rows. No updates. `anon` has no access. |
+
+- No location is stored: no origin, no GPS, no movement history.
+- `dev` rows are sample data from the dev-only hook and are ignored by production builds.
+- The browser derives a decayed taste from the newest 200 events (two-week half-life). That taste tints the map; it is not used for ranking.
+
+## 8. Open questions for the team
 1. Pin the embedding model ID (MiniLM `all-MiniLM-L6-v2`) and its quantization; queries and catalog must match.
 2. Build the ~20 to 30 query validation set (EMBEDDING_PIPELINE.md §2).
 3. Do unknown-price and unknown-hours places pass the filters by default?

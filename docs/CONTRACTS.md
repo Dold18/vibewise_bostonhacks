@@ -108,6 +108,7 @@ export interface MapSelection {
 export interface VibeProfile {
   userId: string;
   vibeText?: string;             // quiz `vibe_so_far`, a media-derived description, or the user's own text; embedded with MiniLM
+  tags?: Record<string, number>; // map-theme taste from the account module (DATA_MODEL.md §7), keys in [0,1]; theme only, not used for ranking
   categories: PlaceCategory[];
   budgetCents?: number;
   origin?: GeoPoint;
@@ -118,6 +119,16 @@ export interface Recommendation {
   placeId: string;
   score: number;                 // normalized [0,1]
   reasons: string[];
+}
+
+// Proposed (DECISIONS.md P-014), not yet ratified.
+// One vibe reading for the signed-in user, sent by the Vibe Engine to the
+// account module's recordVibe(). Keys are the DATA_MODEL.md §7 map-theme vocabulary
+// (VibeKey), values in [0,1]; unknown keys are dropped, out-of-range values clamped.
+export interface VibeSignal {
+  scores: Partial<Record<VibeKey, number>>;
+  source: 'quiz' | 'text' | 'image' | 'song' | 'place' | 'dev';
+  placeId?: string;              // a catalog Place.id the signal came from, if any
 }
 ~~~
 
