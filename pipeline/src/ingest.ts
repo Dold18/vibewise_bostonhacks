@@ -10,12 +10,14 @@ import {
 import { loadFsqRows } from './foursquare.ts';
 import { assertUniqueKeys, mergePlaces } from './merge.ts';
 import { loadOsmElements } from './osm.ts';
+import { applyOverrides, validateOverrides } from './overrides.ts';
 import { PLACE_TYPE_CONFIG, parseTypeOption, type PlaceType } from './placeTypes.ts';
 import { planRekey } from './rekey.ts';
 import { parseFsqRows, parseOverpass } from './sources.ts';
 import type { ExistingRow, FsqPlace, OsmPlace, PlaceRow, RekeyAction } from './types.ts';
 
 const CACHE_DIR = path.resolve(import.meta.dirname, '..', '.cache');
+const OVERRIDES_FILE = path.resolve(import.meta.dirname, '..', 'place-overrides.json');
 
 export type SourcesChoice = 'osm' | 'fsq' | 'all';
 export interface CliArgs { type: PlaceType; dryRun: boolean; sources: SourcesChoice; refresh: boolean; allowPartial?: true }
@@ -127,6 +129,7 @@ export interface SummaryInput {
   existingKeys: Set<string>; rows: PlaceRow[]; actions: RekeyAction[]; notSeen: number | null;
   crossTypeSkipped: number | null; conflictsSkipped: number | null;   // null in a dry run (no database read)
   orphansReused: number | null; orphansCleared: number | null;
+  overridesApplied?: number;           // rows changed by pipeline/place-overrides.json (line printed only when > 0)
 }
 
 const orDryRun = (n: number | null): string => (n === null ? 'n/a (dry run)' : String(n));
@@ -161,12 +164,27 @@ export function summarize(input: SummaryInput): string {
     `Orphan registry ids reused: ${orDryRun(input.orphansReused)}`,
     `Orphan registry rows cleared: ${orDryRun(input.orphansCleared)}`,
     `Not seen this run: ${orDryRun(input.notSeen)}`,
+    ...(input.overridesApplied ? [`Manual overrides applied: ${input.overridesApplied}`] : []),
     ...(input.type === 'restaurants'
       ? [`Rows missing cuisine: ${input.rows.filter((r) => 'source_cuisines' in r && r.source_cuisines.length === 0).length}`]
       : []),
     `Rows missing address: ${input.rows.filter((r) => r.address === null).length}`,
     `Rows missing website: ${input.rows.filter((r) => r.website === null).length}`,
   ].join('\n');
+}
+
+/** Applies pipeline/place-overrides.json to this run's rows. A missing file means no overrides; bad entries are skipped with a warning. */
+async function applyOverrideFile(rows: PlaceRow[]): Promise<number> {
+  let raw: unknown;
+  try {
+    raw = JSON.parse(await fs.readFile(OVERRIDES_FILE, 'utf8'));
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') return 0;
+    throw new Error(`cannot read ${OVERRIDES_FILE}: ${err instanceof Error ? err.message : String(err)}`);
+  }
+  const { overrides, errors } = validateOverrides(raw);
+  for (const e of errors) console.warn(`place-overrides.json ${e} (skipped)`);
+  return applyOverrides(rows, overrides).length;
 }
 
 function requireEnv(name: string): string {
@@ -205,7 +223,9 @@ async function main(): Promise<void> {
 
   const merged = mergePlaces(osm, fsq, { runStart, today, cfg });
   const rows = merged.rows;
+  const overridesApplied = await applyOverrideFile(rows);
   const base = {
+    overridesApplied,
     type: args.type, osm: osm.length, fsq: fsq.length, matches: merged.matches.length,
     dropped: merged.dropped.length, staleFsqDropped: merged.staleFsqDropped,
     unparseableDates: merged.unparseableDates, subVenuesMerged: merged.subVenuesMerged.length,

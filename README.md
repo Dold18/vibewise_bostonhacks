@@ -55,6 +55,8 @@ Every pipeline script (`ingest`, `enrich:media`, `enrich:photos`, `enrich:deals`
 
 Ingest cache files are now per type (`osm-<type>-<date>.json`, `fsq-<type>-<release>.json`); an existing `fsq-2026-01-12.json` can be renamed to `fsq-restaurants-2026-01-12.json` to avoid a refetch.
 
+To correct a single place's address, website, phone or hours, add an entry to `pipeline/place-overrides.json` (`place_id`, `set`, `reason`, `source_url`, `checked_on`); ingest applies it on every run, and `null` clears a field.
+
 ## Demo integrity
 No fake venues, student demographics, discounts, live transit journeys, or private event details. Clearly distinguish live provider responses from labeled sample fixtures. Don't publish secrets or scrape protected business databases.
 
