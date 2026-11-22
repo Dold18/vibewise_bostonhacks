@@ -4,9 +4,9 @@
   "status": "imported_binary_integrity_verified_visual_qa_pending",
   "source": "Papyszoo/CC0-Public-Domain-Models (Modelibr CC0 GLB conversions)",
   "licenseCaveat": "Per-pack CC0 claims checked against metadata in source repository; verify author/pack terms for production. These are converted GLBs, not necessarily original publisher binary files.",
-  "modelCount": 188,
-  "totalBytes": 8878404,
-  "verification": "188/188 source/destination Git blob SHA and GLB v2 header verified at import; render QA pending.",
+  "modelCount": 192,
+  "totalBytes": 9122732,
+  "verification": "192/192 source/destination Git blob SHA and GLB v2 header verified at import; render QA pending.",
   "packCount": 15,
   "packs": [
     {
@@ -119,7 +119,7 @@
       "sourceWebsite": "https://quaternius.com/packs/sushirestaurantkit.html",
       "licenseClaim": "CC0",
       "sourcePackPath": "https://github.com/Papyszoo/CC0-Public-Domain-Models/tree/main/packs/quaternius-sushirestaurantkit",
-      "importedCount": 32
+      "importedCount": 34
     },
     {
       "id": "the-base-mesh",
@@ -127,7 +127,7 @@
       "sourceWebsite": "https://www.thebasemesh.com/",
       "licenseClaim": "CC0",
       "sourcePackPath": "https://github.com/Papyszoo/CC0-Public-Domain-Models/tree/main/packs/the-base-mesh",
-      "importedCount": 8
+      "importedCount": 10
     }
   ],
   "sceneUsageRules": [
@@ -4950,6 +4950,36 @@
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/quaternius-sushirestaurantkit/models/environment_cutting_table/environment_cutting_table.png"
     },
     {
+      "id": "cc0.quaternius-sushirestaurantkit.environment_oven",
+      "name": "environment_oven",
+      "pack": "quaternius-sushirestaurantkit",
+      "uri": "/scene-assets/third-party/modelibr/quaternius-sushirestaurantkit/environment_oven.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/quaternius-sushirestaurantkit/models/environment_oven/environment_oven.glb",
+      "creator": "Quaternius",
+      "originalPackWebsite": "https://quaternius.com/packs/sushirestaurantkit.html",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 84904,
+      "gitBlobSHA": "ed70378fa003bd227c4d5376567f908feb1ec1c6",
+      "format": "glb",
+      "tags": [
+        "restaurant",
+        "food_prep",
+        "dining"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      },
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/quaternius-sushirestaurantkit/models/environment_oven/environment_oven.png"
+    },
+    {
       "id": "cc0.quaternius-sushirestaurantkit.environment_pan",
       "name": "environment_pan",
       "pack": "quaternius-sushirestaurantkit",
@@ -5294,6 +5324,36 @@
       },
       "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/quaternius-sushirestaurantkit/models/food_ingredient_rice/food_ingredient_rice.png"
+    },
+    {
+      "id": "cc0.quaternius-sushirestaurantkit.food_ingredient_salmon",
+      "name": "food_ingredient_salmon",
+      "pack": "quaternius-sushirestaurantkit",
+      "uri": "/scene-assets/third-party/modelibr/quaternius-sushirestaurantkit/food_ingredient_salmon.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/quaternius-sushirestaurantkit/models/food_ingredient_salmon/food_ingredient_salmon.glb",
+      "creator": "Quaternius",
+      "originalPackWebsite": "https://quaternius.com/packs/sushirestaurantkit.html",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 42432,
+      "gitBlobSHA": "0c4674061732a5c5cf451216e8a8fff0ddf687f1",
+      "format": "glb",
+      "tags": [
+        "restaurant",
+        "food_prep",
+        "dining"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      },
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/quaternius-sushirestaurantkit/models/food_ingredient_salmon/food_ingredient_salmon.png"
     },
     {
       "id": "cc0.quaternius-sushirestaurantkit.food_maguro_nigiri",
@@ -5650,6 +5710,36 @@
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/the-base-mesh/models/acoustic_guitar/acoustic_guitar.png"
     },
     {
+      "id": "cc0.the-base-mesh.computer_headphones_01",
+      "name": "computer_headphones_01",
+      "pack": "the-base-mesh",
+      "uri": "/scene-assets/third-party/modelibr/the-base-mesh/computer_headphones_01.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/the-base-mesh/models/computer_headphones_01/computer_headphones_01.glb",
+      "creator": "Tim Steer",
+      "originalPackWebsite": "https://www.thebasemesh.com/",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 94068,
+      "gitBlobSHA": "7da623eb69ec64456fac71b493b0f5237d1204f3",
+      "format": "glb",
+      "tags": [
+        "music",
+        "equipment",
+        "listening_lounge"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      },
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/the-base-mesh/models/computer_headphones_01/computer_headphones_01.png"
+    },
+    {
       "id": "cc0.the-base-mesh.computer_speaker",
       "name": "computer_speaker",
       "pack": "the-base-mesh",
@@ -5768,6 +5858,36 @@
       },
       "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
       "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/the-base-mesh/models/guitar_wall_hanger_01/guitar_wall_hanger_01.png"
+    },
+    {
+      "id": "cc0.the-base-mesh.guitar_wall_hanger_02",
+      "name": "guitar_wall_hanger_02",
+      "pack": "the-base-mesh",
+      "uri": "/scene-assets/third-party/modelibr/the-base-mesh/guitar_wall_hanger_02.glb",
+      "sourceRepository": "https://github.com/Papyszoo/CC0-Public-Domain-Models",
+      "sourcePath": "packs/the-base-mesh/models/guitar_wall_hanger_02/guitar_wall_hanger_02.glb",
+      "creator": "Tim Steer",
+      "originalPackWebsite": "https://www.thebasemesh.com/",
+      "licenseClaim": "CC0-1.0",
+      "bytes": 22924,
+      "gitBlobSHA": "e790267dd299f01e77bb284de1e9bfb2bcec7007",
+      "format": "glb",
+      "tags": [
+        "music",
+        "equipment",
+        "listening_lounge"
+      ],
+      "placementRole": "context_or_mood_accent_candidate",
+      "qa": {
+        "bytesMatchedPublisherMirror": true,
+        "glbMagicAndVersionHeaderChecked": true,
+        "meshPreviewReviewed": false,
+        "dimensionsNormalized": false,
+        "renderedInMap": false,
+        "performanceProfiled": false
+      },
+      "sourceRevision": "77343cac874f06b73d16ad0063339df7c9ca254c",
+      "thumbnailSourceUrl": "https://raw.githubusercontent.com/Papyszoo/CC0-Public-Domain-Models/77343cac874f06b73d16ad0063339df7c9ca254c/packs/the-base-mesh/models/guitar_wall_hanger_02/guitar_wall_hanger_02.png"
     },
     {
       "id": "cc0.the-base-mesh.pan_flute",
