@@ -4,8 +4,9 @@ import {
 } from './config.ts';
 import { metersBetween } from './geo.ts';
 import { nameKey } from './normalize.ts';
+import type { PlaceTypeConfig } from './placeTypes.ts';
 import { fsqRow, osmRow } from './sources.ts';
-import type { DroppedDuplicate, FsqPlace, MatchPair, OsmPlace, RestaurantRow, Source } from './types.ts';
+import type { DroppedDuplicate, FsqPlace, MatchPair, OsmPlace, PlaceRow, Source } from './types.ts';
 
 type Located = { name: string; lat: number; lng: number };
 
@@ -156,8 +157,8 @@ export function freshness(dateRefreshed: string | null, today: string): 'fresh' 
 export function mergePlaces(
   osm: OsmPlace[],
   fsq: FsqPlace[],
-  opts: { runStart: string; today: string },
-): { rows: RestaurantRow[]; matches: MatchPair[]; dropped: DroppedDuplicate[]; staleFsqDropped: number; unparseableDates: number } {
+  opts: { runStart: string; today: string; cfg: PlaceTypeConfig },
+): { rows: PlaceRow[]; matches: MatchPair[]; dropped: DroppedDuplicate[]; staleFsqDropped: number; unparseableDates: number } {
   const o = dedupeWithin(osm, (p) => p.osmId, 'osm', osmFieldCount);
   const f = dedupeWithin(fsq, (p) => p.fsqId, 'foursquare', fsqFieldCount);
   const matches = matchSources(o.kept, f.kept);
@@ -165,16 +166,19 @@ export function mergePlaces(
   const matchedFsq = new Set(matches.map((m) => m.fsqId));
   const fsqById = new Map(f.kept.map((p) => [p.fsqId, p]));
 
-  const rows: RestaurantRow[] = [];
+  const rows: PlaceRow[] = [];
   for (const p of o.kept) {
-    const row = osmRow(p, opts.runStart);
+    const row = osmRow(p, opts.runStart, opts.cfg);
     const fsqId = fsqByMatchedOsm.get(p.osmId);
     if (fsqId !== undefined) {
-      const fr = fsqRow(fsqById.get(fsqId)!, opts.runStart);
+      const fr = fsqRow(fsqById.get(fsqId)!, opts.runStart, opts.cfg);
       row.address ??= fr.address;
       row.website ??= fr.website;
       row.phone ??= fr.phone;
-      row.source_cuisines = [...new Set([...row.source_cuisines, ...fr.source_cuisines])];
+      // Food rows union cuisines; other rows keep the OSM kind.
+      if ('source_cuisines' in row && 'source_cuisines' in fr) {
+        row.source_cuisines = [...new Set([...row.source_cuisines, ...fr.source_cuisines])];
+      }
       row.fsq_place_id = fsqId;
       row.attribution = ATTRIBUTION_MERGED;
     }
@@ -190,13 +194,13 @@ export function mergePlaces(
       if (fresh === 'unparseable') unparseableDates++;
       continue;
     }
-    rows.push(fsqRow(p, opts.runStart));
+    rows.push(fsqRow(p, opts.runStart, opts.cfg));
   }
   return { rows, matches, dropped: [...o.dropped, ...f.dropped], staleFsqDropped, unparseableDates };
 }
 
 /** Throws if two rows share a `source:source_id` or a non-null fsq_place_id (the upsert/rekey would corrupt data). */
-export function assertUniqueKeys(rows: RestaurantRow[]): void {
+export function assertUniqueKeys(rows: PlaceRow[]): void {
   const seenKeys = new Set<string>();
   const seenFsq = new Set<string>();
   const dupKeys: string[] = [];

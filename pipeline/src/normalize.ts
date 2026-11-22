@@ -106,10 +106,10 @@ export const OSM_TAG_KEYS: ReadonlySet<string> = new Set([
   'live_music', 'smoking', 'wikidata', 'wikimedia_commons', 'image', 'happy_hours',
 ]);
 
-export function pickOsmTags(tags: Record<string, string>): Record<string, string> {
+export function pickOsmTags(tags: Record<string, string>, keys: ReadonlySet<string>): Record<string, string> {
   const out: Record<string, string> = {};
   for (const [k, v] of Object.entries(tags)) {
-    if (OSM_TAG_KEYS.has(k) || k.startsWith('diet:')) out[k] = v;
+    if (keys.has(k) || k.startsWith('diet:')) out[k] = v;
   }
   return out;
 }

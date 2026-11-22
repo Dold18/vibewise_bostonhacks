@@ -39,6 +39,7 @@ function matchRules(tags: Tags, rules: OsmRule[]): { key: string; kind: string }
 }
 
 function filterOf(r: OsmRule): string {
+  if (r.values.length === 1) return `["${r.key}"="${r.values[0]}"]`;
   return `["${r.key}"~"^(${r.values.join('|')})$"]`;
 }
 

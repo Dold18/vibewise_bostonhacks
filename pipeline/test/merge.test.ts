@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { assertUniqueKeys, dedupeWithin, freshness, matchSources, mergePlaces } from '../src/merge.ts';
 import { ATTRIBUTION_FSQ, ATTRIBUTION_MERGED, ATTRIBUTION_OSM } from '../src/config.ts';
+import { PLACE_TYPE_CONFIG } from '../src/placeTypes.ts';
 import { fsqRow, osmRow } from '../src/sources.ts';
 import type { FsqPlace, OsmPlace } from '../src/types.ts';
 
@@ -10,9 +11,10 @@ const LNG = -71.06;
 const D30 = 0.00027; // ~30 m of latitude
 const runStart = '2026-11-21T12:00:00.000Z';
 const today = '2026-11-21';
+const cfg = PLACE_TYPE_CONFIG.restaurants;
 
 function osm(id: string, name: string, lat: number, lng: number, tags: Record<string, string> = {}): OsmPlace {
-  return { osmId: id, name, lat, lng, tags: { amenity: 'restaurant', ...tags } };
+  return { osmId: id, name, lat, lng, tags: { amenity: 'restaurant', ...tags }, bounds: null };
 }
 function fsq(id: string, name: string, lat: number, lng: number, extra: Partial<FsqPlace> = {}): FsqPlace {
   return {
@@ -92,7 +94,7 @@ test('mergePlaces: OSM wins, FSQ fills gaps, cuisines union, merged attribution'
     website: 'https://fsq.example', tel: '+1 617 555 0100', address: '1 Main St', locality: 'Boston', postcode: '02108',
     categoryLabels: ['Dining and Drinking > Restaurant > Pizzeria', 'Dining and Drinking > Restaurant > Pizza Restaurant'],
   });
-  const { rows, matches, dropped, staleFsqDropped } = mergePlaces([o], [f], { runStart, today });
+  const { rows, matches, dropped, staleFsqDropped } = mergePlaces([o], [f], { runStart, today, cfg });
   assert.equal(rows.length, 1);
   const r = rows[0]!;
   assert.equal(r.place_id, 'osm:node/1');
@@ -100,6 +102,7 @@ test('mergePlaces: OSM wins, FSQ fills gaps, cuisines union, merged attribution'
   assert.equal(r.website, 'https://osm.example');
   assert.equal(r.phone, '+1 617 555 0100');
   assert.equal(r.address, '1 Main St, Boston 02108');
+  assert.ok('source_cuisines' in r);
   assert.deepEqual(r.source_cuisines, ['pizza', 'pizzeria']);
   assert.equal(r.fsq_place_id, 'f1');
   assert.equal(r.attribution, ATTRIBUTION_MERGED);
@@ -116,7 +119,7 @@ test('mergePlaces: unmatched OSM kept; unmatched FSQ refreshed 1 year ago kept, 
       fsq('old', 'Old', 42.32, -71.12, { dateRefreshed: '2023-11-21' }),
       fsq('none', 'None', 42.33, -71.13, { dateRefreshed: null }),
     ],
-    { runStart, today },
+    { runStart, today, cfg },
   );
   assert.deepEqual(rows.map((r) => r.place_id).sort(), ['fsq:fresh', 'osm:node/1']);
   assert.equal(staleFsqDropped, 2);
@@ -127,7 +130,7 @@ test('mergePlaces: unmatched OSM kept; unmatched FSQ refreshed 1 year ago kept, 
 test('mergePlaces: a stale FSQ record still fills gaps on its OSM match', () => {
   const o = osm('node/1', 'Pizza Place', LAT, LNG);
   const f = fsq('f1', 'Pizza Place', LAT + D30, LNG, { dateRefreshed: null, tel: '555' });
-  const { rows, staleFsqDropped } = mergePlaces([o], [f], { runStart, today });
+  const { rows, staleFsqDropped } = mergePlaces([o], [f], { runStart, today, cfg });
   assert.equal(rows.length, 1);
   assert.equal(rows[0]!.phone, '555');
   assert.equal(rows[0]!.fsq_place_id, 'f1');
@@ -152,9 +155,9 @@ test('matchSources handles 3,000 x 3,000 points in under 2 s', () => {
 });
 
 test('assertUniqueKeys passes unique rows and names duplicates otherwise', () => {
-  const a = osmRow(osm('node/1', 'A', LAT, LNG), runStart);
-  const b = osmRow(osm('node/2', 'B', LAT, LNG), runStart);
-  const f = fsqRow(fsq('f1', 'C', LAT, LNG), runStart);
+  const a = osmRow(osm('node/1', 'A', LAT, LNG), runStart, cfg);
+  const b = osmRow(osm('node/2', 'B', LAT, LNG), runStart, cfg);
+  const f = fsqRow(fsq('f1', 'C', LAT, LNG), runStart, cfg);
   assertUniqueKeys([a, b, f]);
   assert.throws(() => assertUniqueKeys([a, { ...a }]), /duplicate source:source_id .*osm:node.1/);
   const linkedA = { ...a, fsq_place_id: 'f1' };
@@ -177,8 +180,27 @@ test('mergePlaces counts unparseable refresh dates separately from stale ones', 
     fsq('a', 'A', 42.31, -71.11, { dateRefreshed: 'garbage' }),
     fsq('b', 'B', 42.32, -71.12, { dateRefreshed: '2020-01-01' }),
     fsq('c', 'C', 42.33, -71.13, { dateRefreshed: '2026-06-01T10:00:00' }),
-  ], { runStart, today });
+  ], { runStart, today, cfg });
   assert.equal(r.unparseableDates, 1);
   assert.equal(r.staleFsqDropped, 2);
   assert.deepEqual(r.rows.map((x) => x.source_id), ['c']);
+});
+
+test('mergePlaces: a matched museum pair fills website from Foursquare and keeps the OSM kind', () => {
+  const museums = PLACE_TYPE_CONFIG.museums;
+  const o: OsmPlace = { osmId: 'way/5', name: 'Old State House', lat: LAT, lng: LNG, bounds: null,
+    tags: { name: 'Old State House', tourism: 'museum', fee: 'yes' } };
+  const f = fsq('m1', 'Old State House', LAT + D30, LNG, {
+    website: 'https://museum.example', tel: '617', categoryLabels: ['Arts and Entertainment > Museum > History Museum'],
+  });
+  const { rows } = mergePlaces([o], [f], { runStart, today, cfg: museums });
+  assert.equal(rows.length, 1);
+  const r = rows[0]!;
+  assert.equal(r.place_id, 'osm:way/5');
+  assert.equal(r.website, 'https://museum.example');
+  assert.equal(r.phone, '617');
+  assert.equal(r.fsq_place_id, 'm1');
+  assert.equal(r.attribution, ATTRIBUTION_MERGED);
+  assert.ok('kind' in r && r.kind === 'museum');
+  assert.ok(!('category' in r) && !('source_cuisines' in r));
 });

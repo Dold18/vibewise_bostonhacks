@@ -6,6 +6,7 @@ import { applyRekey, connect, fetchExisting, listNotSeen, upsertRows } from './d
 import { loadFsqRows } from './foursquare.ts';
 import { assertUniqueKeys, mergePlaces } from './merge.ts';
 import { loadOsmElements } from './osm.ts';
+import { PLACE_TYPE_CONFIG } from './placeTypes.ts';
 import { planRekey } from './rekey.ts';
 import { parseFsqRows, parseOverpass } from './sources.ts';
 import type { FsqPlace, OsmPlace, RekeyAction, RestaurantRow } from './types.ts';
@@ -94,15 +95,16 @@ async function main(): Promise<void> {
   const args = parseCliArgs(process.argv.slice(2));
   const runStart = new Date().toISOString();
   const today = runStart.slice(0, 10);
+  const cfg = PLACE_TYPE_CONFIG.restaurants; // Task 4 selects this with --type
 
   let osm: OsmPlace[] = [];
   let fsq: FsqPlace[] = [];
   let osmLoaded = false;
   let fsqLoaded = false;
   if (args.sources !== 'fsq') {
-    const { elements, fromCache } = await loadOsmElements({ refresh: args.refresh, cacheDir: CACHE_DIR, today });
+    const { elements, fromCache } = await loadOsmElements({ refresh: args.refresh, cacheDir: CACHE_DIR, today, cfg });
     if (fromCache) console.log('OSM: using cached Overpass response');
-    osm = parseOverpass(elements);
+    osm = parseOverpass(elements, cfg);
     osmLoaded = elements.length > 0;
   }
   if (args.sources !== 'osm') {
@@ -111,12 +113,14 @@ async function main(): Promise<void> {
       release: process.env.FSQ_RELEASE || DEFAULT_FSQ_RELEASE,
       refresh: args.refresh,
       cacheDir: CACHE_DIR,
+      cfg,
     });
-    fsq = parseFsqRows(rows);
+    fsq = parseFsqRows(rows, cfg);
     fsqLoaded = !skipped;
   }
 
-  const merged = mergePlaces(osm, fsq, { runStart, today });
+  const merged = mergePlaces(osm, fsq, { runStart, today, cfg });
+  const rows = merged.rows as RestaurantRow[]; // the restaurants config only builds food rows
   const base = {
     osm: osm.length, fsq: fsq.length, matches: merged.matches.length,
     dropped: merged.dropped.length, staleFsqDropped: merged.staleFsqDropped,
@@ -125,30 +129,30 @@ async function main(): Promise<void> {
 
   if (args.dryRun) {
     await fs.mkdir(CACHE_DIR, { recursive: true });
-    await fs.writeFile(path.join(CACHE_DIR, 'rows.json'), JSON.stringify(merged.rows, null, 2));
+    await fs.writeFile(path.join(CACHE_DIR, 'rows.json'), JSON.stringify(rows, null, 2));
     await fs.writeFile(
       path.join(CACHE_DIR, 'matches.json'),
       JSON.stringify({ matches: merged.matches, dropped: merged.dropped }, null, 2),
     );
-    console.log(summarize({ ...base, existingKeys: new Set(), rows: merged.rows, actions: [], notSeen: null }));
+    console.log(summarize({ ...base, existingKeys: new Set(), rows, actions: [], notSeen: null }));
     return;
   }
 
-  assertUniqueKeys(merged.rows);
+  assertUniqueKeys(rows);
   const warning = assertWritable({ osmLoaded, fsqLoaded, allowPartial: args.allowPartial === true });
   if (warning !== null) console.warn(warning);
 
   const client = connect(requireEnv('SUPABASE_URL'), requireEnv('SUPABASE_SECRET_KEY'));
   const existing = await fetchExisting(client);
-  const actions = planRekey(existing, merged.rows);
+  const actions = planRekey(existing, rows);
   await applyRekey(client, actions);
-  await upsertRows(client, merged.rows);
+  await upsertRows(client, rows);
   const notSeenIds = await listNotSeen(client, runStart);
   await fs.mkdir(CACHE_DIR, { recursive: true });
   await fs.writeFile(path.join(CACHE_DIR, 'not-seen.json'), JSON.stringify(notSeenIds, null, 2));
   const notSeen = notSeenIds.length;
   const existingKeys = new Set(existing.map((e) => `${e.source}:${e.source_id}`));
-  console.log(summarize({ ...base, existingKeys, rows: merged.rows, actions, notSeen }));
+  console.log(summarize({ ...base, existingKeys, rows, actions, notSeen }));
 }
 
 if (import.meta.filename === path.resolve(process.argv[1] ?? '')) {
