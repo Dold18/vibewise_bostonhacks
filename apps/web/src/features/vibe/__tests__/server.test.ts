@@ -37,7 +37,7 @@ it('never uses a configured teammate Gemini key on Vercel or in production',asyn
  vi.stubEnv('GEMINI_API_KEY','TEST-FIXTURE-UNSPENDABLE-KEY');
  vi.stubEnv('VIBE_ENABLE_LOCAL_GEMINI','true');
  for(const environment of ['vercel','production'] as const){
-  vi.stubEnv('VERCEL',environment==='vercel'?'1':'');
+  vi.stubEnv('VERCEL',environment==='vercel'?'1':undefined);
   vi.stubEnv('NODE_ENV',environment==='production'?'production':'test');
   const app=express();app.use(express.json({limit:'64kb'}));app.use('/api/vibe',createVibeRouter());
   const http=app.listen(0,'127.0.0.1');running.push(http);await new Promise<void>(resolve=>http.once('listening',resolve));
