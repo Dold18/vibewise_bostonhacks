@@ -10,7 +10,7 @@ Instead of starting with a restaurant name, VibeWise starts with a feeling. Desc
 
 **[Try the deployed app](https://vibewise-bostonhacks.vercel.app/)** · **[Explore the engineering](docs/PORTFOLIO_ENGINEERING.md)** · **[View the hackathon snapshot](docs/HACKATHON_SNAPSHOT.md)**
 
-> **Scope:** This repository contains a hackathon prototype, not a fully deployed consumer service. Live AI questions, place ranking, accounts, and routing depend on their respective service configuration and data availability. The app provides fallback or unavailable states instead of inventing live results.
+> **Public-demo safety:** The hosted site never uses a shared Gemini API key. Quiz questions run through the existing local fallback so visitors can explore the project without incurring charges for the team. Gemini-assisted questions remain part of the original hackathon implementation and can be enabled **only in private local development with your own key**. Venue ranking, accounts, and routing independently depend on their service configuration and data availability. [Security and setup details](docs/PUBLIC_DEMO_SECURITY.md).
 
 ## The experience
 
@@ -26,7 +26,7 @@ The strongest feature is the **coupling between an evolving preference model and
 
 | System | Hackathon implementation |
 | --- | --- |
-| **Adaptive vibe discovery** | Server-side Gemini question generation with a bounded local fallback; session history, corrections, positive/negative evidence, and a maximum of ten questions. |
+| **Adaptive vibe discovery** | The hackathon implementation used server-side Gemini generation with a bounded local fallback; the **public deployment uses fallback only**. Session history, corrections, evidence, and the ten-question cap remain implemented. |
 | **Semantic matching** | A shared MiniLM text-embedding pipeline, compatible catalog-vector checks, and reversible result/rank presentation. Real semantic venue ranking requires the configured catalog; labeled fixture tests are not live venue results. |
 | **Living 3D Boston map** | MapLibre-based navigation with a scene/compiler pipeline, Three.js appearance and atmosphere rendering, themed materials/decorations, and transitions that retain geographic context. |
 | **Real-place exploration** | Place categories, search, filters, selected-place cards, saved locations, and location-aware discovery. External place data and enrichment are identified separately from illustrative scene effects. |
@@ -39,7 +39,7 @@ The strongest feature is the **coupling between an evolving preference model and
 
 ```mermaid
 flowchart LR
-    A["Outing preferences<br/>+ free-text vibe"] --> B["Adaptive Gemini quiz<br/>(local fallback)"]
+    A["Outing preferences<br/>+ free-text vibe"] --> B["Local fallback quiz<br/>(Gemini for local development only)"]
     B --> C["Revisioned vibe profile<br/>+ evidence publisher"]
     C --> D["MiniLM embedding<br/>+ eligible place matching"]
     C --> E["Scene session<br/>+ deterministic composer"]
@@ -79,7 +79,7 @@ npm run dev:all
 
 The local Vite app uses port **5173** by default; the API server uses port **8787** by default. A browser-only start is available with `npm run dev`. Both local environment files are ignored by Git. The root `.env` holds optional server-only credentials; `apps/web/.env` holds browser-safe Vite configuration.
 
-For the full external-service experience, provide the appropriate server-only Gemini and MBTA keys and the Supabase publishable configuration described in [`.env.example`](.env.example), [`apps/web/.env.example`](apps/web/.env.example), and [the original deployment notes](https://github.com/Dold18/vibewise_bostonhacks/blob/archive/bostonhacks-2026-final-20261122/README.md#deploying-to-vercel). **Never put secret keys in `VITE_` variables or commit `.env` files.** The data-enrichment pipeline has additional configuration and schema requirements; it is not necessary merely to inspect the UI.
+For the full external-service experience, configure MBTA and Supabase according to [`.env.example`](.env.example) and [`apps/web/.env.example`](apps/web/.env.example). **Public deployments cannot use a server-owned Gemini key, even if one remains configured in the hosting environment.** To try Gemini-assisted quiz generation, run the app **locally** with a key from your own Google project and set `VIBE_ENABLE_LOCAL_GEMINI=true` in the root ignored `.env`. Do not set this flag on a hosted service. See [Public-demo security](docs/PUBLIC_DEMO_SECURITY.md) and [historical deployment notes](https://github.com/Dold18/vibewise_bostonhacks/blob/archive/bostonhacks-2026-final-20261122/README.md#deploying-to-vercel). **Never put secret keys in `VITE_` variables or commit `.env` files.** The data-enrichment pipeline has additional configuration and schema requirements; it is not necessary merely to inspect the UI.
 
 ### Build and tests
 
