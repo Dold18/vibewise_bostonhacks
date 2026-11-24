@@ -10,14 +10,14 @@ A location-discovery app can rank venues, or it can render a themed map. VibeWis
 
 | Subsystem | Responsibility | Representative code |
 | --- | --- | --- |
-| **Outing session / evidence** | Maintain a revisioned vibe profile; handle answers, correction/replay, summary, stale-request protection, and publication to consumers. | [\`features/vibe/\`](../apps/web/src/features/vibe/), [\`profile.ts\`](../apps/web/src/features/vibe/profile.ts), [\`publisher.ts\`](../apps/web/src/features/vibe/publisher.ts) |
-| **Generated questions** | Generate bounded questions on the server through Gemini, support a local fallback, and present text, image, and listening formats. | [\`server/vibeGemini.ts\`](../apps/web/server/vibeGemini.ts), [\`server/vibeApi.ts\`](../apps/web/server/vibeApi.ts), [\`features/vibe/ui/\`](../apps/web/src/features/vibe/ui/) |
-| **Semantic retrieval** | Embed profile/search text with MiniLM, check vector compatibility and eligible venues, and present ranked versus unranked results. | [\`server/miniLM.ts\`](../apps/web/server/miniLM.ts), [\`server/catalogIndex.ts\`](../apps/web/server/catalogIndex.ts), [\`features/vibe/matchesView.ts\`](../apps/web/src/features/vibe/matchesView.ts), [\`catalog.ts\`](../apps/web/src/catalog.ts) |
-| **3D visual response** | Convert profile/scene signals into bounded visual intent and coherent map materials, buildings, atmosphere, and optional decor. | [\`features/city/\`](../apps/web/src/features/city/), [\`features/scene/\`](../apps/web/src/features/scene/), [\`features/atmosphere/\`](../apps/web/src/features/atmosphere/), [\`features/buildingAppearance/\`](../apps/web/src/features/buildingAppearance/) |
-| **Map and discovery UI** | Keep place selection, map movement, cards, pins, ranking, search, and scene output coordinated. | [\`main.ts\`](../apps/web/src/main.ts), [\`discovery/\`](../apps/web/src/discovery/), [\`features/map/\`](../apps/web/src/features/map/) |
-| **Transit** | Interpret route requests with supported real MBTA/GTFS data, render legs and route overlays, and expose unsupported journeys explicitly. | [\`features/navigation/\`](../apps/web/src/features/navigation/), [\`server/\`](../apps/web/server/), [\`transitRoute.ts\`](../apps/web/src/transitRoute.ts) |
-| **Identity** | Apply responsive V3 Layered Sheets components and design tokens without replacing interaction contracts. | [\`design/vibewise/\`](../apps/web/src/design/vibewise/), [\`design README\`](../apps/web/src/design/README.md) |
-| **Catalog pipeline** | Build/normalize optional venue metadata and enrichment using explicit source and permission boundaries. | [\`pipeline/\`](../pipeline/), [\`Supabase migrations\`](../supabase/migrations/) |
+| **Outing session / evidence** | Maintain a revisioned vibe profile; handle answers, correction/replay, summary, stale-request protection, and publication to consumers. | [`features/vibe/`](../apps/web/src/features/vibe/), [`profile.ts`](../apps/web/src/features/vibe/profile.ts), [`publisher.ts`](../apps/web/src/features/vibe/publisher.ts) |
+| **Generated questions** | Generate bounded questions on the server through Gemini, support a local fallback, and present text, image, and listening formats. | [`server/vibeGemini.ts`](../apps/web/server/vibeGemini.ts), [`server/vibeApi.ts`](../apps/web/server/vibeApi.ts), [`features/vibe/ui/`](../apps/web/src/features/vibe/ui/) |
+| **Semantic retrieval** | Embed profile/search text with MiniLM, check vector compatibility and eligible venues, and present ranked versus unranked results. | [`server/miniLM.ts`](../apps/web/server/miniLM.ts), [`server/catalogIndex.ts`](../apps/web/server/catalogIndex.ts), [`features/vibe/matchesView.ts`](../apps/web/src/features/vibe/matchesView.ts), [`catalog.ts`](../apps/web/src/catalog.ts) |
+| **3D visual response** | Convert profile/scene signals into bounded visual intent and coherent map materials, buildings, atmosphere, and optional decor. | [`features/city/`](../apps/web/src/features/city/), [`features/scene/`](../apps/web/src/features/scene/), [`features/atmosphere/`](../apps/web/src/features/atmosphere/), [`features/buildingAppearance/`](../apps/web/src/features/buildingAppearance/) |
+| **Map and discovery UI** | Keep place selection, map movement, cards, pins, ranking, search, and scene output coordinated. | [`main.ts`](../apps/web/src/main.ts), [`discovery/`](../apps/web/src/discovery/), [`features/map/`](../apps/web/src/features/map/) |
+| **Transit** | Interpret route requests with supported real MBTA/GTFS data, render legs and route overlays, and expose unsupported journeys explicitly. | [`features/navigation/`](../apps/web/src/features/navigation/), [`server/`](../apps/web/server/), [`transitRoute.ts`](../apps/web/src/transitRoute.ts) |
+| **Identity** | Apply responsive V3 Layered Sheets components and design tokens without replacing interaction contracts. | [`design/vibewise/`](../apps/web/src/design/vibewise/), [`design README`](../apps/web/src/design/README.md) |
+| **Catalog pipeline** | Build/normalize optional venue metadata and enrichment using explicit source and permission boundaries. | [`pipeline/`](../pipeline/), [`Supabase migrations`](../supabase/migrations/) |
 
 ### Engineering design choices
 
@@ -44,23 +44,23 @@ A location-discovery app can rank venues, or it can render a themed map. VibeWis
 
 ## Reproduction and validation
 
-From \`apps/web\`:
+From `apps/web`:
 
-\`\`\`bash
+```bash
 npm install
 npm test
 npm run build
 npm run dev:all
-\`\`\`
+```
 
-Use Node.js 24. \`apps/web/.env.example\` and the root \`.env.example\` name environment variables, with secrets staying server-side. A fully populated external-service experience needs service credentials, valid Supabase schema/data, and any required hosted providers. The pipeline under \`pipeline/\` is a separate process and is not run by the Vite dev server.
+Use Node.js 24. `apps/web/.env.example` and the root `.env.example` name environment variables, with secrets staying server-side. A fully populated external-service experience needs service credentials, valid Supabase schema/data, and any required hosted providers. The pipeline under `pipeline/` is a separate process and is not run by the Vite dev server.
 
 Historical validation evidence is recorded in:
 - [V3 component-level integration report](v3-production-integration.md) — 48 component families, tests and browser observations, including documented failures/constraints.
 - [Quiz V2 acceptance matrix](VIBE_QUIZ_V2_ACCEPTANCE.md) — Gemini, media, accessibility, fallback and real-data limitations.
 - [City engine integration report](CITY_CHANGER_MAIN_INTEGRATION.md) — subsystem boundaries, renderer coordination, and QA artifacts.
 
-These records were written during integration; some first-person statuses such as “not pushed” describe their **historical moment**, not today's \`main\` branch. The final November 22 integration was subsequently merged. This portfolio documentation was authored afterward and does not claim a fresh execution of the tests.
+These records were written during integration; some first-person statuses such as “not pushed” describe their **historical moment**, not today's `main` branch. The final November 22 integration was subsequently merged. This portfolio documentation was authored afterward and does not claim a fresh execution of the tests.
 
 ## Team context and provenance
 
