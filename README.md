@@ -70,13 +70,14 @@ For module-level architecture, design constraints, test evidence, and known limi
 Use **Node.js 24** and npm. From the repository root:
 
 ```bash
+cp .env.example .env
+cp apps/web/.env.example apps/web/.env
 cd apps/web
 npm install
-cp .env.example .env
 npm run dev:all
 ```
 
-The local Vite app uses port **5173** by default; the API server uses port **8787** by default. A browser-only start is available with `npm run dev`. The local environment file is ignored by Git.
+The local Vite app uses port **5173** by default; the API server uses port **8787** by default. A browser-only start is available with `npm run dev`. Both local environment files are ignored by Git. The root `.env` holds optional server-only credentials; `apps/web/.env` holds browser-safe Vite configuration.
 
 For the full external-service experience, provide the appropriate server-only Gemini and MBTA keys and the Supabase publishable configuration described in [`.env.example`](.env.example), [`apps/web/.env.example`](apps/web/.env.example), and [the original deployment notes](https://github.com/Dold18/vibewise_bostonhacks/blob/archive/bostonhacks-2026-final-20261122/README.md#deploying-to-vercel). **Never put secret keys in `VITE_` variables or commit `.env` files.** The data-enrichment pipeline has additional configuration and schema requirements; it is not necessary merely to inspect the UI.
 
