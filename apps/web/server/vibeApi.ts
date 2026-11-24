@@ -7,7 +7,19 @@ import { createGeminiGenerator } from './vibeGemini.ts';
 import { createMiniLM } from './miniLM.ts';
 export function createVibeRouter(deps:{generator?:GenerationProvider;embedder?:EmbeddingProvider;catalog?:CatalogProvider}={}) {
  const reload=()=>{try{process.loadEnvFile(process.env.VIBENTA_ENV_FILE??new URL('../../../.env',import.meta.url));}catch{/* Config can be supplied later without exposing its contents. */}};
- const router=Router(), generator=deps.generator??{generate(context,signal){reload();return createGeminiGenerator({apiKey:process.env.GEMINI_API_KEY,model:process.env.VIBE_GEMINI_MODEL}).generate(context,signal);}},embedder=deps.embedder??createMiniLM();
+ // Public deployments must never spend a collaborator's Gemini quota. Vercel sets
+ // VERCEL, and other production hosts normally set NODE_ENV=production. Local
+ // development is opt-in, with a developer-owned key in an ignored .env file.
+ const isPublicRuntime=()=>process.env.VERCEL!==undefined||process.env.NODE_ENV==='production';
+ const localGeminiEnabled=()=>{
+  if(isPublicRuntime())return false; // Do not even load a Gemini key on public requests.
+  reload();
+  return process.env.VIBE_ENABLE_LOCAL_GEMINI==='true'&&!!process.env.GEMINI_API_KEY;
+ };
+ const router=Router(), generator=deps.generator??{generate(context,signal){
+  if(!localGeminiEnabled())return Promise.reject(new Error('Gemini disabled in public demo'));
+  return createGeminiGenerator({apiKey:process.env.GEMINI_API_KEY,model:process.env.VIBE_GEMINI_MODEL}).generate(context,signal);
+ }},embedder=deps.embedder??createMiniLM();
  // Catalog search reads the same Supabase project as the browser, with the same publishable key
  // (SUPABASE_URL / SUPABASE_PUBLISHABLE_KEY, falling back to the VITE_ names the browser uses).
  let envCatalog:{id:string;provider:CatalogProvider}|null=null;
@@ -27,7 +39,7 @@ export function createVibeRouter(deps:{generator?:GenerationProvider;embedder?:E
   if(++entry.count>80||inflight>=4){res.setHeader('Retry-After','5');res.status(429).json({error:'Vibe service is busy; please retry.'});return;}
   inflight++;res.once('close',()=>{inflight--;});next();
  });
- router.get('/status',(_req,res)=>{reload();res.json({geminiConfigured:!!process.env.GEMINI_API_KEY,modelKey:MODEL_KEY});});
+ router.get('/status',(_req,res)=>{const enabled=localGeminiEnabled();res.json({geminiConfigured:enabled,modelKey:MODEL_KEY,quizMode:enabled?'local-developer-gemini':'public-demo-fallback'});});
  router.post('/generate',async(req,res)=>{
   if(!validContext(req.body)){res.status(400).json({error:'Invalid bounded quiz context'});return;}
   const abort=new AbortController();res.on('close',()=>abort.abort());

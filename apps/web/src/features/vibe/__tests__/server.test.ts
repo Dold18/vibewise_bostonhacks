@@ -9,7 +9,7 @@ import {MODEL_KEY,type GenerationContext} from '../profile';
 import {apiEmbeddingProvider} from '../providers';
 const c:GenerationContext={sessionId:'TEST-FIXTURE',version:1,originalInput:{text:'A cinematic evening with playful little surprises',imageCount:0,imageProcessing:'not_sent'},vibe_so_far:'A cinematic evening',history:[],evidence:[],qualifiers:[]};
 const output=()=>({vibe_so_far:'A cinematic evening with playful little discoveries and room to linger.',qualifiers:[],continuation:'refine' as const,reason:'Another detail may help',nextQuestion:localMediaQuestion(c)});
-const running:Server[]=[];afterEach(async()=>{vi.unstubAllGlobals();for(const server of running.splice(0))await new Promise<void>(r=>server.close(()=>r()));});
+const running:Server[]=[];afterEach(async()=>{vi.unstubAllGlobals();vi.unstubAllEnvs();for(const server of running.splice(0))await new Promise<void>(r=>server.close(()=>r()));});
 async function server() {
  const generator={generate:vi.fn(async()=>output())};
  const embedder={embed:vi.fn(async()=>({modelKey:MODEL_KEY,vector:Array.from({length:384},(_,i)=>i===0?1:0)}))};
@@ -22,6 +22,34 @@ describe('bounded server API (all external providers mocked)',()=>{
  it('accepts a valid zero-venue context and never asks for catalog data',async()=>{const s=await server(),res=await s.post('generate',c);expect(res.status).toBe(200);expect((await res.json()).vibe_so_far).toContain('cinematic');expect(s.generator.generate).toHaveBeenCalledOnce();});
  it('rejects malformed history and excessive input before generation',async()=>{const s=await server();expect((await s.post('generate',{...c,history:Array(11).fill({})})).status).toBe(400);expect((await s.post('generate',{...c,originalInput:{...c.originalInput,text:'x'.repeat(3000)}})).status).toBe(400);expect(s.generator.generate).not.toHaveBeenCalled();});
  it('rejects mismatched embedding identity before invoking MiniLM',async()=>{const s=await server();expect((await s.post('embed',{text:'a scene',modelKey:'other-model'})).status).toBe(400);expect(s.embedder.embed).not.toHaveBeenCalled();const res=await s.post('embed',{text:'a scene',modelKey:MODEL_KEY});expect(res.status).toBe(200);expect((await res.json()).vector).toHaveLength(384);});
+});
+it('never uses a configured teammate Gemini key on Vercel or in production',async()=>{
+ const originalFetch=globalThis.fetch;
+ const externalCalls:string[]=[];
+ vi.stubGlobal('fetch',(input:RequestInfo|URL,init?:RequestInit)=>{
+  const url=String(input);
+  if(url.startsWith('https://generativelanguage.googleapis.com/')){
+   externalCalls.push(url);
+   throw Error('Unexpected paid Gemini request');
+  }
+  return originalFetch(input,init);
+ });
+ vi.stubEnv('GEMINI_API_KEY','TEST-FIXTURE-UNSPENDABLE-KEY');
+ vi.stubEnv('VIBE_ENABLE_LOCAL_GEMINI','true');
+ for(const environment of ['vercel','production'] as const){
+  vi.stubEnv('VERCEL',environment==='vercel'?'1':undefined);
+  vi.stubEnv('NODE_ENV',environment==='production'?'production':'test');
+  const app=express();app.use(express.json({limit:'64kb'}));app.use('/api/vibe',createVibeRouter());
+  const http=app.listen(0,'127.0.0.1');running.push(http);await new Promise<void>(resolve=>http.once('listening',resolve));
+  const address=http.address();if(!address||typeof address==='string')throw Error('Missing test port');
+  const base=`http://127.0.0.1:${address.port}/api/vibe`;
+  const status=await fetch(`${base}/status`);expect(status.status).toBe(200);
+  expect(await status.json()).toMatchObject({geminiConfigured:false,quizMode:'public-demo-fallback'});
+  const response=await fetch(`${base}/generate`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)});
+  expect(response.status).toBe(503);
+  expect((await response.json()).error).toContain('Local fallback');
+ }
+ expect(externalCalls).toEqual([]);
 });
 describe('Gemini request and failure behavior',()=>{
  it('uses a server header, structured schema, context-aware family guidance and no tools',async()=>{
