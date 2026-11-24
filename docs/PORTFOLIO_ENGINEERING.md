@@ -53,7 +53,7 @@ npm run build
 npm run dev:all
 ```
 
-Use Node.js 24. `apps/web/.env.example` and the root `.env.example` name environment variables, with secrets staying server-side. A fully populated external-service experience needs service credentials, valid Supabase schema/data, and any required hosted providers. The pipeline under `pipeline/` is a separate process and is not run by the Vite dev server.
+Use Node.js 24. Copy the root `.env.example` to `.env` for optional server-only settings and `apps/web/.env.example` to `apps/web/.env` for browser-safe Vite settings. Secrets stay server-side. A fully populated external-service experience needs service credentials, valid Supabase schema/data, and any required hosted providers. The pipeline under `pipeline/` is a separate process and is not run by the Vite dev server.
 
 Historical validation evidence is recorded in:
 - [V3 component-level integration report](v3-production-integration.md) — 48 component families, tests and browser observations, including documented failures/constraints.
