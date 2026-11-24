@@ -37,7 +37,7 @@ The strongest feature is the **coupling between an evolving preference model and
 
 ## System overview
 
-\`\`\`mermaid
+```mermaid
 flowchart LR
     A["Outing preferences<br/>+ free-text vibe"] --> B["Adaptive Gemini quiz<br/>(local fallback)"]
     B --> C["Revisioned vibe profile<br/>+ evidence publisher"]
@@ -49,7 +49,7 @@ flowchart LR
     G --> H
     H --> I["Destination selection"]
     I --> J["MBTA / walking<br/>route adapter"]
-\`\`\`
+```
 
 The scene is **artistic**, not a claim about real weather, architecture, lighting, or venue conditions. Real geographic positions, venue identifiers, and transit responses remain separate from the visual effects.
 
@@ -59,9 +59,9 @@ The scene is **artistic**, not a claim about real weather, architecture, lightin
 
 The codebase has three main areas:
 
-- [\`apps/web/\`](apps/web/) — browser experience, map/scene engines, vibe session, UI, and server API.
-- [\`pipeline/\`](pipeline/) — optional offline place-data ingestion and enrichment.
-- [\`supabase/migrations/\`](supabase/migrations/) — catalog, account, and supporting database schema.
+- [`apps/web/`](apps/web/) — browser experience, map/scene engines, vibe session, UI, and server API.
+- [`pipeline/`](pipeline/) — optional offline place-data ingestion and enrichment.
+- [`supabase/migrations/`](supabase/migrations/) — catalog, account, and supporting database schema.
 
 For module-level architecture, design constraints, test evidence, and known limitations, see the **[engineering walkthrough](docs/PORTFOLIO_ENGINEERING.md)**.
 
@@ -69,24 +69,24 @@ For module-level architecture, design constraints, test evidence, and known limi
 
 Use **Node.js 24** and npm. From the repository root:
 
-\`\`\`bash
+```bash
 cd apps/web
 npm install
 cp .env.example .env
 npm run dev:all
-\`\`\`
+```
 
-The local Vite app uses port **5173** by default; the API server uses port **8787** by default. A browser-only start is available with \`npm run dev\`. The local environment file is ignored by Git.
+The local Vite app uses port **5173** by default; the API server uses port **8787** by default. A browser-only start is available with `npm run dev`. The local environment file is ignored by Git.
 
-For the full external-service experience, provide the appropriate server-only Gemini and MBTA keys and the Supabase publishable configuration described in [\`.env.example\`](.env.example), [\`apps/web/.env.example\`](apps/web/.env.example), and [the original deployment notes](https://github.com/Dold18/vibewise_bostonhacks/blob/archive/bostonhacks-2026-final-20261122/README.md#deploying-to-vercel). **Never put secret keys in \`VITE_\` variables or commit \`.env\` files.** The data-enrichment pipeline has additional configuration and schema requirements; it is not necessary merely to inspect the UI.
+For the full external-service experience, provide the appropriate server-only Gemini and MBTA keys and the Supabase publishable configuration described in [`.env.example`](.env.example), [`apps/web/.env.example`](apps/web/.env.example), and [the original deployment notes](https://github.com/Dold18/vibewise_bostonhacks/blob/archive/bostonhacks-2026-final-20261122/README.md#deploying-to-vercel). **Never put secret keys in `VITE_` variables or commit `.env` files.** The data-enrichment pipeline has additional configuration and schema requirements; it is not necessary merely to inspect the UI.
 
 ### Build and tests
 
-\`\`\`bash
+```bash
 cd apps/web
 npm test
 npm run build
-\`\`\`
+```
 
 The [November 22 V3 integration QA report](docs/v3-production-integration.md) records a successful TypeScript check, production build, and **1,118 passing Vitest tests** in the integration environment. The report also documents incomplete or environment-dependent browser checks. Those are historical results; this README update does not claim a fresh test run or verification of the currently hosted deployment.
 
@@ -101,7 +101,7 @@ The archive includes team planning notes and design proposals. Those documents a
 - Real Boston locations and MBTA information are distinguished from generated or stylized map scenery. Service availability, schedule coverage, pricing, and recommendation completeness are not guaranteed.
 - Some functionality requires independently configured credentials, external APIs, and enriched catalog data. Missing data is surfaced rather than silently fabricated.
 - Third-party models, images, fonts, scene assets, and map data have separate licenses/attribution requirements preserved in their respective source directories. **No blanket license to reuse the full repository is asserted here.**
-- The original post-hackathon code state is preserved at [\`archive/bostonhacks-2026-final-20261122\`](https://github.com/Dold18/vibewise_bostonhacks/tree/archive/bostonhacks-2026-final-20261122). [Snapshot details](docs/HACKATHON_SNAPSHOT.md).
+- The original post-hackathon code state is preserved at [`archive/bostonhacks-2026-final-20261122`](https://github.com/Dold18/vibewise_bostonhacks/tree/archive/bostonhacks-2026-final-20261122). [Snapshot details](docs/HACKATHON_SNAPSHOT.md).
 
 ---
 
