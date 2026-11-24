@@ -39,7 +39,7 @@ export function createVibeRouter(deps:{generator?:GenerationProvider;embedder?:E
   if(++entry.count>80||inflight>=4){res.setHeader('Retry-After','5');res.status(429).json({error:'Vibe service is busy; please retry.'});return;}
   inflight++;res.once('close',()=>{inflight--;});next();
  });
- router.get('/status',(_req,res)=>res.json({geminiConfigured:localGeminiEnabled(),modelKey:MODEL_KEY,quizMode:localGeminiEnabled()?'local-developer-gemini':'public-demo-fallback'}));
+ router.get('/status',(_req,res)=>{const enabled=localGeminiEnabled();res.json({geminiConfigured:enabled,modelKey:MODEL_KEY,quizMode:enabled?'local-developer-gemini':'public-demo-fallback'});});
  router.post('/generate',async(req,res)=>{
   if(!validContext(req.body)){res.status(400).json({error:'Invalid bounded quiz context'});return;}
   const abort=new AbortController();res.on('close',()=>abort.abort());
